@@ -1,6 +1,11 @@
 # Examples folder (temporary for testing)
 examples/
 
+# Foundry - Contracts Build Artifacts & Dependencies
+contracts/cache/
+contracts/out/
+contracts/lib/
+
 # IDE / Editor
 .vscode/
 .idea/
@@ -16,6 +21,9 @@ Thumbs.db
 .env
 .env.local
 
+# Dependencies
+node_modules/
+
 # Logs
 *.log
 npm-debug.log*
@@ -25,3 +33,8 @@ yarn-error.log*
 # Temporary files
 *.tmp
 *.temp
+
+# Test coverage
+coverage/
+coverage.json
+lcov.info
