@@ -9,6 +9,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### [0.4.0] - 2024-11-23
+
+#### Added - MockUSDT Contract (Test & Testnet Token)
+
+**Core Features:**
+- ✅ **Binance-Peg BSC-USD Mock** - Accurate replica for testing
+  - 18 decimals (matching real BSC-USD on BNB Chain)
+  - Mimics mainnet address: `0x55d398326f99059fF775485246999027B3197955`
+  - Standard ERC20 implementation (not 6-decimal Tether USDT)
+- ✅ **Minting Functions:**
+  - `mint(address, uint256)` - Owner-only minting for test setup
+  - `batchMint(address[], uint256[])` - Batch minting for multiple accounts
+  - MAX_SUPPLY cap (1 billion USDT) for safety
+- ✅ **Public Faucet (Testnet):**
+  - `claimFaucet()` - Users can claim 100 USDT per hour
+  - 1-hour cooldown period per address
+  - `canClaimFaucet(address)` - Check eligibility and cooldown
+  - Perfect for BNB testnet deployment
+- ✅ **Utility Functions:**
+  - `toSmallestUnit(uint256)` - Convert USDT to wei (helper for tests)
+  - `toUSDT(uint256)` - Convert wei to USDT (helper for tests)
+  - Initial supply: 10,000 USDT minted to deployer
+
+**Technical Details:**
+- Inherits from OpenZeppelin ERC20 and Ownable
+- Custom events: `Minted`, `FaucetClaimed`
+- Custom errors: `ExceedsMaxSupply`, `FaucetCooldownActive`
+- Fully compatible with SignalFriendMarket USDT interface
+
+**Use Cases:**
+1. **Local Testing (Anvil)** - Mint unlimited USDT for unit tests
+2. **BNB Testnet** - Deploy and let users claim from faucet
+3. **Integration Tests** - Batch mint to multiple test accounts
+
+**Important Note:**
+- This is NOT Tether USDT (which has 6 decimals on Ethereum)
+- On BNB Chain, "USDT" refers to Binance-Peg BSC-USD with 18 decimals
+- For mainnet deployment, use real BSC-USD: `0x55d398326f99059fF775485246999027B3197955`
+
+---
+
 ### [0.3.0] - 2024-11-22
 
 #### Added - SignalFriendMarket Contract (Third and Final Smart Contract)

@@ -1,8 +1,8 @@
 # SignalFriend - Project Context
 
-> **Last Updated:** November 22, 2024  
-> **Current Phase:** Smart Contract Development - Contract 1 of 3 Complete  
-> **Project Status:** 🟡 In Progress
+> **Last Updated:** November 23, 2024  
+> **Current Phase:** Smart Contract Development - All 3 Contracts + MockUSDT Complete  
+> **Project Status:** 🟢 Contracts Complete - Ready for Testing
 
 ---
 
@@ -26,7 +26,7 @@
 | **Predictor Join Fee** | $20 USDT | One-time, non-refundable registration fee |
 | **Referral Payout** | $5 USDT | 25% of join fee paid to referring predictor |
 | **Trader Access Fee** | $0.5 USDT | Flat fee per signal purchase (anti-Sybil) |
-| **Minimum Signal Price** | $10 USDT | Prevents rating manipulation via self-purchase |
+| **Minimum Signal Price** | $5 USDT | Prevents rating manipulation via self-purchase |
 | **Platform Commission** | 5% | Of signal price (95% goes to predictor) |
 
 ### Financial Flow:
@@ -88,6 +88,27 @@ Trader purchases $10 signal:
   - Two-phase deployment support (address(0) initial values)
   - Comprehensive statistics tracking
   - 10+ view functions for frontend/backend
+
+#### 4. ✅ **MockUSDT** (COMPLETE)
+- **Type:** ERC-20 Token (Test & Testnet)
+- **Purpose:** Mock Binance-Peg BSC-USD for testing
+- **Status:** ✅ Built, ✅ Compiled, ⏳ Testing Pending
+- **Location:** `/contracts/src/MockUSDT.sol`
+- **Key Features:**
+  - 18 decimals (matching real BSC-USD on BNB Chain)
+  - Mimics mainnet BSC-USD: `0x55d398326f99059fF775485246999027B3197955`
+  - Owner-only minting: `mint()` and `batchMint()`
+  - Public faucet: `claimFaucet()` - 100 USDT per hour per address
+  - Max supply cap: 1 billion USDT
+  - Utility functions: `toSmallestUnit()`, `toUSDT()`
+  - Initial supply: 10,000 USDT to deployer
+- **Use Cases:**
+  - Local testing (Anvil) - Unlimited minting
+  - BNB testnet deployment - Public faucet for users
+  - Integration tests - Batch minting for test accounts
+- **Important Note:** 
+  - NOT Tether USDT (6 decimals on Ethereum)
+  - On BNB Chain, "USDT" = Binance-Peg BSC-USD (18 decimals)
 
 ### Backend Architecture
 
@@ -163,6 +184,14 @@ Trader purchases $10 signal:
   - [x] Statistics tracking
   - [x] Action cleanup for gas optimization
   - [x] Contract compilation verified
+- [x] **MockUSDT contract** implemented ✅
+  - [x] 18 decimals (matching real BSC-USD on BNB Chain)
+  - [x] Mimics mainnet BSC-USD: `0x55d398326f99059fF775485246999027B3197955`
+  - [x] Owner-only minting: `mint()` and `batchMint()`
+  - [x] Public faucet: `claimFaucet()` - 100 USDT per hour per address
+  - [x] Max supply cap: 1 billion USDT
+  - [x] Utility functions: `toSmallestUnit()`, `toUSDT()`
+  - [x] Initial supply: 10,000 USDT to deployer
 - [x] OpenZeppelin v5.5.0 integration
 - [x] Remappings configured
 - [x] **ALL 3 SMART CONTRACTS COMPLETE!** 🎉
@@ -176,7 +205,8 @@ Trader purchases $10 signal:
 ### 🟡 In Progress
 
 - [ ] **Write Comprehensive Tests** (Next immediate task)
-  - Unit tests for all 3 contracts
+  - Unit tests for MockUSDT contract
+  - Unit tests for all 3 main contracts
   - Integration tests (full flow: join → buy → rate)
   - Edge case testing
   - Gas optimization analysis
@@ -185,11 +215,11 @@ Trader purchases $10 signal:
 ### ⏳ Pending (Prioritized)
 
 #### Phase 1: Testing & Deployment
-1. [ ] Write comprehensive tests for all 3 contracts
-2. [ ] Integration testing (full user flows)
-3. [ ] Deploy mock USDT for testing
+1. [ ] Write comprehensive tests for MockUSDT
+2. [ ] Write comprehensive tests for all 3 main contracts
+3. [ ] Integration testing (full user flows)
 4. [ ] Deployment scripts for local Anvil
-5. [ ] BNB Testnet deployment
+5. [ ] BNB Testnet deployment (with MockUSDT)
 6. [ ] Gas optimization analysis
 7. [ ] Security audit preparation
 
@@ -341,11 +371,12 @@ constructor(
 5. Deploy to BNB Testnet
 
 **Achievement Unlocked:** 🎉
-- ✅ 3/3 Smart Contracts Built
-- ✅ ~1,800 lines of production-ready Solidity
+- ✅ 4/4 Smart Contracts Built (3 main + MockUSDT)
+- ✅ ~2,400 lines of production-ready Solidity
 - ✅ All contracts compiled successfully
 - ✅ MultiSig governance across all contracts
-- ✅ Ready for testing phase
+- ✅ MockUSDT ready for testing and testnet deployment
+- ✅ Ready for comprehensive testing phase
 
 ---
 
@@ -357,6 +388,7 @@ constructor(
 | Contract 1: PredictorAccessPass | Week 1 | ✅ Complete (~600 lines) |
 | Contract 2: SignalKeyNFT | Week 1 | ✅ Complete (~600 lines) |
 | Contract 3: SignalFriendMarket | Week 1 | ✅ Complete (~1,000 lines) |
+| Contract 4: MockUSDT | Week 1 | ✅ Complete (~200 lines) |
 | Testing & Deployment | Week 2 | 🟡 In Progress |
 | **Phase 2: Backend** | Weeks 4-6 | ⏳ Not Started |
 | Express API & MongoDB | Week 4-5 | ⏳ Pending |
@@ -374,9 +406,9 @@ constructor(
 - **Contract 1:** `/contracts/src/PredictorAccessPass.sol` ✅ (~600 lines)
 - **Contract 2:** `/contracts/src/SignalKeyNFT.sol` ✅ (~600 lines)
 - **Contract 3:** `/contracts/src/SignalFriendMarket.sol` ✅ (~1,000 lines)
+- **Contract 4:** `/contracts/src/MockUSDT.sol` ✅ (~200 lines)
 - **Tests:** `/contracts/test/` (to be created)
 - **Deploy Scripts:** `/contracts/script/` (to be created)
-- **Mock USDT:** (to be created for testing)
 - **Config:** `/contracts/foundry.toml` ✅
 - **Remappings:** `/contracts/remappings.txt` ✅
 
