@@ -9,13 +9,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * @author SignalFriend Team
  * @notice Mock USDT (BEP-20) contract for testing and BNB testnet deployment
  * @dev This contract mimics Binance-Peg BSC-USD (BSC-USD) with 18 decimals
- * 
+ *
  * Key Features:
  * - 18 decimals (matching Binance-Peg BSC-USD on BNB Chain)
  * - Mintable by owner for testing purposes
  * - Can be deployed to BNB testnet for integration testing
  * - Faucet function for easy testnet distribution
- * 
+ *
  * Important Note:
  * - On BNB Chain, "USDT" is actually Binance-Peg BSC-USD with 18 decimals
  * - Real BSC-USD BNB mainnet address: 0x55d398326f99059fF775485246999027B3197955
@@ -26,10 +26,10 @@ contract MockUSDT is ERC20, Ownable {
     uint8 private constant DECIMALS = 18;
 
     /// @notice Maximum supply cap (optional, for safety in testing)
-    uint256 public constant MAX_SUPPLY = 1_000_000_000 * 10**DECIMALS; // 1 billion USDT
+    uint256 public constant MAX_SUPPLY = 1_000_000_000 * 10 ** DECIMALS; // 1 billion USDT
 
     /// @notice Faucet amount per request (100 USDT for testing)
-    uint256 public constant FAUCET_AMOUNT = 100 * 10**DECIMALS;
+    uint256 public constant FAUCET_AMOUNT = 100 * 10 ** DECIMALS;
 
     /// @notice Cooldown period for faucet requests (1 hour)
     uint256 public constant FAUCET_COOLDOWN = 1 hours;
@@ -66,9 +66,12 @@ contract MockUSDT is ERC20, Ownable {
      * @dev Owner is set to msg.sender via Ownable constructor
      * @dev Name matches Binance-Peg BSC-USD for clarity
      */
-    constructor() ERC20("Binance-Peg BSC-USD (Mock)", "USDT") Ownable(msg.sender) {
+    constructor()
+        ERC20("Binance-Peg BSC-USD (Mock)", "USDT")
+        Ownable(msg.sender)
+    {
         // Mint initial supply to deployer for testing (10,000 USDT)
-        _mint(msg.sender, 10_000 * 10**DECIMALS);
+        _mint(msg.sender, 10_000 * 10 ** DECIMALS);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -107,9 +110,12 @@ contract MockUSDT is ERC20, Ownable {
      * @param recipients Array of addresses to receive tokens
      * @param amounts Array of amounts to mint (must match recipients length)
      */
-    function batchMint(address[] calldata recipients, uint256[] calldata amounts) external onlyOwner {
+    function batchMint(
+        address[] calldata recipients,
+        uint256[] calldata amounts
+    ) external onlyOwner {
         require(recipients.length == amounts.length, "Length mismatch");
-        
+
         for (uint256 i = 0; i < recipients.length; i++) {
             if (totalSupply() + amounts[i] > MAX_SUPPLY) {
                 revert ExceedsMaxSupply();
@@ -130,9 +136,10 @@ contract MockUSDT is ERC20, Ownable {
      */
     function claimFaucet() external {
         uint256 lastClaim = lastFaucetClaim[msg.sender];
-        
+
         if (block.timestamp < lastClaim + FAUCET_COOLDOWN) {
-            uint256 timeRemaining = (lastClaim + FAUCET_COOLDOWN) - block.timestamp;
+            uint256 timeRemaining = (lastClaim + FAUCET_COOLDOWN) -
+                block.timestamp;
             revert FaucetCooldownActive(timeRemaining);
         }
 
@@ -142,7 +149,7 @@ contract MockUSDT is ERC20, Ownable {
 
         lastFaucetClaim[msg.sender] = block.timestamp;
         _mint(msg.sender, FAUCET_AMOUNT);
-        
+
         emit FaucetClaimed(msg.sender, FAUCET_AMOUNT);
     }
 
@@ -152,10 +159,12 @@ contract MockUSDT is ERC20, Ownable {
      * @return canClaim True if the address can claim
      * @return timeRemaining Seconds remaining until next claim (0 if can claim now)
      */
-    function canClaimFaucet(address account) external view returns (bool canClaim, uint256 timeRemaining) {
+    function canClaimFaucet(
+        address account
+    ) external view returns (bool canClaim, uint256 timeRemaining) {
         uint256 lastClaim = lastFaucetClaim[account];
         uint256 nextClaimTime = lastClaim + FAUCET_COOLDOWN;
-        
+
         if (block.timestamp >= nextClaimTime) {
             return (true, 0);
         } else {
@@ -174,7 +183,7 @@ contract MockUSDT is ERC20, Ownable {
      * @return uint256 Amount in smallest unit (e.g., 100_000_000 for 100 USDT)
      */
     function toSmallestUnit(uint256 amount) external pure returns (uint256) {
-        return amount * 10**DECIMALS;
+        return amount * 10 ** DECIMALS;
     }
 
     /**
@@ -184,6 +193,6 @@ contract MockUSDT is ERC20, Ownable {
      * @return uint256 Amount in USDT (e.g., 100)
      */
     function toUSDT(uint256 amount) external pure returns (uint256) {
-        return amount / 10**DECIMALS;
+        return amount / 10 ** DECIMALS;
     }
 }

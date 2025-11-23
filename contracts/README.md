@@ -538,18 +538,21 @@ All critical operations require 3 signers to approve:
 
 ### ⚠️ **Known Limitations & Recommendations**
 
-#### 1. Gas Optimization (LOW Priority)
-**Issue:** `tokensOfOwner()` in SignalKeyNFT loops through all tokens  
-**Impact:** Could be expensive if 10,000+ NFTs minted  
-**Mitigation:** Use off-chain indexing (Viem/TheGraph) for "My Signals" page  
-**Status:** ✅ Acceptable for launch, monitor gas usage
+#### 1. Gas Optimization (RESOLVED ✅)
+**Architecture:** `tokensOfOwner()` in SignalKeyNFT loops through all tokens  
+**Solution:** Off-chain indexing with MongoDB + Express + Viem + Alchemy webhooks  
+**Impact:** No gas concerns - "My Signals" page queries backend, not blockchain  
+**Status:** ✅ **Resolved** - Off-chain indexing is the correct approach
 
-#### 2. Signal Price Storage (MEDIUM Priority)
-**Issue:** Signal prices not stored on-chain (passed as parameters)  
-**Risk:** Predictor could change price between frontend display and transaction  
-**Mitigation:** Frontend should refresh prices before transaction submission  
-**Recommendation:** Consider on-chain price registry (future enhancement)  
-**Status:** ⚠️ Acceptable with frontend validation
+#### 2. Signal Price Storage (SECURE ✅)
+**Architecture:** Signal prices passed as parameters (not stored on-chain)  
+**Security Flow:**
+1. Backend (Express/MongoDB) is the source of truth for prices
+2. Backend passes price directly to smart contract
+3. Frontend only displays prices (read-only, cannot modify)
+4. User sees exact payment amount in wallet before signing transaction
+5. Backend validation prevents price manipulation
+**Status:** ✅ **Secure** - Backend validation + wallet confirmation provides double protection
 
 #### 3. Testing Coverage (HIGH Priority)
 **Status:** ❌ **Test suite in development**  
