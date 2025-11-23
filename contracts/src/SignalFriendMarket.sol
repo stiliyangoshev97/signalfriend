@@ -1059,7 +1059,9 @@ contract SignalFriendMarket is ReentrancyGuard {
     }
 
     /**
-     * @notice Gets all pending action IDs
+     * @notice Gets all tracked action IDs (pending, executed, and expired)
+     * @dev Includes all actions until they are manually cleaned via cleanAction()
+     * @dev To filter for only pending actions, check each action's executed status and expiry time
      * @return Array of action IDs
      */
     function getAllActionIds() external view returns (bytes32[] memory) {
