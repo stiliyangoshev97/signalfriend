@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title PredictorAccessPass
@@ -13,8 +14,9 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
  *      - Built-in 3-of-3 MultiSig governance for administrative actions
  *      - Blacklist system for malicious predictors
  *      - Fixed metadata URI for all tokens
+ *      - ReentrancyGuard protection on minting functions
  */
-contract PredictorAccessPass is ERC721 {
+contract PredictorAccessPass is ERC721, ReentrancyGuard {
     // ============================================
     // STATE VARIABLES
     // ============================================
@@ -195,7 +197,7 @@ contract PredictorAccessPass is ERC721 {
      */
     function mintForLogicContract(
         address _to
-    ) external onlyLogicContract returns (uint256) {
+    ) external onlyLogicContract nonReentrant returns (uint256) {
         return _mintPredictorNFT(_to, false);
     }
 

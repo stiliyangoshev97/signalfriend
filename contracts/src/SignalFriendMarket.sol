@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 // ============================================
 // INTERFACES
@@ -38,8 +39,9 @@ interface ISignalKeyNFT {
  *      - 3-of-3 MultiSig governance for all parameters
  *      - Emergency pause mechanism
  *      - Comprehensive view functions for frontend/backend
+ *      - ReentrancyGuard protection on all state-changing functions
  */
-contract SignalFriendMarket {
+contract SignalFriendMarket is ReentrancyGuard {
     // ============================================
     // STATE VARIABLES
     // ============================================
@@ -295,7 +297,7 @@ contract SignalFriendMarket {
      */
     function joinAsPredictor(
         address _referrer
-    ) external contractsInitialized whenNotPaused {
+    ) external contractsInitialized whenNotPaused nonReentrant {
         // Check if caller already has Predictor NFT
         if (
             IPredictorAccessPass(predictorAccessPass).balanceOf(msg.sender) > 0
@@ -311,6 +313,9 @@ contract SignalFriendMarket {
         if (allowance < predictorJoinFee) {
             revert InsufficientAllowance();
         }
+
+        // CEI Pattern: Update state BEFORE external calls
+        totalPredictorsJoined++;
 
         bool referralPaid = false;
         uint256 treasuryAmount = predictorJoinFee;
@@ -333,6 +338,9 @@ contract SignalFriendMarket {
                     _referrer
                 )
             ) {
+                // CEI Pattern: Update state BEFORE external call
+                totalReferralsPaid++;
+
                 // Pay referrer
                 bool referrerPaymentSuccess = IERC20(usdtToken).transfer(
                     _referrer,
@@ -342,7 +350,6 @@ contract SignalFriendMarket {
 
                 treasuryAmount = predictorJoinFee - referralPayout;
                 referralPaid = true;
-                totalReferralsPaid++;
             }
             // If referrer is invalid, full amount goes to treasury (no change to treasuryAmount)
         }
@@ -358,8 +365,6 @@ contract SignalFriendMarket {
         uint256 nftTokenId = IPredictorAccessPass(predictorAccessPass)
             .mintForLogicContract(msg.sender);
 
-        totalPredictorsJoined++;
-
         emit PredictorJoined(msg.sender, _referrer, nftTokenId, referralPaid);
     }
 
@@ -367,17 +372,24 @@ contract SignalFriendMarket {
      * @notice Purchase a signal by paying predictor and platform fees
      * @dev Mints SignalKeyNFT receipt and handles fee splitting
      * @param _predictor Address of the predictor selling the signal
-     * @param _priceUSDT Price of the signal in USDT
+     * @param _priceUSDT Price of the signal in USDT (must match frontend quote)
+     * @param _maxCommissionRate Maximum acceptable commission rate (front-running protection)
      * @param _contentIdentifier Non-unique content ID linking to signal data
      */
     function buySignalNFT(
         address _predictor,
         uint256 _priceUSDT,
+        uint256 _maxCommissionRate,
         bytes32 _contentIdentifier
-    ) external contractsInitialized whenNotPaused {
+    ) external contractsInitialized whenNotPaused nonReentrant {
         // Validate signal price
         if (_priceUSDT < minSignalPrice) {
             revert SignalPriceTooLow();
+        }
+
+        // Front-running protection: Ensure commission rate hasn't increased beyond user's expectation
+        if (commissionRate > _maxCommissionRate) {
+            revert InvalidCommissionRate();
         }
 
         // Validate predictor
@@ -389,7 +401,10 @@ contract SignalFriendMarket {
             revert InvalidPredictor();
         }
 
-        // Calculate total cost
+        // Calculate commission (5% of signal price by default)
+        uint256 commission = (_priceUSDT * commissionRate) / BASIS_POINTS;
+        uint256 predictorPayout = _priceUSDT - commission;
+        uint256 platformEarnings = commission + buyerAccessFee;
         uint256 totalCost = _priceUSDT + buyerAccessFee;
 
         // Check USDT allowance
@@ -401,6 +416,9 @@ contract SignalFriendMarket {
             revert InsufficientAllowance();
         }
 
+        // CEI Pattern: Update state BEFORE external calls
+        totalSignalsPurchased++;
+
         // Transfer total USDT from buyer to this contract
         bool success = IERC20(usdtToken).transferFrom(
             msg.sender,
@@ -408,11 +426,6 @@ contract SignalFriendMarket {
             totalCost
         );
         if (!success) revert USDTTransferFailed();
-
-        // Calculate commission (5% of signal price)
-        uint256 commission = (_priceUSDT * commissionRate) / BASIS_POINTS;
-        uint256 predictorPayout = _priceUSDT - commission;
-        uint256 platformEarnings = commission + buyerAccessFee;
 
         // Transfer to predictor
         success = IERC20(usdtToken).transfer(_predictor, predictorPayout);
@@ -428,8 +441,6 @@ contract SignalFriendMarket {
         // Mint Signal Key NFT receipt
         uint256 receiptTokenId = ISignalKeyNFT(signalKeyNFT)
             .mintForLogicContract(msg.sender, _contentIdentifier);
-
-        totalSignalsPurchased++;
 
         emit SignalPurchased(
             msg.sender,

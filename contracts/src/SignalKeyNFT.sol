@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title SignalKeyNFT
@@ -12,8 +13,9 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
  *      - Minting only via SignalFriendMarket (Logic) contract
  *      - 3-of-3 MultiSig governance for administrative actions
  *      - Fixed metadata URI for all tokens
+ *      - ReentrancyGuard protection on minting functions
  */
-contract SignalKeyNFT is ERC721 {
+contract SignalKeyNFT is ERC721, ReentrancyGuard {
     // ============================================
     // STATE VARIABLES
     // ============================================
@@ -191,7 +193,7 @@ contract SignalKeyNFT is ERC721 {
     function mintForLogicContract(
         address _to,
         bytes32 _contentIdentifier
-    ) external onlyLogicContract returns (uint256) {
+    ) external onlyLogicContract nonReentrant returns (uint256) {
         if (_to == address(0)) {
             revert CannotMintToZeroAddress();
         }
