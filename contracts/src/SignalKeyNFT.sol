@@ -24,7 +24,7 @@ contract SignalKeyNFT is ERC721, ReentrancyGuard {
     uint256 private _nextTokenId;
 
     /// @notice Address of the SignalFriendMarket (Logic/Orchestrator) contract
-    address public signalFriendMarket;
+    address public immutable signalFriendMarket;
 
     /// @notice Array of 3 MultiSig signer addresses
     address[3] public multiSigSigners;
@@ -47,14 +47,12 @@ contract SignalKeyNFT is ERC721, ReentrancyGuard {
 
     /// @notice Enum defining types of administrative actions
     enum ActionType {
-        UPDATE_LOGIC_CONTRACT,
         UPDATE_METADATA_URI
     }
 
     /// @notice Structure representing a proposed action
     struct Action {
         ActionType actionType;
-        address newLogicContract; // Used for UPDATE_LOGIC_CONTRACT
         string newMetadataURI; // Used for UPDATE_METADATA_URI
         uint256 proposalTime; // Timestamp when action was proposed
         uint8 approvalCount; // Number of approvals received
@@ -81,7 +79,6 @@ contract SignalKeyNFT is ERC721, ReentrancyGuard {
     error CannotMintToZeroAddress();
     error InvalidSignerAddress();
     error DuplicateSignerAddress();
-    error InvalidLogicContractAddress();
     error ActionAlreadyExecuted();
     error ActionExpired();
     error AlreadyApproved();
@@ -96,7 +93,6 @@ contract SignalKeyNFT is ERC721, ReentrancyGuard {
         uint256 indexed tokenId,
         bytes32 indexed contentIdentifier
     );
-    event LogicContractUpdated(address oldLogic, address newLogic);
     event MetadataURIUpdated(string oldURI, string newURI);
     event ActionProposed(
         bytes32 indexed actionId,
@@ -155,7 +151,7 @@ contract SignalKeyNFT is ERC721, ReentrancyGuard {
         string memory _initialBaseTokenURI
     ) ERC721("SignalFriend Signal Key", "SFSK") {
         if (_signalFriendMarketAddress == address(0)) {
-            revert InvalidLogicContractAddress();
+            revert CannotMintToZeroAddress();
         }
 
         // Validate MultiSig signers
@@ -207,63 +203,6 @@ contract SignalKeyNFT is ERC721, ReentrancyGuard {
         emit SignalReceiptMinted(_to, newTokenId, _contentIdentifier);
 
         return newTokenId;
-    }
-
-    // ============================================
-    // LOGIC CONTRACT UPDATE FUNCTIONS
-    // ============================================
-
-    /**
-     * @notice Proposes to update the SignalFriendMarket contract address
-     * @dev Requires 3-of-3 MultiSig approval to execute
-     * @param _newLogicContract New Logic contract address
-     * @return actionId The unique identifier for this proposed action
-     */
-    function proposeUpdateLogicContract(
-        address _newLogicContract
-    ) external onlyMultiSigSigner returns (bytes32) {
-        if (_newLogicContract == address(0)) {
-            revert InvalidLogicContractAddress();
-        }
-
-        bytes32 actionId = keccak256(
-            abi.encodePacked(
-                ActionType.UPDATE_LOGIC_CONTRACT,
-                _newLogicContract,
-                block.timestamp
-            )
-        );
-
-        Action storage action = actions[actionId];
-        action.actionType = ActionType.UPDATE_LOGIC_CONTRACT;
-        action.newLogicContract = _newLogicContract;
-        action.proposalTime = block.timestamp;
-        action.approvalCount = 0;
-        action.executed = false;
-
-        _actionIds.push(actionId);
-
-        emit ActionProposed(
-            actionId,
-            ActionType.UPDATE_LOGIC_CONTRACT,
-            msg.sender,
-            block.timestamp + ACTION_EXPIRY_TIME
-        );
-
-        // Auto-approve for the proposer
-        _approveAction(actionId);
-
-        return actionId;
-    }
-
-    /**
-     * @notice Internal function to update the Logic contract address
-     * @param _newLogicContract New Logic contract address
-     */
-    function _updateLogicContract(address _newLogicContract) internal {
-        address oldLogic = signalFriendMarket;
-        signalFriendMarket = _newLogicContract;
-        emit LogicContractUpdated(oldLogic, _newLogicContract);
     }
 
     // ============================================
@@ -385,9 +324,7 @@ contract SignalKeyNFT is ERC721, ReentrancyGuard {
         Action storage action = actions[_actionId];
         action.executed = true;
 
-        if (action.actionType == ActionType.UPDATE_LOGIC_CONTRACT) {
-            _updateLogicContract(action.newLogicContract);
-        } else if (action.actionType == ActionType.UPDATE_METADATA_URI) {
+        if (action.actionType == ActionType.UPDATE_METADATA_URI) {
             _updateMetadataURI(action.newMetadataURI);
         }
 
@@ -628,7 +565,6 @@ contract SignalKeyNFT is ERC721, ReentrancyGuard {
      * @notice Gets action details
      * @param _actionId Action ID to query
      * @return actionType Type of action
-     * @return newLogicContract New logic contract address (only for UPDATE_LOGIC_CONTRACT)
      * @return proposalTime When action was proposed
      * @return approvalCount Number of approvals
      * @return executed Whether action was executed
@@ -640,7 +576,6 @@ contract SignalKeyNFT is ERC721, ReentrancyGuard {
         view
         returns (
             ActionType actionType,
-            address newLogicContract,
             uint256 proposalTime,
             uint8 approvalCount,
             bool executed
@@ -649,7 +584,6 @@ contract SignalKeyNFT is ERC721, ReentrancyGuard {
         Action storage action = actions[_actionId];
         return (
             action.actionType,
-            action.newLogicContract,
             action.proposalTime,
             action.approvalCount,
             action.executed

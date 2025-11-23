@@ -7,9 +7,29 @@
 
 ---
 
-## 🔒 Recent Security Improvements (v0.5.0 - November 23, 2024)
+## 🔒 Recent Security Improvements
 
-### Critical Fixes Applied:
+### v0.6.0 - Immutability Hardening (November 23, 2024)
+
+**Critical Security Enhancement:**
+1. ✅ **Made SignalKeyNFT Logic Contract Immutable**
+   - Changed `signalFriendMarket` from mutable to `immutable`
+   - Eliminates rug pull vector (cannot redirect minting to malicious contract)
+   - Consistent with PredictorAccessPass architecture
+   
+2. ✅ **Removed UPDATE_LOGIC_CONTRACT Functionality**
+   - Removed `proposeUpdateLogicContract()` and related code
+   - Simplified Action enum to only `UPDATE_METADATA_URI`
+   - Reduced attack surface while maintaining metadata flexibility
+
+**Architecture Decision:**
+- ✅ **Immutable Logic Contracts** = Security (cannot be changed after deployment)
+- ✅ **Mutable Metadata URI** = Flexibility (can fix IPFS issues, migrate to Arweave)
+- ✅ **Best of Both Worlds** = Trust + Practicality
+
+### v0.5.0 - Security Hardening Update (November 23, 2024)
+
+**Critical Fixes Applied:**
 1. ✅ **ReentrancyGuard Protection** - Added to all vulnerable functions
 2. ✅ **CEI Pattern Refactoring** - State changes moved before external calls
 3. ✅ **Front-Running Protection** - Added `maxCommissionRate` parameter to `buySignalNFT()`
@@ -76,9 +96,11 @@ Trader purchases $10 signal:
 - **Location:** `/contracts/src/SignalKeyNFT.sol`
 - **Key Features:**
   - Stores non-unique ContentIdentifier (bytes32) on-chain
+  - **Immutable logic contract address** (v0.6.0 - security hardening)
   - Minting only via SignalFriendMarket contract
   - Auto-incremented unique token IDs starting from 1
   - Transferable (can be resold/gifted)
+  - MultiSig governance for metadata URI updates only
   - Built-in 3-of-3 MultiSig governance
   - Updateable Logic contract address
   - Token ownership tracking (`tokensOfOwner`)
@@ -178,10 +200,10 @@ Trader purchases $10 signal:
   - [x] Transferable ERC-721 functionality
   - [x] Content identifier storage (bytes32)
   - [x] Built-in 3-of-3 MultiSig governance system
-  - [x] Updateable Logic contract address
+  - [x] **Immutable logic contract address** (v0.6.0 security hardening) ✅
   - [x] Token ownership tracking (`tokensOfOwner`)
   - [x] Exclusive minting via Logic contract
-  - [x] Metadata URI management
+  - [x] Metadata URI management (only mutable feature for IPFS flexibility)
   - [x] Comprehensive view functions (13 total)
   - [x] Action cleanup for gas optimization
   - [x] Contract compilation verified
