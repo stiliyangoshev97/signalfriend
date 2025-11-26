@@ -681,4 +681,23 @@ contract PredictorAccessPass is ERC721, ReentrancyGuard {
             action.executed
         );
     }
+
+    /**
+     * @notice Gets all MultiSig signer addresses
+     * @return Array of 3 signer addresses
+     */
+    function getSigners() external view returns (address[3] memory) {
+        return multiSigSigners;
+    }
+
+    /**
+     * @notice Gets the expiration timestamp for an action
+     * @param _actionId Action ID to query
+     * @return Expiration timestamp (proposalTime + ACTION_EXPIRY_TIME)
+     */
+    function getActionExpirationTime(
+        bytes32 _actionId
+    ) external view returns (uint256) {
+        return actions[_actionId].proposalTime + ACTION_EXPIRY_TIME;
+    }
 }

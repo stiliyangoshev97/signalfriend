@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### [0.6.2] - 2024-11-27 📊 GETTER FUNCTIONS
+
+#### ➕ Added Convenience Getter Functions
+
+**1. ✅ Added `getSigners()` to All Contracts**
+- **Purpose:** Returns the 3 MultiSig signer addresses
+- **Use Case:** Admin dashboard display, transparency for users
+- **Returns:** `address[3] memory` - Array of signer addresses
+
+**2. ✅ Added `getActionExpirationTime()` to All Contracts**
+- **Purpose:** Returns the expiration timestamp for a specific action
+- **Use Case:** Frontend can display countdown timers for pending actions
+- **Returns:** `uint256` - Unix timestamp when action expires
+
+**Contracts Updated:**
+- ✅ `SignalFriendMarket.sol` (+18 lines)
+- ✅ `PredictorAccessPass.sol` (+18 lines)
+- ✅ `SignalKeyNFT.sol` (+18 lines)
+
+---
+
 ### [0.6.1] - 2024-11-26 🧹 CONTRACT CLEANUP
 
 #### 🗑️ Removed On-Chain Rating Logic

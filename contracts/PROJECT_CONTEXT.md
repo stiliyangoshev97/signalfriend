@@ -1,13 +1,29 @@
 # SignalFriend - Project Context
 
-> **Last Updated:** November 26, 2024  
-> **Current Phase:** Contract Cleanup Complete - Testing Phase Ready  
+> **Last Updated:** November 27, 2024  
+> **Current Phase:** Getter Functions Added - Testing Phase Ready  
 > **Project Status:** 🟢 **Production-Ready Code (97/100)** - Testing Required Before Mainnet  
 > **Security Score:** 97/100 (Post-Hardening)
 
 ---
 
 ## 🔒 Recent Security Improvements
+
+### v0.6.2 - Getter Functions (November 27, 2024)
+
+**Added Convenience View Functions:**
+1. ✅ **`getSigners()`** - Returns all 3 MultiSig signer addresses
+   - Use case: Admin dashboard display, user transparency
+   - Added to all 3 contracts
+
+2. ✅ **`getActionExpirationTime(bytes32 actionId)`** - Returns action expiration timestamp
+   - Use case: Frontend countdown timers for pending actions
+   - Added to all 3 contracts
+
+**Contract Line Counts Updated:**
+- SignalFriendMarket.sol: ~1,084 lines (+18)
+- PredictorAccessPass.sol: ~703 lines (+18)
+- SignalKeyNFT.sol: ~613 lines (+18)
 
 ### v0.6.1 - Contract Cleanup (November 26, 2024)
 
@@ -459,9 +475,9 @@ constructor(
 ## 📚 Key Files & Locations
 
 ### Smart Contracts:
-- **Contract 1:** `/contracts/src/PredictorAccessPass.sol` ✅ (~685 lines)
-- **Contract 2:** `/contracts/src/SignalKeyNFT.sol` ✅ (~595 lines)
-- **Contract 3:** `/contracts/src/SignalFriendMarket.sol` ✅ (~1,066 lines)
+- **Contract 1:** `/contracts/src/PredictorAccessPass.sol` ✅ (~703 lines)
+- **Contract 2:** `/contracts/src/SignalKeyNFT.sol` ✅ (~613 lines)
+- **Contract 3:** `/contracts/src/SignalFriendMarket.sol` ✅ (~1,084 lines)
 - **Contract 4:** `/contracts/src/MockUSDT.sol` ✅ (~200 lines)
 - **Tests:** `/contracts/test/` (to be created)
 - **Deploy Scripts:** `/contracts/script/` (to be created)

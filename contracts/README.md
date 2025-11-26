@@ -36,9 +36,9 @@ SignalFriend is a Web3 signal marketplace built on BNB Chain that leverages:
 ✅ **Referral System** - $5 USDT automatic payouts to valid referrers  
 ✅ **Flexible Fee Structure** - Platform commission, buyer access fees, minimum pricing  
 ✅ **Blacklisting System** - On-chain malicious actor prevention  
-✅ **Rating Enforcement** - One rating per purchase with on-chain verification  
 ✅ **Token Enumeration** - Reliable ownership tracking without relying on events  
 ✅ **Emergency Pause** - MultiSig-controlled circuit breaker  
+✅ **Off-Chain Ratings** - Express backend handles ratings (v0.6.1)  
 
 ---
 
@@ -54,7 +54,6 @@ SignalFriend is a Web3 signal marketplace built on BNB Chain that leverages:
 │  • Predictor Registration ($20 USDT)                         │
 │  • Signal Purchase (min $5 USDT + $0.5 fee)                 │
 │  • Fee Splitting (5% platform, 95% predictor)                │
-│  • Rating System (markSignalRated)                           │
 │  • MultiSig Governance (11 action types)                     │
 └───────────────┬─────────────────────┬────────────────────────┘
                 │                     │
@@ -201,43 +200,36 @@ Step 5: Update statistics & emit event
 
 ---
 
-### Flow 3: Rating a Signal
+### Flow 3: Rating a Signal (Off-Chain)
+
+**Note:** As of v0.6.1, ratings are handled entirely off-chain by the Express backend.
 
 **User Action:** A buyer wants to rate a signal they purchased
 
-```solidity
-// User calls SignalFriendMarket
-signalFriendMarket.markSignalRated(tokenId);
+```
+Step 1: Frontend calls Express API
+├─ POST /api/ratings { tokenId, score (1-5), comment }
+└─ ✅ Request received
+
+Step 2: Backend verifies ownership
+├─ Call: signalKeyNFT.ownerOf(tokenId) via Viem
+├─ Check: Does caller own this token? ❌ Reject if no
+└─ ✅ Ownership verified
+
+Step 3: Backend stores rating in MongoDB
+├─ Check: Has this tokenId been rated? ❌ Reject if yes
+├─ Store: Rating document with tokenId, score, comment, timestamp
+└─ ✅ Rating saved
+
+Step 4: Backend updates predictor stats
+└─ Recalculate predictor's average rating
 ```
 
-**What Happens Internally:**
-
-```
-Step 1: SignalFriendMarket validates ownership
-├─ Call: signalKeyNFT.ownerOf(tokenId)
-├─ Check: Does caller own this token? ❌ Revert if no
-└─ ✅ Proceed
-
-Step 2: SignalFriendMarket checks rating status
-├─ Check: Has this token been rated before? ❌ Revert if yes
-└─ ✅ Proceed (one rating per purchase enforced)
-
-Step 3: Mark as rated on-chain
-├─ Set: _isRated[tokenId] = true
-└─ ✅ Marked as rated
-
-Step 4: Emit event for backend
-└─ emit SignalRated(tokenId, caller)
-    └─ Express backend catches this event
-        └─ Stores actual rating (1-5 stars) in MongoDB
-            └─ Calculates predictor's average rating
-```
-
-**Key Security:**
-- ✅ Only token owner can rate
-- ✅ One rating per token (cannot rate same purchase twice)
-- ✅ On-chain enforcement prevents manipulation
-- ✅ Backend handles actual rating scores (off-chain flexibility)
+**Why Off-Chain?**
+- ✅ No gas costs for rating
+- ✅ Faster (no blockchain confirmation needed)
+- ✅ More flexible (can add comments, edit, etc.)
+- ✅ Contract is simpler and cheaper to deploy
 
 ---
 
@@ -355,7 +347,6 @@ address signalAddress = market.signalKeyNFT();
 |----------|-------------|-------------|
 | `joinAsPredictor()` | Anyone | Have 20 USDT + no existing NFT |
 | `buySignalNFT()` | Anyone | Have USDT + valid predictor exists |
-| `markSignalRated()` | Token owners only | Own the signal receipt NFT |
 | `proposeUpdate*()` | MultiSig signers only | Be one of 3 signers |
 | `approveAction()` | MultiSig signers only | Be one of 3 signers |
 
@@ -449,16 +440,15 @@ address signalAddress = market.signalKeyNFT();
 - Predictor registration with referral system
 - Signal purchase with fee splitting
 - USDT payment processing
-- Rating system with ownership verification
 - Built-in 3-of-3 MultiSig governance (11 action types)
 - Emergency pause mechanism
 - Two-phase deployment support
 - Statistics tracking
+- Ratings handled off-chain by Express backend (v0.6.1)
 
 **Key Functions:**
 - `joinAsPredictor(address)` - Register as predictor with $20 USDT fee
-- `buySignalNFT(bytes32, uint256, address)` - Purchase signal NFT
-- `markSignalRated(uint256)` - Mark token as rated (one-time only)
+- `buySignalNFT(address, uint256, uint256, bytes32)` - Purchase signal NFT
 - `calculateBuyerCost(uint256)` - Calculate total cost for buyer
 - `calculatePredictorPayout(uint256)` - Calculate predictor earnings
 - `isValidPredictor(address)` - Check if predictor is active
@@ -506,6 +496,110 @@ All critical operations require 3 signers to approve:
 - Updating commission rate
 - Updating all fee amounts
 - Pausing/unpausing contract
+
+### 📖 How MultiSig Action Workflow Works (Deep Dive)
+
+Understanding how proposed actions flow from proposal to execution:
+
+#### The Action Struct
+
+Each proposed action is stored in an `Action` struct with two data fields:
+
+```solidity
+struct Action {
+    ActionType actionType;
+    address newAddress;    // Used for ADDRESS updates (treasury, USDT, etc.)
+    uint256 newValue;      // Used for UINT256 updates (fees, rates, etc.)
+    uint256 proposalTime;
+    uint8 approvalCount;
+    bool executed;
+    mapping(address => bool) hasApproved;
+}
+```
+
+**Why two fields?** Different action types need different data types:
+
+| Action Type | Uses `newAddress` | Uses `newValue` |
+|-------------|-------------------|-----------------|
+| `UPDATE_USDT` | ✅ new USDT address | ❌ (placeholder: 0) |
+| `UPDATE_TREASURY` | ✅ new treasury address | ❌ (placeholder: 0) |
+| `UPDATE_PREDICTOR_JOIN_FEE` | ❌ (placeholder: address(0)) | ✅ new fee amount |
+| `UPDATE_COMMISSION_RATE` | ❌ (placeholder: address(0)) | ✅ new rate |
+| `PAUSE_CONTRACT` | ❌ (placeholder: address(0)) | ❌ (placeholder: 0) |
+
+#### Complete Data Flow Example
+
+**Scenario:** Update USDT token address to `0xNewUSDT`
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  Time T1: Signer1 calls proposeUpdateUSDT(0xNewUSDT)                │
+│           │                                                          │
+│           ▼                                                          │
+│     proposeUpdateUSDT(address _newUSDT)                             │
+│           │                                                          │
+│           │ Passes _newUSDT to _createAction()                      │
+│           ▼                                                          │
+│     _createAction(actionId, UPDATE_USDT, 0xNewUSDT, 0)              │
+│           │                                                          │
+│           │ Stores in blockchain storage:                           │
+│           │   actions[actionId].newAddress = 0xNewUSDT              │
+│           │                                                          │
+│           └─> Auto-approves (1/3)                                   │
+├─────────────────────────────────────────────────────────────────────┤
+│  Time T2: Signer2 calls approveAction(actionId)                     │
+│           └─> Approval count = 2/3                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│  Time T3: Signer3 calls approveAction(actionId)                     │
+│           └─> Approval count = 3/3                                  │
+│           └─> _executeAction() auto-triggers                        │
+│                   │                                                  │
+│                   │ Reads from storage:                             │
+│                   │   action.newAddress (0xNewUSDT)                 │
+│                   ▼                                                  │
+│               usdtToken = action.newAddress  ✅                      │
+│               emit USDTAddressUpdated(old, new)                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### Key Insight: Blockchain Storage as "Memory"
+
+The `Action` struct acts as **temporary storage** between proposal and execution:
+
+```solidity
+mapping(bytes32 => Action) public actions;  // Persists on blockchain!
+```
+
+**Flow:**
+1. **Proposal:** Value passed as function parameter → stored in `actions[actionId]`
+2. **Wait:** Value **persists** on blockchain until execution (or cleanup)
+3. **Execution:** `_executeAction()` reads value back from storage
+
+This is the **MultiSig pattern** - store the proposed change, wait for approvals, then execute using the stored data.
+
+#### Placeholder Values Explained
+
+When you see `address(0)` or `0` in `_createAction()`:
+
+```solidity
+// For fee updates (uses newValue, not newAddress)
+_createAction(
+    actionId,
+    ActionType.UPDATE_PREDICTOR_JOIN_FEE,
+    address(0),    // ← Placeholder (not used for fee updates)
+    _newFee        // ← This is the actual value we care about
+);
+
+// For address updates (uses newAddress, not newValue)
+_createAction(
+    actionId, 
+    ActionType.UPDATE_TREASURY, 
+    _newTreasury,  // ← The actual address we care about
+    0              // ← Placeholder (not used for address updates)
+);
+```
+
+These placeholders are just "not applicable" values that will be ignored during execution.
 
 ### Additional Security
 
