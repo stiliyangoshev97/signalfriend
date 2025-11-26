@@ -1,0 +1,25 @@
+1. Write critical tests for the contracts
+    (1. ✅ Write critical unit tests (2-4 hours)
+    - Core functionality (join, buy, rate)
+    - Access control (minting, blacklisting)
+    - Fee calculations
+    
+    2. ✅ Deploy to BNB testnet with script (1 day)
+    - Two-phase deployment
+    - MultiSig setup
+    - Manual testing (2-3 days)
+    
+    3. ✅ Write comprehensive test suite (1-2 weeks)
+    - Unit tests (all contracts)
+    - Integration tests (full flows)
+    - Security tests (exploits, edge cases)
+    - Fuzz tests (payment logic)
+    - Gas profiling
+
+    4. ⏳ Professional audit (optional, 2-4 weeks)
+    
+    5. ⏳ Deploy to mainnet
+    )
+2. Test on testnet how everything works (deploy with script)
+3. Write all unit testing, integration testing and security testing for the contracts
+4. Check if we need any other functions for the frontend and we are good to go

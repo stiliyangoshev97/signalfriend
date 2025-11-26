@@ -306,7 +306,7 @@ contract SignalFriendMarket is ReentrancyGuard {
             revert InsufficientAllowance();
         }
 
-        // CEI Pattern: Update state BEFORE external calls
+        // CEI Pattern: Update state BEFORE external calls (CEI stands for Checks-Effects-Interactions)
         totalPredictorsJoined++;
 
         bool referralPaid = false;
