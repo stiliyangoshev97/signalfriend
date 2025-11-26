@@ -1,13 +1,33 @@
 # SignalFriend - Project Context
 
-> **Last Updated:** November 23, 2024  
-> **Current Phase:** Security Hardening Complete - Testing Phase Ready  
+> **Last Updated:** November 26, 2024  
+> **Current Phase:** Contract Cleanup Complete - Testing Phase Ready  
 > **Project Status:** 🟢 **Production-Ready Code (97/100)** - Testing Required Before Mainnet  
 > **Security Score:** 97/100 (Post-Hardening)
 
 ---
 
 ## 🔒 Recent Security Improvements
+
+### v0.6.1 - Contract Cleanup (November 26, 2024)
+
+**On-Chain Rating Logic Removed:**
+1. ✅ **Removed Rating Functionality from SignalFriendMarket.sol**
+   - Ratings will be handled by Express backend + MongoDB (off-chain)
+   - Reduces gas costs (no on-chain storage for ratings)
+   - More flexible rating system (comments, timestamps, etc.)
+   - Contract reduced from ~1,104 to ~1,066 lines
+
+2. ✅ **Removed Components:**
+   - `_isRated` mapping, `markSignalRated()`, `isTokenRated()`
+   - `NotTokenOwner`, `SignalAlreadyRated` errors
+   - `SignalRated` event
+   - `ownerOf()` from ISignalKeyNFT interface
+
+**Architecture Decision:**
+- ✅ **On-chain:** Ownership verification (NFT contracts handle this)
+- ✅ **Off-chain:** Ratings, reviews, comments (Express + MongoDB)
+- ✅ **Result:** Cleaner contract, lower gas costs, more flexibility
 
 ### v0.6.0 - Immutability Hardening (November 23, 2024)
 
@@ -102,7 +122,7 @@ Trader purchases $10 signal:
   - Transferable (can be resold/gifted)
   - MultiSig governance for metadata URI updates only
   - Built-in 3-of-3 MultiSig governance
-  - Updateable Logic contract address
+  - **Immutable logic contract address** (v0.6.0 - security hardening)
   - Token ownership tracking (`tokensOfOwner`)
   - Fixed metadata URI for all tokens
 
@@ -119,10 +139,10 @@ Trader purchases $10 signal:
   - Minting orchestration for both NFT contracts
   - Built-in 3-of-3 MultiSig governance (11 action types)
   - Emergency pause mechanism
-  - User-callable rating system with ownership verification
   - Two-phase deployment support (address(0) initial values)
   - Comprehensive statistics tracking
   - 10+ view functions for frontend/backend
+  - **Note:** Ratings handled off-chain by Express backend (v0.6.1)
 
 #### 4. ✅ **MockUSDT** (COMPLETE)
 - **Type:** ERC-20 Token (Test & Testnet)
@@ -177,7 +197,8 @@ Trader purchases $10 signal:
 
 4. **Review Model**
    - Primary Key: `tokenId` (one rating per purchase)
-   - Fields: `predictorWallet`, `score` (1-5), `reviewText`, `isRatedOnChain`
+   - Fields: `predictorWallet`, `score` (1-5), `reviewText`
+   - **Note:** Ratings handled entirely off-chain (v0.6.1 - removed on-chain rating)
 
 ---
 
@@ -213,12 +234,12 @@ Trader purchases $10 signal:
   - [x] Signal purchase with fee splitting
   - [x] Built-in 3-of-3 MultiSig governance (11 action types)
   - [x] Emergency pause mechanism
-  - [x] User-callable rating system
   - [x] Two-phase deployment support
   - [x] Comprehensive view functions (10+ total)
   - [x] Statistics tracking
   - [x] Action cleanup for gas optimization
   - [x] Contract compilation verified
+  - [x] Ratings moved off-chain (v0.6.1 cleanup)
 - [x] **MockUSDT contract** implemented ✅
   - [x] 18 decimals (matching real BSC-USD on BNB Chain)
   - [x] Mimics mainnet BSC-USD: `0x55d398326f99059fF775485246999027B3197955`
@@ -400,17 +421,17 @@ constructor(
    - Full flow: deploy all 3 contracts
    - Test predictor registration with referral
    - Test signal purchase with fee splitting
-   - Test rating system
 3. Create deployment scripts
 4. Deploy to local Anvil for manual testing
-5. Deploy to BNB Testnet
+5. Deploy to BNB Testnet (0.05 gwei - very cheap)
 
 **Achievement Unlocked:** 🎉
 - ✅ 4/4 Smart Contracts Built (3 main + MockUSDT)
-- ✅ ~2,400 lines of production-ready Solidity
+- ✅ ~2,350 lines of production-ready Solidity
 - ✅ All contracts compiled successfully
 - ✅ MultiSig governance across all contracts
 - ✅ MockUSDT ready for testing and testnet deployment
+- ✅ Ratings moved off-chain (Express backend)
 - ✅ Ready for comprehensive testing phase
 
 ---
@@ -438,9 +459,9 @@ constructor(
 ## 📚 Key Files & Locations
 
 ### Smart Contracts:
-- **Contract 1:** `/contracts/src/PredictorAccessPass.sol` ✅ (~600 lines)
-- **Contract 2:** `/contracts/src/SignalKeyNFT.sol` ✅ (~600 lines)
-- **Contract 3:** `/contracts/src/SignalFriendMarket.sol` ✅ (~1,000 lines)
+- **Contract 1:** `/contracts/src/PredictorAccessPass.sol` ✅ (~685 lines)
+- **Contract 2:** `/contracts/src/SignalKeyNFT.sol` ✅ (~595 lines)
+- **Contract 3:** `/contracts/src/SignalFriendMarket.sol` ✅ (~1,066 lines)
 - **Contract 4:** `/contracts/src/MockUSDT.sol` ✅ (~200 lines)
 - **Tests:** `/contracts/test/` (to be created)
 - **Deploy Scripts:** `/contracts/script/` (to be created)

@@ -9,6 +9,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### [0.6.1] - 2024-11-26 🧹 CONTRACT CLEANUP
+
+#### 🗑️ Removed On-Chain Rating Logic
+
+**1. ✅ Removed Rating Functionality from SignalFriendMarket.sol**
+- **Rationale:** Ratings will be handled by Express backend + MongoDB (off-chain)
+- **Benefits:** 
+  - Reduces gas costs (no on-chain storage for ratings)
+  - Faster rating submissions (no blockchain transactions needed)
+  - More flexible rating system (can add comments, timestamps, etc.)
+  - Contract simplification (~38 lines removed)
+
+**2. ✅ Removed Components:**
+| Component | Type | Description |
+|-----------|------|-------------|
+| `_isRated` | Mapping | `mapping(uint256 => bool)` tracking rated tokens |
+| `markSignalRated()` | Function | ~15 lines for marking tokens as rated |
+| `isTokenRated()` | View Function | ~5 lines for checking if token was rated |
+| `NotTokenOwner` | Error | Custom error for non-owner rating attempts |
+| `SignalAlreadyRated` | Error | Custom error for duplicate ratings |
+| `SignalRated` | Event | Event emitted when signal was rated |
+| `ownerOf()` | Interface | Removed from ISignalKeyNFT (no longer needed) |
+
+**3. ✅ Backend Will Handle:**
+```javascript
+// Express backend will:
+// 1. Verify ownership via contract.ownerOf(tokenId)
+// 2. Store ratings in MongoDB
+// 3. Enforce one rating per tokenId at database level
+```
+
+#### 📊 Contract Size Reduction
+- **Before:** ~1,104 lines
+- **After:** ~1,066 lines
+- **Saved:** ~38 lines of code
+
+#### ⚠️ No Impact on Other Contracts
+- `PredictorAccessPass.sol` - ❌ Not affected
+- `SignalKeyNFT.sol` - ❌ Not affected
+
+---
+
 ### [0.6.0] - 2024-11-23 🔒 IMMUTABILITY HARDENING
 
 #### 🔐 Security Improvements

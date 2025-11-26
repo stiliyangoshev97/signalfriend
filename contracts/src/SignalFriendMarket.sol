@@ -24,8 +24,6 @@ interface ISignalKeyNFT {
         address _to,
         bytes32 _contentIdentifier
     ) external returns (uint256);
-
-    function ownerOf(uint256 _tokenId) external view returns (address);
 }
 
 /**
@@ -78,9 +76,6 @@ contract SignalFriendMarket is ReentrancyGuard {
 
     /// @notice Contract pause status
     bool public paused;
-
-    /// @notice Mapping to track if a signal receipt has been rated
-    mapping(uint256 => bool) private _isRated;
 
     /// @notice Statistics tracking
     uint256 public totalPredictorsJoined;
@@ -152,8 +147,6 @@ contract SignalFriendMarket is ReentrancyGuard {
     error SignalPriceTooLow();
     error InsufficientAllowance();
     error USDTTransferFailed();
-    error NotTokenOwner();
-    error SignalAlreadyRated();
     error InvalidPredictor();
 
     // ============================================
@@ -174,7 +167,6 @@ contract SignalFriendMarket is ReentrancyGuard {
         uint256 signalPrice,
         uint256 totalCost
     );
-    event SignalRated(uint256 indexed tokenId, address indexed rater);
     event USDTAddressUpdated(address oldAddress, address newAddress);
     event PredictorAccessPassUpdated(address oldAddress, address newAddress);
     event SignalKeyNFTUpdated(address oldAddress, address newAddress);
@@ -450,29 +442,6 @@ contract SignalFriendMarket is ReentrancyGuard {
             _priceUSDT,
             totalCost
         );
-    }
-
-    /**
-     * @notice Mark a signal receipt as rated (one rating per purchase)
-     * @dev Verifies caller owns the token before marking as rated
-     * @param _tokenId Token ID of the SignalKeyNFT receipt
-     */
-    function markSignalRated(uint256 _tokenId) external contractsInitialized {
-        // Verify caller owns the token
-        address tokenOwner = ISignalKeyNFT(signalKeyNFT).ownerOf(_tokenId);
-        if (tokenOwner != msg.sender) {
-            revert NotTokenOwner();
-        }
-
-        // Check if already rated
-        if (_isRated[_tokenId]) {
-            revert SignalAlreadyRated();
-        }
-
-        // Mark as rated
-        _isRated[_tokenId] = true;
-
-        emit SignalRated(_tokenId, msg.sender);
     }
 
     // ============================================
@@ -1003,15 +972,6 @@ contract SignalFriendMarket is ReentrancyGuard {
             usdtToken != address(0) &&
             predictorAccessPass != address(0) &&
             signalKeyNFT != address(0);
-    }
-
-    /**
-     * @notice Checks if a token has been rated
-     * @param _tokenId Token ID to check
-     * @return True if rated
-     */
-    function isTokenRated(uint256 _tokenId) external view returns (bool) {
-        return _isRated[_tokenId];
     }
 
     /**
