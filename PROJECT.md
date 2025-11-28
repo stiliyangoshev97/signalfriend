@@ -1,6 +1,6 @@
 ## SignalFriend
 
-That is an **excellent refine| **Minimum Signal Price**      | Signal price **cannot be less than $5 USDT**.             | **Solidity**                | Smart Contracts    | Defines the logic for the **NFT** (the signal ticket), the **access fee contracts** ($5/$20), the **commission fee structure** (5%), and the **immutable on-chain rating storage**.                                                                                                                                                                                                                         |                                                                            | Enforced by `buySignalNFT` logic.                                                                 |ent** of the business model. By structuring the core transaction around an **NFT as a data ticket** within a **gated room**, you significantly strengthen the argument that your platf- **Minimum Signal Price:** A signal cannot be less than **5 USDT** (to prevent people from buying their own signals cheaply for rating manipulation).rm is a **Digital Information Marketplace** and not a gambling or betting platform.
+That is an **excellent refinement** of the business model. By structuring the core transaction around an **NFT as a data ticket** within a **gated room**, you significantly strengthen the argument that your platform is a **Digital Information Marketplace** and not a gambling or betting platform.
 
 Here is a breakdown of how this refined model addresses the regulatory risks and creates new opportunities:
 
@@ -44,8 +44,8 @@ The key to avoiding the "gambling" classification is the **NFT as the purchased
 | **Predictor Join Fee**        | **$20 USDT** (One-time, non-refundable fee).                                                                                            | Handled by `joinAsPredictor`.                                                                     |
 | **Predictor Referral Payout** | **$5 USDT** (25% of the join fee) is paid instantly to the existing Predictor if they hold a Predictor Access Pass NFT.                 | Enforced by `joinAsPredictor` logic.                                                              |
 | **Trader Access Fee (Flat)**  | **$0.5 USDT** flat fee added to **every** signal purchase.                                                                              | Mitigates Sybil Attacks; routed directly to the platform Treasury.                                |
-| **Minimum Signal Price**      | Signal price **cannot be less than $10 USDT**.                                                                                          | Enforced by `buySignalNFT` logic.                                                                 |
-| **Signal Price Fee**          | Price set by Predictor (min. $5 USDT).                                                                                                 | The primary portion of the sale, subject to the commission split.                                 |
+| **Minimum Signal Price**      | Signal price **cannot be less than $5 USDT**.                                                                                           | Enforced by `buySignalNFT` logic.                                                                 |
+| **Signal Price Fee**          | Price set by Predictor (min. $5 USDT).                                                                                                  | The primary portion of the sale, subject to the commission split.                                 |
 | **Commission**                | **5%** commission (adjustable via MultiSig) on the Signal Price Fee. The remaining 95% goes to the Predictor.                           | Enforced by `buySignalNFT` logic.                                                                 |
 | **Treasury Management**       | All platform fees are routed directly to an Externally Owned Account (EOA) (Ledger-backed), which is rotated periodically for security. | The Logic Contract contains a MultiSig-guarded function to update the `platformTreasury` address. |
 
@@ -136,7 +136,7 @@ Here is a breakdown of how each tool fits into your project and one important mi
 
 | Tool                        | Component          | Role in Your App                                                                                                                                                                                                                                                                                                                                                                                             |
 | --------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Solidity**                | Smart Contracts    | Defines the logic for the **NFT** (the signal ticket), the **access fee contracts** ($10/$20), the **commission fee structure** (5%), and the **immutable on-chain rating storage**.                                                                                                                                                                                                                         |
+| **Solidity**                | Smart Contracts    | Defines the logic for the **NFT** (the signal ticket), the **access fee contracts** ($5/$20), the **commission fee structure** (5%), and the **immutable on-chain rating storage**.                                                                                                                                                                                                                          |
 | **Foundry**                 | Smart Contract Dev | The best-in-class toolset for **writing, testing, and deploying** your Solidity contracts efficiently and securely.                                                                                                                                                                                                                                                                                          |
 | **React, Tailwind CSS**     | Frontend/UI        | **React** handles the entire user interface and state. **Tailwind** provides the modern, responsive, and highly customizable styling for a great user experience.                                                                                                                                                                                                                                            |
 | **wagmi, viem, RainbowKit** | Web3 Frontend Libs | This is your Web3 powerhouse. **`viem`** is the low-level, type-safe interface for reading/writing to the blockchain. **`wagmi`** builds on `viem` to provide powerful **React Hooks** for connecting wallets, reading balances, calling smart contract functions (minting the signal NFT, paying fees), and sending transactions. **`RainbowKit`** handles the beautiful, multi-wallet connection modal UI. |
@@ -343,7 +343,9 @@ This section targets the primary Web3 trading audience, including perpetuals and
 
 | Category Vertical | Sub-Categories (Predictor Selection)                                    |
 | ----------------- | ----------------------------------------------------------------------- |
-| **Crypto**        | **Altcoins** (e.g., general large/mid-cap moves)                        |
+| **Crypto**        | Bitcoin                                                                 |
+|                   | Ethereum                                                                |
+|                   | **Altcoins** (e.g., general large/mid-cap moves)                        |
 |                   | **DeFi** (e.g., yield farming, token unlocks, protocol exploits)        |
 |                   | **NFTs** (e.g., floor price trends, project mints)                      |
 |                   | **Layer 1 / Layer 2** (e.g., blockchain ecosystem growth)               |
@@ -403,6 +405,56 @@ You **must implement an indexing process** in your Express backend.
 1. **Phase 1 (Setup):** Use **Viem** in your Express backend to set up **event listeners** on your smart contract.
 2. **Phase 2 (Indexing):** When a crucial event happens (like `PredictorJoined` or `SignalPurchased`), your Express backend catches the event **once** and writes the clean, structured data into **MongoDB**.
 3. **Phase 3 (Display):** Your React frontend fetches the Leaderboard and signal lists directly from the fast **MongoDB**.
+
+## The indexing must happen using Webhook from Alchemy
+
+That is an excellent question that gets to the core difference between a traditional database and a blockchain-based database. Your confusion stems from thinking the blockchain is just another database you can query whenever you need to.
+
+You are correct that **once the data is indexed and stored in MongoDB, you only need standard read APIs (no webhook)** to build your front-end features (like displaying seller profiles, leaderboards, and signal lists).
+
+However, you need the webhook (or some other event monitoring tool) for the process of **indexing** itself.
+
+### The Need for Webhooks (or Polling)
+
+The fundamental challenge is **detecting the change on the blockchain and syncing it with MongoDB**.
+
+| Task            | When it Happens                                                                                                  | Why a Simple API Read Isn't Enough                                                  |
+| --------------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **Indexing**    | A user successfully executes a transaction, like calling `buySignalNFT`. This emits the `SignalPurchased` event. | You need to know **when** that event occurs to record the new `Receipt` in MongoDB. |
+| **Simple Read** | Your front-end displays the list of purchased signals.                                                           | You are querying the **already synchronized**data in MongoDB.                       |
+
+Export to Sheets
+
+The API key for Alchemy (which enables Webhooks) solves the problem of **event detection**.
+
+---
+
+### 1. The Polling Problem (The "Bad" Way) 📉
+
+Without a webhook, your Express Indexing Service would have to constantly ask the blockchain:
+
+> "Has a new block been mined? Has anyone called the buySignalNFT function in the last 5 seconds? Check the last 100 blocks!"
+> 
+
+This process is called **polling**.
+
+- **Result:** It's slow (you only find the event after the next poll), expensive (each poll costs you money/credits), and unreliable. This is especially true for an application like **SignalFriend** that relies on near-instant purchase updates.
+
+### 2. The Webhook Solution (The "Good" Way) 🚀
+
+A **Webhook** (via Alchemy Notify) is an automatic alarm system:
+
+1. You tell Alchemy, "If you see a `SignalPurchased` event on my `SignalFriendMarket` contract, immediately send an HTTP POST request to this specific URL on my Express server (`yourdomain.com/api/webhooks/signal-purchased`) with the event data."
+2. The blockchain mines the transaction.
+3. Alchemy detects the event and **immediately pushes** the data to your Express backend.
+4. Your Express backend receives the data and writes the new `Receipt` document to MongoDB.
+
+This method is:
+
+- **Real-time:** Updates MongoDB instantly.
+- **Efficient:** You only use API resources when an event actually happens.
+
+In summary, you need the Webhook **to know *when* to write the data to MongoDB**. Once the data is in MongoDB, the webhook's job is done, and your front-end can read the synchronized data instantly and cheaply.
 
 ---
 
@@ -476,6 +528,36 @@ To help you translate these into Tailwind CSS, here are the approximate hex code
 
 ---
 
+## RPC and API Key Alchemy
+
+**RPC URL**, which is  what your **Viem/Wagmi** code uses for basic read/write operations (like `eth_call`, `eth_sendRawTransaction`, and `eth_getBlock`).
+
+The separate **Alchemy API Key** is used for the **enhanced features** that Alchemy provides on top of the standard blockchain node. Think of it as your key to Alchemy's powerful developer ecosystem.
+
+Here is what that API key is typically used for in an application like **SignalFriend**:
+
+| Alchemy Feature                  | Purpose in **SignalFriend**                                                                                                                                                                                                                                                                                          | Used in which component?                                           |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| **1. Alchemy Notify (Webhooks)** | Crucial for your **Indexing Service** to achieve real-time updates. Instead of constantly polling the blockchain (which is slow and expensive), you register a webhook with Alchemy. When your contract emits a key event (e.g., `SignalPurchased`), Alchemy sends a notification to your Express backend instantly. | **Backend/Indexer**                                                |
+| **2. NFT API / Token API**       | Used to fetch rich, indexed data that is difficult to get via standard RPC. For example, getting the full NFT metadata for the `SignalKeyNFT` or fetching a user's exact **USDT (ERC-20)** balance quickly without complex `eth_call` manual decoding.                                                               | **Backend/Frontend**(Server-side rendering or dedicated API route) |
+| **3. Trace / Debug APIs**        | Used during development and debugging to see the **internal steps** of a complex transaction (like a failed `buySignalNFT` call) with greater detail than what the explorer shows.                                                                                                                                   | **Foundry Testing / Development**                                  |
+| **4. Composer / Dashboard**      | The key authenticates your access to the **developer dashboard** for real-time monitoring, usage tracking, error logs, and testing API endpoints directly in your browser.                                                                                                                                           | **Developer Workflow**                                             |
+
+Export to Sheets
+
+### Summary of the Difference
+
+| Item        | Included in RPC URL         | Used for                                                                                                     |
+| ----------- | --------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **RPC URL** | Yes (often embedded)        | Standard read/write, transaction broadcasting (handled by Viem).                                             |
+| **API Key** | Sometimes (as a path param) | **Advanced APIs**, **Webhooks/Notify**, and **Dashboard Access** (handled by their SDK/dedicated endpoints). |
+
+Export to Sheets
+
+You are 100% correct to separate the two and use the custom RPC URL for your core app functionality. The API Key becomes essential when you build the **real-time indexing service** in your Express backend using Alchemy's Notify feature.
+
+---
+
 ## 🏗️ SignalFriend Project Requirements
 
 ### Smart Contract Architecture & Security
@@ -496,7 +578,7 @@ To help you translate these into Tailwind CSS, here are the approximate hex code
 
 ### 💰 Financial & Business Rules
 
-- **Minimum Signal Price:** A signal cannot be less than **10 USDT** (to prevent people from buying their own signals cheaply for rating manipulation).
+- **Minimum Signal Price:** A signal cannot be less than 5 **USDT** (to prevent people from buying their own signals cheaply for rating manipulation).
 - **Buyer Access Fee:** **0.5 USDT** flat commission added to every signal purchase.
 - **Commission Split:** The Logic Contract handles the fee split: 5% of the signal price goes to the platform Treasury, and the remaining 95% goes to the Predictor.
 - **Treasury Management:** Use a **Ledger-backed Externally Owned Account (EOA)** as the platform treasury, which should be rotated periodically for security.

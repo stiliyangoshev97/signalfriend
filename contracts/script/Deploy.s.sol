@@ -34,8 +34,10 @@ contract DeployScript is Script {
     address constant MAINNET_USDT = 0x55d398326f99059fF775485246999027B3197955;
 
     // Metadata URIs (can be empty for initial deployment, update via MultiSig later)
-    string constant PREDICTOR_METADATA_URI = "";
-    string constant SIGNAL_KEY_METADATA_URI = "";
+    string constant PREDICTOR_METADATA_URI =
+        "ipfs://bafkreicq55af3scx6eixkeegaq75ghjl2odoyw4nfplrqtokv4w5re3u6e";
+    string constant SIGNAL_KEY_METADATA_URI =
+        "ipfs://bafkreidmq2zqmlkummwzrdwmpau5bgs4xqfy5yu2cmhmfxipqe7cbpdk6e";
 
     // ============================================
     // DEPLOYED CONTRACTS (set after deployment)
