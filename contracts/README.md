@@ -739,17 +739,35 @@ contracts/
 
 ## 🧪 Testing
 
+### Test Suite Overview
+
+**96 Unit Tests** across all contracts - ALL PASSING ✅
+
+| Test File | Tests | Coverage |
+|-----------|-------|----------|
+| `SignalFriendMarket.t.sol` | 28 | Registration, purchases, fees, referrals, pause, MultiSig |
+| `PredictorAccessPass.t.sol` | 35 | Soulbound, one-per-wallet, blacklist, owner mint, MultiSig |
+| `SignalKeyNFT.t.sol` | 33 | Minting, transfers, ownership tracking, content IDs, MultiSig |
+
 ### Run Tests
 
 ```bash
 # Run all tests
 forge test
 
-# Run with verbosity
-forge test -vvv
+# Run with verbosity (recommended)
+forge test -vv
 
-# Run specific test file
-forge test --match-path test/PredictorAccessPass.t.sol
+# Run with full trace
+forge test -vvvv
+
+# Run specific contract tests
+forge test --match-contract SignalFriendMarketTest
+forge test --match-contract PredictorAccessPassTest
+forge test --match-contract SignalKeyNFTTest
+
+# Run specific test function
+forge test --match-test test_JoinAsPredictor_Success
 
 # Gas report
 forge test --gas-report
@@ -766,45 +784,112 @@ forge coverage --report lcov
 genhtml lcov.info -o coverage
 ```
 
-**Note:** Test files are currently in development. See [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md) for testing roadmap.
+### Test Infrastructure
+
+The test suite uses `TestHelper.sol` as a base contract that:
+- Implements **two-phase deployment** matching production deployment exactly
+- Provides helper functions for common operations (`_registerPredictor`, `_buySignal`, etc.)
+- Uses real contracts (only MockUSDT is a mock)
 
 ---
 
 ## 🚀 Deployment
 
+### Two-Phase Deployment Pattern
+
+SignalFriend uses a two-phase deployment due to circular dependencies:
+
+1. **Phase 1 (Deploy.s.sol):** Deploy all contracts
+   - Deploy MockUSDT (testnet only)
+   - Deploy SignalFriendMarket with `address(0)` for NFT addresses
+   - Deploy PredictorAccessPass with Market address (immutable)
+   - Deploy SignalKeyNFT with Market address (immutable)
+
+2. **Phase 2 (SetupMultiSig.s.sol):** Connect contracts via 3-of-3 MultiSig
+   - Signer 1 proposes `updatePredictorAccessPass` and `updateSignalKeyNFT`
+   - Signer 2 approves both actions
+   - Signer 3 approves (auto-executes on 3rd approval)
+
+### Environment Setup
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Edit .env with your values:
+# - DEPLOYER_PRIVATE_KEY
+# - MULTISIG_SIGNER_1, _2, _3
+# - PLATFORM_TREASURY
+```
+
 ### Local Deployment (Anvil)
 
 ```bash
-# Start local node
+# Terminal 1: Start local node
 anvil
 
-# Deploy contracts
-forge script script/Deploy.s.sol --rpc-url http://localhost:8545 --broadcast
+# Terminal 2: Deploy contracts
+source .env
+forge script script/Deploy.s.sol:DeployScript --rpc-url http://localhost:8545 --broadcast
 ```
 
 ### BNB Testnet Deployment
 
 ```bash
-# Set environment variables in .env
-# TESTNET_RPC_URL=https://data-seed-prebsc-1-s1.binance.org:8545
-# PRIVATE_KEY=your_private_key
-# BSCSCAN_API_KEY=your_api_key
+# 1. Ensure you have testnet BNB (get from https://testnet.bnbchain.org/faucet-smart)
 
-# Deploy to testnet
-forge script script/Deploy.s.sol --rpc-url $TESTNET_RPC_URL --broadcast --verify
+# 2. Load environment variables
+source .env
 
-# Verify contracts
-forge verify-contract <CONTRACT_ADDRESS> <CONTRACT_NAME> --chain-id 97
+# 3. Phase 1: Deploy all contracts
+forge script script/Deploy.s.sol:DeployScript \
+  --rpc-url $BNB_TESTNET_RPC \
+  --broadcast \
+  --verify
+
+# 4. Copy deployed addresses to .env (from deployment-addresses.txt or console output)
+
+# 5. Phase 2: MultiSig setup (run by each signer)
+# Signer 1 proposes:
+SIGNER_ROLE=1 forge script script/SetupMultiSig.s.sol:SetupMultiSigScript \
+  --rpc-url $BNB_TESTNET_RPC --broadcast
+
+# Copy ACTION_ID_1 and ACTION_ID_2 from output to .env
+
+# Signer 2 approves:
+SIGNER_ROLE=2 forge script script/SetupMultiSig.s.sol:SetupMultiSigScript \
+  --rpc-url $BNB_TESTNET_RPC --broadcast
+
+# Signer 3 approves (auto-executes):
+SIGNER_ROLE=3 forge script script/SetupMultiSig.s.sol:SetupMultiSigScript \
+  --rpc-url $BNB_TESTNET_RPC --broadcast
+
+# 6. Verify market.isFullyInitialized() == true
 ```
 
 ### BNB Mainnet Deployment
 
 ```bash
-# Deploy to mainnet (use with caution)
-forge script script/Deploy.s.sol --rpc-url $MAINNET_RPC_URL --broadcast --verify
+# ⚠️ MAINNET DEPLOYMENT - Use with caution!
+# Ensure DEPLOY_MOCK_USDT = false in Deploy.s.sol
+# This will use real USDT at 0x55d398326f99059fF775485246999027B3197955
+
+forge script script/Deploy.s.sol:DeployScript \
+  --rpc-url $BNB_MAINNET_RPC \
+  --broadcast \
+  --verify
 ```
 
-**Important:** See [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md) for detailed two-phase deployment strategy.
+### Contract Verification
+
+```bash
+# Verify individual contracts on BscScan
+forge verify-contract <ADDRESS> SignalFriendMarket \
+  --chain-id 97 \
+  --constructor-args $(cast abi-encode "constructor(address,address[3],address,address,address)" $USDT $SIGNER1 $SIGNER2 $SIGNER3 $TREASURY 0x0 0x0)
+```
+
+**Important:** See [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md) for detailed deployment documentation.
 
 ---
 

@@ -1,9 +1,51 @@
 # SignalFriend - Project Context
 
-> **Last Updated:** November 27, 2024  
-> **Current Phase:** Getter Functions Added - Testing Phase Ready  
-> **Project Status:** 🟢 **Production-Ready Code (97/100)** - Testing Required Before Mainnet  
-> **Security Score:** 97/100 (Post-Hardening)
+> **Last Updated:** November 28, 2024  
+> **Current Phase:** Unit Testing Complete - Deployment Scripts Ready  
+> **Project Status:** 🟢 **Production-Ready Code (97/100)** - Testnet Deployment Next  
+> **Security Score:** 97/100 (Post-Hardening)  
+> **Test Coverage:** 96 Unit Tests Passing ✅
+
+---
+
+## 🧪 Testing Infrastructure (NEW - v0.7.0)
+
+### v0.7.0 - Comprehensive Unit Tests (November 28, 2024)
+
+**Created Full Test Suite:**
+- ✅ **96 Unit Tests** across all 3 contracts - ALL PASSING
+- ✅ **TestHelper.sol** - Base test infrastructure with two-phase deployment
+- ✅ **Two-Phase Deployment Pattern** - Matches production deployment exactly
+
+**Test Files Created:**
+| File | Tests | Coverage |
+|------|-------|----------|
+| `SignalFriendMarket.t.sol` | 28 tests | Registration, purchases, fees, referrals, pause/unpause, MultiSig |
+| `PredictorAccessPass.t.sol` | 35 tests | Soulbound, one-per-wallet, blacklist, owner mint, MultiSig |
+| `SignalKeyNFT.t.sol` | 33 tests | Minting, transfers, ownership tracking, content IDs, MultiSig |
+| `helpers/TestHelper.sol` | N/A | Base contract with deployment and helper functions |
+
+**Test Coverage Highlights:**
+- ✅ Setup verification (deployment, initialization, parameters)
+- ✅ Core business logic (join predictor, buy signal, fee calculations)
+- ✅ Referral system (valid, invalid, self-referral scenarios)
+- ✅ Access control (onlyLogicContract, onlyMultiSigSigner)
+- ✅ Soulbound enforcement (PredictorAccessPass transfers blocked)
+- ✅ Token transfers (SignalKeyNFT is transferable)
+- ✅ Blacklist/unblacklist functionality
+- ✅ Pause/unpause functionality
+- ✅ MultiSig governance (3-of-3 approval, expiry, cleanup)
+- ✅ View functions
+- ✅ Metadata URI updates
+
+**Running Tests:**
+```bash
+cd contracts
+forge test           # Run all tests
+forge test -vv       # Verbose output
+forge test -vvvv     # Trace output
+forge test --match-contract SignalFriendMarketTest  # Single contract
+```
 
 ---
 
@@ -276,22 +318,19 @@ Trader purchases $10 signal:
 
 ### 🟡 In Progress
 
-- [ ] **Write Comprehensive Tests** (Next immediate task)
-  - Unit tests for MockUSDT contract
-  - Unit tests for all 3 main contracts
-  - Integration tests (full flow: join → buy → rate)
-  - Edge case testing
-  - Gas optimization analysis
-  - Security testing
+- [ ] **Deployment Scripts** (Current task)
+  - Foundry deployment scripts for BNB Testnet
+  - Two-phase deployment automation
+  - Contract verification on BscScan
 
 ### ⏳ Pending (Prioritized)
 
-#### Phase 1: Testing & Deployment
-1. [ ] Write comprehensive tests for MockUSDT
-2. [ ] Write comprehensive tests for all 3 main contracts
-3. [ ] Integration testing (full user flows)
-4. [ ] Deployment scripts for local Anvil
-5. [ ] BNB Testnet deployment (with MockUSDT)
+#### Phase 1: Testnet Deployment & Manual Testing
+1. [x] ~~Write comprehensive tests for all 3 main contracts~~ ✅ **96 tests passing**
+2. [ ] Create deployment scripts for BNB Testnet
+3. [ ] Deploy to BNB Testnet with MockUSDT
+4. [ ] Manual testing with real transactions
+5. [ ] Integration tests (full user flows)
 6. [ ] Gas optimization analysis
 7. [ ] Security audit preparation
 
