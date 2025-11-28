@@ -522,10 +522,10 @@ contract SignalKeyNFTTest is TestHelper {
 
     function test_MultiSig_GetAllActionIds() public {
         vm.prank(signer1);
-        bytes32 actionId1 = signalKey.proposeUpdateMetadataURI("ipfs://test1/");
+        signalKey.proposeUpdateMetadataURI("ipfs://test1/");
 
         vm.prank(signer1);
-        bytes32 actionId2 = signalKey.proposeUpdateMetadataURI("ipfs://test2/");
+        signalKey.proposeUpdateMetadataURI("ipfs://test2/");
 
         bytes32[] memory actionIds = signalKey.getAllActionIds();
         assertTrue(actionIds.length >= 2, "Should have at least 2 actions");

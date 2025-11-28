@@ -27,8 +27,8 @@ contract DeployScript is Script {
     // DEPLOYMENT CONFIGURATION
     // ============================================
 
-    // Set to true to deploy MockUSDT (testnet), false to use real USDT (mainnet)
-    bool constant DEPLOY_MOCK_USDT = true;
+    // Set to true for testnet (uses MockUSDT), false for mainnet (uses real USDT)
+    bool constant IS_TESTNET = true;
 
     // BNB Chain Mainnet USDT (Binance-Peg BSC-USD)
     address constant MAINNET_USDT = 0x55d398326f99059fF775485246999027B3197955;
@@ -64,6 +64,10 @@ contract DeployScript is Script {
         // Treasury address for platform fees
         address treasury = vm.envAddress("PLATFORM_TREASURY");
 
+        // Optional: Use existing MockUSDT address (testnet only)
+        // If set, skip MockUSDT deployment and use this address
+        address existingMockUsdt = vm.envOr("MOCK_USDT_ADDRESS", address(0));
+
         // ============================================
         // PRE-DEPLOYMENT LOGGING
         // ============================================
@@ -78,7 +82,8 @@ contract DeployScript is Script {
         console.log("Deployer Balance:", deployer.balance / 1e18, "BNB");
         console.log("");
         console.log("--- Configuration ---");
-        console.log("Deploy MockUSDT:", DEPLOY_MOCK_USDT);
+        console.log("Is Testnet:", IS_TESTNET);
+        console.log("Existing MockUSDT:", existingMockUsdt);
         console.log("Treasury:", treasury);
         console.log("Signer 1:", signer1);
         console.log("Signer 2:", signer2);
@@ -91,16 +96,24 @@ contract DeployScript is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        // Step 1: Deploy USDT (MockUSDT for testnet, skip for mainnet)
+        // Step 1: Determine USDT address
         address usdtAddress;
-        if (DEPLOY_MOCK_USDT) {
-            console.log("--- Phase 1.1: Deploying MockUSDT ---");
+        if (!IS_TESTNET) {
+            // Mainnet: Use real USDT
+            usdtAddress = MAINNET_USDT;
+            console.log("--- Phase 1.1: Using Mainnet USDT ---");
+            console.log("USDT address:", usdtAddress);
+        } else if (existingMockUsdt != address(0)) {
+            // Testnet with existing MockUSDT: Reuse it
+            usdtAddress = existingMockUsdt;
+            console.log("--- Phase 1.1: Using Existing MockUSDT ---");
+            console.log("MockUSDT address:", usdtAddress);
+        } else {
+            // Testnet without existing MockUSDT: Deploy new one
+            console.log("--- Phase 1.1: Deploying NEW MockUSDT ---");
             mockUsdt = new MockUSDT();
             usdtAddress = address(mockUsdt);
             console.log("MockUSDT deployed at:", usdtAddress);
-        } else {
-            usdtAddress = MAINNET_USDT;
-            console.log("Using mainnet USDT at:", usdtAddress);
         }
 
         // Step 2: Deploy SignalFriendMarket with address(0) for NFT contracts
@@ -153,9 +166,7 @@ contract DeployScript is Script {
         console.log("========================================");
         console.log("");
         console.log("--- Deployed Addresses ---");
-        if (DEPLOY_MOCK_USDT) {
-            console.log("MockUSDT:            ", address(mockUsdt));
-        }
+        console.log("USDT:                ", usdtAddress);
         console.log("SignalFriendMarket:  ", address(market));
         console.log("PredictorAccessPass: ", address(accessPass));
         console.log("SignalKeyNFT:        ", address(signalKey));
@@ -207,7 +218,7 @@ contract DeployScript is Script {
         // SAVE DEPLOYMENT ADDRESSES TO FILE
         // ============================================
 
-        _writeDeploymentFile(treasury, signers);
+        _writeDeploymentFile(usdtAddress, treasury, signers);
         console.log("Deployment addresses saved to: deployment-addresses.txt");
     }
 
@@ -216,6 +227,7 @@ contract DeployScript is Script {
      * @dev Separated to avoid stack too deep error
      */
     function _writeDeploymentFile(
+        address usdtAddress,
         address treasury,
         address[3] memory signers
     ) internal {
@@ -230,15 +242,9 @@ contract DeployScript is Script {
             )
         );
 
-        string memory line2 = DEPLOY_MOCK_USDT
-            ? string(
-                abi.encodePacked(
-                    "MOCK_USDT=",
-                    vm.toString(address(mockUsdt)),
-                    "\n"
-                )
-            )
-            : "";
+        string memory line2 = string(
+            abi.encodePacked("USDT_ADDRESS=", vm.toString(usdtAddress), "\n")
+        );
 
         string memory line3 = string(
             abi.encodePacked(

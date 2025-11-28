@@ -468,10 +468,10 @@ contract PredictorAccessPassTest is TestHelper {
 
     function test_MultiSig_GetAllActionIds() public {
         vm.prank(signer1);
-        bytes32 actionId1 = accessPass.proposeOwnerMint(predictor1);
+        accessPass.proposeOwnerMint(predictor1);
 
         vm.prank(signer1);
-        bytes32 actionId2 = accessPass.proposeBlacklist(predictor2, true);
+        accessPass.proposeBlacklist(predictor2, true);
 
         bytes32[] memory actionIds = accessPass.getAllActionIds();
 
