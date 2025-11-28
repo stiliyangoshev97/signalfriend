@@ -1,10 +1,37 @@
 # SignalFriend - Project Context
 
-> **Last Updated:** November 28, 2024  
-> **Current Phase:** Unit Testing Complete - Deployment Scripts Ready  
-> **Project Status:** 🟢 **Production-Ready Code (97/100)** - Testnet Deployment Next  
+> **Last Updated:** November 29, 2024  
+> **Current Phase:** Testnet Deployment Complete ✅  
+> **Project Status:** 🟢 **Production-Ready Code (97/100)** - Manual Testing in Progress  
 > **Security Score:** 97/100 (Post-Hardening)  
 > **Test Coverage:** 96 Unit Tests Passing ✅
+
+---
+
+## 🌐 Testnet Deployment (v0.7.2 - November 29, 2024)
+
+### Deployed Contract Addresses (BNB Testnet - Chain ID 97)
+| Contract | Address |
+|----------|---------|
+| MockUSDT | `0xF87d17a5ca95F3f992f82Baabf4eBC5301A178a5` |
+| SignalFriendMarket | `0x5133397a4B9463c5270beBa05b22301e6dD184ca` |
+| PredictorAccessPass | `0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4` |
+| SignalKeyNFT | `0xfb26Df6101e1a52f9477f52F54b91b99fb016aed` |
+
+### MultiSig Signers
+| Role | Address |
+|------|---------|
+| Signer 1 | `0x4Cca77ba15B0D85d7B733E0838a429E7bEF42DD2` |
+| Signer 2 | `0xC119B9152afcC5f40C019aABd78A312d37C63926` |
+| Signer 3 | `0x6499fe8016cE2C2d3a21d08c3016345Edf3467F1` |
+| Treasury | `0xc21Ca5BA47cF1C485DE33b26D9Da3d10ACcDa413` |
+
+### Deployment Status
+- ✅ Phase 1: All contracts deployed via `Deploy.s.sol`
+- ✅ Phase 2: MultiSig setup complete (`isFullyInitialized() = true`)
+- ✅ `joinAsPredictor()` tested successfully
+- ✅ `buySignalNFT()` tested successfully
+- ✅ Treasury receiving fees correctly
 
 ---
 
@@ -92,6 +119,11 @@ source .env && forge script script/Deploy.s.sol:DeployScript \
 | `ETHERSCAN_API_KEY` | Contract verification |
 | `MULTISIG_SIGNER_1/2/3` | Public addresses for 3-of-3 MultiSig |
 | `PLATFORM_TREASURY` | Treasury address for fee collection |
+| `MOCK_USDT_ADDRESS` | (Optional) Reuse existing MockUSDT instead of deploying new |
+
+**MOCK_USDT_ADDRESS Behavior:**
+- If **set** → Script reuses existing MockUSDT (saves gas, preserves balances)
+- If **not set** → Script deploys new MockUSDT (testnet only)
 
 **Files Created:**
 ```

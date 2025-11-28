@@ -1,5 +1,5 @@
 {
   "name": "SignalFriend - Receipt",
   "description": "SignalFriend Receipt - A transferable ERC-721 NFT that serves as proof of purchase for a trading signal. This token grants the holder access to exclusive signal content from a verified predictor. Can be transferred or sold on secondary markets.",
-  "image": "ipfs://bafkreiaijsonphxzuyjneg677dl46vfffqjzhg7ayzdn3u2aceqtamocr4/receipt.JPG"
+  "image": "ipfs://bafkreiaijsonphxzuyjneg677dl46vfffqjzhg7ayzdn3u2aceqtamocr4"
 }

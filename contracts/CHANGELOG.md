@@ -9,6 +9,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### [0.7.2] - 2024-11-29 📋 RUNBOOK & DEPLOYMENT IMPROVEMENTS
+
+#### Documentation
+- **Renamed `COMMANDS.md` → `RUNBOOK.md`** - Comprehensive operations guide
+- **Added detailed buySignalNFT documentation:**
+  - 0.5 USDT buyer access fee breakdown
+  - Total cost vs signal price clarification
+  - Fee distribution explanation (predictor gets 95%, platform gets 5% + 0.5 fee)
+- **Added note:** Predictors CAN buy their own signals (no contract restriction, but loses money)
+- **Added Administrative Operations section:**
+  - Update NFT Metadata URI via MultiSig
+  - Blacklist/Unblacklist a Predictor via MultiSig
+- **Added Read-Only Queries section** with `cast` commands
+
+#### Deployment Script Enhancement
+- **`Deploy.s.sol`** now supports `MOCK_USDT_ADDRESS` environment variable
+- If `MOCK_USDT_ADDRESS` is set in `.env` → reuses existing MockUSDT (no redeploy)
+- If not set → deploys new MockUSDT (testnet only)
+- Saves gas and preserves test USDT balances across redeployments
+
+#### Testnet Deployment Complete ✅
+- MockUSDT: `0xF87d17a5ca95F3f992f82Baabf4eBC5301A178a5`
+- SignalFriendMarket: `0x5133397a4B9463c5270beBa05b22301e6dD184ca`
+- PredictorAccessPass: `0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4`
+- SignalKeyNFT: `0xfb26Df6101e1a52f9477f52F54b91b99fb016aed`
+- Phase 2 MultiSig setup complete (`isFullyInitialized() = true`)
+- Manual testing passed: `joinAsPredictor()`, `buySignalNFT()`
+
+---
+
 ### [0.7.0] - 2024-11-28 🧪 COMPREHENSIVE UNIT TESTS
 
 #### ✅ Complete Test Suite Implementation
