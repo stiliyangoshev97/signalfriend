@@ -49,6 +49,60 @@ forge test --match-contract SignalFriendMarketTest  # Single contract
 
 ---
 
+## 🚀 Deployment Scripts (NEW - v0.7.1)
+
+### v0.7.1 - Simplified Deployment (November 28, 2024)
+
+**Deployment Infrastructure:**
+- ✅ **`Deploy.s.sol`** - Phase 1 automated deployment script
+- ✅ **`.env.example`** - Environment template with all required variables
+- ✅ **Phase 2 Manual** - MultiSig setup via BscScan + MetaMask (no script needed)
+
+**Deployment Commands:**
+```bash
+# BNB Testnet
+cd contracts
+source .env && forge script script/Deploy.s.sol:DeployScript \
+  --rpc-url $BNB_TESTNET_RPC_URL --broadcast --verify
+
+# Local Anvil (testing)
+source .env && forge script script/Deploy.s.sol:DeployScript \
+  --rpc-url http://localhost:8545 --broadcast
+```
+
+**Two-Phase Deployment:**
+| Phase | Method | What Happens |
+|-------|--------|--------------|
+| Phase 1 | Script | Deploy Market(address(0), address(0)), then NFTs with Market address |
+| Phase 2 | BscScan | 3-of-3 MultiSig calls `proposeUpdatePredictorAccessPass()` and `proposeUpdateSignalKeyNFT()` |
+
+**Phase 2 Manual Steps (BscScan):**
+1. Go to SignalFriendMarket contract on BscScan
+2. Connect Signer 1 → Call `proposeUpdatePredictorAccessPass(address)`
+3. Connect Signer 2 → Call `approveAction(actionId)`
+4. Connect Signer 3 → Call `approveAction(actionId)` (auto-executes on 3rd approval)
+5. Repeat for `proposeUpdateSignalKeyNFT(address)`
+6. Verify: Call `isFullyInitialized()` → should return `true`
+
+**Environment Variables Required:**
+| Variable | Purpose |
+|----------|---------|
+| `BNB_TESTNET_RPC_URL` | BNB Chain testnet RPC |
+| `PRIVATE_KEY_1` | Deployer private key |
+| `ETHERSCAN_API_KEY` | Contract verification |
+| `MULTISIG_SIGNER_1/2/3` | Public addresses for 3-of-3 MultiSig |
+| `PLATFORM_TREASURY` | Treasury address for fee collection |
+
+**Files Created:**
+```
+contracts/script/
+├── Deploy.s.sol     # Phase 1 deployment script
+contracts/
+└── .env.example     # Environment template
+```
+
+---
+
 ## 🔒 Recent Security Improvements
 
 ### v0.6.2 - Getter Functions (November 27, 2024)
