@@ -13,15 +13,14 @@ import {MockUSDT} from "../src/MockUSDT.sol";
  * @notice Deployment script for SignalFriend contracts on BNB Testnet
  * @dev Implements two-phase deployment pattern:
  *      Phase 1: Deploy Market with address(0) for NFTs, then deploy NFTs with Market address
- *      Phase 2: Update NFT addresses in Market via MultiSig (manual step after deployment)
+ *      Phase 2: Update NFT addresses in Market via MultiSig (manual on BscScan)
  *
  * Usage:
- *   # Set environment variables first (see .env.example)
  *   # For BNB Testnet:
- *   forge script script/Deploy.s.sol:DeployScript --rpc-url $BNB_TESTNET_RPC --broadcast --verify
+ *   source .env && forge script script/Deploy.s.sol:DeployScript --rpc-url $BNB_TESTNET_RPC_URL --broadcast --verify
  *
  *   # For local Anvil testing:
- *   forge script script/Deploy.s.sol:DeployScript --rpc-url http://localhost:8545 --broadcast
+ *   source .env && forge script script/Deploy.s.sol:DeployScript --rpc-url http://localhost:8545 --broadcast
  */
 contract DeployScript is Script {
     // ============================================
@@ -51,7 +50,7 @@ contract DeployScript is Script {
         // LOAD CONFIGURATION FROM ENVIRONMENT
         // ============================================
 
-        uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY_1");
         address deployer = vm.addr(deployerPrivateKey);
 
         // MultiSig signers (3-of-3)
@@ -161,46 +160,44 @@ contract DeployScript is Script {
         console.log("");
 
         // ============================================
-        // PHASE 2 INSTRUCTIONS (Manual MultiSig Step)
+        // PHASE 2 INSTRUCTIONS (Manual via BscScan)
         // ============================================
 
         console.log("========================================");
-        console.log("   PHASE 2: MultiSig Setup Required");
+        console.log("   PHASE 2: MultiSig Setup via BscScan");
         console.log("========================================");
         console.log("");
-        console.log(
-            "The Market contract needs NFT addresses set via 3-of-3 MultiSig."
-        );
-        console.log("Run the following after this deployment completes:");
+        console.log("Go to BscScan and connect MetaMask to complete setup:");
         console.log("");
-        console.log("Option A: Use the SetupMultiSig script:");
+        console.log("Step 1: Set PredictorAccessPass");
+        console.log("  - Go to SignalFriendMarket contract on BscScan");
+        console.log("  - Connect Signer 1 wallet via MetaMask");
         console.log(
-            "  forge script script/SetupMultiSig.s.sol:SetupMultiSigScript --rpc-url $BNB_TESTNET_RPC --broadcast"
-        );
-        console.log("");
-        console.log("Option B: Manual steps (each signer must execute):");
-        console.log("");
-        console.log("1. Signer 1 proposes and auto-approves:");
-        console.log(
-            "   market.proposeUpdatePredictorAccessPass(",
+            "  - Call: proposeUpdatePredictorAccessPass(",
             address(accessPass),
             ")"
         );
-        console.log("2. Signer 2 approves the action");
-        console.log("3. Signer 3 approves (auto-executes)");
-        console.log("");
-        console.log("4. Signer 1 proposes and auto-approves:");
+        console.log("  - Copy the returned actionId from the transaction");
+        console.log("  - Connect Signer 2, call: approveAction(actionId)");
         console.log(
-            "   market.proposeUpdateSignalKeyNFT(",
+            "  - Connect Signer 3, call: approveAction(actionId) - auto executes"
+        );
+        console.log("");
+        console.log("Step 2: Set SignalKeyNFT");
+        console.log("  - Connect Signer 1 wallet via MetaMask");
+        console.log(
+            "  - Call: proposeUpdateSignalKeyNFT(",
             address(signalKey),
             ")"
         );
-        console.log("5. Signer 2 approves the action");
-        console.log("6. Signer 3 approves (auto-executes)");
-        console.log("");
+        console.log("  - Copy the returned actionId from the transaction");
+        console.log("  - Connect Signer 2, call: approveAction(actionId)");
         console.log(
-            "After Phase 2, verify: market.isFullyInitialized() == true"
+            "  - Connect Signer 3, call: approveAction(actionId) - auto executes"
         );
+        console.log("");
+        console.log("Step 3: Verify setup complete");
+        console.log("  - Call: isFullyInitialized() - should return true");
         console.log("");
         console.log("========================================");
 

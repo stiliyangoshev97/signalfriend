@@ -104,10 +104,66 @@ contracts/test/
 ```
 
 #### 🚀 Next Steps
-- [ ] Create deployment scripts for BNB Testnet
+- [x] ~~Create deployment scripts for BNB Testnet~~ ✅
 - [ ] Deploy and perform manual testing
 - [ ] Create integration tests for cross-contract scenarios
 - [ ] Gas optimization analysis
+
+---
+
+### [0.7.1] - 2024-11-28 🚀 SIMPLIFIED DEPLOYMENT SCRIPTS
+
+#### 📦 Deployment Script Simplification
+
+**1. Simplified `Deploy.s.sol`**
+- Uses `PRIVATE_KEY_1` from `.env` for deployment
+- Reads MultiSig signer addresses from `.env` (public addresses only)
+- Clear Phase 2 instructions for manual BscScan + MetaMask setup
+- Outputs deployed addresses to `deployment-addresses.txt`
+
+**2. Removed `SetupMultiSig.s.sol`**
+- Not needed - Phase 2 MultiSig setup done manually via BscScan UI
+- Signers connect MetaMask and call functions directly on BscScan
+
+**3. Simplified `.env.example`**
+```bash
+# Network
+BNB_TESTNET_RPC_URL=...
+BNB_MAINNET_RPC_URL=...
+
+# Private keys (deployment only)
+PRIVATE_KEY_1=...
+PRIVATE_KEY_2=...
+PRIVATE_KEY_ANVIL_1=...
+
+# Verification
+ETHERSCAN_API_KEY=...
+
+# Public addresses (no private keys needed)
+MULTISIG_SIGNER_1=0x...
+MULTISIG_SIGNER_2=0x...
+MULTISIG_SIGNER_3=0x...
+PLATFORM_TREASURY=0x...
+```
+
+**4. Deployment Commands**
+```bash
+# BNB Testnet
+source .env && forge script script/Deploy.s.sol:DeployScript \
+  --rpc-url $BNB_TESTNET_RPC_URL --broadcast --verify
+
+# Local Anvil
+source .env && forge script script/Deploy.s.sol:DeployScript \
+  --rpc-url http://localhost:8545 --broadcast
+```
+
+**5. Phase 2 (Manual via BscScan)**
+- Go to SignalFriendMarket on BscScan
+- Connect Signer 1 → `proposeUpdatePredictorAccessPass(address)`
+- Connect Signer 2 → `approveAction(actionId)`
+- Connect Signer 3 → `approveAction(actionId)` (auto-executes)
+- Repeat for `proposeUpdateSignalKeyNFT(address)`
+- Verify: `isFullyInitialized()` returns `true`
 
 ---
 
