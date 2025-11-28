@@ -22,4 +22,3 @@
     )
 2. Test on testnet how everything works (deploy with script)
 3. Write all unit testing, integration testing and security testing for the contracts
-4. Check if we need any other functions for the frontend and we are good to go
