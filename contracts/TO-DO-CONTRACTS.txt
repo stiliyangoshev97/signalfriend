@@ -135,18 +135,18 @@ SIGNALFRIENDMARKET TESTS - BUY SIGNAL
 ------------------------------------------------------------------------------
 PREDICTORACCESSPASS TESTS - SOULBOUND
 ------------------------------------------------------------------------------
-[⏳] 16. Try to TRANSFER PredictorAccessPass NFT
+[✅] 16. Try to TRANSFER PredictorAccessPass NFT
         - Function: transferFrom(from, to, tokenId)
         - EXPECTED: ❌ REVERT with "SoulboundTokenCannotBeTransferred"
 
-[⏳] 17. Try to APPROVE PredictorAccessPass NFT
+[✅] 17. Try to APPROVE PredictorAccessPass NFT
         - Function: approve(to, tokenId)
         - EXPECTED: ❌ REVERT with "SoulboundTokenCannotBeApproved"
 
 ------------------------------------------------------------------------------
 PREDICTORACCESSPASS TESTS - BLACKLIST (MultiSig)
 ------------------------------------------------------------------------------
-[⏳] 18. Blacklist a predictor
+[✅] 18. Blacklist a predictor
         - Signer 1: proposeSetBlacklist(predictorAddress, true)
         - Get actionId from logs
         - Signer 2: approveAction(actionId)
@@ -155,21 +155,21 @@ PREDICTORACCESSPASS TESTS - BLACKLIST (MultiSig)
           - isBlacklisted(predictorAddress) = true
           - isPredictorActive(predictorAddress) = false
 
-[⏳] 19. Unblacklist a predictor
+[✅] 19. Unblacklist a predictor
         - Signer 1: proposeSetBlacklist(predictorAddress, false)
         - Signer 2 + 3: approveAction(actionId)
         - EXPECTED: ✅ SUCCESS
           - isBlacklisted(predictorAddress) = false
           - isPredictorActive(predictorAddress) = true
 
-[⏳] 20. Blacklisted predictor still OWNS their NFT
+[✅] 20. Blacklisted predictor still OWNS their NFT
         - Check: balanceOf(blacklistedAddress)
         - EXPECTED: ✅ Returns 1 (they still own NFT, just can't sell)
 
 ------------------------------------------------------------------------------
 PREDICTORACCESSPASS TESTS - OWNER MINT (MultiSig)
 ------------------------------------------------------------------------------
-[⏳] 21. Owner mint a free predictor pass
+[✅] 21. Owner mint a free predictor pass
         - Signer 1: proposeOwnerMint(newPredictorAddress)
         - Signer 2 + 3: approveAction(actionId)
         - EXPECTED: ✅ SUCCESS
@@ -179,12 +179,12 @@ PREDICTORACCESSPASS TESTS - OWNER MINT (MultiSig)
 ------------------------------------------------------------------------------
 SIGNALKEYNFT TESTS - TRANSFERS
 ------------------------------------------------------------------------------
-[⏳] 22. Transfer SignalKeyNFT to another wallet
+[✅] 22. Transfer SignalKeyNFT to another wallet
         - Function: transferFrom(from, to, tokenId)
         - EXPECTED: ✅ SUCCESS (SignalKeyNFT IS transferable)
           - ownerOf(tokenId) = new owner
 
-[⏳] 23. Check contentIdentifier preserved after transfer
+[✅] 23. Check contentIdentifier preserved after transfer
         - Function: getContentIdentifier(tokenId)
         - EXPECTED: ✅ Returns same contentIdentifier as before transfer
 
@@ -203,18 +203,18 @@ METADATA URI TESTS (MultiSig)
 ------------------------------------------------------------------------------
 PAUSE/UNPAUSE TESTS (MultiSig on SignalFriendMarket)
 ------------------------------------------------------------------------------
-[⏳] 26. Pause the contract
+[✅] 26. Pause the contract
         - Signer 1: proposePause()
         - Signer 2 + 3: approveAction(actionId)
         - EXPECTED: ✅ SUCCESS - paused() = true
 
-[⏳] 27. Try operations while paused
+[✅] 27. Try operations while paused
         - Try: joinAsPredictor()
         - EXPECTED: ❌ REVERT with "ContractCurrentlyPaused"
         - Try: buySignalNFT()
         - EXPECTED: ❌ REVERT with "ContractCurrentlyPaused"
 
-[⏳] 28. Unpause the contract
+[✅] 28. Unpause the contract
         - Signer 1: proposeUnpause()
         - Signer 2 + 3: approveAction(actionId)
         - EXPECTED: ✅ SUCCESS
@@ -224,7 +224,7 @@ PAUSE/UNPAUSE TESTS (MultiSig on SignalFriendMarket)
 ------------------------------------------------------------------------------
 VIEW FUNCTIONS (Read Contract Tab)
 ------------------------------------------------------------------------------
-[⏳] 29. Check platform statistics
+[✅] 29. Check platform statistics
         - totalPredictorsJoined()
         - EXPECTED: ✅ Returns correct count
         - totalSignalsPurchased()
@@ -232,7 +232,7 @@ VIEW FUNCTIONS (Read Contract Tab)
         - totalReferralsPaid()
         - EXPECTED: ✅ Returns correct count
 
-[⏳] 30. Check fee parameters
+[✅] 30. Check fee parameters
         - commissionRate()
         - EXPECTED: ✅ Returns 500 (5%)
         - minSignalPrice()
@@ -244,7 +244,7 @@ VIEW FUNCTIONS (Read Contract Tab)
         - referralPayout()
         - EXPECTED: ✅ Returns 5000000000000000000 (5 USDT)
 
-[⏳] 31. Check predictor status
+[✅] 31. Check predictor status
         - PredictorAccessPass: balanceOf(address)
         - EXPECTED: ✅ Returns 1 for predictors, 0 for non-predictors
         - PredictorAccessPass: isPredictorActive(address)
@@ -254,7 +254,7 @@ VIEW FUNCTIONS (Read Contract Tab)
         - PredictorAccessPass: isBlacklisted(address)
         - EXPECTED: ✅ Returns true/false correctly
 
-[⏳] 32. Check signal ownership
+[✅] 32. Check signal ownership
         - SignalKeyNFT: balanceOf(address)
         - EXPECTED: ✅ Returns number of signals owned
         - SignalKeyNFT: tokensOfOwner(address)
