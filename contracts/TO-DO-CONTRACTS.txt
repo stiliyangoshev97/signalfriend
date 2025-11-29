@@ -87,7 +87,7 @@ SIGNALFRIENDMARKET TESTS - JOIN AS PREDICTOR
          - Transaction succeeds, but NO referral payout
          - Full 20 USDT goes to treasury
 
-[⏳] 8. Try to join TWICE with same wallet
+[✅] 8. Try to join TWICE with same wallet
        - EXPECTED: ❌ REVERT with "AlreadyHasPredictorNFT"
 
 ------------------------------------------------------------------------------
@@ -105,30 +105,30 @@ SIGNALFRIENDMARKET TESTS - BUY SIGNAL
          - Predictor receives 4.75 USDT (95%)
          - Treasury receives 0.75 USDT (5% + 0.5 fee)
 
-[⏳] 10. Buy Signal with HIGHER price (e.g., 10 USDT)
+[✅] 10. Buy Signal with HIGHER price (e.g., 10 USDT)
         - Pre-req: Approve 10.5 USDT
         - _signalPrice: 10000000000000000000 (10 USDT)
         - EXPECTED: ✅ SUCCESS
           - Predictor receives 9.5 USDT
           - Treasury receives 1.0 USDT (0.5 + 0.5 fee)
 
-[⏳] 11. Buy Signal with price BELOW minimum (< 5 USDT)
+[✅] 11. Buy Signal with price BELOW minimum (< 5 USDT)
         - _signalPrice: 1000000000000000000 (1 USDT)
         - EXPECTED: ❌ REVERT with "SignalPriceTooLow"
 
-[⏳] 12. Buy Signal from INVALID predictor (non-predictor address)
+[✅] 12. Buy Signal from INVALID predictor (non-predictor address)
         - _predictor: random address with no NFT
         - EXPECTED: ❌ REVERT with "InvalidPredictor"
 
-[⏳] 13. Buy Signal from BLACKLISTED predictor
+[✅] 13. Buy Signal from BLACKLISTED predictor
         - Pre-req: Blacklist a predictor first (see test #18)
         - EXPECTED: ❌ REVERT with "InvalidPredictor"
 
-[⏳] 14. Buy MULTIPLE signals (same content, different buyers)
+[✅] 14. Buy MULTIPLE signals (same content, different buyers)
         - Same contentIdentifier, different buyer wallets
         - EXPECTED: ✅ SUCCESS - Each buyer gets unique tokenId, same contentIdentifier
 
-[⏳] 15. Buy Signal with INSUFFICIENT allowance
+[✅] 15. Buy Signal with INSUFFICIENT allowance
         - Approve only 4 USDT (less than 5.5 needed)
         - EXPECTED: ❌ REVERT with "InsufficientAllowance"
 
