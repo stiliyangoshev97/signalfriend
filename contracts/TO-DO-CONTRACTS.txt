@@ -66,7 +66,7 @@ SIGNALFRIENDMARKET TESTS - JOIN AS PREDICTOR
        - Cost: 20 USDT
        - EXPECTED: ✅ SUCCESS - Mints PredictorAccessPass NFT, Treasury receives 20 USDT
 
-[⏳] 5. Join as Predictor WITH valid referrer
+[✅] 5. Join as Predictor WITH valid referrer
        - Use a different wallet
        - Pre-req: Wallet A is already a predictor
        - Function: joinAsPredictor(walletA_address)
@@ -75,13 +75,13 @@ SIGNALFRIENDMARKET TESTS - JOIN AS PREDICTOR
          - Referrer (walletA) receives 5 USDT
          - Treasury receives 15 USDT
 
-[⏳] 6. Join as Predictor with INVALID referrer (non-predictor)
+[✅] 6. Join as Predictor with INVALID referrer (non-predictor)
        - Function: joinAsPredictor(random_address)
        - EXPECTED: ✅ SUCCESS (no revert)
          - Transaction succeeds, but NO referral payout
          - Full 20 USDT goes to treasury
 
-[⏳] 7. Join as Predictor with SELF as referrer
+[✅] 7. Join as Predictor with SELF as referrer
        - Function: joinAsPredictor(your_own_address)
        - EXPECTED: ✅ SUCCESS (no revert)
          - Transaction succeeds, but NO referral payout
@@ -191,12 +191,12 @@ SIGNALKEYNFT TESTS - TRANSFERS
 ------------------------------------------------------------------------------
 METADATA URI TESTS (MultiSig)
 ------------------------------------------------------------------------------
-[⏳] 24. Update PredictorAccessPass metadata URI
+[✅] 24. Update PredictorAccessPass metadata URI
         - Signer 1: proposeUpdateMetadataURI("ipfs://new-uri/")
         - Signer 2 + 3: approveAction(actionId)
         - EXPECTED: ✅ SUCCESS - tokenURI(1) returns new URI
 
-[⏳] 25. Update SignalKeyNFT metadata URI
+[✅] 25. Update SignalKeyNFT metadata URI
         - Same process on SignalKeyNFT contract
         - EXPECTED: ✅ SUCCESS - tokenURI(1) returns new URI
 
@@ -268,11 +268,11 @@ VIEW FUNCTIONS (Read Contract Tab)
                     ⏳ REMAINING TASKS
 ================================================================================
 
-[⏳] 1. Complete all manual tests above (items 5-32)
+[⏳] 1. Complete all manual tests above (items 8-23, 26-32)
 
-[⏳] 2. Fix NFT metadata/image display issue
-       - Current URIs may not be loading correctly
-       - May need to update via MultiSig (proposeUpdateMetadataURI)
+[✅] 2. Fix NFT metadata/image display issue
+       - Updated URIs via MultiSig (proposeUpdateMetadataURI)
+       - NFT images now display correctly
 
 [⏳] 3. Integration Tests (Foundry)
        - Cross-contract scenarios
