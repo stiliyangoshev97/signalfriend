@@ -1,0 +1,192 @@
+================================================================================
+                    🤖 AI PROMPTS FOR SIGNALFRIEND PROJECT
+================================================================================
+# Use these prompts to quickly onboard AI assistants to the project state.
+# Copy and paste the relevant prompt when starting a new chat.
+# Last Updated: November 29, 2024
+
+================================================================================
+PROMPT #1: FULL PROJECT CONTEXT REVIEW (Recommended for new chats)
+================================================================================
+
+Please review the SignalFriend project to understand the current state before we continue development. 
+
+First, scan the workspace structure to see what components exist (contracts/, backend/, frontend/, etc.).
+
+Then read and analyze these core documentation files:
+1. `/PROJECT.md` - Business model and overall project vision
+2. `/TO-DO.txt` - Task list with current progress
+3. `/contracts/README.md` - Smart contracts overview (if exists)
+4. `/contracts/PROJECT_CONTEXT.md` - Smart contracts technical details (if exists)
+5. `/contracts/CHANGELOG.md` - Smart contracts version history (if exists)
+6. `/contracts/deployment-addresses.txt` - Deployed contract addresses (if exists)
+7. `/backend/README.md` - Backend overview (if exists)
+8. `/frontend/README.md` - Frontend overview (if exists)
+
+After reviewing what exists, provide a brief summary of:
+- Current project phase and overall status
+- Which components exist (contracts, backend, frontend)
+- What has been completed in each component
+- What is pending/in progress
+- Any blockers or issues noted
+
+Then ask me what I'd like to work on next.
+
+================================================================================
+PROMPT #2: QUICK STATUS CHECK (For shorter sessions)
+================================================================================
+
+Please quickly review the SignalFriend project status:
+
+1. Scan the workspace structure to see what folders/components exist
+2. Read `/TO-DO.txt` - Focus on completed vs pending items
+3. Read `/PROJECT.md` - Quick overview of the project
+
+Give me a 1-paragraph summary of where we are across all components, then ask what I want to work on.
+
+================================================================================
+PROMPT #3: SMART CONTRACTS CONTEXT
+================================================================================
+
+I'm working on SignalFriend smart contracts. Please review:
+
+1. `/contracts/README.md` - Contracts overview
+2. `/contracts/PROJECT_CONTEXT.md` - Technical context
+3. `/contracts/CHANGELOG.md` - Version history
+4. `/contracts/deployment-addresses.txt` - Deployed addresses
+5. Scan `/contracts/src/` to see all contract files
+6. Scan `/contracts/test/` to see test coverage
+
+Summarize the contract architecture, deployment status, and test coverage. Then ask what smart contract work I need help with.
+
+================================================================================
+PROMPT #4: BACKEND CONTEXT (Express/MongoDB)
+================================================================================
+
+I'm working on SignalFriend backend. Please review:
+
+1. `/PROJECT.md` - Overall vision and API requirements
+2. `/TO-DO.txt` - Backend-related tasks
+3. `/backend/README.md` - Backend overview (if exists)
+4. Scan `/backend/` folder structure (if exists)
+5. `/contracts/deployment-addresses.txt` - Contract addresses the backend needs
+
+Summarize the backend architecture, what's implemented, and what's pending. Then ask what backend work I need help with.
+
+================================================================================
+PROMPT #5: FRONTEND CONTEXT (React/Viem/Wagmi/RainbowKit)
+================================================================================
+
+I'm working on SignalFriend frontend. Please review:
+
+1. `/PROJECT.md` - Overall vision and UX requirements
+2. `/TO-DO.txt` - Frontend-related tasks
+3. `/frontend/README.md` - Frontend overview (if exists)
+4. Scan `/frontend/` folder structure (if exists)
+5. `/contracts/deployment-addresses.txt` - Contract addresses for Web3 integration
+
+Summarize the frontend architecture, what's implemented, and what's pending. Then ask what frontend work I need help with.
+
+================================================================================
+PROMPT #6: TESTING CONTEXT
+================================================================================
+
+I'm working on SignalFriend testing. Please review:
+
+1. `/TO-DO.txt` - Testing tasks and manual test checklist
+2. For smart contracts: `/contracts/test/` folder
+3. For backend: `/backend/test/` or `/backend/__tests__/` (if exists)
+4. For frontend: `/frontend/test/` or component tests (if exists)
+
+Summarize what testing exists across all components and what's pending. Then ask what testing work I need.
+
+================================================================================
+PROMPT #7: DEPLOYMENT & OPERATIONS CONTEXT
+================================================================================
+
+I need help with SignalFriend deployment or operations. Please review:
+
+1. `/contracts/RUNBOOK.md` - Smart contracts operations guide (if exists)
+2. `/contracts/deployment-addresses.txt` - Current addresses
+3. Any deployment scripts in `/contracts/script/`, `/backend/`, `/frontend/`
+4. Environment setup files (`.env.example` files)
+
+Summarize deployment status across all components and available operations. Then ask what I need help with.
+
+================================================================================
+PROMPT #8: BUG FIX / ISSUE CONTEXT
+================================================================================
+
+I'm encountering an issue with SignalFriend. Before I describe it, please:
+
+1. Scan the workspace to understand the project structure
+2. Read `/TO-DO.txt` - See current state
+3. Read relevant CHANGELOG files - See recent changes
+4. Read deployment addresses if it's a deployed contract issue
+
+Then I'll describe the issue and we can troubleshoot together.
+
+================================================================================
+PROMPT #9: NEW COMPONENT SETUP
+================================================================================
+
+I want to set up a new component for SignalFriend. Please review:
+
+1. `/PROJECT.md` - Understand the overall vision
+2. `/TO-DO.txt` - See what's planned
+3. Scan existing folders to understand the project structure
+4. `/contracts/deployment-addresses.txt` - Contract addresses for integration
+
+Then ask me which component I want to set up (backend, frontend, etc.) and help me scaffold it properly.
+
+================================================================================
+                    📝 NOTES FOR AI ASSISTANTS
+================================================================================
+
+## Project Overview:
+SignalFriend is a Web3 signal marketplace on BNB Chain where:
+- Predictors sell trading signals as NFTs
+- Traders buy signals and receive transferable receipt NFTs
+- All payments in USDT, transparent on-chain
+
+## Tech Stack:
+- **Smart Contracts:** Solidity, Foundry, OpenZeppelin (BNB Chain)
+- **Backend:** Express.js, MongoDB, ethers.js (planned/in-progress)
+- **Frontend:** React, Viem, Wagmi, RainbowKit (planned/in-progress)
+
+## Project Structure:
+```
+/SignalFriend
+├── PROJECT.md          # Business model, vision
+├── TO-DO.txt           # Master task list
+├── AI-PROMPTS.txt      # This file
+├── contracts/          # Solidity smart contracts (Foundry)
+│   ├── src/            # Contract source files
+│   ├── test/           # Foundry tests
+│   ├── script/         # Deployment scripts
+│   └── *.md            # Documentation
+├── backend/            # Express + MongoDB API (when created)
+└── frontend/           # React + Wagmi frontend (when created)
+```
+
+## Smart Contracts (BNB Testnet - Chain ID 97):
+- MockUSDT: 0xF87d17a5ca95F3f992f82Baabf4eBC5301A178a5
+- SignalFriendMarket: 0x5133397a4B9463c5270beBa05b22301e6dD184ca
+- PredictorAccessPass: 0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4
+- SignalKeyNFT: 0xfb26Df6101e1a52f9477f52F54b91b99fb016aed
+
+## Key Documentation:
+- `PROJECT.md` - Business model, legal strategy, vision
+- `TO-DO.txt` - Master task list across all components
+- `contracts/PROJECT_CONTEXT.md` - Smart contracts technical details
+- `contracts/CHANGELOG.md` - Smart contracts version history
+- `contracts/RUNBOOK.md` - Smart contracts operations guide
+- `contracts/README.md` - Smart contracts overview
+
+## Important Patterns:
+- Smart contracts use 3-of-3 MultiSig governance
+- Two-phase deployment (script + manual MultiSig setup)
+- Backend verifies NFT ownership + MongoDB purchase records
+- Frontend uses Wagmi hooks for Web3 interactions
+
+================================================================================

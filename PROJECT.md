@@ -73,46 +73,55 @@ The platform uses **three tightly integrated Smart Contracts**, all governed by
 
 ---
 
-## V. MongoDB Data Architecture (4 Core Models)
-
-The data models reflect the new fields for filtering (`riskLevel`, `potentialReward`) and the detailed content structure (`reasoning`).
+## V. 💾 MongoDB Data Architecture
 
 ### 1. 🧑‍💻 Predictor Model (Sellers)
 
-| Field                         | Purpose                                                 |
-| ----------------------------- | ------------------------------------------------------- |
-| `walletAddress` (Primary Key) | On-chain address holding the Predictor Access Pass NFT. |
-| `isBlacklisted`               | Status synced from the Smart Contract.                  |
-| `totalSalesCount`             | Calculated count of signals sold.                       |
-| `averageRating`               | Calculated from the **Review** Model.                   |
+This model serves as the searchable off-chain profile for sellers and stores calculated metrics.
+
+| Field                         | Purpose                                                         | Visibility                                    | Example Content   |
+| ----------------------------- | --------------------------------------------------------------- | --------------------------------------------- | ----------------- |
+| `walletAddress` (Primary Key) | On-chain address holding the P.A.P. NFT.                        | **High** (Public profile ID)                  | `0x5d4A...b5f2`   |
+| `isBlacklisted`               | Status synced from the **P.A.P. Contract** (via event).         | **Internal** (Used for filtering out sellers) | `true` or `false` |
+| `totalSalesCount`             | Calculated count of signals sold (synced from `Receipt` model). | **High** (Leaderboards/Profile)               | `145`             |
+| `averageRating`               | Calculated from the **`Review` Model**.                         | **High** (Leaderboards/Profile)               | `4.6`             |
 
 ### 2. 📢 Signal Model (Content & Metadata)
 
-| Field                     | Purpose                                                                         |
-| ------------------------- | ------------------------------------------------------------------------------- |
-| `contentId` (Primary Key) | The non-unique ID linking the NFT receipt to the content.                       |
-| **`category`**            | **NEW:** Platform-defined category (e.g., `Crypto - DeFi`).                     |
-| **`riskLevel`**           | **NEW:** `Low`, `Medium`, `High`. Used for filtering.                           |
-| **`potentialReward`**     | **NEW:** `Normal`, `Medium`, `High`. Used for filtering.                        |
-| `expiryDate`              | Time-to-live index for signal removal.                                          |
-| `fullContent`             | Private data unlocked after purchase.                                           |
-| **`reasoning`**           | **NEW:** Predictor's detailed justification (private, unlocked after purchase). |
+This model stores all necessary content, metadata, and security fields for a signal.
+
+| Field                    | Purpose                                                             | Visibility                                | Example Content                                                               |
+| ------------------------ | ------------------------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------- |
+| `contentId`(Primary Key) | The non-unique ID linking all receipts to this content.             | **Internal** (Used by `Receipt` model)    | `661a5b...1f09`                                                               |
+| **`name`**               | **The Headline/Title.** Primary, concise identifier for the signal. | **High** (Listings/Cards)                 | "BTC: Short-Term Breakout to $68k"                                            |
+| `description`            | Teaser hook for the signal, visible before purchase.                | **Medium** (Signal Detail Page)           | "Anticipating a swift move past key resistance at $65k based on volume data." |
+| `category`               | Platform-defined category (e.g., Crypto - DeFi).                    | **High**(Filters/Browsing)                | `"Ethereum (ETH)"`                                                            |
+| `riskLevel`              | Predictor-defined risk level (Low, Medium, High).                   | **High**(Filters/Browsing)                | `"Medium"`                                                                    |
+| `potentialReward`        | Predictor-defined reward potential (Normal, Medium, High).          | **High**(Filters/Browsing)                | `"High"`                                                                      |
+| `expiryDateTime`         | Time-to-live index for signal removal.                              | **High** (Displaying countdown)           | `2025-12-10T15:00:00Z`                                                        |
+| `reasoning`              | Predictor's detailed justification for the trade.                   | **Low (Hidden)**(Unlocked after purchase) | "The 4-hour RSI shows a bullish divergence from the daily chart..."           |
+| `fullContent`            | The *exact* trade parameters (entry, exit, stop-loss, duration).    | **Low (Hidden)**(Unlocked after purchase) | "Entry: $63,500. TP: $68,100. SL: $62,900."                                   |
 
 ### 3. 🧾 Receipt Model (The Unique Link)
 
-| Field                   | Purpose                                                     |
-| ----------------------- | ----------------------------------------------------------- |
-| `tokenId` (Primary Key) | The unique ERC-721 ID of the buyer's NFT receipt.           |
-| `buyerWallet`           | The address that bought the NFT.                            |
-| `contentId`             | The non-unique content ID that this unique receipt unlocks. |
+This model links the user's unique NFT receipt to the shared signal content.
+
+| Field                   | Purpose                                                          | Visibility                                    | Example Content        |
+| ----------------------- | ---------------------------------------------------------------- | --------------------------------------------- | ---------------------- |
+| `tokenId` (Primary Key) | The unique ERC-721 ID of the buyer's **Signal Key NFT** receipt. | **Internal/Low** (Used for unlock check)      | `42`                   |
+| `buyerWallet`           | The address that bought and currently holds the NFT.             | **Internal** (Used for user purchase history) | `0x1f56...c3a9`        |
+| `contentId`             | The non-unique ID of the signal that this receipt unlocks.       | **Internal** (Used to join to `Signal`model)  | `661a5b...1f09`        |
+| `purchaseTimestamp`     | The time the event was indexed.                                  | **Internal**                                  | `2025-11-29T13:00:00Z` |
 
 ### 4. ⭐ Review Model (The Immutable Score Source)
 
-| Field                   | Purpose                                                  |
-| ----------------------- | -------------------------------------------------------- |
-| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase. |
-| `score` (1-5)           | The final rating score.                                  |
-| `isRatedOnChain`        | Status synced from the `markSignalRated` event.          |
+This model tracks ratings, enforced one-per-purchase by the `tokenId`.
+
+| Field                   | Purpose                                                                 | Visibility                                       | Example Content |
+| ----------------------- | ----------------------------------------------------------------------- | ------------------------------------------------ | --------------- |
+| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase.                | **Internal** (Used for lookup)                   | `42`            |
+| `score` (1-5)           | The final rating score.                                                 | **Internal** (Used to calculate `averageRating`) | `5`             |
+| `isRatedOnChain`        | Status synced from the **`markSignalRated` event** in the Orchestrator. | **Internal** (Prevents off-chain double rating)  | `true`          |
 
 ### VI. Category Structure
 
@@ -209,8 +218,6 @@ When a user buys Signal A and receives **TokenID 124**, your Express Indexer cr
 | **125**                  | **'SIG-B'**                    | Trader X |
 | **126**                  | **'SIG-A'**                    | Trader Y |
 
-Export to Sheets
-
 ### 2. The Verification Flow
 
 When **Trader X** tries to unlock their content:
@@ -251,16 +258,16 @@ This architecture is designed for **sonic-speed performance** by serving struc
 
 This model serves as the single source of truth for a seller's profile and reputation.
 
-| Field                 | Type         | Uniqueness/Index                | Description                                                                 |
-| --------------------- | ------------ | ------------------------------- | --------------------------------------------------------------------------- |
-| **`walletAddress`**   | String       | **Unique (Index, PRIMARY KEY)** | The on-chain address holding the `Predictor Access Pass NFT`.               |
-| **`nickname`**        | String       | **Unique (Index)**              | Public display name.                                                        |
-| **`isBlacklisted`**   | Boolean      | Indexed                         | Synced from the Smart Contract (Logic Contract's blacklist mapping).        |
-| **`isVerified`**      | Boolean      | Indexed                         | Status for verified badge (after 100 sales or manual onboarding).           |
-| **`bio`**             | String       |                                 | Predictor biography.                                                        |
-| **`socialLinks`**     | Array/Object |                                 | Telegram, Discord, Twitter (optional).                                      |
-| **`totalSalesCount`** | Number       | Indexed                         | Critical for leaderboards. Calculated by indexing `SignalPurchased` events. |
-| **`averageRating`**   | Number (1-5) | Indexed                         | Current aggregated rating. Calculated from the **Reviews**Model.            |
+| Field             | Type           | Uniqueness/Index         | Description                                                                 |
+| ----------------- | -------------- | ------------------------ | --------------------------------------------------------------------------- |
+| `walletAddress`   | `String`       | **Unique** (PRIMARY KEY) | The on-chain address holding the **Predictor Access Pass NFT**.             |
+| `nickname`        | `String`       | **Unique** (Index)       | Public display name.                                                        |
+| `isBlacklisted`   | `Boolean`      | Indexed                  | Status synced from the Smart Contract (Logic Contract's blacklist mapping). |
+| `isVerified`      | `Boolean`      | Indexed                  | Status for verified badge (after 100 sales or manual onboarding).           |
+| `bio`             | `String`       |                          | Predictor biography.                                                        |
+| `socialLinks`     | `Array/Object` |                          | Telegram, Discord, Twitter (optional).                                      |
+| `totalSalesCount` | `Number`       | Indexed                  | Critical for leaderboards. Calculated by indexing `SignalPurchased`events.  |
+| `averageRating`   | `Number` (1-5) | Indexed                  | Current aggregated rating. Calculated from the `ReviewsModel`.              |
 
 ---
 
@@ -268,20 +275,20 @@ This model serves as the single source of truth for a seller's profile and reput
 
 This model holds the signal's public and private content, ready to be unlocked.
 
-| Field                 | Type   | Uniqueness/Index                | Visibility             | Description                                                                   |
-| --------------------- | ------ | ------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
-| **`contentId`**       | String | **Unique (Index, PRIMARY KEY)** | Hidden                 | The non-unique ID passed to the NFT upon purchase (e.g., `SIG-A`).            |
-| **`predictorWallet`** | String | Indexed                         | Public                 | Reference to Predictor Model (seller address).                                |
-| **`name`**            | String |                                 | Public                 | Signal title.                                                                 |
-| **`description`**     | String |                                 | Public                 | Short summary, visible **before** purchase.                                   |
-| **`priceUSDT`**       | Number | Indexed                         | Public                 | Price set by the Predictor.                                                   |
-| **`category`**        | String | Indexed                         | Public                 | Platform-defined category (e.g., `Crypto - DeFi`, `Forex - Majors`).          |
-| **`riskLevel`**       | String | Indexed                         | Public                 | **NEW:** `Low`, `Medium`, `High`. Used for filtering.                         |
-| **`potentialReward`** | String | Indexed                         | Public                 | **NEW:** `Normal`, `Medium`, `High`. Used for filtering.                      |
-| **`expiryDate`**      | Date   | **TTL Index**                   | Public                 | Signal expires and is removed from active listings.                           |
-| **`fullContent`**     | String |                                 | **Private (Unlocked)** | The core signal data (entry/exit points).                                     |
-| **`reasoning`**       | String |                                 | **Private (Unlocked)** | **NEW:** The Predictor's detailed justification, visible only after purchase. |
-| **`totalBuyers`**     | Number | Indexed                         | Public                 | Count of unique buyers (useful for popularity metrics).                       |
+| Field             | Type     | Uniqueness/Index         | Description                                                        |
+| ----------------- | -------- | ------------------------ | ------------------------------------------------------------------ |
+| `contentId`       | `String` | **Unique** (PRIMARY KEY) | The non-unique ID passed to the NFT upon purchase (e.g., `SIG-A`). |
+| `predictorWallet` | `String` | Indexed                  | Reference to Predictor Model (seller address).                     |
+| **`name`**        | `String` |                          | **Signal title/headline (Public).**                                |
+| **`description`** | `String` |                          | **Short summary, visible before purchase (Public).**               |
+| `priceUSDT`       | `Number` | Indexed                  | Price set by the Predictor.                                        |
+| `category`        | `String` | Indexed                  | Platform-defined category (e.g., Crypto - DeFi, Forex - Majors).   |
+| `riskLevel`       | `String` | Indexed                  | Predictor-defined risk level (`Low`, `Medium`, `High`).            |
+| `potentialReward` | `String` | Indexed                  | Predictor-defined reward potential (`Normal`, `Medium`, `High`).   |
+| `expiryDate`      | `Date`   | **TTL Index**            | Signal expires and is removed from active listings.                |
+| `fullContent`     | `String` |                          | The core signal data (entry/exit points) - **Private (Unlocked)**. |
+| `reasoning`       | `String` |                          | The Predictor's detailed justification - **Private (Unlocked)**.   |
+| `totalBuyers`     | `Number` | Indexed                  | Count of unique buyers (useful for popularity metrics).            |
 
 ---
 
@@ -289,12 +296,12 @@ This model holds the signal's public and private content, ready to be unlocked.
 
 This is the **CRITICAL** mapping model, created by the Express Indexer listening to the `SignalPurchased` event.
 
-| Field              | Type   | Uniqueness/Index                | Description                                                                              |
-| ------------------ | ------ | ------------------------------- | ---------------------------------------------------------------------------------------- |
-| **`tokenId`**      | Number | **Unique (Index, PRIMARY KEY)** | The unique ERC-721 ID of the buyer's NFT receipt.                                        |
-| **`buyerWallet`**  | String | Indexed                         | The address that bought the NFT.                                                         |
-| **`contentId`**    | String | Indexed                         | Reference to the Signal Model. The non-unique signal content ID that this token unlocks. |
-| **`purchaseDate`** | Date   |                                 | Timestamp of the purchase event.                                                         |
+| Field          | Type     | Uniqueness/Index         | Description                                                                              |
+| -------------- | -------- | ------------------------ | ---------------------------------------------------------------------------------------- |
+| `tokenId`      | `Number` | **Unique** (PRIMARY KEY) | The unique ERC-721 ID of the buyer's NFT receipt.                                        |
+| `buyerWallet`  | `String` | Indexed                  | The address that bought the NFT.                                                         |
+| `contentId`    | `String` | Indexed                  | Reference to the Signal Model. The non-unique signal content ID that this token unlocks. |
+| `purchaseDate` | `Date`   |                          | Timestamp of the purchase event.                                                         |
 
 ---
 
@@ -302,13 +309,13 @@ This is the **CRITICAL** mapping model, created by the Express Indexer listeni
 
 Tracks all user ratings, enforced by the unique purchase receipt.
 
-| Field                 | Type         | Uniqueness/Index                | Description                                                                                      |
-| --------------------- | ------------ | ------------------------------- | ------------------------------------------------------------------------------------------------ |
-| **`tokenId`**         | Number       | **Unique (Index, PRIMARY KEY)** | The unique NFT receipt ID. Used to enforce **one rating per purchase** (on-chain marker).        |
-| **`predictorWallet`** | String       | Indexed                         | Reference to the seller being reviewed.                                                          |
-| **`score`**           | Number (1-5) |                                 | The final rating score.                                                                          |
-| **`reviewText`**      | String       |                                 | The optional text review.                                                                        |
-| **`isRatedOnChain`**  | Boolean      |                                 | Status synced from the `markSignalRated` event (used by the Smart Contract for one-time rating). |
+| Field             | Type          | Uniqueness/Index         | Description                                                                                      |
+| ----------------- | ------------- | ------------------------ | ------------------------------------------------------------------------------------------------ |
+| `tokenId`         | `Number`      | **Unique** (PRIMARY KEY) | The unique NFT receipt ID. Used to enforce **one rating per purchase**.                          |
+| `predictorWallet` | `String`      | Indexed                  | Reference to the seller being reviewed.                                                          |
+| `score`           | `Number`(1-5) |                          | The final rating score.                                                                          |
+| `reviewText`      | `String`      |                          | The optional text review.                                                                        |
+| `isRatedOnChain`  | `Boolean`     |                          | Status synced from the `markSignalRated` event (used by the Smart Contract for one-time rating). |
 
 ---
 
@@ -316,12 +323,12 @@ Tracks all user ratings, enforced by the unique purchase receipt.
 
 This model ensures a consistent, platform-defined list of categories for Predictors to select and Traders to filter.
 
-| Field             | Type    | Uniqueness/Index                | Description                                                                              |
-| ----------------- | ------- | ------------------------------- | ---------------------------------------------------------------------------------------- |
-| **`name`**        | String  | **Unique (Index, PRIMARY KEY)** | The full category name (e.g., `Crypto - DeFi`).                                          |
-| **`mainGroup`**   | String  | Indexed                         | The high-level grouping (`Crypto`, `Traditional Finance`, `Macro / Other`).              |
-| **`description`** | String  |                                 | A short explanation of the category's focus.                                             |
-| **`isActive`**    | Boolean | Indexed                         | Flag to easily enable/disable categories on the frontend (for future expansion control). |
+| Field         | Type      | Uniqueness/Index         | Description                                                                 |
+| ------------- | --------- | ------------------------ | --------------------------------------------------------------------------- |
+| `name`        | `String`  | **Unique** (PRIMARY KEY) | The full category name (e.g., `Crypto - DeFi`).                             |
+| `mainGroup`   | `String`  | Indexed                  | The high-level grouping (`Crypto`, `Traditional Finance`, `Macro / Other`). |
+| `description` | `String`  |                          | A short explanation of the category's focus.                                |
+| `isActive`    | `Boolean` | Indexed                  | Flag to easily enable/disable categories on the frontend.                   |
 
 ## 🧭 Other Models and Architectural Decisions
 
@@ -723,6 +730,12 @@ You are 100% correct to separate the two and use the custom RPC URL for your cor
 
 ---
 
+### 📟 Frontend, Wagmi, Viem, Rainbow (logic)
+
+- Approve unlimited amount for spending USDT for the contract so we have no issues or maybe not do it and just make accurate calculation, think of it..
+
+---
+
 ### 💾 Data & Backend Logic (Express/MongoDB)
 
 - **Hybrid Security:** Sensitive signal content and high-volume data (profiles, reviews) are stored **off-chain in MongoDB**.
@@ -738,6 +751,7 @@ You are 100% correct to separate the two and use the custom RPC URL for your cor
 
 - **Rating System:** Users can **rate (1 to 5 stars) and review** sellers after purchase (once per purchase receipt). The seller's rank is derived from these user ratings.
 - **Predictor Profile:** Seller profiles list their signals, which have descriptions and can be **sorted/filtered based on platform-defined categories**.
+- Sellers can see how much they earned
 - **Public Metrics:** A buyer can view a seller's **total sales and total active signals**.
 - **Seller Verification:** Sellers receive a **verified badge upon request after 100 sales**. Onboarded "premium" sellers will be verified from the beginning.
 - **Predictor Info:** Sellers can include **social media links** (optional).
