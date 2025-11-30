@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
 > **Last Updated:** November 30, 2024  
-> **Current Phase:** Foundation Complete ✅ → Building Features  
-> **Project Status:** 🟡 **In Development (40/100)** - Core Infrastructure Ready  
-> **Branch:** `main` (foundation merged)
+> **Current Phase:** Building Features  
+> **Project Status:** 🟡 **In Development (50/100)** - Categories Feature Complete  
+> **Branch:** `feature/backend-categories` (ready for PR)
 
 ---
 
@@ -37,7 +37,7 @@ backend/
 │   ├── features/                # Feature-based modules
 │   │   ├── auth/                # SIWE + JWT authentication ✅
 │   │   ├── webhooks/            # Alchemy event indexing ✅
-│   │   ├── categories/          # Signal categories ⏳
+│   │   ├── categories/          # Signal categories ✅
 │   │   ├── predictors/          # Predictor profiles ⏳
 │   │   ├── signals/             # Trading signals ⏳
 │   │   ├── receipts/            # Purchase receipts ⏳
@@ -192,12 +192,15 @@ backend/
 | POST | `/api/auth/verify` | No | Verify signature, get JWT |
 | GET | `/api/auth/me` | Yes | Get current user |
 | POST | `/api/webhooks/alchemy` | Signature | Blockchain event webhook |
+| GET | `/api/categories` | No | List all categories |
+| GET | `/api/categories/:slug` | No | Get category by slug |
+| POST | `/api/categories` | Yes | Create category (admin) |
+| PUT | `/api/categories/:slug` | Yes | Update category (admin) |
+| DELETE | `/api/categories/:slug` | Yes | Delete category (admin) |
 
 ### Planned ⏳
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/api/categories` | No | List all categories |
-| GET | `/api/categories/:slug` | No | Get category by slug |
 | GET | `/api/predictors` | No | List predictors (filtered) |
 | GET | `/api/predictors/:address` | No | Get predictor profile |
 | PUT | `/api/predictors/:address` | Yes | Update own profile |
@@ -303,9 +306,10 @@ npm test
 | 4. MongoDB Models | ✅ Complete | All 5 models defined |
 | 5. Auth Feature | ✅ Complete | SIWE + JWT flow |
 | 6. Webhook Feature | ✅ Scaffolded | Routes ready, event decoding pending |
-| 7. Core Features | ⏳ Pending | Categories, Predictors, Signals, etc. |
-| 8. Testing | ⏳ Pending | Unit & integration tests |
-| 9. Deployment | ⏳ Pending | Docker, MongoDB Atlas |
+| 7. Categories Feature | ✅ Complete | Full CRUD with validation |
+| 8. Remaining Features | ⏳ Pending | Predictors, Signals, Receipts, Reviews |
+| 9. Testing | ⏳ Pending | Unit & integration tests |
+| 10. Deployment | ⏳ Pending | Docker, MongoDB Atlas |
 
 ---
 

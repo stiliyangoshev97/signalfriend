@@ -1,3 +1,17 @@
+/**
+ * @fileoverview Main entry point for the SignalFriend backend server.
+ *
+ * This file sets up and configures the Express application with:
+ * - Security middleware (Helmet, CORS)
+ * - Rate limiting (general + auth-specific)
+ * - Body parsing and cookie parsing
+ * - API routes (auth, webhooks, categories)
+ * - Health check endpoint
+ * - Error handling and 404 handler
+ * - Graceful shutdown handling
+ *
+ * @module index
+ */
 import express from "express";
 import cookieParser from "cookie-parser";
 import { env } from "./shared/config/env.js";
@@ -8,7 +22,9 @@ import { rateLimiter } from "./shared/middleware/rateLimiter.js";
 import { errorHandler, notFoundHandler } from "./shared/middleware/errorHandler.js";
 import { authRoutes } from "./features/auth/auth.routes.js";
 import { webhookRoutes } from "./features/webhooks/webhook.routes.js";
+import { categoryRoutes } from "./features/categories/category.routes.js";
 
+/** Express application instance */
 const app = express();
 
 // Trust proxy (for rate limiting behind reverse proxy)
@@ -41,13 +57,13 @@ app.get("/health", (_req, res) => {
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/webhooks", webhookRoutes);
+app.use("/api/categories", categoryRoutes);
 
 // TODO: Add remaining feature routes
 // app.use("/api/predictors", predictorRoutes);
 // app.use("/api/signals", signalRoutes);
 // app.use("/api/receipts", receiptRoutes);
 // app.use("/api/reviews", reviewRoutes);
-// app.use("/api/categories", categoryRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
@@ -55,7 +71,12 @@ app.use(notFoundHandler);
 // Error handler (must be last)
 app.use(errorHandler);
 
-// Graceful shutdown
+/**
+ * Handles graceful shutdown of the server.
+ * Closes database connections and exits cleanly.
+ *
+ * @param signal - The signal that triggered the shutdown (SIGTERM or SIGINT)
+ */
 async function gracefulShutdown(signal: string): Promise<void> {
   logger.info(`${signal} received. Starting graceful shutdown...`);
 
@@ -67,7 +88,12 @@ async function gracefulShutdown(signal: string): Promise<void> {
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
-// Start server
+/**
+ * Initializes and starts the Express server.
+ * Connects to the database and begins listening for requests.
+ *
+ * @throws Will exit process if database connection fails
+ */
 async function startServer(): Promise<void> {
   try {
     // Connect to database
