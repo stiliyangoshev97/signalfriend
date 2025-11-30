@@ -1,22 +1,54 @@
+/**
+ * @fileoverview MongoDB model for Signal documents.
+ *
+ * Signals are the core content sold by predictors. Each signal has:
+ * - Public metadata (title, description, price, ratings)
+ * - Protected content (revealed only after purchase)
+ * - Statistics (sales count, average rating)
+ *
+ * @module features/signals/signal.model
+ */
 import mongoose, { Schema, Document } from "mongoose";
 
+/**
+ * Interface representing a Signal document in MongoDB.
+ * Extends Mongoose Document for type safety.
+ */
 export interface ISignal extends Document {
-  contentId: string; // Unique content identifier (e.g., UUID)
+  /** Unique content identifier (UUID v4) */
+  contentId: string;
+  /** Reference to the predictor who created this signal */
   predictorId: mongoose.Types.ObjectId;
+  /** Predictor's wallet address (denormalized for quick queries) */
   predictorAddress: string;
+  /** Signal title (public) */
   title: string;
+  /** Public description shown before purchase */
   description: string;
-  content: string; // The actual signal content (encrypted or protected)
+  /** Protected signal content (revealed after purchase) */
+  content: string;
+  /** Reference to the signal's category */
   categoryId: mongoose.Types.ObjectId;
-  priceUsdt: number; // Price in USDT (from contract)
+  /** Price in USDT */
+  priceUsdt: number;
+  /** Total number of purchases */
   totalSales: number;
+  /** Average rating from reviews (0-5) */
   averageRating: number;
+  /** Total number of reviews */
   totalReviews: number;
+  /** Whether the signal is active (soft delete) */
   isActive: boolean;
+  /** Timestamp when signal was created */
   createdAt: Date;
+  /** Timestamp when signal was last updated */
   updatedAt: Date;
 }
 
+/**
+ * Mongoose schema definition for Signal documents.
+ * Includes indexes for efficient queries.
+ */
 const signalSchema = new Schema<ISignal>(
   {
     contentId: {

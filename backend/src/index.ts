@@ -23,6 +23,10 @@ import { errorHandler, notFoundHandler } from "./shared/middleware/errorHandler.
 import { authRoutes } from "./features/auth/auth.routes.js";
 import { webhookRoutes } from "./features/webhooks/webhook.routes.js";
 import { categoryRoutes } from "./features/categories/category.routes.js";
+import { predictorRoutes } from "./features/predictors/predictor.routes.js";
+import { signalRoutes } from "./features/signals/signal.routes.js";
+import { receiptRoutes } from "./features/receipts/receipt.routes.js";
+import { reviewRoutes } from "./features/reviews/review.routes.js";
 
 /** Express application instance */
 const app = express();
@@ -58,12 +62,10 @@ app.get("/health", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/webhooks", webhookRoutes);
 app.use("/api/categories", categoryRoutes);
-
-// TODO: Add remaining feature routes
-// app.use("/api/predictors", predictorRoutes);
-// app.use("/api/signals", signalRoutes);
-// app.use("/api/receipts", receiptRoutes);
-// app.use("/api/reviews", reviewRoutes);
+app.use("/api/predictors", predictorRoutes);
+app.use("/api/signals", signalRoutes);
+app.use("/api/receipts", receiptRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
