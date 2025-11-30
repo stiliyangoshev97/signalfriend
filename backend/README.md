@@ -209,3 +209,89 @@ npm run seed:categories  # Seed default categories
 - **Ratings are entirely off-chain** in MongoDB (removed from smart contracts in v0.6.1)
 - One review per purchase receipt (enforced by unique `tokenId` in Review model)
 - Blacklisted predictors are hidden from API responses
+
+---
+
+## Development Phase Guide
+
+### Phase 1: Foundation ✅
+> **Goal:** Basic project structure with health check
+
+| Task | Status | Description |
+|------|--------|-------------|
+| Project setup | ✅ | TypeScript, ESLint, Prettier configuration |
+| Express server | ✅ | Basic HTTP server with middleware stack |
+| Health endpoint | ✅ | `GET /health` for uptime monitoring |
+| Logger setup | ✅ | Pino logger with request/response logging |
+| Error handling | ✅ | Global error handler, ApiError class |
+
+### Phase 2: Database & Configuration ✅
+> **Goal:** MongoDB connection and environment management
+
+| Task | Status | Description |
+|------|--------|-------------|
+| MongoDB connection | ✅ | Mongoose with connection retry logic |
+| Environment config | ✅ | Zod-validated env vars, .env.example |
+| Base models | ✅ | Mongoose schemas with indexes and timestamps |
+| Database seeding | ✅ | Category seeding script |
+
+### Phase 3: Authentication ✅
+> **Goal:** Web3-native authentication with JWT
+
+| Task | Status | Description |
+|------|--------|-------------|
+| SIWE integration | ✅ | Sign-In with Ethereum message verification |
+| Nonce generation | ✅ | Time-limited nonces for replay protection |
+| JWT tokens | ✅ | Access tokens with wallet address payload |
+| Auth middleware | ✅ | `requireAuth` for protected routes |
+
+### Phase 4: Core CRUD Features ✅
+> **Goal:** All domain models with full REST APIs
+
+| Task | Status | Description |
+|------|--------|-------------|
+| Categories API | ✅ | List, get by slug, create, update, delete |
+| Predictors API | ✅ | Profile management, leaderboards, search |
+| Signals API | ✅ | Create, list, protected content unlock |
+| Receipts API | ✅ | Purchase history, predictor stats |
+| Reviews API | ✅ | Create, update, delete with rating recalc |
+
+### Phase 5: Blockchain Integration ✅
+> **Goal:** Viem clients and Alchemy webhook indexing
+
+| Task | Status | Description |
+|------|--------|-------------|
+| Viem clients | ✅ | Public and wallet clients for BNB Chain |
+| Contract ABIs | ✅ | Type-safe ABI imports for all contracts |
+| Webhook endpoint | ✅ | Alchemy signature verification |
+| Event handlers | ✅ | PredictorJoined, SignalPurchased, Blacklisted |
+
+### Phase 6: Testing & Quality 🔄
+> **Goal:** Comprehensive test coverage
+
+| Task | Status | Description |
+|------|--------|-------------|
+| Unit tests | 🔄 | Service layer tests with mocks |
+| Integration tests | 🔄 | API endpoint tests with test database |
+| E2E tests | 🔄 | Full flow tests including blockchain |
+| Test fixtures | 🔄 | Factory functions for test data |
+
+### Phase 7: Production Readiness 🔄
+> **Goal:** Deployment and monitoring
+
+| Task | Status | Description |
+|------|--------|-------------|
+| Docker setup | 🔄 | Dockerfile and docker-compose.yml |
+| Rate limiting | 🔄 | Request throttling per IP/wallet |
+| CORS config | 🔄 | Whitelist frontend origins |
+| API documentation | 🔄 | OpenAPI/Swagger spec generation |
+| Monitoring | 🔄 | Health metrics, error tracking |
+
+### Legend
+
+| Symbol | Meaning |
+|--------|---------|
+| ✅ | Complete |
+| 🔄 | In Progress |
+| ⏳ | Planned |
+| ❌ | Blocked |

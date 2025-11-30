@@ -1,74 +1,22 @@
-## SignalFriend
+# SignalFriend
 
-That is an **excellent refinement** of the business mo| **Rating System| **Rati| **Rating System*| **Un| **Rating System**    | Rating submissions are ha| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase.                | **Internal** (Used for lookup)                   | `42`            |
-| `score` (1-5)           | `score`           | `Number`(1-5) |                          | The final rating score.                                                                          |
-| `reviewText`      | `String`      |                          | The optional text review.                                                                        |
-| `createdAt`       | `Date`        |                          | Timestamp when the review was submitted.                                                    - **Rating Enforcement:** The rating system is **entirely off-chain** in MongoDB. Express backend enforces **one rating per purchase receipt (Token ID)** via database lookup.    |he final rating score.                                                 | **Internal** (Used to calculate `averageRating`) | `5`             |
-| `reviewText`            | Optional text feedback from the buyer.                                  | **Internal** (Displayed on signal page)          | `"Great call!"` |
-| `createdAt`             | Timestamp when the review was submitted.                                | **Internal** (For sorting/display)               | ISO Date        |ed off-chain for speed and flexibility.                                                     | Express backend enforces **one rating per purchase receipt (Token ID)** via MongoDB lookup, preventing double-rating.                                                                          |ock Flow**      | The unique NFT ID is used to verify ownership on-chain, and then unlock the off-chain content via the database mapping. | The Express backend performs a **Two-Part Check** (via Viem): 1. Verify user **owns** the unique **TokenID**. 2. Retrieve the linked **ContentIdentifier** from the MongoDB **Receipt** Model. |
-| **Rating System**    | Rating submissions are handled **entirely off-chain** in MongoDB for speed and flexibility.                             | The Express backend enforces **one rating per purchase receipt (Token ID)** using the unique `tokenId` as a primary key in the Review model.                                                   |
+## Overview
+
+SignalFriend is a **Web3 Transparent Signal Marketplace** that connects verified prediction makers (Predictors) with traders via a transparent, on-chain NFT mechanism. By structuring the core transaction around an **NFT as a data ticket** within a **gated room**, the platform is legally positioned as a **Digital Information Marketplace** rather than a gambling or betting platform.
 
 ---
 
-## V. 💾 MongoDB Data Architecture Rating submissions are handled **| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase.                | **Internal** (Used for lookup)                   | `42`              |
-| `score` (1-5)        | `tokenId`         | `Number`      | **Unique** (PRIMARY KEY) | The unique NFT receipt ID. Used to enforce **one rating per purchase**. |
-| `predictorWallet` | `String`      | Indexed                  | Reference to the seller being reviewed.                                 |
-| `score`           | `Number`(1-5) |                          | The final rating score.                                                 |
-| `reviewText`      | `String`      |                          | The op- **Malicious Seller Control:** If a seller wallet is blacklisted on-chain, **MongoDB should not display their profile**or active signals.
-- **Rating Enforcement:** The rating system is **entirely off-chain** in MongoDB. The unique `tokenId` (NFT receipt ID) is used as the primary key in the Review model to enforce **one rating per purchase**.
-- **App Infrastructure:** Use **custom RPCs** for reliable blockchain communication. **Back up the database and the whole app** regularly.
-- Api authentication, approve requests only from where is needed (example frontend server, alchemy api, discuss with ai), rate limiting and anything else neededal text review.                                               |
-| `createdAt`       | `Date`        |                          | Timestamp when the review was submitted.                                |The final rating score.                                                 | **Internal** (Used to calculate `averageRating`) | `5`               |
-| `reviewText`            | Optional text review from the buyer.                                    | **Medium** (Displayed on predictor profile)      | `"Great signal!"` |
+## Legal Framework: Addressing the Gambling Risk
 
-### VI. Category Structureely off-chain** in MongoDB for speed and flexibility.                             | The Express backend enforces **one rating per purchase receipt (Token ID)** using the unique `tokenId` as a primary key in the Review model.                                                   |
+The key to avoiding the "gambling" classification is the **NFT as the purchased item**.
 
----
-
-## V. 💾 MongoDB Data Architecture
-
-### 1. 🧑‍💻 Predictor Model (Sellers)
-
-This model serves as the searchable off-chain profile for sellers and stores calculated metrics.**    | Rating submissions are handle| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase.                | **Internal** (Used for lookup)                   | `42`             |
-| `score` (1-5)           | The final rating score.                                                 | **Internal** (Used to calculate `averageRating`) | `5`              |
-| `reviewText`            | Optional text review from the buyer.                                    | **Medium** (Displayed on predictor profile)      | `"Great signal!"` |*entirely off-chain** in MongoDB for speed and flexibility.                             | The Express backend enforces **one rating per purchase receipt (Token ID- **Malicious Seller Control:** If a seller wallet is blacklisted on-chain, **MongoDB should not display their profile**or active signals.
-- **Rating Enforcement:** The rating system is **entirely off-chain** in MongoDB. The unique `tokenId` (NFT receipt ID) is used as the primary key in the Review model to enforce **one rating per purchase**.
-- **App Infrastructure:** Use **custom RPCs** for reliable blockchain communication. **Back up the database and the whole app** regularly. using the unique `tokenId` as a primary key in the Review model.                                                   |
-
----
-
-## V. 💾 MongoDB Data Architecture | Rating submissions ### 4. ⭐ RThis model tracks ratings, enforced one-per-purchase by the `tokenId`.
-
-| Field                   | Purpose                                                                 | Visibility                       | `reviewText`      | `String`      |                          | The optional text review.                                               |
-| `createdAt`       | `Date`        |                          | Timestamp when the review was submitted.                                |              | Example Content  |
-| ----------------------- | ----------------------------------------------------------------------- | ------------------------------------------------ | ---------------- |
-| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase.                | **Internal** (Used for lookup)                   | `42`             |
-| `score` (1-5)           | The final rating score.                                                 | **Internal** (Used to calculate `averageRating`) | `5`              |
-| `reviewText`            | Optional text review from the buyer.                                    | **Medium** (Displayed on predictor profile)      | `"Great signal!"` |
-
-### VI. Category Structureel (The Immutable Score Source)
-
-This model tracks ratings, enforced one-per-purchase by the `tokenId`.
-
-| Field                   | Purpose                                                                 | Visibility                                       | Example Content |
-| ----------------------- | ----------------------------------------------------------------------- | ------------------------------------------------ | --------------- |
-| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase.                | **Internal** (Used for lookup)                   | `42`            |
-| `score` (1-5)           | The final rating score.                                                 | **Internal** (Used to calculate `averageRating`) | `5`             |
-| `reviewText`            | Optional text review from the buyer.                                    | **Medium** (Displayed on predictor profile)      | `"Great call!"` |ed **entirely off-chain** in MongoDB for speed and flexibility.                             | The Express backend enforces **one rating per purchase receipt (Token ID)** using the unique `tokenId` as a primary key in the Review model.                                                   |el. By structuring the core transaction around an **NFT as a data ticket** within a **gated room**, you significantly strengthen the argument that your platform is a **Digital Information Marketplace** and not a gambling or betting platform.
-
-Here is a breakdown of how this refined model addresses the regulatory risks and creates new opportunities:
-
-## 1. ✅ **Addressing the Gambling Risk (The Strength of the NFT)**
-
-The key to avoiding the "gambling" classification is the **NFT as the purchased item**.
-
-| Your NFT-Based Model                                                                                                        | Why It's **NOT** Gambling                                                                                                                                                                   |
+| Your NFT-Based Model                                                                                                        | Why It's **NOT** Gambling                                                                                                                                                                   |
 | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **The Purchase:** A trader pays $X USDC for an NFT (the "ticket").                                                          | This is a **purchase of a digital asset** (the NFT) that contains a piece of data (the signal). The value is exchanged immediately for the data itself, not for a contingent future payout. |
-| **The Signal/Prediction:** The prediction is stored in the NFT's metadata (e.g., Target Price, Timeframe).                  | The prediction is the **content** of the purchased NFT, making the NFT a *content delivery mechanism*, similar to buying a digital research report or a streaming ticket.                   |
-| **No Payout:** When the prediction is correct, the platform/predictor does **not** send any additional funds to the trader. | This breaks the "Prize" element of gambling. The success of the prediction only improves the predictor's **reputation** (rank) and future sales, not their payout for that specific signal. |
+| **The Purchase:** A trader pays $X USDC for an NFT (the "ticket").                                                          | This is a **purchase of a digital asset** (the NFT) that contains a piece of data (the signal). The value is exchanged immediately for the data itself, not for a contingent future payout. |
+| **The Signal/Prediction:** The prediction is stored in the NFT's metadata (e.g., Target Price, Timeframe).                  | The prediction is the **content** of the purchased NFT, making the NFT a *content delivery mechanism*, similar to buying a digital research report or a streaming ticket.                   |
+| **No Payout:** When the prediction is correct, the platform/predictor does **not** send any additional funds to the trader. | This breaks the "Prize" element of gambling. The success of the prediction only improves the predictor's **reputation** (rank) and future sales, not their payout for that specific signal. |
 
-**Conclusion:** This model legally looks like an NFT marketplace (like OpenSea or Magic Eden) where the NFTs are for a **Utility** (data access) rather than art. This is a much safer legal classification.
+**Conclusion:** This model legally looks like an NFT marketplace (like OpenSea or Magic Eden) where the NFTs are for a **Utility** (data access) rather than art. This is a much safer legal classification.
 
 ---
 
