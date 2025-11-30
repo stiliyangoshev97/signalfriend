@@ -1,0 +1,140 @@
+# SignalFriend Backend Development Tracker
+# Created: 2024-11-30
+# Branch: feature/backend-setup
+
+================================================================================
+## PHASE 1: Project Setup ✅
+================================================================================
+[x] Create feature branch (feature/backend-setup)
+[x] Initialize backend folder structure
+[x] Create package.json with dependencies
+[x] Create tsconfig.json
+[x] Create .env.example
+[x] Set up ESLint + Prettier configs
+
+================================================================================
+## PHASE 2: Shared Infrastructure ✅
+================================================================================
+[x] src/shared/config/env.ts - Environment variables with Zod validation
+[x] src/shared/config/database.ts - MongoDB connection with Mongoose
+[x] src/shared/config/logger.ts - Pino logger setup
+[x] src/shared/middleware/security.ts - Helmet, CORS config
+[x] src/shared/middleware/rateLimiter.ts - Express rate limiting
+[x] src/shared/middleware/errorHandler.ts - Global error handler
+[x] src/shared/middleware/validation.ts - Zod validation middleware
+[x] src/shared/middleware/auth.ts - JWT verification middleware
+[x] src/shared/utils/ApiError.ts - Custom error class
+[x] src/shared/utils/asyncHandler.ts - Async route wrapper
+[x] src/shared/types/api.types.ts - API response types
+[x] src/shared/types/common.types.ts - Shared types (Address, etc.)
+
+================================================================================
+## PHASE 3: Contract Integration ⏳
+================================================================================
+[x] src/contracts/addresses.ts - Contract addresses by chainId
+[x] src/contracts/clients.ts - Viem public client setup
+[ ] src/contracts/abis/ - Copy ABIs from contracts/out/
+
+================================================================================
+## PHASE 4: MongoDB Models ✅
+================================================================================
+[x] src/features/predictors/predictor.model.ts
+[x] src/features/signals/signal.model.ts
+[x] src/features/receipts/receipt.model.ts
+[x] src/features/reviews/review.model.ts
+[x] src/features/categories/category.model.ts
+
+================================================================================
+## PHASE 5: Authentication Feature (SIWE + JWT) ✅
+================================================================================
+[x] src/features/auth/auth.schemas.ts - Zod schemas (nonce, verify)
+[x] src/features/auth/auth.service.ts - SIWE verify, JWT sign/verify
+[x] src/features/auth/auth.controller.ts - getNonce, verify, logout
+[x] src/features/auth/auth.routes.ts - POST /auth/nonce, /auth/verify
+[x] src/features/auth/auth.types.ts - Auth-specific types
+
+================================================================================
+## PHASE 6: Webhook Feature (Alchemy Event Indexing) ✅
+================================================================================
+[x] src/features/webhooks/webhook.schemas.ts - Alchemy webhook payload
+[x] src/features/webhooks/webhook.service.ts - Event handlers
+[x] src/features/webhooks/webhook.controller.ts - Process events
+[x] src/features/webhooks/webhook.routes.ts - POST /webhooks/alchemy
+[ ] Set up Alchemy Custom Webhook (PredictorJoined, SignalPurchased, PredictorBlacklisted)
+[ ] Copy ABIs and implement actual event decoding in webhook.service.ts
+
+================================================================================
+## PHASE 7: Core Features
+================================================================================
+
+### Predictors Feature
+[ ] src/features/predictors/predictor.schemas.ts
+[ ] src/features/predictors/predictor.service.ts
+[ ] src/features/predictors/predictor.controller.ts
+[ ] src/features/predictors/predictor.routes.ts
+
+### Signals Feature
+[ ] src/features/signals/signal.schemas.ts
+[ ] src/features/signals/signal.service.ts
+[ ] src/features/signals/signal.controller.ts
+[ ] src/features/signals/signal.routes.ts
+
+### Receipts Feature
+[ ] src/features/receipts/receipt.schemas.ts
+[ ] src/features/receipts/receipt.service.ts
+[ ] src/features/receipts/receipt.controller.ts
+[ ] src/features/receipts/receipt.routes.ts
+
+### Reviews Feature
+[ ] src/features/reviews/review.schemas.ts
+[ ] src/features/reviews/review.service.ts
+[ ] src/features/reviews/review.controller.ts
+[ ] src/features/reviews/review.routes.ts
+
+### Categories Feature
+[ ] src/features/categories/category.schemas.ts
+[ ] src/features/categories/category.service.ts
+[ ] src/features/categories/category.controller.ts
+[ ] src/features/categories/category.routes.ts
+[ ] Database seed script for initial categories
+
+================================================================================
+## PHASE 8: Main App Entry ✅
+================================================================================
+[x] src/index.ts - Express app setup, route mounting
+[x] Health check endpoint
+[x] Graceful shutdown handling
+
+================================================================================
+## PHASE 9: Testing ⏳
+================================================================================
+[x] vitest.config.ts
+[x] tests/setup.ts - Test database setup
+[ ] Unit tests for services
+[ ] Integration tests for routes
+
+================================================================================
+## PHASE 10: Deployment Prep
+================================================================================
+[ ] Dockerfile
+[ ] docker-compose.yml (with MongoDB)
+[ ] Production environment variables
+[ ] MongoDB Atlas setup guide
+
+================================================================================
+## NOTES
+================================================================================
+- Contract Addresses (BNB Testnet - Chain ID 97):
+  - MockUSDT: 0xF87d17a5ca95F3f992f82Baabf4eBC5301A178a5
+  - SignalFriendMarket: 0x5133397a4B9463c5270beBa05b22301e6dD184ca
+  - PredictorAccessPass: 0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4
+  - SignalKeyNFT: 0xfb26Df6101e1a52f9477f52F54b91b99fb016aed
+
+- Alchemy Webhook Setup:
+  1. Go to Alchemy Dashboard → Webhooks → Create Webhook
+  2. Select "Custom Webhook" → "Specific events for a contract"
+  3. Add SignalFriendMarket address
+  4. Select events: PredictorJoined, SignalPurchased, PredictorBlacklisted
+  5. Set webhook URL: https://your-backend.com/api/webhooks/alchemy
+
+- Ratings are ENTIRELY off-chain in MongoDB (removed from smart contracts in v0.6.1)
