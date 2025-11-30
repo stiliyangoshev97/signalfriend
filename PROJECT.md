@@ -1,6 +1,60 @@
 ## SignalFriend
 
-That is an **excellent refinement** of the business model. By structuring the core transaction around an **NFT as a data ticket** within a **gated room**, you significantly strengthen the argument that your platform is a **Digital Information Marketplace** and not a gambling or betting platform.
+That is an **excellent refinement** of the business mo| **Rating System| **Rati| **Rating System*| **Un| **Rating System**    | Rating submissions are ha| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase.                | **Internal** (Used for lookup)                   | `42`            |
+| `score` (1-5)           | `score`           | `Number`(1-5) |                          | The final rating score.                                                                          |
+| `reviewText`      | `String`      |                          | The optional text review.                                                                        |
+| `createdAt`       | `Date`        |                          | Timestamp when the review was submitted.                                                    - **Rating Enforcement:** The rating system is **entirely off-chain** in MongoDB. Express backend enforces **one rating per purchase receipt (Token ID)** via database lookup.    |he final rating score.                                                 | **Internal** (Used to calculate `averageRating`) | `5`             |
+| `reviewText`            | Optional text feedback from the buyer.                                  | **Internal** (Displayed on signal page)          | `"Great call!"` |
+| `createdAt`             | Timestamp when the review was submitted.                                | **Internal** (For sorting/display)               | ISO Date        |ed off-chain for speed and flexibility.                                                     | Express backend enforces **one rating per purchase receipt (Token ID)** via MongoDB lookup, preventing double-rating.                                                                          |ock Flow**      | The unique NFT ID is used to verify ownership on-chain, and then unlock the off-chain content via the database mapping. | The Express backend performs a **Two-Part Check** (via Viem): 1. Verify user **owns** the unique **TokenID**. 2. Retrieve the linked **ContentIdentifier** from the MongoDB **Receipt** Model. |
+| **Rating System**    | Rating submissions are handled **entirely off-chain** in MongoDB for speed and flexibility.                             | The Express backend enforces **one rating per purchase receipt (Token ID)** using the unique `tokenId` as a primary key in the Review model.                                                   |
+
+---
+
+## V. 💾 MongoDB Data Architecture Rating submissions are handled **| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase.                | **Internal** (Used for lookup)                   | `42`              |
+| `score` (1-5)        | `tokenId`         | `Number`      | **Unique** (PRIMARY KEY) | The unique NFT receipt ID. Used to enforce **one rating per purchase**. |
+| `predictorWallet` | `String`      | Indexed                  | Reference to the seller being reviewed.                                 |
+| `score`           | `Number`(1-5) |                          | The final rating score.                                                 |
+| `reviewText`      | `String`      |                          | The op- **Malicious Seller Control:** If a seller wallet is blacklisted on-chain, **MongoDB should not display their profile**or active signals.
+- **Rating Enforcement:** The rating system is **entirely off-chain** in MongoDB. The unique `tokenId` (NFT receipt ID) is used as the primary key in the Review model to enforce **one rating per purchase**.
+- **App Infrastructure:** Use **custom RPCs** for reliable blockchain communication. **Back up the database and the whole app** regularly.
+- Api authentication, approve requests only from where is needed (example frontend server, alchemy api, discuss with ai), rate limiting and anything else neededal text review.                                               |
+| `createdAt`       | `Date`        |                          | Timestamp when the review was submitted.                                |The final rating score.                                                 | **Internal** (Used to calculate `averageRating`) | `5`               |
+| `reviewText`            | Optional text review from the buyer.                                    | **Medium** (Displayed on predictor profile)      | `"Great signal!"` |
+
+### VI. Category Structureely off-chain** in MongoDB for speed and flexibility.                             | The Express backend enforces **one rating per purchase receipt (Token ID)** using the unique `tokenId` as a primary key in the Review model.                                                   |
+
+---
+
+## V. 💾 MongoDB Data Architecture
+
+### 1. 🧑‍💻 Predictor Model (Sellers)
+
+This model serves as the searchable off-chain profile for sellers and stores calculated metrics.**    | Rating submissions are handle| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase.                | **Internal** (Used for lookup)                   | `42`             |
+| `score` (1-5)           | The final rating score.                                                 | **Internal** (Used to calculate `averageRating`) | `5`              |
+| `reviewText`            | Optional text review from the buyer.                                    | **Medium** (Displayed on predictor profile)      | `"Great signal!"` |*entirely off-chain** in MongoDB for speed and flexibility.                             | The Express backend enforces **one rating per purchase receipt (Token ID- **Malicious Seller Control:** If a seller wallet is blacklisted on-chain, **MongoDB should not display their profile**or active signals.
+- **Rating Enforcement:** The rating system is **entirely off-chain** in MongoDB. The unique `tokenId` (NFT receipt ID) is used as the primary key in the Review model to enforce **one rating per purchase**.
+- **App Infrastructure:** Use **custom RPCs** for reliable blockchain communication. **Back up the database and the whole app** regularly. using the unique `tokenId` as a primary key in the Review model.                                                   |
+
+---
+
+## V. 💾 MongoDB Data Architecture | Rating submissions ### 4. ⭐ RThis model tracks ratings, enforced one-per-purchase by the `tokenId`.
+
+| Field                   | Purpose                                                                 | Visibility                       | `reviewText`      | `String`      |                          | The optional text review.                                               |
+| `createdAt`       | `Date`        |                          | Timestamp when the review was submitted.                                |              | Example Content  |
+| ----------------------- | ----------------------------------------------------------------------- | ------------------------------------------------ | ---------------- |
+| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase.                | **Internal** (Used for lookup)                   | `42`             |
+| `score` (1-5)           | The final rating score.                                                 | **Internal** (Used to calculate `averageRating`) | `5`              |
+| `reviewText`            | Optional text review from the buyer.                                    | **Medium** (Displayed on predictor profile)      | `"Great signal!"` |
+
+### VI. Category Structureel (The Immutable Score Source)
+
+This model tracks ratings, enforced one-per-purchase by the `tokenId`.
+
+| Field                   | Purpose                                                                 | Visibility                                       | Example Content |
+| ----------------------- | ----------------------------------------------------------------------- | ------------------------------------------------ | --------------- |
+| `tokenId` (Primary Key) | Unique NFT receipt ID. Enforces one rating per purchase.                | **Internal** (Used for lookup)                   | `42`            |
+| `score` (1-5)           | The final rating score.                                                 | **Internal** (Used to calculate `averageRating`) | `5`             |
+| `reviewText`            | Optional text review from the buyer.                                    | **Medium** (Displayed on predictor profile)      | `"Great call!"` |ed **entirely off-chain** in MongoDB for speed and flexibility.                             | The Express backend enforces **one rating per purchase receipt (Token ID)** using the unique `tokenId` as a primary key in the Review model.                                                   |el. By structuring the core transaction around an **NFT as a data ticket** within a **gated room**, you significantly strengthen the argument that your platform is a **Digital Information Marketplace** and not a gambling or betting platform.
 
 Here is a breakdown of how this refined model addresses the regulatory risks and creates new opportunities:
 
