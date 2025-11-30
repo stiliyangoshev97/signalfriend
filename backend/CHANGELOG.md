@@ -10,13 +10,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Predictors CRUD routes
-- Signals CRUD routes
-- Receipts query routes
-- Reviews CRUD routes
-- Webhook event decoding implementation
+- Webhook event decoding implementation (actual ABI decoding)
 - Unit & integration tests
 - Docker configuration
+
+---
+
+## [0.5.0] - 2024-11-30 🎯 ALL CRUD FEATURES COMPLETE
+
+### Added
+- **Signals Feature - Full CRUD Implementation**
+  - `signal.schemas.ts` - Zod validation for list/get/create/update operations
+  - `signal.service.ts` - Business logic with protected content handling
+  - `signal.controller.ts` - Express route handlers
+  - `signal.routes.ts` - Route definitions with middleware
+
+- **Receipts Feature - Query Implementation**
+  - `receipt.schemas.ts` - Zod validation for list/check operations
+  - `receipt.service.ts` - Business logic with purchase verification
+  - `receipt.controller.ts` - Express route handlers
+  - `receipt.routes.ts` - Route definitions (all auth required)
+
+- **Reviews Feature - Full CRUD Implementation**
+  - `review.schemas.ts` - Zod validation for create/update/list operations
+  - `review.service.ts` - Business logic with rating calculations
+  - `review.controller.ts` - Express route handlers
+  - `review.routes.ts` - Route definitions with middleware
+
+### API Endpoints (v0.5.0)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/signals` | No | List signals (filter, paginate) |
+| GET | `/api/signals/predictor/:address` | No | Get predictor's signals |
+| GET | `/api/signals/:contentId` | No | Get signal metadata |
+| GET | `/api/signals/:contentId/content` | Yes | Get protected content |
+| POST | `/api/signals` | Yes | Create signal (predictor) |
+| PUT | `/api/signals/:contentId` | Yes | Update own signal |
+| DELETE | `/api/signals/:contentId` | Yes | Deactivate own signal |
+| GET | `/api/receipts/mine` | Yes | Get user's purchases |
+| GET | `/api/receipts/stats` | Yes | Get predictor stats |
+| GET | `/api/receipts/check/:contentId` | Yes | Check if purchased |
+| GET | `/api/receipts/signal/:contentId` | Yes | Get signal sales |
+| GET | `/api/receipts/:tokenId` | Yes | Get receipt by ID |
+| GET | `/api/reviews/mine` | Yes | Get user's reviews |
+| GET | `/api/reviews/signal/:contentId` | No | Get signal reviews |
+| GET | `/api/reviews/predictor/:address` | No | Get predictor reviews |
+| GET | `/api/reviews/check/:tokenId` | No | Check if review exists |
+| GET | `/api/reviews/:tokenId` | No | Get review by ID |
+| POST | `/api/reviews` | Yes | Create review |
+| PUT | `/api/reviews/:tokenId` | Yes | Update own review |
+| DELETE | `/api/reviews/:tokenId` | Yes | Delete own review |
+
+### Technical Details
+- Signals have public metadata and protected content (revealed after purchase)
+- Receipts are created via webhooks, not API (idempotent createFromEvent)
+- Reviews enforce one per purchase via unique tokenId constraint
+- Rating statistics auto-calculated on review create/update/delete
+- All features include comprehensive JSDoc documentation
+
+---
+
+## [0.4.0] - 2024-11-30 👤 PREDICTORS FEATURE
+
+### Added
+- **Predictors Feature - Full CRUD Implementation**
+  - `predictor.schemas.ts` - Zod validation for list/get/update operations
+  - `predictor.service.ts` - Business logic with filtering, pagination, stats
+  - `predictor.controller.ts` - Express route handlers
+  - `predictor.routes.ts` - Route definitions with middleware
+
+### API Endpoints (v0.4.0)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/predictors` | No | List predictors (filter, sort, paginate, search) |
+| GET | `/api/predictors/top` | No | Get leaderboard (by sales, rating, signals) |
+| GET | `/api/predictors/:address` | No | Get predictor by wallet address |
+| GET | `/api/predictors/:address/check` | No | Check if address is active predictor |
+| PUT | `/api/predictors/:address` | Yes | Update own profile (predictor only) |
+
+### Technical Details
+- Ethereum address validation via regex pattern
+- Profile updates restricted to predictor owner only
+- Blacklist status checks prevent profile updates
+- Category validation on profile update
+- Rating statistics calculated incrementally (weighted average)
+- Internal methods for webhook integration:
+  - `createFromEvent()` - Create predictor from PredictorJoined event
+  - `updateBlacklistStatus()` - Update from PredictorBlacklisted event
+  - `incrementSignalCount()` - Called when new signal created
+  - `incrementSalesCount()` - Called when signal purchased
+  - `updateRatingStats()` - Called when review submitted
 
 ---
 

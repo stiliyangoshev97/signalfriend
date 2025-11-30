@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
 > **Last Updated:** November 30, 2024  
-> **Current Phase:** Building Features  
-> **Project Status:** 🟡 **In Development (50/100)** - Categories Feature Complete  
-> **Branch:** `feature/backend-categories` (ready for PR)
+> **Current Phase:** All CRUD Features Complete  
+> **Project Status:** 🟢 **In Development (85/100)** - All Features Implemented  
+> **Branch:** `feature/backend-predictors` (ready for PR)
 
 ---
 
@@ -38,10 +38,10 @@ backend/
 │   │   ├── auth/                # SIWE + JWT authentication ✅
 │   │   ├── webhooks/            # Alchemy event indexing ✅
 │   │   ├── categories/          # Signal categories ✅
-│   │   ├── predictors/          # Predictor profiles ⏳
-│   │   ├── signals/             # Trading signals ⏳
-│   │   ├── receipts/            # Purchase receipts ⏳
-│   │   └── reviews/             # Ratings & reviews ⏳
+│   │   ├── predictors/          # Predictor profiles ✅
+│   │   ├── signals/             # Trading signals ✅
+│   │   ├── receipts/            # Purchase receipts ✅
+│   │   └── reviews/             # Ratings & reviews ✅
 │   ├── scripts/
 │   │   └── seedCategories.ts    # Database seeding
 │   └── shared/
@@ -197,20 +197,31 @@ backend/
 | POST | `/api/categories` | Yes | Create category (admin) |
 | PUT | `/api/categories/:slug` | Yes | Update category (admin) |
 | DELETE | `/api/categories/:slug` | Yes | Delete category (admin) |
-
-### Planned ⏳
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/api/predictors` | No | List predictors (filtered) |
+| GET | `/api/predictors` | No | List predictors (filter, sort, paginate) |
+| GET | `/api/predictors/top` | No | Get leaderboard |
 | GET | `/api/predictors/:address` | No | Get predictor profile |
+| GET | `/api/predictors/:address/check` | No | Check if active predictor |
 | PUT | `/api/predictors/:address` | Yes | Update own profile |
-| GET | `/api/signals` | No | List signals (filtered) |
-| GET | `/api/signals/:contentId` | No | Get signal details |
-| POST | `/api/signals` | Yes | Create signal (predictor only) |
-| GET | `/api/signals/:contentId/content` | Yes | Get protected content (owner only) |
+| GET | `/api/signals` | No | List signals (filter, paginate) |
+| GET | `/api/signals/predictor/:address` | No | Get predictor's signals |
+| GET | `/api/signals/:contentId` | No | Get signal metadata |
+| GET | `/api/signals/:contentId/content` | Yes | Get protected content |
+| POST | `/api/signals` | Yes | Create signal (predictor) |
+| PUT | `/api/signals/:contentId` | Yes | Update own signal |
+| DELETE | `/api/signals/:contentId` | Yes | Deactivate own signal |
 | GET | `/api/receipts/mine` | Yes | Get user's purchases |
-| POST | `/api/reviews` | Yes | Submit review (owner only) |
+| GET | `/api/receipts/stats` | Yes | Get predictor stats |
+| GET | `/api/receipts/check/:contentId` | Yes | Check if purchased |
+| GET | `/api/receipts/signal/:contentId` | Yes | Get signal sales |
+| GET | `/api/receipts/:tokenId` | Yes | Get receipt by ID |
+| GET | `/api/reviews/mine` | Yes | Get user's reviews |
 | GET | `/api/reviews/signal/:contentId` | No | Get signal reviews |
+| GET | `/api/reviews/predictor/:address` | No | Get predictor reviews |
+| GET | `/api/reviews/check/:tokenId` | No | Check if review exists |
+| GET | `/api/reviews/:tokenId` | No | Get review by ID |
+| POST | `/api/reviews` | Yes | Create review |
+| PUT | `/api/reviews/:tokenId` | Yes | Update own review |
+| DELETE | `/api/reviews/:tokenId` | Yes | Delete own review |
 
 ---
 

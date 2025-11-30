@@ -91,23 +91,78 @@ src/
 
 ### Authentication
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/auth/nonce?address=0x...` | Get SIWE nonce |
-| POST | `/api/auth/verify` | Verify signature, get JWT |
-| GET | `/api/auth/me` | Get current user (protected) |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/auth/nonce?address=0x...` | No | Get SIWE nonce |
+| POST | `/api/auth/verify` | No | Verify signature, get JWT |
+| GET | `/api/auth/me` | Yes | Get current user |
+
+### Categories
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/categories` | No | List all categories |
+| GET | `/api/categories/:slug` | No | Get category by slug |
+| POST | `/api/categories` | Yes | Create category (admin) |
+| PUT | `/api/categories/:slug` | Yes | Update category |
+| DELETE | `/api/categories/:slug` | Yes | Delete category |
+
+### Predictors
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/predictors` | No | List predictors (filter, sort, paginate) |
+| GET | `/api/predictors/top` | No | Get leaderboard |
+| GET | `/api/predictors/:address` | No | Get predictor profile |
+| GET | `/api/predictors/:address/check` | No | Check if active predictor |
+| PUT | `/api/predictors/:address` | Yes | Update own profile |
+
+### Signals
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/signals` | No | List signals (filter, paginate) |
+| GET | `/api/signals/predictor/:address` | No | Get predictor's signals |
+| GET | `/api/signals/:contentId` | No | Get signal metadata |
+| GET | `/api/signals/:contentId/content` | Yes | Get protected content (purchaser only) |
+| POST | `/api/signals` | Yes | Create signal (predictor only) |
+| PUT | `/api/signals/:contentId` | Yes | Update own signal |
+| DELETE | `/api/signals/:contentId` | Yes | Deactivate own signal |
+
+### Receipts
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/receipts/mine` | Yes | Get user's purchases |
+| GET | `/api/receipts/stats` | Yes | Get predictor stats |
+| GET | `/api/receipts/check/:contentId` | Yes | Check if purchased |
+| GET | `/api/receipts/signal/:contentId` | Yes | Get signal sales (predictor) |
+| GET | `/api/receipts/:tokenId` | Yes | Get receipt by token ID |
+
+### Reviews
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/reviews/mine` | Yes | Get user's reviews |
+| GET | `/api/reviews/signal/:contentId` | No | Get signal reviews |
+| GET | `/api/reviews/predictor/:address` | No | Get predictor reviews |
+| GET | `/api/reviews/check/:tokenId` | No | Check if review exists |
+| GET | `/api/reviews/:tokenId` | No | Get review by token ID |
+| POST | `/api/reviews` | Yes | Create review (purchaser only) |
+| PUT | `/api/reviews/:tokenId` | Yes | Update own review |
+| DELETE | `/api/reviews/:tokenId` | Yes | Delete own review |
 
 ### Webhooks
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/webhooks/alchemy` | Alchemy event webhook |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/webhooks/alchemy` | Signature | Alchemy event webhook |
 
 ### Health
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health` | Health check |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/health` | No | Health check |
 
 ## Authentication Flow
 
