@@ -91,12 +91,12 @@
 [ ] src/features/reviews/review.controller.ts
 [ ] src/features/reviews/review.routes.ts
 
-### Categories Feature
-[ ] src/features/categories/category.schemas.ts
-[ ] src/features/categories/category.service.ts
-[ ] src/features/categories/category.controller.ts
-[ ] src/features/categories/category.routes.ts
-[ ] Database seed script for initial categories
+### Categories Feature ✅
+[x] src/features/categories/category.schemas.ts
+[x] src/features/categories/category.service.ts
+[x] src/features/categories/category.controller.ts
+[x] src/features/categories/category.routes.ts
+[x] Database seed script for initial categories
 
 ================================================================================
 ## PHASE 8: Main App Entry ✅

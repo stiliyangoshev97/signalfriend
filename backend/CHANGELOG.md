@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Categories CRUD routes
 - Predictors CRUD routes
 - Signals CRUD routes
 - Receipts query routes
@@ -18,6 +17,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Webhook event decoding implementation
 - Unit & integration tests
 - Docker configuration
+
+---
+
+## [0.3.0] - 2024-11-30 📁 CATEGORIES FEATURE
+
+### Added
+- **Categories Feature - Full CRUD Implementation**
+  - `category.schemas.ts` - Zod validation schemas for all operations
+  - `category.service.ts` - Business logic with error handling
+  - `category.controller.ts` - Express route handlers
+  - `category.routes.ts` - Route definitions with middleware
+
+### API Endpoints (v0.3.0)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/categories` | No | List categories (filter by active) |
+| GET | `/api/categories/:slug` | No | Get category by slug |
+| POST | `/api/categories` | Yes | Create category (admin) |
+| PUT | `/api/categories/:slug` | Yes | Update category (admin) |
+| DELETE | `/api/categories/:slug` | Yes | Delete category (admin) |
+
+### Technical Details
+- Zod schemas with proper validation (slug format, max lengths)
+- Service layer handles duplicate checking for name/slug
+- Conflict handling for category deletion with signals (TODO)
+- Public routes for read operations, auth required for mutations
+
+### Added JSDoc Comments
+- Comprehensive documentation added to all backend files
+- File-level module descriptions
+- Function/method documentation with @param and @returns
 
 ---
 
@@ -153,5 +183,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.3.0 | 2024-11-30 | Categories CRUD feature |
 | 0.2.0 | 2024-11-30 | Contract ABIs added |
 | 0.1.0 | 2024-11-30 | Initial backend setup with auth & webhooks |
