@@ -38,26 +38,12 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default("7d"),
 
   // Blockchain Configuration
-  /** Target blockchain chain ID (97 for BNB Testnet) */
-  CHAIN_ID: z.coerce.number().default(97),
+  /** Target blockchain chain ID (97 = BNB Testnet, 56 = BNB Mainnet) */
+  CHAIN_ID: z.coerce.number().refine((val) => val === 97 || val === 56, {
+    message: "CHAIN_ID must be 97 (testnet) or 56 (mainnet)",
+  }),
   /** RPC endpoint URL for blockchain interactions */
   RPC_URL: z.string().url(),
-
-  // Contract Addresses
-  /** SignalFriendMarket contract address */
-  SIGNALFRIEND_MARKET_ADDRESS: z
-    .string()
-    .regex(/^0x[a-fA-F0-9]{40}$/, "Invalid address"),
-  /** PredictorAccessPass contract address */
-  PREDICTOR_ACCESS_PASS_ADDRESS: z
-    .string()
-    .regex(/^0x[a-fA-F0-9]{40}$/, "Invalid address"),
-  /** SignalKeyNFT contract address */
-  SIGNAL_KEY_NFT_ADDRESS: z
-    .string()
-    .regex(/^0x[a-fA-F0-9]{40}$/, "Invalid address"),
-  /** MockUSDT contract address */
-  MOCK_USDT_ADDRESS: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Invalid address"),
 
   // Alchemy Configuration
   /** Alchemy webhook signing key (optional for development) */

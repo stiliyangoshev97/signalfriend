@@ -15,6 +15,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.0] - 2024-12-01 🌐 NETWORK CONFIGURATION
+
+### Added
+- **Network Detection & Configuration**
+  - `isTestnet()` - Check if running on BNB Testnet (97)
+  - `isMainnet()` - Check if running on BNB Mainnet (56)
+  - `getNetworkName()` - Get human-readable network name
+  - `getCurrentAddresses()` - Get addresses for current environment
+
+- **Mainnet Address Validation**
+  - Automatic validation when `CHAIN_ID=56`
+  - Throws clear error if mainnet addresses not configured
+  - Pre-configured official BSC USDT address for mainnet
+
+- **Simplified Environment Configuration**
+  - Removed contract addresses from `.env` (now in code)
+  - Single `CHAIN_ID` variable controls network selection
+  - Addresses automatically selected based on chain ID
+  - Better documentation in `.env.example`
+
+### Changed
+- **`addresses.ts`** - Complete rewrite with network helpers
+  - Renamed `mockUSDT` → `usdt` (same field for testnet MockUSDT and mainnet USDT)
+  - Added `NETWORK_NAMES` constant for display
+  - Added mainnet zero-address validation
+  - Exported `ChainId` type and `ContractAddresses` interface
+
+- **`clients.ts`** - Improved with network logging
+  - Logs network info on startup (development only)
+  - Better error messages for unsupported chains
+
+- **`env.ts`** - Simplified blockchain config
+  - Removed individual contract address env vars
+  - Added Zod validation for valid chain IDs (97 or 56)
+
+### Removed
+- `SIGNALFRIEND_MARKET_ADDRESS` env var (use `addresses.ts`)
+- `PREDICTOR_ACCESS_PASS_ADDRESS` env var (use `addresses.ts`)
+- `SIGNAL_KEY_NFT_ADDRESS` env var (use `addresses.ts`)
+- `MOCK_USDT_ADDRESS` env var (use `addresses.ts`)
+
+---
+
 ## [0.6.0] - 2024-12-01 🔗 WEBHOOK EVENT DECODING & BLOCKCHAIN SERVICE
 
 ### Added
