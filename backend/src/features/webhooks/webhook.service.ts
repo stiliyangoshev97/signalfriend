@@ -6,6 +6,10 @@
  * - Event decoding using viem and contract ABIs
  * - Database updates based on blockchain events
  *
+ * Supports both webhook types:
+ * - GRAPHQL: Custom webhooks that capture all contract events (recommended)
+ * - ADDRESS_ACTIVITY: Only captures token transfers (not used for custom events)
+ *
  * Events handled:
  * - PredictorJoined: Creates new Predictor record
  * - SignalPurchased: Creates new Receipt record
@@ -21,20 +25,18 @@ import { PredictorService } from "../predictors/predictor.service.js";
 import { ReceiptService } from "../receipts/receipt.service.js";
 import { signalFriendMarketAbi } from "../../contracts/abis/SignalFriendMarket.js";
 import { predictorAccessPassAbi } from "../../contracts/abis/PredictorAccessPass.js";
-import type { AlchemyWebhookPayload } from "./webhook.schemas.js";
+import type { 
+  AlchemyGraphqlWebhookPayload, 
+  AlchemyAddressActivityWebhookPayload 
+} from "./webhook.schemas.js";
 import { EVENT_SIGNATURES } from "./webhook.schemas.js";
 
-/** Event log structure from Alchemy webhook */
+/** Normalized event log structure used internally */
 interface EventLog {
   address: string;
   topics: string[];
   data: string;
-  blockNumber: string;
   transactionHash: string;
-  transactionIndex: string;
-  blockHash: string;
-  logIndex: string;
-  removed: boolean;
 }
 
 /**
@@ -64,13 +66,58 @@ export class WebhookService {
   }
 
   /**
-   * Processes all activities in an Alchemy webhook payload.
-   * Iterates through events and routes them to appropriate handlers.
+   * Processes a GraphQL webhook payload.
+   * This is the recommended webhook type for custom contract events.
    *
-   * @param payload - The validated Alchemy webhook payload
+   * @param payload - The validated GraphQL webhook payload
    */
-  static async processWebhook(payload: AlchemyWebhookPayload): Promise<void> {
+  static async processGraphqlWebhook(payload: AlchemyGraphqlWebhookPayload): Promise<void> {
+    const logs = payload.event.data.block.logs;
+
+    logger.info({ 
+      logsCount: logs.length, 
+      webhookId: payload.webhookId 
+    }, "Processing GraphQL webhook");
+
+    for (const log of logs) {
+      const topic0 = log.topics[0];
+      if (!topic0) continue;
+
+      // Normalize log structure
+      const normalizedLog: EventLog = {
+        address: log.account.address,
+        topics: log.topics,
+        data: log.data,
+        transactionHash: log.transaction.hash,
+      };
+
+      try {
+        await this.processEventLog(normalizedLog, topic0);
+      } catch (error) {
+        logger.error({
+          err: error,
+          topic: topic0,
+          txHash: log.transaction.hash,
+        }, "Error processing blockchain event");
+        // Continue processing other events
+      }
+    }
+  }
+
+  /**
+   * Processes an Address Activity webhook payload.
+   * Note: This type only captures token transfers, not custom events.
+   * Kept for backwards compatibility.
+   *
+   * @param payload - The validated Address Activity webhook payload
+   */
+  static async processAddressActivityWebhook(payload: AlchemyAddressActivityWebhookPayload): Promise<void> {
     const { activity } = payload.event;
+
+    logger.info({ 
+      activityCount: activity.length, 
+      webhookId: payload.webhookId 
+    }, "Processing Address Activity webhook");
 
     for (const event of activity) {
       if (!event.log) continue;
@@ -78,26 +125,16 @@ export class WebhookService {
       const topic0 = event.log.topics[0];
       if (!topic0) continue;
 
+      // Normalize log structure
+      const normalizedLog: EventLog = {
+        address: event.log.address,
+        topics: event.log.topics,
+        data: event.log.data,
+        transactionHash: event.hash,
+      };
+
       try {
-        switch (topic0.toLowerCase()) {
-          case EVENT_SIGNATURES.PredictorJoined.toLowerCase():
-            await this.handlePredictorJoined(event.log, event.hash);
-            break;
-
-          case EVENT_SIGNATURES.SignalPurchased.toLowerCase():
-            await this.handleSignalPurchased(event.log, event.hash);
-            break;
-
-          case EVENT_SIGNATURES.PredictorBlacklisted.toLowerCase():
-            await this.handlePredictorBlacklisted(event.log, event.hash);
-            break;
-
-          default:
-            logger.debug({
-              topic: topic0,
-              txHash: event.hash,
-            }, "Unhandled event type");
-        }
+        await this.processEventLog(normalizedLog, topic0);
       } catch (error) {
         logger.error({
           err: error,
@@ -111,15 +148,44 @@ export class WebhookService {
   }
 
   /**
+   * Routes an event log to the appropriate handler based on its topic.
+   *
+   * @param log - Normalized event log
+   * @param topic0 - The first topic (event signature hash)
+   */
+  private static async processEventLog(log: EventLog, topic0: string): Promise<void> {
+    switch (topic0.toLowerCase()) {
+      case EVENT_SIGNATURES.PredictorJoined.toLowerCase():
+        await this.handlePredictorJoined(log);
+        break;
+
+      case EVENT_SIGNATURES.SignalPurchased.toLowerCase():
+        await this.handleSignalPurchased(log);
+        break;
+
+      case EVENT_SIGNATURES.PredictorBlacklisted.toLowerCase():
+        await this.handlePredictorBlacklisted(log);
+        break;
+
+      default:
+        logger.debug({
+          topic: topic0,
+          txHash: log.transactionHash,
+        }, "Unhandled event type");
+    }
+  }
+
+  /**
    * Handles PredictorJoined events from SignalFriendMarket contract.
    * Creates a new Predictor record in the database.
    *
    * Event signature: PredictorJoined(address indexed predictor, address indexed referrer, uint256 nftTokenId, bool referralPaid)
    *
-   * @param log - The event log data from the blockchain
-   * @param txHash - Transaction hash for logging
+   * @param log - The normalized event log data
    */
-  static async handlePredictorJoined(log: EventLog, txHash: string): Promise<void> {
+  static async handlePredictorJoined(log: EventLog): Promise<void> {
+    const txHash = log.transactionHash;
+
     try {
       // Decode the event using viem
       const decoded = decodeEventLog({
@@ -177,10 +243,11 @@ export class WebhookService {
    *
    * Event signature: SignalPurchased(address indexed buyer, address indexed predictor, uint256 indexed receiptTokenId, bytes32 contentIdentifier, uint256 signalPrice, uint256 totalCost)
    *
-   * @param log - The event log data from the blockchain
-   * @param txHash - Transaction hash for logging
+   * @param log - The normalized event log data
    */
-  static async handleSignalPurchased(log: EventLog, txHash: string): Promise<void> {
+  static async handleSignalPurchased(log: EventLog): Promise<void> {
+    const txHash = log.transactionHash;
+
     try {
       // Decode the event using viem
       const decoded = decodeEventLog({
@@ -250,10 +317,11 @@ export class WebhookService {
    *
    * Event signature: PredictorBlacklisted(address indexed predictor, bool status)
    *
-   * @param log - The event log data from the blockchain
-   * @param txHash - Transaction hash for logging
+   * @param log - The normalized event log data
    */
-  static async handlePredictorBlacklisted(log: EventLog, txHash: string): Promise<void> {
+  static async handlePredictorBlacklisted(log: EventLog): Promise<void> {
+    const txHash = log.transactionHash;
+
     try {
       // Decode the event using viem
       const decoded = decodeEventLog({

@@ -2,83 +2,129 @@
  * @fileoverview Zod validation schemas for Alchemy Webhook payloads.
  *
  * Defines schemas for:
- * - Alchemy webhook payload structure
+ * - Alchemy webhook payload structure (both Address Activity and GraphQL types)
  * - Event signature constants for blockchain events
  *
  * @module features/webhooks/webhook.schemas
  */
-// filepath: /Users/stiliyangoshev/Desktop/Coding/Full Projects/SignalFriend/backend/src/features/webhooks/webhook.schemas.ts
 import { z } from "zod";
 
 /**
- * Zod schema for Alchemy Custom Webhook payload.
- * Validates the structure of incoming webhook requests from Alchemy.
+ * Schema for GraphQL webhook log structure.
+ * Used when webhook type is "GRAPHQL".
+ */
+const graphqlLogSchema = z.object({
+  transaction: z.object({
+    hash: z.string(),
+    from: z.object({ address: z.string() }),
+    to: z.object({ address: z.string() }).nullable(),
+  }),
+  topics: z.array(z.string()),
+  data: z.string(),
+  account: z.object({ address: z.string() }),
+});
+
+/**
+ * Schema for Address Activity webhook activity structure.
+ * Used when webhook type is "ADDRESS_ACTIVITY".
+ */
+const addressActivitySchema = z.object({
+  /** Transaction sender address */
+  fromAddress: z.string(),
+  /** Transaction recipient address */
+  toAddress: z.string().optional(),
+  /** Block number (as string) */
+  blockNum: z.string(),
+  /** Transaction hash */
+  hash: z.string(),
+  /** Event log data (present for contract events) */
+  log: z.object({
+    /** Contract address that emitted the event */
+    address: z.string(),
+    /** Array of indexed event topics */
+    topics: z.array(z.string()),
+    /** ABI-encoded event data */
+    data: z.string(),
+    /** Block number (as string) */
+    blockNumber: z.string(),
+    /** Transaction hash */
+    transactionHash: z.string(),
+    /** Index of transaction in block */
+    transactionIndex: z.string(),
+    /** Block hash */
+    blockHash: z.string(),
+    /** Index of log in transaction */
+    logIndex: z.string(),
+    /** Whether the log was removed due to reorg */
+    removed: z.boolean(),
+  }).optional(),
+  /** Activity category */
+  category: z.string(),
+  /** Raw contract data */
+  rawContract: z.object({
+    rawValue: z.string(),
+    address: z.string().optional(),
+    decimals: z.number().optional(),
+  }).optional(),
+  /** Transfer value */
+  value: z.number().optional(),
+  /** Asset symbol */
+  asset: z.string().optional(),
+});
+
+/**
+ * Zod schema for Alchemy Custom Webhook payload (GraphQL type).
+ * This is the recommended type for capturing custom contract events.
  *
  * @see https://docs.alchemy.com/reference/custom-webhooks-quickstart
  */
-export const alchemyWebhookSchema = z.object({
-  /** Unique identifier for the webhook configuration */
+export const alchemyGraphqlWebhookSchema = z.object({
   webhookId: z.string(),
-  /** Unique identifier for this specific webhook event */
   id: z.string(),
-  /** ISO timestamp when the webhook was created */
   createdAt: z.string(),
-  /** Type of webhook event */
-  type: z.enum(["ADDRESS_ACTIVITY", "MINED_TRANSACTION", "DROPPED_TRANSACTION", "GRAPHQL"]),
-  /** Event data containing network info and activity array */
+  type: z.literal("GRAPHQL"),
   event: z.object({
-    /** Network identifier (e.g., "BNB_TESTNET") */
-    network: z.string(),
-    /** Array of blockchain activities detected */
-    activity: z.array(
-      z.object({
-        /** Transaction sender address */
-        fromAddress: z.string(),
-        /** Transaction recipient address */
-        toAddress: z.string().optional(),
-        /** Block number (as string) */
-        blockNum: z.string(),
-        /** Transaction hash */
-        hash: z.string(),
-        /** Event log data (present for contract events) */
-        log: z.object({
-          /** Contract address that emitted the event */
-          address: z.string(),
-          /** Array of indexed event topics */
-          topics: z.array(z.string()),
-          /** ABI-encoded event data */
-          data: z.string(),
-          /** Block number (as string) */
-          blockNumber: z.string(),
-          /** Transaction hash */
-          transactionHash: z.string(),
-          /** Index of transaction in block */
-          transactionIndex: z.string(),
-          /** Block hash */
-          blockHash: z.string(),
-          /** Index of log in transaction */
-          logIndex: z.string(),
-          /** Whether the log was removed due to reorg */
-          removed: z.boolean(),
-        }).optional(),
-        /** Activity category */
-        category: z.string(),
-        /** Raw contract data */
-        rawContract: z.object({
-          rawValue: z.string(),
-          address: z.string().optional(),
-          decimals: z.number().optional(),
-        }).optional(),
-        /** Transfer value */
-        value: z.number().optional(),
-        /** Asset symbol */
-        asset: z.string().optional(),
-      })
-    ),
+    data: z.object({
+      block: z.object({
+        logs: z.array(graphqlLogSchema),
+      }),
+    }),
+    sequenceNumber: z.string(),
+    network: z.string().optional(),
   }),
 });
 
-/** Type for validated Alchemy webhook payload */
+/**
+ * Zod schema for Alchemy Address Activity Webhook payload.
+ * Note: This type only captures token transfers, not custom events.
+ *
+ * @see https://docs.alchemy.com/reference/address-activity-webhook
+ */
+export const alchemyAddressActivityWebhookSchema = z.object({
+  webhookId: z.string(),
+  id: z.string(),
+  createdAt: z.string(),
+  type: z.literal("ADDRESS_ACTIVITY"),
+  event: z.object({
+    network: z.string(),
+    activity: z.array(addressActivitySchema),
+  }),
+});
+
+/**
+ * Combined schema that accepts both webhook types.
+ * The service will handle each type differently.
+ */
+export const alchemyWebhookSchema = z.discriminatedUnion("type", [
+  alchemyGraphqlWebhookSchema.extend({ type: z.literal("GRAPHQL") }),
+  alchemyAddressActivityWebhookSchema.extend({ type: z.literal("ADDRESS_ACTIVITY") }),
+]);
+
+/** Type for GraphQL webhook payload */
+export type AlchemyGraphqlWebhookPayload = z.infer<typeof alchemyGraphqlWebhookSchema>;
+
+/** Type for Address Activity webhook payload */
+export type AlchemyAddressActivityWebhookPayload = z.infer<typeof alchemyAddressActivityWebhookSchema>;
 export type AlchemyWebhookPayload = z.infer<typeof alchemyWebhookSchema>;
 
 /**
