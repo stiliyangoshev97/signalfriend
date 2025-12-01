@@ -15,6 +15,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.0] - 2024-12-XX 📝 REVIEWS ENHANCEMENT & REPORTS FEATURE
+
+### Added
+- **Report Feature** (New)
+  - Complete reporting system for buyers to flag scam/false signals
+  - `src/features/reports/report.model.ts` - MongoDB model with status workflow
+  - `src/features/reports/report.schemas.ts` - Zod validation schemas
+  - `src/features/reports/report.service.ts` - Business logic with CRUD operations
+  - `src/features/reports/report.controller.ts` - Express request handlers
+  - `src/features/reports/report.routes.ts` - API route definitions
+  - Report reasons: `false_signal`, `misleading_info`, `scam`, `duplicate_content`, `other`
+  - Status workflow: `pending` → `reviewed` → `resolved` / `dismissed`
+  - One report per purchase (unique `tokenId` constraint)
+
+- **Report API Endpoints**
+  - `POST /api/reports` - Create a report (authenticated, must own Receipt)
+  - `GET /api/reports/mine` - Get user's submitted reports
+  - `GET /api/reports/signal/:contentId` - Get reports for a specific signal
+  - `GET /api/reports/predictor/:address` - Get reports against a predictor
+  - `GET /api/reports/predictor/:address/stats` - Get report statistics
+  - `GET /api/reports/check/:tokenId` - Check if report exists for tokenId
+
+### Changed
+- **Review Model Simplified to Rating-Only**
+  - Removed `reviewText` field from `IReview` interface
+  - Removed `reviewText` from Mongoose schema
+  - Updated `createReviewSchema` and `updateReviewSchema` (Zod)
+  - Updated `ReviewService` - removed `reviewText` from create/update methods
+  - Reviews are now pure ratings (1-5 score) as per original PROJECT.md spec
+  - Comments/text moved to separate Report feature for flagging issues
+
+- **Documentation Updated**
+  - `README.md` - Added Reports API section, clarified Reviews as "Ratings"
+  - Clarified that ratings are off-chain only (no `markSignalRated` on-chain)
+
+### Technical Notes
+- Reports are separate from ratings - users can rate AND report
+- Report validation requires Receipt ownership (same as reviews)
+- Reports are for moderation/flagging; ratings are for reputation
+- No on-chain component for reviews/ratings (purely off-chain feature)
+
+---
+
 ## [0.8.0] - 2024-12-01 🎯 WEBHOOK INTEGRATION COMPLETE
 
 ### Added

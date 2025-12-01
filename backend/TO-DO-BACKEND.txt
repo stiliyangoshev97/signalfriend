@@ -94,11 +94,25 @@
 [x] src/features/receipts/receipt.controller.ts
 [x] src/features/receipts/receipt.routes.ts
 
-### Reviews Feature ✅
+### Reviews Feature ✅ (Simplified to Rating-Only)
 [x] src/features/reviews/review.schemas.ts
 [x] src/features/reviews/review.service.ts
 [x] src/features/reviews/review.controller.ts
 [x] src/features/reviews/review.routes.ts
+[x] Simplified to rating-only (removed reviewText field)
+[x] Verified review validation (checks Receipt ownership via tokenId)
+[x] Clarified ratings are off-chain only (no markSignalRated on-chain)
+
+### Reports Feature ✅ (NEW - Scam/False Signal Reporting)
+[x] src/features/reports/report.model.ts - MongoDB model with status workflow
+[x] src/features/reports/report.schemas.ts - Zod validation schemas
+[x] src/features/reports/report.service.ts - Business logic (create, list, stats)
+[x] src/features/reports/report.controller.ts - Express request handlers
+[x] src/features/reports/report.routes.ts - API route definitions
+[x] Report reasons: false_signal, misleading_info, scam, duplicate_content, other
+[x] Status workflow: pending → reviewed → resolved/dismissed
+[x] One report per purchase (unique tokenId constraint)
+[x] Report validation (requires Receipt ownership)
 
 ### Categories Feature ✅
 [x] src/features/categories/category.schemas.ts
