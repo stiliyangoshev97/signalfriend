@@ -85,13 +85,14 @@ export type AlchemyWebhookPayload = z.infer<typeof alchemyWebhookSchema>;
  * Keccak256 hashes of event signatures for blockchain event matching.
  * Used to identify which event type was emitted.
  *
- * @todo Generate actual hashes using viem's keccak256 function
+ * Generated using: keccak256(toBytes("EventName(type1,type2,...)"))
+ * These match the topic[0] of each event log.
  */
 export const EVENT_SIGNATURES = {
-  /** PredictorJoined(address indexed predictor, uint256 tokenId, uint256 timestamp) */
-  PredictorJoined: "0x" as const,
-  /** SignalPurchased(address indexed buyer, address indexed predictor, uint256 tokenId, string contentIdentifier, uint256 price) */
-  SignalPurchased: "0x" as const,
-  /** PredictorBlacklisted(address indexed predictor) */
-  PredictorBlacklisted: "0x" as const,
+  /** PredictorJoined(address indexed predictor, address indexed referrer, uint256 nftTokenId, bool referralPaid) */
+  PredictorJoined: "0x2f2789d1da7b490fc20c28c5014f1fdd449737869b924042025cd634b2248cc4" as const,
+  /** SignalPurchased(address indexed buyer, address indexed predictor, uint256 indexed receiptTokenId, bytes32 contentIdentifier, uint256 signalPrice, uint256 totalCost) */
+  SignalPurchased: "0x906c548d19aa6c7ed9e105a3d02cb6a435b802903a30000aa9ad5e01d93ef647" as const,
+  /** PredictorBlacklisted(address indexed predictor, bool status) */
+  PredictorBlacklisted: "0xad6b8655f145f95522485d58e7cd8ca2689dbe89691511217c7cc914b1226005" as const,
 } as const;
