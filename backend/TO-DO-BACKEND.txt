@@ -57,11 +57,13 @@
 ## PHASE 6: Webhook Feature (Alchemy Event Indexing) ✅
 ================================================================================
 [x] src/features/webhooks/webhook.schemas.ts - Alchemy webhook payload
-[x] src/features/webhooks/webhook.service.ts - Event handlers
+[x] src/features/webhooks/webhook.service.ts - Event handlers with viem decoding
 [x] src/features/webhooks/webhook.controller.ts - Process events
 [x] src/features/webhooks/webhook.routes.ts - POST /webhooks/alchemy
-[ ] Set up Alchemy Custom Webhook (PredictorJoined, SignalPurchased, PredictorBlacklisted)
-[ ] Copy ABIs and implement actual event decoding in webhook.service.ts
+[x] Event signature generation (PredictorJoined, SignalPurchased, PredictorBlacklisted)
+[x] viem decodeEventLog integration with contract ABIs
+[x] src/shared/services/blockchain.service.ts - On-chain verification utilities
+[ ] Set up Alchemy Custom Webhook in Dashboard (requires deployed backend URL)
 
 ================================================================================
 ## PHASE 7: Core Features

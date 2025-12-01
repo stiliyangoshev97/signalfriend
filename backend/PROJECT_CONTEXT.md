@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** November 30, 2024  
-> **Current Phase:** All CRUD Features Complete  
-> **Project Status:** 🟢 **In Development (85/100)** - All Features Implemented  
-> **Branch:** `feature/backend-predictors` (ready for PR)
+> **Last Updated:** December 1, 2024  
+> **Current Phase:** Webhooks Complete → Testing Phase  
+> **Project Status:** 🟢 **In Development (90/100)** - All Features + Webhooks Implemented  
+> **Branch:** `feature/webhooks-complete`
 
 ---
 
@@ -43,10 +43,12 @@ backend/
 │   │   ├── receipts/            # Purchase receipts ✅
 │   │   └── reviews/             # Ratings & reviews ✅
 │   ├── scripts/
-│   │   └── seedCategories.ts    # Database seeding
+│   │   ├── seedCategories.ts    # Database seeding
+│   │   └── generateEventSignatures.ts  # Event hash generator
 │   └── shared/
 │       ├── config/              # env, database, logger
 │       ├── middleware/          # auth, validation, errors, security
+│       ├── services/            # blockchain.service.ts (viem)
 │       ├── types/               # TypeScript types
 │       └── utils/               # ApiError, asyncHandler
 ├── tests/
@@ -69,12 +71,38 @@ backend/
 | SignalKeyNFT | `0xfb26Df6101e1a52f9477f52F54b91b99fb016aed` | Purchase receipt NFT |
 | MockUSDT | `0xF87d17a5ca95F3f992f82Baabf4eBC5301A178a5` | Test USDT token |
 
+### Event Signatures (Topic0 Hashes)
+| Event | Signature Hash |
+|-------|----------------|
+| `PredictorJoined` | `0x2f2789d1da7b490fc20c28c5014f1fdd449737869b924042025cd634b2248cc4` |
+| `SignalPurchased` | `0x906c548d19aa6c7ed9e105a3d02cb6a435b802903a30000aa9ad5e01d93ef647` |
+| `PredictorBlacklisted` | `0xad6b8655f145f95522485d58e7cd8ca2689dbe89691511217c7cc914b1226005` |
+
 ### Events to Index (via Alchemy Webhooks)
 | Event | Contract | Action |
 |-------|----------|--------|
 | `PredictorJoined` | SignalFriendMarket | Create Predictor record |
 | `SignalPurchased` | SignalFriendMarket | Create Receipt record |
 | `PredictorBlacklisted` | PredictorAccessPass | Update Predictor.isBlacklisted |
+
+### Blockchain Service (viem)
+The `BlockchainService` provides on-chain verification utilities:
+```typescript
+// Verify SignalKeyNFT ownership
+BlockchainService.verifySignalKeyOwnership(tokenId, address): Promise<boolean>
+
+// Check if address is a predictor
+BlockchainService.verifyPredictorStatus(address): Promise<boolean>
+
+// Check blacklist status on-chain
+BlockchainService.isPredictorBlacklisted(address): Promise<boolean>
+
+// Get SignalKeyNFT owner
+BlockchainService.getSignalKeyOwner(tokenId): Promise<string | null>
+
+// Get content ID from SignalKeyNFT
+BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
+```
 
 ---
 

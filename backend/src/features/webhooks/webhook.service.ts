@@ -3,7 +3,7 @@
  *
  * Handles blockchain event indexing via Alchemy Custom Webhooks:
  * - Signature verification for webhook security
- * - Event decoding and processing
+ * - Event decoding using viem and contract ABIs
  * - Database updates based on blockchain events
  *
  * Events handled:
@@ -13,18 +13,29 @@
  *
  * @module features/webhooks/webhook.service
  */
-// filepath: /Users/stiliyangoshev/Desktop/Coding/Full Projects/SignalFriend/backend/src/features/webhooks/webhook.service.ts
 import { createHmac } from "crypto";
-import { decodeEventLog } from "viem";
+import { decodeEventLog, formatUnits, type Address, type Hex } from "viem";
 import { env } from "../../shared/config/env.js";
 import { logger } from "../../shared/config/logger.js";
-import { Predictor } from "../predictors/predictor.model.js";
-import { Receipt } from "../receipts/receipt.model.js";
-import { Signal } from "../signals/signal.model.js";
+import { PredictorService } from "../predictors/predictor.service.js";
+import { ReceiptService } from "../receipts/receipt.service.js";
+import { signalFriendMarketAbi } from "../../contracts/abis/SignalFriendMarket.js";
+import { predictorAccessPassAbi } from "../../contracts/abis/PredictorAccessPass.js";
 import type { AlchemyWebhookPayload } from "./webhook.schemas.js";
+import { EVENT_SIGNATURES } from "./webhook.schemas.js";
 
-// TODO: Import ABIs when available
-// import { signalFriendMarketAbi } from "../../contracts/abis/SignalFriendMarket.js";
+/** Event log structure from Alchemy webhook */
+interface EventLog {
+  address: string;
+  topics: string[];
+  data: string;
+  blockNumber: string;
+  transactionHash: string;
+  transactionIndex: string;
+  blockHash: string;
+  logIndex: string;
+  removed: boolean;
+}
 
 /**
  * Service class for Alchemy webhook processing.
@@ -68,28 +79,33 @@ export class WebhookService {
       if (!topic0) continue;
 
       try {
-        // TODO: Match against actual event signatures and decode
-        // For now, log the events
-        logger.info({
+        switch (topic0.toLowerCase()) {
+          case EVENT_SIGNATURES.PredictorJoined.toLowerCase():
+            await this.handlePredictorJoined(event.log, event.hash);
+            break;
+
+          case EVENT_SIGNATURES.SignalPurchased.toLowerCase():
+            await this.handleSignalPurchased(event.log, event.hash);
+            break;
+
+          case EVENT_SIGNATURES.PredictorBlacklisted.toLowerCase():
+            await this.handlePredictorBlacklisted(event.log, event.hash);
+            break;
+
+          default:
+            logger.debug({
+              topic: topic0,
+              txHash: event.hash,
+            }, "Unhandled event type");
+        }
+      } catch (error) {
+        logger.error({
+          err: error,
           topic: topic0,
           txHash: event.hash,
           blockNum: event.blockNum,
-        }, "Received blockchain event");
-
-        // Example event handling structure:
-        // switch (topic0) {
-        //   case EVENT_SIGNATURES.PredictorJoined:
-        //     await this.handlePredictorJoined(event.log);
-        //     break;
-        //   case EVENT_SIGNATURES.SignalPurchased:
-        //     await this.handleSignalPurchased(event.log);
-        //     break;
-        //   case EVENT_SIGNATURES.PredictorBlacklisted:
-        //     await this.handlePredictorBlacklisted(event.log);
-        //     break;
-        // }
-      } catch (error) {
-        logger.error({ err: error, event }, "Error processing event");
+        }, "Error processing blockchain event");
+        // Continue processing other events
       }
     }
   }
@@ -98,79 +114,184 @@ export class WebhookService {
    * Handles PredictorJoined events from SignalFriendMarket contract.
    * Creates a new Predictor record in the database.
    *
+   * Event signature: PredictorJoined(address indexed predictor, address indexed referrer, uint256 nftTokenId, bool referralPaid)
+   *
    * @param log - The event log data from the blockchain
-   * @param log.topics - Indexed event parameters
-   * @param log.data - ABI-encoded non-indexed parameters
-   * @param log.transactionHash - Hash of the transaction that emitted the event
-   * @todo Implement ABI decoding and database record creation
+   * @param txHash - Transaction hash for logging
    */
-  static async handlePredictorJoined(log: {
-    topics: string[];
-    data: string;
-    transactionHash: string;
-  }): Promise<void> {
-    // TODO: Decode with actual ABI
-    // const decoded = decodeEventLog({
-    //   abi: signalFriendMarketAbi,
-    //   data: log.data,
-    //   topics: log.topics,
-    // });
+  static async handlePredictorJoined(log: EventLog, txHash: string): Promise<void> {
+    try {
+      // Decode the event using viem
+      const decoded = decodeEventLog({
+        abi: signalFriendMarketAbi,
+        data: log.data as Hex,
+        topics: log.topics as [Hex, ...Hex[]],
+      });
 
-    // Example: Create predictor record
-    // const predictor = new Predictor({
-    //   walletAddress: decoded.args.predictor,
-    //   tokenId: Number(decoded.args.tokenId),
-    //   displayName: `Predictor #${decoded.args.tokenId}`,
-    //   joinedAt: new Date(Number(decoded.args.timestamp) * 1000),
-    // });
-    // await predictor.save();
+      if (decoded.eventName !== "PredictorJoined") {
+        logger.warn({ txHash, decoded: decoded.eventName }, "Unexpected event name in PredictorJoined handler");
+        return;
+      }
 
-    logger.info({ txHash: log.transactionHash }, "PredictorJoined event processed");
+      const args = decoded.args as {
+        predictor: Address;
+        referrer: Address;
+        nftTokenId: bigint;
+        referralPaid: boolean;
+      };
+
+      logger.info({
+        predictor: args.predictor,
+        referrer: args.referrer,
+        tokenId: Number(args.nftTokenId),
+        referralPaid: args.referralPaid,
+        txHash,
+      }, "Processing PredictorJoined event");
+
+      // Create predictor record
+      await PredictorService.createFromEvent({
+        walletAddress: args.predictor,
+        tokenId: Number(args.nftTokenId),
+        joinedAt: new Date(), // Could fetch block timestamp if needed
+      });
+
+      logger.info({
+        predictor: args.predictor,
+        tokenId: Number(args.nftTokenId),
+        txHash,
+      }, "Predictor record created successfully");
+
+    } catch (error) {
+      // Check if it's a conflict error (predictor already exists) - this is OK for idempotency
+      if (error instanceof Error && error.message.includes("already exists")) {
+        logger.info({ txHash }, "Predictor already exists, skipping (idempotent)");
+        return;
+      }
+      throw error;
+    }
   }
 
   /**
    * Handles SignalPurchased events from SignalFriendMarket contract.
    * Creates a new Receipt record linked to the SignalKeyNFT.
    *
+   * Event signature: SignalPurchased(address indexed buyer, address indexed predictor, uint256 indexed receiptTokenId, bytes32 contentIdentifier, uint256 signalPrice, uint256 totalCost)
+   *
    * @param log - The event log data from the blockchain
-   * @param log.topics - Indexed event parameters (buyer, predictor)
-   * @param log.data - ABI-encoded non-indexed parameters
-   * @param log.transactionHash - Hash of the transaction
-   * @param log.blockNumber - Block number containing the transaction
-   * @todo Implement ABI decoding and Receipt record creation
+   * @param txHash - Transaction hash for logging
    */
-  static async handleSignalPurchased(log: {
-    topics: string[];
-    data: string;
-    transactionHash: string;
-    blockNumber: string;
-  }): Promise<void> {
-    // TODO: Decode with actual ABI and create receipt
-    logger.info({ txHash: log.transactionHash }, "SignalPurchased event processed");
+  static async handleSignalPurchased(log: EventLog, txHash: string): Promise<void> {
+    try {
+      // Decode the event using viem
+      const decoded = decodeEventLog({
+        abi: signalFriendMarketAbi,
+        data: log.data as Hex,
+        topics: log.topics as [Hex, ...Hex[]],
+      });
+
+      if (decoded.eventName !== "SignalPurchased") {
+        logger.warn({ txHash, decoded: decoded.eventName }, "Unexpected event name in SignalPurchased handler");
+        return;
+      }
+
+      const args = decoded.args as {
+        buyer: Address;
+        predictor: Address;
+        receiptTokenId: bigint;
+        contentIdentifier: Hex;
+        signalPrice: bigint;
+        totalCost: bigint;
+      };
+
+      // Convert bytes32 contentIdentifier to string (remove trailing zeros)
+      const contentId = args.contentIdentifier;
+
+      // Convert price from USDT (6 decimals) to number
+      const priceUsdt = Number(formatUnits(args.signalPrice, 6));
+
+      logger.info({
+        buyer: args.buyer,
+        predictor: args.predictor,
+        tokenId: Number(args.receiptTokenId),
+        contentId,
+        priceUsdt,
+        txHash,
+      }, "Processing SignalPurchased event");
+
+      // Create receipt record
+      await ReceiptService.createFromEvent({
+        tokenId: Number(args.receiptTokenId),
+        contentId, // bytes32 hex string
+        buyerAddress: args.buyer,
+        predictorAddress: args.predictor,
+        priceUsdt,
+        purchasedAt: new Date(),
+        transactionHash: txHash,
+      });
+
+      logger.info({
+        tokenId: Number(args.receiptTokenId),
+        buyer: args.buyer,
+        txHash,
+      }, "Receipt record created successfully");
+
+    } catch (error) {
+      // Receipt service returns existing receipt if duplicate (idempotent)
+      if (error instanceof Error && error.message.includes("not found")) {
+        logger.warn({ txHash, error: error.message }, "Signal not found for purchase event");
+      }
+      throw error;
+    }
   }
 
   /**
    * Handles PredictorBlacklisted events from PredictorAccessPass contract.
-   * Updates the Predictor's isBlacklisted status to true.
+   * Updates the Predictor's isBlacklisted status.
+   *
+   * Event signature: PredictorBlacklisted(address indexed predictor, bool status)
    *
    * @param log - The event log data from the blockchain
-   * @param log.topics - Indexed event parameters (predictor address)
-   * @param log.data - ABI-encoded non-indexed parameters
-   * @param log.transactionHash - Hash of the transaction
-   * @todo Implement ABI decoding and Predictor status update
+   * @param txHash - Transaction hash for logging
    */
-  static async handlePredictorBlacklisted(log: {
-    topics: string[];
-    data: string;
-    transactionHash: string;
-  }): Promise<void> {
-    // TODO: Decode with actual ABI
-    // const predictorAddress = decoded.args.predictor;
-    // await Predictor.updateOne(
-    //   { walletAddress: predictorAddress.toLowerCase() },
-    //   { isBlacklisted: true }
-    // );
+  static async handlePredictorBlacklisted(log: EventLog, txHash: string): Promise<void> {
+    try {
+      // Decode the event using viem
+      const decoded = decodeEventLog({
+        abi: predictorAccessPassAbi,
+        data: log.data as Hex,
+        topics: log.topics as [Hex, ...Hex[]],
+      });
 
-    logger.info({ txHash: log.transactionHash }, "PredictorBlacklisted event processed");
+      if (decoded.eventName !== "PredictorBlacklisted") {
+        logger.warn({ txHash, decoded: decoded.eventName }, "Unexpected event name in PredictorBlacklisted handler");
+        return;
+      }
+
+      const args = decoded.args as {
+        predictor: Address;
+        status: boolean;
+      };
+
+      logger.info({
+        predictor: args.predictor,
+        isBlacklisted: args.status,
+        txHash,
+      }, "Processing PredictorBlacklisted event");
+
+      // Update predictor blacklist status
+      await PredictorService.updateBlacklistStatus(args.predictor, args.status);
+
+      logger.info({
+        predictor: args.predictor,
+        isBlacklisted: args.status,
+        txHash,
+      }, "Predictor blacklist status updated successfully");
+
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("not found")) {
+        logger.warn({ txHash, error: error.message }, "Predictor not found for blacklist event");
+      }
+      throw error;
+    }
   }
 }

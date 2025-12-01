@@ -10,9 +10,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Webhook event decoding implementation (actual ABI decoding)
 - Unit & integration tests
 - Docker configuration
+
+---
+
+## [0.6.0] - 2024-12-01 🔗 WEBHOOK EVENT DECODING & BLOCKCHAIN SERVICE
+
+### Added
+- **Webhook Event Decoding - Full Implementation**
+  - Complete `webhook.service.ts` rewrite with viem `decodeEventLog`
+  - Proper event signature hashes generated via `toEventSelector`
+  - `handlePredictorJoined()` - Decodes event, creates Predictor record
+  - `handleSignalPurchased()` - Decodes event, creates Receipt record
+  - `handlePredictorBlacklisted()` - Decodes event, updates blacklist status
+  - Idempotent event handling (safe to replay webhooks)
+
+- **Blockchain Service - On-Chain Verification**
+  - New `src/shared/services/blockchain.service.ts`
+  - `verifySignalKeyOwnership()` - Check NFT ownership on-chain
+  - `verifyPredictorStatus()` - Check if address holds PredictorAccessPass
+  - `isPredictorBlacklisted()` - Check blacklist status on-chain
+  - `getSignalKeyOwner()` - Get current owner of SignalKeyNFT
+  - `getSignalKeyContentId()` - Get content ID from NFT
+  - Uses viem `publicClient` for read-only contract calls
+
+- **Event Signature Generation**
+  - `src/scripts/generateEventSignatures.ts` - Script to generate topic0 hashes
+  - Correct signatures for all 3 events:
+    - `PredictorJoined`: `0x2f2789d1da7b490fc20c28c5014f1fdd449737869b924042025cd634b2248cc4`
+    - `SignalPurchased`: `0x906c548d19aa6c7ed9e105a3d02cb6a435b802903a30000aa9ad5e01d93ef647`
+    - `PredictorBlacklisted`: `0xad6b8655f145f95522485d58e7cd8ca2689dbe89691511217c7cc914b1226005`
+
+### Technical Details
+- viem properly integrated for blockchain interactions
+- ABIs imported from `src/contracts/abis/` for type-safe decoding
+- Event handlers integrate with existing service layer
+- Comprehensive logging with Pino for debugging
 
 ---
 
