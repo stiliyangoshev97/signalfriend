@@ -116,7 +116,17 @@
 [ ] Integration tests for routes
 
 ================================================================================
-## PHASE 10: Deployment Prep
+## PHASE 10: Network Configuration ✅
+================================================================================
+[x] CHAIN_ID env variable (97=testnet, 56=mainnet)
+[x] Network helper functions (isTestnet, isMainnet, getNetworkName)
+[x] Mainnet address validation (throws if zeros)
+[x] Simplified .env (removed contract addresses)
+[x] Contract addresses in addresses.ts (single source of truth)
+[x] Official BSC USDT address pre-configured for mainnet
+
+================================================================================
+## PHASE 11: Deployment Prep
 ================================================================================
 [ ] Dockerfile
 [ ] docker-compose.yml (with MongoDB)
