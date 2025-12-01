@@ -63,7 +63,14 @@
 [x] Event signature generation (PredictorJoined, SignalPurchased, PredictorBlacklisted)
 [x] viem decodeEventLog integration with contract ABIs
 [x] src/shared/services/blockchain.service.ts - On-chain verification utilities
-[ ] Set up Alchemy Custom Webhook in Dashboard (requires deployed backend URL)
+[x] Set up Alchemy Custom (GraphQL) Webhook in Dashboard
+[x] GraphQL webhook payload support (discriminated union schema)
+[x] ContentId format conversion (UUID ↔ bytes32)
+[x] src/shared/utils/contentId.ts - uuidToBytes32, bytes32ToUuid
+[x] SignalService.getContentIdentifier() - For frontend to get bytes32
+[x] Tested PredictorJoined event → Creates Predictor in MongoDB
+[x] Tested SignalPurchased event → Creates Receipt in MongoDB
+[x] Tested PredictorBlacklisted event → Updates Predictor.isBlacklisted
 
 ================================================================================
 ## PHASE 7: Core Features
@@ -142,11 +149,17 @@
   - PredictorAccessPass: 0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4
   - SignalKeyNFT: 0xfb26Df6101e1a52f9477f52F54b91b99fb016aed
 
-- Alchemy Webhook Setup:
+- Alchemy Webhook Setup (Completed with GraphQL):
   1. Go to Alchemy Dashboard → Webhooks → Create Webhook
-  2. Select "Custom Webhook" → "Specific events for a contract"
-  3. Add SignalFriendMarket address
-  4. Select events: PredictorJoined, SignalPurchased, PredictorBlacklisted
-  5. Set webhook URL: https://your-backend.com/api/webhooks/alchemy
+  2. Select "Custom Webhook" (GraphQL) for richer data
+  3. Add SignalFriendMarket address: 0x5133397a4B9463c5270beBa05b22301e6dD184ca
+  4. Add PredictorAccessPass address: 0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4
+  5. Set webhook URL: https://your-ngrok-url.ngrok-free.dev/api/webhooks/alchemy
+  6. Copy signing key to ALCHEMY_SIGNING_KEY env var
 
-- Ratings are ENTIRELY off-chain in MongoDB (removed from smart contracts in v0.6.1)
+- ContentId Conversion (UUID ↔ bytes32):
+  - Backend uses UUID: 00000000-0000-0000-0000-000000000001
+  - Smart contract uses bytes32: 0x0000000000000000000000000000000100000000...
+  - Use SignalService.getContentIdentifier() for frontend
+
+- USDT on BNB Chain uses 18 decimals (not 6 like Ethereum!)

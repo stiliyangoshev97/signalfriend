@@ -16,6 +16,7 @@ import { Receipt, IReceipt } from "./receipt.model.js";
 import { Signal } from "../signals/signal.model.js";
 import { Predictor } from "../predictors/predictor.model.js";
 import { ApiError } from "../../shared/utils/ApiError.js";
+import { bytes32ToUuid, isValidBytes32 } from "../../shared/utils/contentId.js";
 import type {
   ListMyReceiptsQuery,
   ListSignalReceiptsQuery,
@@ -206,6 +207,10 @@ export class ReceiptService {
    * Creates a new receipt from a SignalPurchased blockchain event.
    * Called by the webhook service when indexing events.
    *
+   * Handles contentId conversion:
+   * - On-chain: bytes32 hex (e.g., "0x550e8400e29b41d4a716446655440000...")
+   * - Backend: UUID string (e.g., "550e8400-e29b-41d4-a716-446655440000")
+   *
    * @param data - Event data for the new receipt
    * @returns Promise resolving to the created receipt document
    * @throws {ApiError} 409 if receipt already exists (duplicate event)
@@ -224,18 +229,24 @@ export class ReceiptService {
       return existing;
     }
 
-    // Find the signal
-    const signal = await Signal.findOne({ contentId: data.contentId });
+    // Convert bytes32 contentId from blockchain to UUID format for lookup
+    let lookupContentId = data.contentId;
+    if (isValidBytes32(data.contentId)) {
+      lookupContentId = bytes32ToUuid(data.contentId);
+    }
+
+    // Find the signal using converted contentId
+    const signal = await Signal.findOne({ contentId: lookupContentId });
     if (!signal) {
       throw ApiError.notFound(
-        `Signal with contentId '${data.contentId}' not found`
+        `Signal with contentId '${lookupContentId}' not found (original: ${data.contentId})`
       );
     }
 
-    // Create receipt
+    // Create receipt with UUID contentId (matching the signal)
     const receipt = new Receipt({
       tokenId: data.tokenId,
-      contentId: data.contentId,
+      contentId: lookupContentId,
       buyerAddress: normalizedBuyer,
       predictorAddress: normalizedPredictor,
       signalId: signal._id,

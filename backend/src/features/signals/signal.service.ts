@@ -17,6 +17,7 @@ import { Category } from "../categories/category.model.js";
 import { Predictor } from "../predictors/predictor.model.js";
 import { Receipt } from "../receipts/receipt.model.js";
 import { ApiError } from "../../shared/utils/ApiError.js";
+import { uuidToBytes32 } from "../../shared/utils/contentId.js";
 import type {
   ListSignalsQuery,
   CreateSignalInput,
@@ -210,6 +211,33 @@ export class SignalService {
     }
 
     return { content: signal.content };
+  }
+
+  /**
+   * Gets the bytes32 contentIdentifier for use in on-chain purchases.
+   * The frontend needs this value to call buySignalNFT on the smart contract.
+   *
+   * @param contentId - The signal's UUID contentId
+   * @returns Promise resolving to the bytes32 hex string
+   * @throws {ApiError} 404 if signal not found
+   *
+   * @example
+   * // UUID: "550e8400-e29b-41d4-a716-446655440000"
+   * // Returns: "0x550e8400e29b41d4a7164466554400000000000000000000000000000000"
+   */
+  static async getContentIdentifier(
+    contentId: string
+  ): Promise<{ contentIdentifier: string }> {
+    // Verify signal exists
+    const signal = await Signal.findOne({ contentId });
+    if (!signal) {
+      throw ApiError.notFound(`Signal with contentId '${contentId}' not found`);
+    }
+
+    // Convert UUID to bytes32 for on-chain use
+    const contentIdentifier = uuidToBytes32(contentId);
+
+    return { contentIdentifier };
   }
 
   /**

@@ -13,6 +13,16 @@ Express + MongoDB + Viem backend API for the SignalFriend platform.
 - **Logging**: Pino
 - **Testing**: Vitest
 
+## Quick Start
+
+```bash
+cd backend
+npm install
+cp .env.example .env
+# Edit .env with your values
+npm run dev
+```
+
 ## Getting Started
 
 ### Prerequisites
@@ -20,6 +30,7 @@ Express + MongoDB + Viem backend API for the SignalFriend platform.
 - Node.js 20+
 - MongoDB (local or Atlas)
 - pnpm/npm/yarn
+- ngrok (for webhook testing)
 
 ### Installation
 
@@ -41,6 +52,9 @@ NODE_ENV=development
 PORT=3001
 MONGODB_URI=mongodb://localhost:27017/signalfriend
 JWT_SECRET=your-super-secret-jwt-key-min-32-chars
+CHAIN_ID=97
+RPC_URL=https://bsc-testnet-rpc.publicnode.com
+ALCHEMY_SIGNING_KEY=whsec_xxx  # From Alchemy webhook
 ```
 
 ### Running
@@ -59,6 +73,9 @@ npm start
 ```bash
 # Seed categories
 npm run seed:categories
+
+# Seed test signal (for webhook testing)
+npx tsx src/scripts/seedTestSignal.ts
 ```
 
 ## Project Structure
@@ -67,8 +84,8 @@ npm run seed:categories
 src/
 ├── index.ts                 # App entry point
 ├── contracts/               # Viem clients & ABIs
-│   ├── addresses.ts
-│   ├── clients.ts
+│   ├── addresses.ts         # Contract addresses by chainId
+│   ├── clients.ts           # Viem public client
 │   └── abis/
 ├── features/                # Feature-based modules
 │   ├── auth/                # SIWE + JWT authentication
@@ -77,14 +94,17 @@ src/
 │   ├── receipts/            # Purchase receipts (NFTs)
 │   ├── reviews/             # Ratings & reviews
 │   ├── categories/          # Signal categories
-│   └── webhooks/            # Alchemy event indexing
+│   └── webhooks/            # Alchemy event indexing (GraphQL)
 ├── scripts/                 # Utility scripts
-│   └── seedCategories.ts
+│   ├── seedCategories.ts
+│   ├── seedTestSignal.ts
+│   └── generateEventSignatures.ts
 └── shared/                  # Shared utilities
     ├── config/              # Environment, DB, logger
     ├── middleware/          # Auth, validation, errors
+    ├── services/            # blockchain.service.ts
     ├── types/               # TypeScript types
-    └── utils/               # Helpers (ApiError, asyncHandler)
+    └── utils/               # ApiError, asyncHandler, contentId
 ```
 
 ## API Endpoints
@@ -125,6 +145,7 @@ src/
 | GET | `/api/signals/predictor/:address` | No | Get predictor's signals |
 | GET | `/api/signals/:contentId` | No | Get signal metadata |
 | GET | `/api/signals/:contentId/content` | Yes | Get protected content (purchaser only) |
+| GET | `/api/signals/:contentId/content-identifier` | No | Get bytes32 for on-chain purchase |
 | POST | `/api/signals` | Yes | Create signal (predictor only) |
 | PUT | `/api/signals/:contentId` | Yes | Update own signal |
 | DELETE | `/api/signals/:contentId` | Yes | Deactivate own signal |
@@ -175,12 +196,31 @@ src/
 
 ## Alchemy Webhook Setup
 
+We use **Custom (GraphQL) Webhooks** for richer event data. See [SetupWebhooks.md](./SetupWebhooks.md) for detailed instructions.
+
+### Quick Setup
 1. Go to [Alchemy Dashboard](https://dashboard.alchemy.com/) → Webhooks
-2. Create Webhook → Custom Webhook → Specific events
-3. Add SignalFriendMarket contract address
-4. Select events: `PredictorJoined`, `SignalPurchased`, `PredictorBlacklisted`
-5. Set webhook URL: `https://your-backend.com/api/webhooks/alchemy`
+2. Create Webhook → **Custom Webhook**
+3. Network: **BNB Smart Chain Testnet**
+4. Webhook URL: `https://your-ngrok-url.ngrok-free.dev/api/webhooks/alchemy`
+5. Add GraphQL query (see SetupWebhooks.md for template)
 6. Copy signing key to `ALCHEMY_SIGNING_KEY` env var
+
+### Indexed Events
+| Event | Contract | Action |
+|-------|----------|--------|
+| `PredictorJoined` | SignalFriendMarket | Creates Predictor in MongoDB |
+| `SignalPurchased` | SignalFriendMarket | Creates Receipt, increments sales |
+| `PredictorBlacklisted` | PredictorAccessPass | Updates isBlacklisted flag |
+
+### Local Testing with ngrok
+```bash
+# Terminal 1: Start ngrok
+ngrok http 3001
+
+# Terminal 2: Start backend
+npm run dev
+```
 
 ## Contract Addresses (BNB Testnet - Chain 97)
 
@@ -206,9 +246,12 @@ npm run seed:categories  # Seed default categories
 
 ## Notes
 
+- **USDT on BNB Chain uses 18 decimals** (not 6 like Ethereum USDT!)
 - **Ratings are entirely off-chain** in MongoDB (removed from smart contracts in v0.6.1)
 - One review per purchase receipt (enforced by unique `tokenId` in Review model)
 - Blacklisted predictors are hidden from API responses
+- **ContentId Conversion**: Backend uses UUID, smart contracts use bytes32
+  - Use `GET /api/signals/:contentId/content-identifier` to get bytes32 for on-chain calls
 
 ---
 
@@ -261,10 +304,13 @@ npm run seed:categories  # Seed default categories
 
 | Task | Status | Description |
 |------|--------|-------------|
-| Viem clients | ✅ | Public and wallet clients for BNB Chain |
+| Viem clients | ✅ | Public client for BNB Chain |
 | Contract ABIs | ✅ | Type-safe ABI imports for all contracts |
 | Webhook endpoint | ✅ | Alchemy signature verification |
+| GraphQL webhooks | ✅ | Custom webhook with rich event data |
 | Event handlers | ✅ | PredictorJoined, SignalPurchased, Blacklisted |
+| ContentId bridge | ✅ | UUID ↔ bytes32 conversion utilities |
+| Blockchain service | ✅ | On-chain verification utilities |
 
 ### Phase 6: Testing & Quality 🔄
 > **Goal:** Comprehensive test coverage
