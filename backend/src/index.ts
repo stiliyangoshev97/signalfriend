@@ -27,6 +27,7 @@ import { predictorRoutes } from "./features/predictors/predictor.routes.js";
 import { signalRoutes } from "./features/signals/signal.routes.js";
 import { receiptRoutes } from "./features/receipts/receipt.routes.js";
 import { reviewRoutes } from "./features/reviews/review.routes.js";
+import reportRoutes from "./features/reports/report.routes.js";
 
 /** Express application instance */
 const app = express();
@@ -66,6 +67,7 @@ app.use("/api/predictors", predictorRoutes);
 app.use("/api/signals", signalRoutes);
 app.use("/api/receipts", receiptRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/reports", reportRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

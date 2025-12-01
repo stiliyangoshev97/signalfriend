@@ -1,14 +1,15 @@
 /**
- * @fileoverview Business logic service for Review operations.
+ * @fileoverview Business logic service for Rating operations.
  *
- * Provides operations for reviews including:
- * - Listing reviews for signals and predictors
- * - Creating reviews (one per purchase, enforced by tokenId)
- * - Updating and deleting own reviews
+ * Provides operations for ratings including:
+ * - Listing ratings for signals and predictors
+ * - Creating ratings (one per purchase, enforced by tokenId)
+ * - Updating and deleting own ratings
  * - Statistics calculation for signals and predictors
  *
- * Key constraint: Only buyers who own a SignalKeyNFT can review.
- * One review per tokenId ensures one review per purchase.
+ * Key constraint: Only buyers who own a SignalKeyNFT can rate.
+ * One rating per tokenId ensures one rating per purchase.
+ * Note: This is RATING only (1-5 stars), no text reviews.
  *
  * @module features/reviews/review.service
  */
@@ -160,7 +161,7 @@ export class ReviewService {
       throw ApiError.notFound("Signal associated with this receipt not found");
     }
 
-    // Create review
+    // Create rating
     const review = new Review({
       tokenId: data.tokenId,
       signalId: signal._id,
@@ -168,7 +169,6 @@ export class ReviewService {
       buyerAddress: normalizedReviewer,
       predictorAddress: receipt.predictorAddress,
       score: data.score,
-      reviewText: data.reviewText || "",
     });
 
     await review.save();
@@ -183,15 +183,15 @@ export class ReviewService {
   }
 
   /**
-   * Updates an existing review.
-   * Only the original reviewer can update their review.
+   * Updates an existing rating.
+   * Only the original rater can update their rating.
    *
    * @param tokenId - The SignalKeyNFT token ID
-   * @param data - Fields to update
-   * @param callerAddress - Address of the caller (must be reviewer)
-   * @returns Promise resolving to the updated review
-   * @throws {ApiError} 404 if review not found
-   * @throws {ApiError} 403 if caller is not the reviewer
+   * @param data - Fields to update (score only)
+   * @param callerAddress - Address of the caller (must be rater)
+   * @returns Promise resolving to the updated rating
+   * @throws {ApiError} 404 if rating not found
+   * @throws {ApiError} 403 if caller is not the rater
    */
   static async update(
     tokenId: number,
@@ -202,18 +202,17 @@ export class ReviewService {
 
     const review = await Review.findOne({ tokenId });
     if (!review) {
-      throw ApiError.notFound(`Review with tokenId '${tokenId}' not found`);
+      throw ApiError.notFound(`Rating with tokenId '${tokenId}' not found`);
     }
 
     if (review.buyerAddress !== normalizedCaller) {
-      throw ApiError.forbidden("You can only update your own reviews");
+      throw ApiError.forbidden("You can only update your own ratings");
     }
 
     const oldScore = review.score;
 
-    // Update allowed fields
+    // Update score
     if (data.score !== undefined) review.score = data.score;
-    if (data.reviewText !== undefined) review.reviewText = data.reviewText;
 
     await review.save();
 
@@ -227,24 +226,24 @@ export class ReviewService {
   }
 
   /**
-   * Deletes a review.
-   * Only the original reviewer can delete their review.
+   * Deletes a rating.
+   * Only the original rater can delete their rating.
    *
    * @param tokenId - The SignalKeyNFT token ID
-   * @param callerAddress - Address of the caller (must be reviewer)
-   * @throws {ApiError} 404 if review not found
-   * @throws {ApiError} 403 if caller is not the reviewer
+   * @param callerAddress - Address of the caller (must be rater)
+   * @throws {ApiError} 404 if rating not found
+   * @throws {ApiError} 403 if caller is not the rater
    */
   static async delete(tokenId: number, callerAddress: string): Promise<void> {
     const normalizedCaller = callerAddress.toLowerCase();
 
     const review = await Review.findOne({ tokenId });
     if (!review) {
-      throw ApiError.notFound(`Review with tokenId '${tokenId}' not found`);
+      throw ApiError.notFound(`Rating with tokenId '${tokenId}' not found`);
     }
 
     if (review.buyerAddress !== normalizedCaller) {
-      throw ApiError.forbidden("You can only delete your own reviews");
+      throw ApiError.forbidden("You can only delete your own ratings");
     }
 
     const { contentId, predictorAddress } = review;

@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** December 1, 2024  
-> **Current Phase:** Webhook Integration Complete → Reviews Enhancement  
-> **Project Status:** 🟢 **In Development (95/100)** - All Features + Webhooks Fully Tested  
-> **Branch:** `feature/graphql-webhooks`
+> **Last Updated:** December 2024  
+> **Current Phase:** Reviews Enhancement & Reports Feature Complete  
+> **Project Status:** 🟢 **In Development (97/100)** - All Features + Reports Complete  
+> **Branch:** `feature/reviews-enhancement`
 
 ---
 
@@ -46,7 +46,8 @@ backend/
 │   │   ├── predictors/          # Predictor profiles ✅
 │   │   ├── signals/             # Trading signals ✅
 │   │   ├── receipts/            # Purchase receipts ✅
-│   │   └── reviews/             # Ratings & reviews ✅
+│   │   ├── reviews/             # Ratings (1-5 score, off-chain) ✅
+│   │   └── reports/             # Scam/false signal reports ✅ (NEW)
 │   ├── scripts/
 │   │   ├── seedCategories.ts    # Database seeding
 │   │   ├── seedTestSignal.ts    # Test signal for webhook testing
@@ -165,7 +166,7 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
 }
 ```
 
-### Review Model
+### Review Model (Rating-Only)
 ```typescript
 {
   tokenId: number,            // Unique - one review per purchase
@@ -173,8 +174,21 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
   contentId: string,
   buyerAddress: string,
   predictorAddress: string,
-  score: number,              // 1-5
-  reviewText: string,
+  score: number,              // 1-5 (off-chain only, no markSignalRated on-chain)
+}
+```
+
+### Report Model (NEW)
+```typescript
+{
+  tokenId: number,            // Unique - one report per purchase
+  signalId: ObjectId,
+  contentId: string,
+  buyerAddress: string,
+  predictorAddress: string,
+  reason: enum,               // false_signal, misleading_info, scam, duplicate_content, other
+  description: string,        // Optional (required if reason is "other")
+  status: enum,               // pending, reviewed, resolved, dismissed
 }
 ```
 
@@ -248,14 +262,20 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
 | GET | `/api/receipts/check/:contentId` | Yes | Check if purchased |
 | GET | `/api/receipts/signal/:contentId` | Yes | Get signal sales |
 | GET | `/api/receipts/:tokenId` | Yes | Get receipt by ID |
-| GET | `/api/reviews/mine` | Yes | Get user's reviews |
-| GET | `/api/reviews/signal/:contentId` | No | Get signal reviews |
-| GET | `/api/reviews/predictor/:address` | No | Get predictor reviews |
-| GET | `/api/reviews/check/:tokenId` | No | Check if review exists |
-| GET | `/api/reviews/:tokenId` | No | Get review by ID |
-| POST | `/api/reviews` | Yes | Create review |
-| PUT | `/api/reviews/:tokenId` | Yes | Update own review |
-| DELETE | `/api/reviews/:tokenId` | Yes | Delete own review |
+| GET | `/api/reviews/mine` | Yes | Get user's ratings |
+| GET | `/api/reviews/signal/:contentId` | No | Get signal ratings |
+| GET | `/api/reviews/predictor/:address` | No | Get predictor ratings |
+| GET | `/api/reviews/check/:tokenId` | No | Check if rating exists |
+| GET | `/api/reviews/:tokenId` | No | Get rating by ID |
+| POST | `/api/reviews` | Yes | Create rating (1-5 score) |
+| PUT | `/api/reviews/:tokenId` | Yes | Update own rating |
+| DELETE | `/api/reviews/:tokenId` | Yes | Delete own rating |
+| POST | `/api/reports` | Yes | Create report (scam/false signal) |
+| GET | `/api/reports/mine` | Yes | Get user's reports |
+| GET | `/api/reports/signal/:contentId` | No | Get signal reports |
+| GET | `/api/reports/predictor/:address` | No | Get predictor reports |
+| GET | `/api/reports/predictor/:address/stats` | No | Get report statistics |
+| GET | `/api/reports/check/:tokenId` | No | Check if report exists |
 
 ---
 

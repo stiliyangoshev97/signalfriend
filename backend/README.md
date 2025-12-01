@@ -160,18 +160,31 @@ src/
 | GET | `/api/receipts/signal/:contentId` | Yes | Get signal sales (predictor) |
 | GET | `/api/receipts/:tokenId` | Yes | Get receipt by token ID |
 
-### Reviews
+### Reviews (Ratings)
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/api/reviews/mine` | Yes | Get user's reviews |
-| GET | `/api/reviews/signal/:contentId` | No | Get signal reviews |
-| GET | `/api/reviews/predictor/:address` | No | Get predictor reviews |
-| GET | `/api/reviews/check/:tokenId` | No | Check if review exists |
-| GET | `/api/reviews/:tokenId` | No | Get review by token ID |
-| POST | `/api/reviews` | Yes | Create review (purchaser only) |
-| PUT | `/api/reviews/:tokenId` | Yes | Update own review |
-| DELETE | `/api/reviews/:tokenId` | Yes | Delete own review |
+| GET | `/api/reviews/mine` | Yes | Get user's ratings |
+| GET | `/api/reviews/signal/:contentId` | No | Get signal ratings |
+| GET | `/api/reviews/predictor/:address` | No | Get predictor ratings |
+| GET | `/api/reviews/check/:tokenId` | No | Check if rating exists |
+| GET | `/api/reviews/:tokenId` | No | Get rating by token ID |
+| POST | `/api/reviews` | Yes | Create rating (purchaser only, 1-5 stars) |
+| PUT | `/api/reviews/:tokenId` | Yes | Update own rating |
+| DELETE | `/api/reviews/:tokenId` | Yes | Delete own rating |
+
+### Reports (Scam/False Signal)
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/reports/mine` | Yes | Get user's reports |
+| GET | `/api/reports/signal/:contentId` | No | Get signal reports |
+| GET | `/api/reports/signal/:contentId/count` | No | Get signal report count |
+| GET | `/api/reports/predictor/:address` | No | Get predictor reports |
+| GET | `/api/reports/predictor/:address/stats` | No | Get predictor report stats |
+| GET | `/api/reports/check/:tokenId` | No | Check if report exists |
+| GET | `/api/reports/:tokenId` | No | Get report by token ID |
+| POST | `/api/reports` | Yes | Create report (purchaser only) |
 
 ### Webhooks
 

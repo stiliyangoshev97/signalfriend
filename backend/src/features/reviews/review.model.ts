@@ -1,22 +1,25 @@
 /**
- * @fileoverview MongoDB model for Review documents.
+ * @fileoverview MongoDB model for Rating documents.
  *
- * Reviews allow buyers to rate and provide feedback on purchased signals.
- * Key constraint: One review per purchase (enforced by unique tokenId).
+ * Ratings allow buyers to rate purchased signals (1-5 stars).
+ * Key constraint: One rating per purchase (enforced by unique tokenId).
  * Ratings are stored entirely off-chain in MongoDB.
+ * 
+ * Note: This is RATING only, no text reviews. For reporting scam signals,
+ * see the Report model.
  *
  * @module features/reviews/review.model
  */
 import mongoose, { Schema, Document } from "mongoose";
 
 /**
- * Interface representing a Review document in MongoDB.
+ * Interface representing a Review (Rating) document in MongoDB.
  * Extends Mongoose Document for type safety.
  */
 export interface IReview extends Document {
-  /** SignalKeyNFT token ID - ensures one review per purchase */
+  /** SignalKeyNFT token ID - ensures one rating per purchase */
   tokenId: number;
-  /** Reference to the reviewed Signal */
+  /** Reference to the rated Signal */
   signalId: mongoose.Types.ObjectId;
   /** Signal content ID (denormalized for quick queries) */
   contentId: string;
@@ -26,11 +29,9 @@ export interface IReview extends Document {
   predictorAddress: string;
   /** Rating score (1-5 stars) */
   score: number;
-  /** Optional review text */
-  reviewText: string;
-  /** Timestamp when review was created */
+  /** Timestamp when rating was created */
   createdAt: Date;
-  /** Timestamp when review was last updated */
+  /** Timestamp when rating was last updated */
   updatedAt: Date;
 }
 
@@ -74,11 +75,6 @@ const reviewSchema = new Schema<IReview>(
       required: true,
       min: 1,
       max: 5,
-    },
-    reviewText: {
-      type: String,
-      default: "",
-      maxlength: 1000,
     },
   },
   {
