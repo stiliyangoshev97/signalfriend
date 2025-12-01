@@ -15,6 +15,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.0] - 2024-12-01 🎯 WEBHOOK INTEGRATION COMPLETE
+
+### Added
+- **GraphQL Webhook Support**
+  - Support for Alchemy Custom (GraphQL) webhooks alongside Address Activity
+  - Discriminated union schema for webhook payload types
+  - `processGraphqlWebhook()` method for GraphQL payload processing
+  - Log normalization for unified event processing
+
+- **ContentId Format Conversion**
+  - New `src/shared/utils/contentId.ts` utility module
+  - `uuidToBytes32()` - Convert UUID to bytes32 for smart contract calls
+  - `bytes32ToUuid()` - Convert bytes32 back to UUID for MongoDB lookups
+  - Seamless bridge between backend UUID format and on-chain bytes32 format
+
+- **Signal ContentIdentifier Endpoint**
+  - `SignalService.getContentIdentifier()` - Returns bytes32 for frontend to use in `buySignalNFT` calls
+  - Enables frontend to get the on-chain compatible content identifier
+
+- **Database Seeding Scripts**
+  - `src/scripts/seedTestSignal.ts` - Create test signals for webhook testing
+
+### Changed
+- **`receipt.service.ts`** - Enhanced contentId handling
+  - Automatically converts bytes32 to UUID when processing blockchain events
+  - Supports both UUID and bytes32 formats for signal lookups
+
+- **`webhook.service.ts`** - GraphQL webhook support
+  - Routes to appropriate processor based on webhook type
+  - Handles both `event.data.block.logs[]` (GraphQL) and `event.activity[]` (Address Activity)
+
+- **`webhook.schemas.ts`** - Extended payload schemas
+  - Added `GraphqlWebhookPayload` and `GraphqlWebhookLog` schemas
+  - Discriminated union for type-safe payload handling
+
+### Tested
+- ✅ **PredictorJoined** - Creates Predictor record in MongoDB
+- ✅ **SignalPurchased** - Creates Receipt record, links to Signal via UUID conversion
+- ✅ **PredictorBlacklisted** - Updates Predictor.isBlacklisted status
+
+### Technical Notes
+- USDT on BNB Chain uses **18 decimals** (not 6 like Ethereum USDT)
+- GraphQL webhooks provide richer data structure with transaction context
+- ContentId conversion: `00000000-0000-0000-0000-000000000001` ↔ `0x0000000000000000000000000000000100000000...`
+
+---
+
 ## [0.7.0] - 2024-12-01 🌐 NETWORK CONFIGURATION
 
 ### Added

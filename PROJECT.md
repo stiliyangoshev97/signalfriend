@@ -2,7 +2,10 @@
 
 ## Overview
 
-SignalFriend is a **Web3 Transparent Signal Marketplace** that connects verified prediction makers (Predictors) with traders via a transparent, on-chain NFT mechanism. By structuring the core transaction around an **NFT as a data ticket** within a **gated room**, the platform is legally positioned as a **Digital Information Marketplace** rather than a gambling or betting platform.
+Signa| **Product**          | Predictors sell individual trading signals/reports packaged as an **Non-Fungible Token (NFT)**. The NFT acts as a secure, one-time-use **key** to unlock the signal's private content stored off-chain. |
+| **Target Chain**     | **BNB Chain** (BEP-20/BEP-721).                                                                                                                                                                         |
+| **Payment Currency** | **USDT (BEP-20, 18 decimals)** for all fees and signal purchases.                                                                                                                                       |
+| **Legal Strategy**   | Platform is legally structured as an **NFT-based digital information marketplace** to mitigate risks associated with gambling, betting, or unregistered financial advising.                             |end is a **Web3 Transparent Signal Marketplace** that connects verified prediction makers (Predictors) with traders via a transparent, on-chain NFT mechanism. By structuring the core transaction around an **NFT as a data ticket** within a **gated room**, the platform is legally positioned as a **Digital Information Marketplace** rather than a gambling or betting platform.
 
 ---
 

@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
 > **Last Updated:** December 1, 2024  
-> **Current Phase:** Webhooks Complete → Testing Phase  
-> **Project Status:** 🟢 **In Development (90/100)** - All Features + Webhooks Implemented  
-> **Branch:** `feature/webhooks-complete`
+> **Current Phase:** Webhook Integration Complete → Reviews Enhancement  
+> **Project Status:** 🟢 **In Development (95/100)** - All Features + Webhooks Fully Tested  
+> **Branch:** `feature/graphql-webhooks`
 
 ---
 
@@ -21,6 +21,11 @@
 | Logging | Pino | Structured logging |
 | Testing | Vitest | Unit & integration tests |
 
+### Key Technical Details
+- **USDT Decimals:** 18 (BNB Chain, not 6 like Ethereum)
+- **ContentId Format:** UUID in MongoDB ↔ bytes32 on-chain
+- **Webhook Type:** Alchemy Custom (GraphQL) webhooks
+
 ### Project Structure
 ```
 backend/
@@ -36,7 +41,7 @@ backend/
 │   │       └── MockUSDT.ts
 │   ├── features/                # Feature-based modules
 │   │   ├── auth/                # SIWE + JWT authentication ✅
-│   │   ├── webhooks/            # Alchemy event indexing ✅
+│   │   ├── webhooks/            # Alchemy event indexing ✅ (GraphQL + Address Activity)
 │   │   ├── categories/          # Signal categories ✅
 │   │   ├── predictors/          # Predictor profiles ✅
 │   │   ├── signals/             # Trading signals ✅
@@ -44,13 +49,14 @@ backend/
 │   │   └── reviews/             # Ratings & reviews ✅
 │   ├── scripts/
 │   │   ├── seedCategories.ts    # Database seeding
+│   │   ├── seedTestSignal.ts    # Test signal for webhook testing
 │   │   └── generateEventSignatures.ts  # Event hash generator
 │   └── shared/
 │       ├── config/              # env, database, logger
 │       ├── middleware/          # auth, validation, errors, security
 │       ├── services/            # blockchain.service.ts (viem)
 │       ├── types/               # TypeScript types
-│       └── utils/               # ApiError, asyncHandler
+│       └── utils/               # ApiError, asyncHandler, contentId
 ├── tests/
 │   └── setup.ts                 # Test configuration
 ├── package.json
@@ -344,9 +350,9 @@ npm test
 | 3. Contract Integration | ✅ Complete | ABIs, addresses, Viem client |
 | 4. MongoDB Models | ✅ Complete | All 5 models defined |
 | 5. Auth Feature | ✅ Complete | SIWE + JWT flow |
-| 6. Webhook Feature | ✅ Scaffolded | Routes ready, event decoding pending |
-| 7. Categories Feature | ✅ Complete | Full CRUD with validation |
-| 8. Remaining Features | ⏳ Pending | Predictors, Signals, Receipts, Reviews |
+| 6. Webhook Feature | ✅ **Complete** | GraphQL + Address Activity webhooks, all 3 events tested |
+| 7. All CRUD Features | ✅ Complete | Categories, Predictors, Signals, Receipts, Reviews |
+| 8. ContentId Bridge | ✅ Complete | UUID ↔ bytes32 conversion for on-chain compatibility |
 | 9. Testing | ⏳ Pending | Unit & integration tests |
 | 10. Deployment | ⏳ Pending | Docker, MongoDB Atlas |
 
@@ -358,6 +364,8 @@ npm test
 2. **One review per purchase** - Enforced by unique `tokenId` constraint in Review model
 3. **Feature-based folder structure** - Each feature has its own schemas, service, controller, routes
 4. **SIWE for auth** - Wallet signature proves ownership, JWT for session management
-5. **Alchemy webhooks for indexing** - Real-time blockchain event processing
+5. **Alchemy GraphQL webhooks for indexing** - Real-time blockchain event processing with rich data
 6. **Pino for logging** - Fast, JSON-based logging with pretty printing in dev
 7. **Zod for validation** - Runtime type checking with TypeScript inference
+8. **UUID ↔ bytes32 bridge** - Seamless conversion between backend and on-chain content identifiers
+9. **USDT 18 decimals** - BNB Chain USDT uses 18 decimals, unlike Ethereum's 6

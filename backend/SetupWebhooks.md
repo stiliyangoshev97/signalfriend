@@ -1,6 +1,6 @@
 # 🔗 Alchemy Webhook Setup Guide
 
-> This guide walks you through setting up Alchemy webhooks to index blockchain events for SignalFriend.
+> This guide walks you through setting up Alchemy Custom (GraphQL) webhooks to index blockchain events for SignalFriend.
 
 ---
 
@@ -42,22 +42,22 @@ The backend uses Alchemy webhooks to listen for blockchain events and sync them 
    - **Network**: BNB Smart Chain Testnet (for testing) or Mainnet (for production)
 3. Give it a name (e.g., "SignalFriend")
 
-### Step 3: Create the Webhook
+### Step 3: Create the Custom Webhook
 
-> ⚠️ **IMPORTANT:** You must use a **Custom Webhook (GraphQL)** type, NOT "Address Activity". 
+> ⚠️ **IMPORTANT:** You MUST use a **Custom Webhook** type, NOT "Address Activity". 
 > Address Activity only captures token transfers, not custom contract events like `PredictorJoined`.
 
 1. Navigate to **Webhooks** in the left sidebar
 2. Click **"Create Webhook"**
-3. Select **"Custom Webhook"** (GraphQL type)
+3. Select **"Custom Webhook"** (this uses GraphQL)
 4. Configure:
    - **Chain**: BNB Smart Chain
    - **Network**: BNB Smart Chain Testnet
-   - **Webhook URL**: Your backend endpoint (see options below)
+   - **Webhook URL**: Your backend endpoint (e.g., `https://your-ngrok-url.ngrok-free.dev/api/webhooks/alchemy`)
 
 ### Step 4: Configure GraphQL Query
 
-Use this GraphQL query to capture all event logs from our contracts:
+**This is the exact GraphQL query template we use:**
 
 ```graphql
 {
@@ -82,15 +82,22 @@ Use this GraphQL query to capture all event logs from our contracts:
 }
 ```
 
-**Contract Addresses to Monitor:**
-- `0x5133397a4B9463c5270beBa05b22301e6dD184ca` - SignalFriendMarket
-- `0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4` - PredictorAccessPass
+**What this query does:**
+- Filters logs to only our two contract addresses
+- Returns transaction hash for reference
+- Returns `topics` array (topic0 = event signature, topic1-3 = indexed params)
+- Returns `data` (non-indexed event parameters, ABI-encoded)
+- Returns emitting contract address
+
+**Contract Addresses:**
+- `0x5133397a4B9463c5270beBa05b22301e6dD184ca` - SignalFriendMarket (PredictorJoined, SignalPurchased)
+- `0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4` - PredictorAccessPass (PredictorBlacklisted)
 
 ### Step 5: Copy the Signing Key
 
 After creating the webhook:
 1. Click on your webhook to view details
-2. Find the **"Signing Key"** (also called Auth Token)
+2. Find the **"Signing Key"** (starts with `whsec_`)
 3. Copy it
 
 ### Step 6: Update Your .env File
@@ -98,8 +105,47 @@ After creating the webhook:
 Add the signing key to your backend `.env` file:
 
 ```bash
-ALCHEMY_SIGNING_KEY=your-signing-key-here
+ALCHEMY_SIGNING_KEY=whsec_your-signing-key-here
 ```
+
+---
+
+## 📦 GraphQL Webhook Payload Structure
+
+When an event occurs, Alchemy sends this payload structure:
+
+```json
+{
+  "webhookId": "wh_abc123",
+  "id": "evt_xyz789",
+  "createdAt": "2024-12-01T12:00:00.000Z",
+  "type": "GRAPHQL",
+  "event": {
+    "data": {
+      "block": {
+        "logs": [
+          {
+            "transaction": {
+              "hash": "0x1234...",
+              "from": { "address": "0xbuyer..." },
+              "to": { "address": "0xcontract..." }
+            },
+            "topics": [
+              "0x2f2789d1da7b490fc20c28c5014f1fdd449737869b924042025cd634b2248cc4",
+              "0x000000000000000000000000predictor-address..."
+            ],
+            "data": "0x...",
+            "account": { "address": "0x5133397a4b9463c5270beba05b22301e6dd184ca" }
+          }
+        ]
+      }
+    },
+    "sequenceNumber": "12345"
+  }
+}
+```
+
+Our backend handles this structure in `webhook.service.ts` → `processGraphqlWebhook()`.
 
 ---
 
@@ -107,7 +153,7 @@ ALCHEMY_SIGNING_KEY=your-signing-key-here
 
 Your webhook endpoint is: `/api/webhooks/alchemy`
 
-### Option A: Local Development with ngrok
+### Option A: Local Development with ngrok (Recommended for Testing)
 
 1. Install ngrok:
    ```bash
@@ -132,14 +178,14 @@ Your webhook endpoint is: `/api/webhooks/alchemy`
    ngrok http 3001
    ```
 
-6. Copy the ngrok URL (e.g., `https://abc123.ngrok.io`)
+6. Copy the ngrok URL (e.g., `https://preinaugural-subconvex-belen.ngrok-free.dev`)
 
-7. Use this as your webhook URL:
+7. Use this as your webhook URL in Alchemy:
    ```
-   https://abc123.ngrok.io/api/webhooks/alchemy
+   https://preinaugural-subconvex-belen.ngrok-free.dev/api/webhooks/alchemy
    ```
 
-> ⚠️ **Note**: The ngrok URL changes every time you restart ngrok (unless you have a paid plan). You'll need to update the webhook URL in Alchemy each time.
+> 💡 **Tip**: With a free ngrok account, your URL changes each restart. Update the webhook URL in Alchemy accordingly.
 
 ### Option B: Deployed Backend
 
@@ -268,13 +314,13 @@ When switching from testnet to mainnet:
 
 - [ ] Created Alchemy account
 - [ ] Created Alchemy app for BNB Testnet
-- [ ] Created webhook with "Address Activity" type
-- [ ] Added SignalFriendMarket address: `0x5133397a4B9463c5270beBa05b22301e6dD184ca`
-- [ ] Added PredictorAccessPass address: `0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4`
+- [ ] Created **Custom Webhook** (NOT Address Activity)
+- [ ] Pasted the GraphQL query with both contract addresses
 - [ ] Set webhook URL (ngrok or deployed)
-- [ ] Copied signing key to `.env` as `ALCHEMY_SIGNING_KEY`
-- [ ] Tested webhook health endpoint
-- [ ] Triggered a real event and verified it was processed
+- [ ] Copied signing key (starts with `whsec_`) to `.env` as `ALCHEMY_SIGNING_KEY`
+- [ ] Started backend with `npm run dev`
+- [ ] Tested webhook by triggering a real blockchain event
+- [ ] Verified event was processed (check backend logs & MongoDB)
 
 ---
 
