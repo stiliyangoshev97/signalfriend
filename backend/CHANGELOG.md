@@ -15,6 +15,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.10.0] - 2024-12-02 🎯 PREDICTOR ENHANCEMENTS
+
+### Added
+- **Preferred Contact Field**
+  - Added `preferredContact` field to Predictor model (`telegram` | `discord`)
+  - Allows admin to know how to contact predictors for moderation
+  - Defaults to `telegram`
+  - Can be updated via `PUT /api/predictors/:address`
+
+- **Earnings Endpoint**
+  - `GET /api/predictors/:address/earnings` - Get predictor's earnings breakdown
+  - Returns: `totalSalesRevenue`, `predictorEarnings` (95%), `platformCommission` (5%), `totalSalesCount`
+  - Requires authentication - only predictor can view their own earnings
+  - Aggregates data from Receipt collection
+
+- **Configurable Minimum Signal Price**
+  - Added `MIN_SIGNAL_PRICE_USDT` environment variable (default: 5)
+  - Signal creation validates against this value
+  - To change: update `.env` and restart (must match smart contract)
+
+### Changed
+- `predictor.model.ts` - Added `preferredContact` enum field
+- `predictor.schemas.ts` - Added `preferredContact` to update schema
+- `predictor.service.ts` - Added `getEarnings()` method, updated `updateProfile()`
+- `predictor.controller.ts` - Added `getPredictorEarnings` handler
+- `predictor.routes.ts` - Added `GET /:address/earnings` route
+- `signal.schemas.ts` - Now uses `env.MIN_SIGNAL_PRICE_USDT` for validation
+- `env.ts` - Added `MIN_SIGNAL_PRICE_USDT` config
+- `.env.example` - Added `MIN_SIGNAL_PRICE_USDT` documentation
+
+---
+
 ## [0.9.0] - 2024-12-XX 📝 REVIEWS ENHANCEMENT & REPORTS FEATURE
 
 ### Added

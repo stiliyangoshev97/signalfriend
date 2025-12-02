@@ -9,6 +9,7 @@
  * @module features/signals/signal.schemas
  */
 import { z } from "zod";
+import { env } from "../../shared/config/env.js";
 
 /** Regex pattern for valid Ethereum addresses */
 const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
@@ -77,8 +78,8 @@ export const createSignalSchema = z.object({
   content: z.string().min(1).max(10000),
   /** Category ID */
   categoryId: z.string(),
-  /** Price in USDT (min 0.01) */
-  priceUsdt: z.number().min(0.01).max(100000),
+  /** Price in USDT (min from env, default 5 USDT) */
+  priceUsdt: z.number().min(env.MIN_SIGNAL_PRICE_USDT).max(100000),
 });
 
 /**

@@ -17,6 +17,7 @@ import {
   getPredictorByAddress,
   updatePredictorProfile,
   checkPredictorStatus,
+  getPredictorEarnings,
 } from "./predictor.controller.js";
 import { validate } from "../../shared/middleware/validation.js";
 import { authenticate } from "../../shared/middleware/auth.js";
@@ -71,6 +72,18 @@ router.get(
 // ============================================================================
 // Protected Routes (Authentication Required)
 // ============================================================================
+
+/**
+ * GET /api/predictors/:address/earnings
+ * Get predictor's earnings breakdown from signal sales.
+ * Only the predictor can view their own earnings.
+ */
+router.get(
+  "/:address/earnings",
+  authenticate,
+  validate(getPredictorByAddressSchema, "params"),
+  getPredictorEarnings
+);
 
 /**
  * PUT /api/predictors/:address

@@ -135,6 +135,7 @@ src/
 | GET | `/api/predictors/top` | No | Get leaderboard |
 | GET | `/api/predictors/:address` | No | Get predictor profile |
 | GET | `/api/predictors/:address/check` | No | Check if active predictor |
+| GET | `/api/predictors/:address/earnings` | Yes | Get own earnings breakdown |
 | PUT | `/api/predictors/:address` | Yes | Update own profile |
 
 ### Signals

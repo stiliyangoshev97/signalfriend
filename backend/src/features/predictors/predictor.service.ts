@@ -13,6 +13,7 @@
 import mongoose from "mongoose";
 import { Predictor, IPredictor } from "./predictor.model.js";
 import { Category } from "../categories/category.model.js";
+import { Receipt } from "../receipts/receipt.model.js";
 import { ApiError } from "../../shared/utils/ApiError.js";
 import type {
   ListPredictorsQuery,
@@ -192,6 +193,9 @@ export class PredictorService {
         ...data.socialLinks,
       };
     }
+    if (data.preferredContact !== undefined) {
+      predictor.preferredContact = data.preferredContact;
+    }
     if (data.categoryIds !== undefined) {
       predictor.categoryIds = data.categoryIds.map(
         (id) => new mongoose.Types.ObjectId(id)
@@ -359,5 +363,53 @@ export class PredictorService {
       .sort({ [metric]: -1 })
       .limit(limit)
       .populate("categoryIds", "name slug icon");
+  }
+
+  /**
+   * Calculates the total earnings for a predictor from signal sales.
+   * Earnings = 95% of total signal sales (5% platform commission).
+   *
+   * @param address - The predictor's wallet address
+   * @returns Promise resolving to earnings summary
+   */
+  static async getEarnings(address: string): Promise<{
+    totalSalesRevenue: number;
+    predictorEarnings: number;
+    platformCommission: number;
+    totalSalesCount: number;
+  }> {
+    const normalizedAddress = address.toLowerCase();
+
+    // Verify predictor exists
+    const predictor = await Predictor.findOne({ walletAddress: normalizedAddress });
+    if (!predictor) {
+      throw ApiError.notFound(`Predictor with address '${address}' not found`);
+    }
+
+    // Aggregate all receipts for this predictor
+    const result = await Receipt.aggregate([
+      { $match: { predictorAddress: normalizedAddress } },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: "$priceUsdt" },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const totalSalesRevenue = result[0]?.totalRevenue || 0;
+    const totalSalesCount = result[0]?.count || 0;
+
+    // Calculate predictor earnings (95% of sales, 5% platform commission)
+    const platformCommission = totalSalesRevenue * 0.05;
+    const predictorEarnings = totalSalesRevenue * 0.95;
+
+    return {
+      totalSalesRevenue: Math.round(totalSalesRevenue * 100) / 100,
+      predictorEarnings: Math.round(predictorEarnings * 100) / 100,
+      platformCommission: Math.round(platformCommission * 100) / 100,
+      totalSalesCount,
+    };
   }
 }

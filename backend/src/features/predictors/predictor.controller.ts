@@ -127,3 +127,34 @@ export const checkPredictorStatus = asyncHandler(async (req: Request, res: Respo
     },
   });
 });
+
+/**
+ * GET /api/predictors/:address/earnings
+ * Gets a predictor's total earnings from signal sales.
+ * Requires authentication - only the predictor can view their earnings.
+ *
+ * @param {string} address - Ethereum wallet address
+ * @returns {Object} JSON response with earnings breakdown
+ * @throws {403} If caller is not the predictor
+ * @throws {404} If predictor not found
+ */
+export const getPredictorEarnings = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const { address } = req.params as GetPredictorByAddressParams;
+  const callerAddress = req.user!.address;
+
+  // Only allow predictor to view their own earnings
+  if (address.toLowerCase() !== callerAddress.toLowerCase()) {
+    res.status(403).json({
+      success: false,
+      error: "You can only view your own earnings",
+    });
+    return;
+  }
+
+  const earnings = await PredictorService.getEarnings(address);
+
+  res.json({
+    success: true,
+    data: earnings,
+  });
+});
