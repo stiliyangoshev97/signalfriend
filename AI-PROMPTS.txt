@@ -3,7 +3,7 @@
 ================================================================================
 # Use these prompts to quickly onboard AI assistants to the project state.
 # Copy and paste the relevant prompt when starting a new chat.
-# Last Updated: November 30, 2024
+# Last Updated: December 3, 2024
 
 ================================================================================
 PROMPT #1: FULL PROJECT CONTEXT REVIEW (Recommended for new chats)
@@ -28,8 +28,11 @@ For Backend:
 8. `/backend/CHANGELOG.md` - Version history
 9. `/backend/TO-DO-BACKEND.txt` - Backend task tracker
 
-For Frontend (when exists):
-10. `/frontend/README.md` - Frontend overview
+For Frontend:
+10. `/frontend/README.md` - Frontend overview & setup
+11. `/frontend/PROJECT_CONTEXT.md` - Architecture & component details
+12. `/frontend/CHANGELOG.md` - Version history
+13. `/frontend/TO-DO-FRONTEND.txt` - Frontend task tracker
 
 After reviewing what exists, provide a brief summary of:
 - Current project phase and overall status
@@ -49,7 +52,7 @@ Please quickly review the SignalFriend project status:
 1. Scan the workspace structure to see what folders/components exist
 2. Read `/TO-DO.txt` - Focus on completed vs pending items
 3. Read `/PROJECT.md` - Quick overview of the project
-4. Skim `/contracts/PROJECT_CONTEXT.md` and `/backend/PROJECT_CONTEXT.md` headers
+4. Skim `/contracts/PROJECT_CONTEXT.md`, `/backend/PROJECT_CONTEXT.md`, and `/frontend/PROJECT_CONTEXT.md` headers
 
 Give me a 1-paragraph summary of where we are across all components, then ask what I want to work on.
 
@@ -91,19 +94,32 @@ Summarize:
 Then ask what backend work I need help with.
 
 ================================================================================
-PROMPT #5: FRONTEND CONTEXT (React/Viem/Wagmi/RainbowKit)
+PROMPT #5: FRONTEND CONTEXT (React/Vite/Wagmi/RainbowKit)
 ================================================================================
 
 I'm working on SignalFriend frontend. Please review:
 
-1. `/PROJECT.md` - Overall vision and UX requirements
-2. `/TO-DO.txt` - Frontend-related tasks
-3. `/frontend/README.md` - Frontend overview (if exists)
-4. Scan `/frontend/` folder structure (if exists)
-5. `/contracts/deployment-addresses.txt` - Contract addresses for Web3 integration
-6. `/backend/PROJECT_CONTEXT.md` - API endpoints to integrate with
+1. `/frontend/README.md` - Frontend overview & setup instructions
+2. `/frontend/PROJECT_CONTEXT.md` - Architecture, components, design system
+3. `/frontend/CHANGELOG.md` - Version history
+4. `/frontend/TO-DO-FRONTEND.txt` - Frontend task tracker
+5. Scan `/frontend/src/` folder structure:
+   - `/frontend/src/shared/` - Shared components, hooks, utils, schemas
+   - `/frontend/src/features/` - Feature modules (auth, signals, predictors)
+   - `/frontend/src/providers/` - React context providers
+   - `/frontend/src/router/` - Routes and layouts
+6. `/frontend/tailwind.config.js` - Custom theme colors (logo-inspired)
+7. `/contracts/deployment-addresses.txt` - Contract addresses for Web3 integration
+8. `/backend/PROJECT_CONTEXT.md` - API endpoints to integrate with
 
-Summarize the frontend architecture, what's implemented, and what's pending. Then ask what frontend work I need help with.
+Summarize:
+- Current frontend architecture (Vite + React + TypeScript)
+- Design system (logo-inspired green/golden theme)
+- Which components and features are built
+- What's pending (pages, API integration)
+- Web3 setup (wagmi, RainbowKit, BNB Chain)
+
+Then ask what frontend work I need help with.
 
 ================================================================================
 PROMPT #6: TESTING CONTEXT
@@ -172,7 +188,29 @@ Then tell me:
 Ask me what I want to work on or suggest the next logical task.
 
 ================================================================================
-PROMPT #10: NEW FEATURE IMPLEMENTATION
+PROMPT #10: CONTINUE FRONTEND DEVELOPMENT
+================================================================================
+
+I want to continue building the SignalFriend frontend. Please review:
+
+1. `/frontend/PROJECT_CONTEXT.md` - Full architecture context
+2. `/frontend/TO-DO-FRONTEND.txt` - Current task progress  
+3. `/frontend/CHANGELOG.md` - What's been done
+4. Scan `/frontend/src/` structure:
+   - `/frontend/src/features/` - Feature modules
+   - `/frontend/src/shared/components/ui/` - UI components
+   - `/frontend/src/router/` - Routes and layouts
+5. `/frontend/tailwind.config.js` - Theme colors
+
+Then tell me:
+- What phase we're in (scaffold done, building pages)
+- What's the next priority from the TODO
+- Which pages/features are ready to build
+
+Ask me what I want to work on or suggest the next logical task.
+
+================================================================================
+PROMPT #11: NEW FEATURE IMPLEMENTATION
 ================================================================================
 
 I want to implement a new feature for SignalFriend. Please review:
@@ -181,6 +219,7 @@ I want to implement a new feature for SignalFriend. Please review:
 2. Relevant component docs:
    - `/contracts/PROJECT_CONTEXT.md` for smart contract features
    - `/backend/PROJECT_CONTEXT.md` for backend features
+   - `/frontend/PROJECT_CONTEXT.md` for frontend features
 3. Existing code patterns in the codebase
 
 Then ask me which feature I want to implement and help me plan the approach following existing patterns.
@@ -201,7 +240,7 @@ SignalFriend is a Web3 signal marketplace on BNB Chain where:
 |-----------|-------------|
 | Smart Contracts | Solidity, Foundry, OpenZeppelin (BNB Chain) |
 | Backend | Express.js, MongoDB, Viem, SIWE, JWT, Zod, Pino |
-| Frontend | React, Viem, Wagmi, RainbowKit (planned) |
+| Frontend | React 19, Vite, TypeScript, Tailwind CSS, wagmi v2, RainbowKit |
 
 ## Project Structure
 ```
@@ -209,6 +248,7 @@ SignalFriend is a Web3 signal marketplace on BNB Chain where:
 ├── PROJECT.md              # Business model, vision
 ├── TO-DO.txt               # Master task list
 ├── AI-PROMPTS.txt          # This file
+├── assets/                 # Branding assets (logo, NFT metadata)
 ├── contracts/              # Solidity smart contracts (Foundry)
 │   ├── src/                # Contract source files
 │   ├── test/               # Foundry tests (125 tests)
@@ -224,7 +264,15 @@ SignalFriend is a Web3 signal marketplace on BNB Chain where:
 │   ├── PROJECT_CONTEXT.md  # Architecture & API details
 │   ├── CHANGELOG.md        # Version history
 │   └── TO-DO-BACKEND.txt   # Backend tasks
-└── frontend/               # React + Wagmi (when created)
+└── frontend/               # React + Vite + wagmi
+    ├── src/
+    │   ├── features/       # auth, signals, predictors
+    │   ├── shared/         # components, hooks, schemas, utils
+    │   ├── providers/      # Web3, Query, Sentry providers
+    │   └── router/         # Routes and layouts
+    ├── PROJECT_CONTEXT.md  # Architecture & component details
+    ├── CHANGELOG.md        # Version history
+    └── TO-DO-FRONTEND.txt  # Frontend tasks
 ```
 
 ## Smart Contracts (BNB Testnet - Chain ID 97)
@@ -235,12 +283,12 @@ SignalFriend is a Web3 signal marketplace on BNB Chain where:
 | PredictorAccessPass | `0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4` |
 | SignalKeyNFT | `0xfb26Df6101e1a52f9477f52F54b91b99fb016aed` |
 
-## Current Status (November 30, 2024)
+## Current Status (December 3, 2024)
 | Component | Status | Progress |
 |-----------|--------|----------|
 | Smart Contracts | ✅ Complete | 125 tests, deployed to testnet |
 | Backend | 🟡 In Progress | Foundation done, building features |
-| Frontend | ⏳ Not Started | Planned |
+| Frontend | 🟡 In Progress | Scaffold complete, building pages |
 
 ## Key Documentation Files
 | File | Purpose |
@@ -253,6 +301,17 @@ SignalFriend is a Web3 signal marketplace on BNB Chain where:
 | `backend/PROJECT_CONTEXT.md` | Backend architecture & API details |
 | `backend/CHANGELOG.md` | Backend version history |
 | `backend/TO-DO-BACKEND.txt` | Backend task tracker |
+| `frontend/PROJECT_CONTEXT.md` | Frontend architecture & components |
+| `frontend/CHANGELOG.md` | Frontend version history |
+| `frontend/TO-DO-FRONTEND.txt` | Frontend task tracker |
+
+## Frontend Design System
+- **Theme**: Logo-inspired colors (green background, golden text)
+- **Background**: Muted forest green `#2D5030` (dark-700)
+- **Text**: Warm cream `#FBE3A8` (fur-cream)
+- **Accent**: Golden `#F4C56A` (fur-light)
+- **Error**: Cape red `#C63732`
+- **Success**: Logo green `#3E6B3F`
 
 ## Important Patterns
 - Smart contracts use 3-of-3 MultiSig governance
@@ -260,7 +319,9 @@ SignalFriend is a Web3 signal marketplace on BNB Chain where:
 - Backend verifies NFT ownership + MongoDB records
 - SIWE for wallet auth, JWT for session management
 - Alchemy webhooks for blockchain event indexing
-- Feature-based folder structure in backend
+- Feature-based folder structure in backend AND frontend
 - Ratings are ENTIRELY off-chain in MongoDB
+- Frontend uses Zod schemas for type inference (single source of truth)
+- wagmi v2 + RainbowKit for Web3 wallet connection
 
 ================================================================================

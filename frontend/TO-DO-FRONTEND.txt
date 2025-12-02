@@ -1,0 +1,263 @@
+================================================================================
+                        SIGNALFRIEND FRONTEND TO-DO LIST
+================================================================================
+
+Last Updated: 2024-12-03
+Branch: feature/frontend-scaffold
+
+================================================================================
+PHASE 1: CORE SCAFFOLD ✅ COMPLETE
+================================================================================
+
+[✅] Project Setup
+    - Vite + React + TypeScript configuration
+    - Tailwind CSS with dark theme
+    - Path aliases (@/ for src/)
+
+[✅] Web3 Integration
+    - wagmi v2 configuration for BNB Chain
+    - RainbowKit wallet connection UI
+    - viem for blockchain interactions
+    - Contract addresses config
+
+[✅] Base UI Components
+    - Button (5 variants: primary, secondary, danger, ghost, outline)
+    - Input with label, error, helper text
+    - Textarea
+    - Select dropdown
+    - Card with sub-components
+    - Modal (accessible dialog)
+    - Badge (status indicators)
+    - Spinner / PageLoader
+    - Avatar with fallback
+
+[✅] Providers Setup
+    - Web3Provider (wagmi + RainbowKit)
+    - QueryProvider (TanStack Query)
+    - SentryProvider (error boundary placeholder)
+
+[✅] Router Setup
+    - React Router v6 with placeholder pages
+    - RootLayout with Header/Footer
+    - Routes: /, /signals, /predictors, /dashboard, /profile
+
+[✅] API Layer
+    - Axios client with interceptors
+    - JWT token refresh logic
+    - API endpoints configuration
+
+[✅] State Management
+    - Zustand auth store with persistence
+
+[✅] Zod Schemas
+    - API response schemas
+    - Auth schemas
+    - Signal schemas
+    - Predictor schemas
+    - Review schemas
+    - Receipt schemas
+    - Category schemas
+
+[✅] Documentation
+    - README.md with setup instructions
+    - PROJECT_CONTEXT.md
+    - CHANGELOG.md
+    - RUNBOOK.md
+
+================================================================================
+PHASE 2: AUTHENTICATION & WALLET (PRIORITY: HIGH)
+================================================================================
+
+[ ] Wallet Authentication Flow
+    - Connect wallet button in header
+    - Sign message for authentication (SIWE pattern)
+    - Auto-reconnect on page refresh
+    - Handle chain switching (BSC only)
+
+[ ] Auth API Integration
+    - GET /auth/nonce - get signing nonce
+    - POST /auth/verify - verify signature & get JWT
+    - Token storage in Zustand + localStorage
+    - Auto-refresh token logic
+
+[ ] Protected Routes
+    - Create ProtectedRoute component
+    - Redirect to home if not authenticated
+    - Role-based access (user vs predictor vs admin)
+
+[ ] User Profile Page
+    - Display wallet address
+    - Show role/predictor status
+    - Edit profile form (for predictors)
+
+================================================================================
+PHASE 3: SIGNALS FEATURE (PRIORITY: HIGH)
+================================================================================
+
+[ ] Signals List Page (/signals)
+    - Fetch signals from API with pagination
+    - Filter by category, risk level, price
+    - Sort by newest, price, popularity
+    - Signal cards with preview info
+    - Loading states and error handling
+
+[ ] Signal Detail Page (/signals/:id)
+    - Full signal info (public data)
+    - Purchase button (if not owned)
+    - Show protected content (if owned)
+    - Predictor info card
+    - Related signals
+
+[ ] Purchase Flow
+    - Check USDT allowance
+    - Approve USDT if needed
+    - Call purchaseSignal contract method
+    - Show transaction status
+    - Update UI on success
+
+[ ] My Purchased Signals
+    - List user's receipts/purchases
+    - Access protected content
+    - Leave review functionality
+
+================================================================================
+PHASE 4: PREDICTOR FEATURES (PRIORITY: MEDIUM)
+================================================================================
+
+[ ] Predictor List Page (/predictors)
+    - Fetch predictors with stats
+    - Filter by rating, verification
+    - Predictor cards with avatars
+
+[ ] Predictor Profile Page (/predictors/:wallet)
+    - Full profile info
+    - Statistics (signals, sales, rating)
+    - List of active signals
+    - Reviews section
+
+[ ] Become a Predictor Flow
+    - Check if user owns PredictorAccessPass NFT
+    - If not, show purchase option
+    - Call registerPredictor contract method
+    - Update role in backend
+
+[ ] Predictor Dashboard (/dashboard - predictor only)
+    - Sales statistics
+    - Revenue charts
+    - Active signals management
+    - Create new signal form
+
+[ ] Create Signal Form
+    - Multi-step form wizard
+    - Category selection
+    - Risk/reward settings
+    - Pricing
+    - Protected content editor
+    - Preview before publish
+    - Submit to API
+
+================================================================================
+PHASE 5: REVIEWS & RATINGS (PRIORITY: MEDIUM)
+================================================================================
+
+[ ] Review System
+    - Star rating component
+    - Review form after purchase
+    - Submit review to API
+    - Display reviews on predictor page
+
+[ ] Rating Display
+    - Average rating badge
+    - Rating breakdown chart
+    - Recent reviews list
+
+================================================================================
+PHASE 6: ADMIN FEATURES (PRIORITY: LOW)
+================================================================================
+
+[ ] Admin Dashboard (/admin - admin only)
+    - Platform statistics
+    - User management
+    - Signal moderation
+    - Category management
+
+[ ] Verification Management
+    - Pending verifications list
+    - Approve/reject predictor
+    - Blacklist functionality
+
+[ ] Reports Management
+    - View reported content
+    - Take action on reports
+
+================================================================================
+PHASE 7: POLISH & OPTIMIZATION (PRIORITY: LOW)
+================================================================================
+
+[ ] Performance
+    - React.lazy for route splitting
+    - Image optimization
+    - Query caching strategies
+    - Debounced search inputs
+
+[ ] UX Improvements
+    - Toast notifications
+    - Loading skeletons
+    - Optimistic updates
+    - Error recovery
+
+[ ] Accessibility
+    - Keyboard navigation
+    - Screen reader support
+    - Focus management
+    - ARIA labels
+
+[ ] Mobile Responsiveness
+    - Mobile navigation menu
+    - Touch-friendly interactions
+    - Responsive layouts
+
+[ ] SEO & Meta
+    - React Helmet for meta tags
+    - Open Graph tags
+    - Twitter cards
+
+================================================================================
+KNOWN ISSUES / BUGS
+================================================================================
+
+[ ] None currently tracked
+
+================================================================================
+TECHNICAL DEBT
+================================================================================
+
+[ ] Add comprehensive error handling to all API calls
+[ ] Add unit tests for components
+[ ] Add integration tests for flows
+[ ] Add E2E tests with Playwright
+[ ] Set up Sentry error tracking (currently placeholder)
+[ ] Configure proper CSP headers
+[ ] Add rate limiting feedback to users
+
+================================================================================
+DEPENDENCIES TO WATCH
+================================================================================
+
+- wagmi: Currently v2, watch for v3 updates
+- RainbowKit: Keep in sync with wagmi version
+- viem: Core blockchain library
+- TanStack Query: v5, stable
+- Zustand: v4, stable
+- React Router: v6, stable
+
+================================================================================
+NOTES
+================================================================================
+
+1. Always test wallet flows on BSC Testnet (chainId: 97) before mainnet
+2. Use the WalletConnect projectId from .env.local for wallet connections
+3. API URL defaults to http://localhost:3001 for local development
+4. Frontend runs on port 5173 (Vite default)
+
+================================================================================
