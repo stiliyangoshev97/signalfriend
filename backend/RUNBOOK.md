@@ -1,7 +1,7 @@
 # 📋 SignalFriend Backend Runbook
 
 > Complete development, testing, and operations guide.  
-> Last Updated: December 1, 2024
+> Last Updated: December 2024
 
 ---
 
@@ -17,6 +17,51 @@ npm run dev
 
 # Terminal 3: Start ngrok (for webhook testing)
 ngrok http 3001
+```
+
+---
+
+## 🚧 Maintenance Mode
+
+Use maintenance mode when deploying updates or performing server maintenance.
+
+### Enable Maintenance Mode
+
+```bash
+# 1. FIRST: Pause smart contracts on-chain via MultiSig
+#    Go to BscScan → SignalFriendMarket → Write Contract → pause()
+
+# 2. Edit .env file
+MAINTENANCE_MODE=true
+MAINTENANCE_END=2024-12-03T12:00:00Z   # Optional: ETA for users
+
+# 3. Restart the server
+npm run dev   # or restart your production server
+```
+
+### What Happens During Maintenance
+- All API endpoints return **503 Service Unavailable**
+- Health check (`/health`) still works (for monitoring)
+- Response includes optional ETA if `MAINTENANCE_END` is set:
+  ```json
+  {
+    "success": false,
+    "error": "Site is under maintenance. Please try again later.",
+    "maintenanceEnd": "2024-12-03T12:00:00Z"
+  }
+  ```
+
+### Disable Maintenance Mode
+
+```bash
+# 1. Edit .env file
+MAINTENANCE_MODE=false
+
+# 2. Restart the server
+npm run dev   # or restart your production server
+
+# 3. LAST: Unpause smart contracts on-chain via MultiSig
+#    Go to BscScan → SignalFriendMarket → Write Contract → unpause()
 ```
 
 ---
