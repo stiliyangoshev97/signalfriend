@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
 > **Last Updated:** December 2024  
-> **Current Phase:** Reviews Enhancement & Reports Feature Complete  
-> **Project Status:** 🟢 **In Development (97/100)** - All Features + Reports Complete  
-> **Branch:** `feature/reviews-enhancement`
+> **Current Phase:** Admin Features Complete  
+> **Project Status:** 🟢 **In Development (98/100)** - All Features + Admin Complete  
+> **Branch:** `feature/admin-features`
 
 ---
 
@@ -47,14 +47,15 @@ backend/
 │   │   ├── signals/             # Trading signals ✅
 │   │   ├── receipts/            # Purchase receipts ✅
 │   │   ├── reviews/             # Ratings (1-5 score, off-chain) ✅
-│   │   └── reports/             # Scam/false signal reports ✅ (NEW)
+│   │   ├── reports/             # Scam/false signal reports ✅
+│   │   └── admin/               # Admin endpoints (MultiSig only) ✅ (NEW)
 │   ├── scripts/
 │   │   ├── seedCategories.ts    # Database seeding
 │   │   ├── seedTestSignal.ts    # Test signal for webhook testing
 │   │   └── generateEventSignatures.ts  # Event hash generator
 │   └── shared/
 │       ├── config/              # env, database, logger
-│       ├── middleware/          # auth, validation, errors, security
+│       ├── middleware/          # auth, validation, errors, security, admin
 │       ├── services/            # blockchain.service.ts (viem)
 │       ├── types/               # TypeScript types
 │       └── utils/               # ApiError, asyncHandler, contentId
@@ -277,6 +278,12 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
 | GET | `/api/reports/predictor/:address` | No | Get predictor reports |
 | GET | `/api/reports/predictor/:address/stats` | No | Get report statistics |
 | GET | `/api/reports/check/:tokenId` | No | Check if report exists |
+| GET | `/api/admin/predictors/:address` | Admin | Get full predictor info (includes contacts) |
+| POST | `/api/admin/predictors/:address/blacklist` | Admin | Blacklist predictor in DB |
+| POST | `/api/admin/predictors/:address/unblacklist` | Admin | Remove blacklist in DB |
+| DELETE | `/api/admin/signals/:contentId` | Admin | Deactivate signal (soft delete) |
+
+> **Admin Endpoints:** Require authentication from one of 3 MultiSig wallet addresses configured in `ADMIN_ADDRESSES`.
 
 ---
 

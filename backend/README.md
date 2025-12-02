@@ -187,6 +187,17 @@ src/
 | GET | `/api/reports/:tokenId` | No | Get report by token ID |
 | POST | `/api/reports` | Yes | Create report (purchaser only) |
 
+### Admin (MultiSig Wallet Only)
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/admin/predictors/:address` | Admin | Get full predictor info (includes contacts) |
+| POST | `/api/admin/predictors/:address/blacklist` | Admin | Blacklist predictor in DB |
+| POST | `/api/admin/predictors/:address/unblacklist` | Admin | Remove blacklist in DB |
+| DELETE | `/api/admin/signals/:contentId` | Admin | Deactivate signal (soft delete) |
+
+> **Note:** Admin endpoints require authentication from one of the 3 MultiSig wallet addresses configured in `ADMIN_ADDRESSES`. Blacklist operations also require a manual on-chain MultiSig transaction for full effect.
+
 ### Webhooks
 
 | Method | Endpoint | Auth | Description |
