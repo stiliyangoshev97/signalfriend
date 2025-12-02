@@ -54,7 +54,6 @@ const predictorSchema = new Schema<IPredictor>(
     displayName: {
       type: String,
       required: true,
-      unique: true,
       maxlength: 50,
     },
     displayNameChanged: {
