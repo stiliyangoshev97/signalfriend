@@ -15,6 +15,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.11.0] - 2024-12-02 🔐 ADMIN FEATURES
+
+### Added
+- **Admin Middleware**
+  - `src/shared/middleware/admin.ts` - Admin authentication middleware
+  - `isAdmin(address)` helper to check if wallet is in admin list
+  - `requireAdmin` middleware requiring MultiSig wallet authentication
+  - Configured via `ADMIN_ADDRESSES` environment variable (comma-separated)
+
+- **Admin API Endpoints**
+  - `GET /api/admin/predictors/:address` - Get full predictor info with hidden contacts
+  - `POST /api/admin/predictors/:address/blacklist` - Blacklist predictor in database
+  - `POST /api/admin/predictors/:address/unblacklist` - Remove blacklist from database
+  - `DELETE /api/admin/signals/:contentId` - Deactivate signal (soft delete)
+  - All endpoints require authentication from one of 3 MultiSig wallet addresses
+
+- **Admin Signal Access**
+  - Admins can view any signal's protected content without purchasing
+  - Bypass added to `SignalService.getProtectedContent()`
+
+- **Admin Feature Module**
+  - `src/features/admin/admin.controller.ts` - Request handlers
+  - `src/features/admin/admin.routes.ts` - Route definitions
+  - `src/features/admin/index.ts` - Module exports
+
+### Changed
+- **Hidden Contact Info from Public API**
+  - `telegram`, `discord`, and `preferredContact` now hidden from public responses
+  - Only `twitter` visible to regular users in predictor profiles
+  - Affects `getAll()`, `getByAddress()`, `getTopPredictors()` in PredictorService
+  - Admins can still access full contact info via admin endpoints
+
+- **Predictor Service**
+  - Added `HIDDEN_FIELDS` constant for excluded fields
+  - Added `getByAddressAdmin()` - returns full predictor info
+  - Added `adminBlacklist()` - sets `isBlacklisted = true`
+  - Added `adminUnblacklist()` - sets `isBlacklisted = false`
+
+- **Signal Service**
+  - Added `adminDeactivate()` - sets `isActive = false` for admin removal
+  - Updated `getProtectedContent()` with admin bypass
+
+- **Environment Configuration**
+  - Added `ADMIN_ADDRESSES` to `env.ts` (comma-separated list)
+  - Updated `.env.example` with admin addresses documentation
+
+### Notes
+- Blacklist operations require manual on-chain MultiSig transaction for full effect
+- Admin should contact predictor via their preferred contact method to explain signal removal
+- All 3 MultiSig wallet addresses have equal admin privileges
+
+---
+
 ## [0.10.0] - 2024-12-02 🎯 PREDICTOR ENHANCEMENTS
 
 ### Added

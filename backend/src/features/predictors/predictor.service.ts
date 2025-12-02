@@ -23,7 +23,7 @@ import type {
 
 /** Predictor list response with pagination metadata */
 export interface PredictorListResponse {
-  predictors: IPredictor[];
+  predictors: Partial<IPredictor>[];
   pagination: {
     total: number;
     page: number;
@@ -32,11 +32,64 @@ export interface PredictorListResponse {
   };
 }
 
+/** Public predictor data (without sensitive contact info) */
+export interface PublicPredictor {
+  _id: mongoose.Types.ObjectId;
+  walletAddress: string;
+  tokenId: number;
+  displayName: string;
+  bio: string;
+  avatarUrl: string;
+  socialLinks: {
+    twitter?: string;
+    // telegram and discord are hidden from public
+  };
+  // preferredContact is hidden from public
+  categoryIds: mongoose.Types.ObjectId[];
+  totalSignals: number;
+  totalSales: number;
+  averageRating: number;
+  totalReviews: number;
+  isBlacklisted: boolean;
+  joinedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 /**
  * Service class for Predictor business logic.
  * All methods are static for stateless operation.
  */
 export class PredictorService {
+  /**
+   * Fields to exclude from public predictor responses.
+   * Hides sensitive contact information.
+   */
+  private static readonly HIDDEN_FIELDS = "-socialLinks.telegram -socialLinks.discord -preferredContact";
+
+  /**
+   * Sanitizes a predictor document for public consumption.
+   * Removes sensitive contact information.
+   *
+   * @param predictor - The predictor document to sanitize
+   * @returns Sanitized predictor object
+   */
+  private static sanitizeForPublic(predictor: IPredictor): Partial<IPredictor> {
+    const obj = predictor.toObject();
+    
+    // Only keep twitter in socialLinks
+    if (obj.socialLinks) {
+      obj.socialLinks = {
+        twitter: obj.socialLinks.twitter,
+      };
+    }
+    
+    // Remove preferredContact
+    delete obj.preferredContact;
+    
+    return obj;
+  }
+
   /**
    * Retrieves predictors with filtering, pagination, and sorting.
    *
@@ -80,9 +133,10 @@ export class PredictorService {
     // Calculate skip for pagination
     const skip = (page - 1) * limit;
 
-    // Execute query with pagination
+    // Execute query with pagination (exclude sensitive contact info)
     const [predictors, total] = await Promise.all([
       Predictor.find(filter)
+        .select(PredictorService.HIDDEN_FIELDS)
         .sort(sort)
         .skip(skip)
         .limit(limit)
@@ -103,14 +157,16 @@ export class PredictorService {
 
   /**
    * Retrieves a single predictor by wallet address.
+   * Returns sanitized data without sensitive contact info.
    *
    * @param address - The predictor's wallet address
-   * @returns Promise resolving to the predictor document
+   * @returns Promise resolving to the predictor document (sanitized)
    * @throws {ApiError} 404 if predictor not found
    */
-  static async getByAddress(address: string): Promise<IPredictor> {
+  static async getByAddress(address: string): Promise<Partial<IPredictor>> {
     const normalizedAddress = address.toLowerCase();
     const predictor = await Predictor.findOne({ walletAddress: normalizedAddress })
+      .select(PredictorService.HIDDEN_FIELDS)
       .populate("categoryIds", "name slug icon");
 
     if (!predictor) {
@@ -350,6 +406,7 @@ export class PredictorService {
 
   /**
    * Gets the top predictors by a specific metric.
+   * Returns sanitized data without sensitive contact info.
    *
    * @param metric - The metric to sort by
    * @param limit - Number of predictors to return
@@ -358,8 +415,9 @@ export class PredictorService {
   static async getTopPredictors(
     metric: "totalSales" | "averageRating" | "totalSignals" = "totalSales",
     limit: number = 10
-  ): Promise<IPredictor[]> {
+  ): Promise<Partial<IPredictor>[]> {
     return Predictor.find({ isBlacklisted: false })
+      .select(PredictorService.HIDDEN_FIELDS)
       .sort({ [metric]: -1 })
       .limit(limit)
       .populate("categoryIds", "name slug icon");
@@ -411,5 +469,79 @@ export class PredictorService {
       platformCommission: Math.round(platformCommission * 100) / 100,
       totalSalesCount,
     };
+  }
+
+  // ============================================================================
+  // ADMIN METHODS
+  // ============================================================================
+
+  /**
+   * Retrieves a predictor's full profile including sensitive contact info.
+   * Admin-only method.
+   *
+   * @param address - The predictor's wallet address
+   * @returns Promise resolving to full predictor document
+   * @throws {ApiError} 404 if predictor not found
+   */
+  static async getByAddressAdmin(address: string): Promise<IPredictor> {
+    const normalizedAddress = address.toLowerCase();
+    const predictor = await Predictor.findOne({ walletAddress: normalizedAddress })
+      .populate("categoryIds", "name slug icon");
+
+    if (!predictor) {
+      throw ApiError.notFound(`Predictor with address '${address}' not found`);
+    }
+
+    return predictor;
+  }
+
+  /**
+   * Blacklists a predictor in the database.
+   * Admin-only method. Note: This is a backend-only blacklist.
+   * For full effect, also blacklist on-chain via MultiSig.
+   *
+   * @param address - The predictor's wallet address
+   * @returns Promise resolving to the updated predictor
+   * @throws {ApiError} 404 if predictor not found
+   */
+  static async adminBlacklist(address: string): Promise<IPredictor> {
+    const normalizedAddress = address.toLowerCase();
+
+    const predictor = await Predictor.findOneAndUpdate(
+      { walletAddress: normalizedAddress },
+      { isBlacklisted: true },
+      { new: true }
+    );
+
+    if (!predictor) {
+      throw ApiError.notFound(`Predictor with address '${address}' not found`);
+    }
+
+    return predictor;
+  }
+
+  /**
+   * Removes blacklist status from a predictor in the database.
+   * Admin-only method. Note: This is a backend-only unblacklist.
+   * For full effect, also unblacklist on-chain via MultiSig.
+   *
+   * @param address - The predictor's wallet address
+   * @returns Promise resolving to the updated predictor
+   * @throws {ApiError} 404 if predictor not found
+   */
+  static async adminUnblacklist(address: string): Promise<IPredictor> {
+    const normalizedAddress = address.toLowerCase();
+
+    const predictor = await Predictor.findOneAndUpdate(
+      { walletAddress: normalizedAddress },
+      { isBlacklisted: false },
+      { new: true }
+    );
+
+    if (!predictor) {
+      throw ApiError.notFound(`Predictor with address '${address}' not found`);
+    }
+
+    return predictor;
   }
 }

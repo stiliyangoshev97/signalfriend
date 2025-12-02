@@ -159,6 +159,31 @@
 [x] Updated predictor.routes.ts with earnings route
 
 ================================================================================
+## PHASE 10.6: Admin Features ✅
+================================================================================
+[x] Added ADMIN_ADDRESSES env variable (comma-separated MultiSig wallets)
+[x] Created admin middleware (src/shared/middleware/admin.ts)
+    - isAdmin(address) helper function
+    - requireAdmin middleware for protected routes
+[x] Hidden sensitive contact info from public API responses
+    - telegram, discord, preferredContact hidden from regular users
+    - Only twitter visible to public
+[x] Admin can view any signal's protected content (bypass in getProtectedContent)
+[x] Created admin feature module (src/features/admin/)
+    - admin.controller.ts - Request handlers
+    - admin.routes.ts - Route definitions
+    - index.ts - Module exports
+[x] Admin endpoints:
+    - GET /api/admin/predictors/:address - Full predictor info with contacts
+    - POST /api/admin/predictors/:address/blacklist - Blacklist in DB
+    - POST /api/admin/predictors/:address/unblacklist - Remove blacklist in DB
+    - DELETE /api/admin/signals/:contentId - Deactivate signal (soft delete)
+[x] Added adminDeactivate() to signal.service.ts
+[x] Added getByAddressAdmin(), adminBlacklist(), adminUnblacklist() to predictor.service.ts
+[x] Updated .env.example with admin addresses documentation
+[x] Mounted admin routes at /api/admin in src/index.ts
+
+================================================================================
 ## PHASE 11: Deployment Prep
 ================================================================================
 [ ] Dockerfile

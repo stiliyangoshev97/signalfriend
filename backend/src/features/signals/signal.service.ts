@@ -18,6 +18,7 @@ import { Predictor } from "../predictors/predictor.model.js";
 import { Receipt } from "../receipts/receipt.model.js";
 import { ApiError } from "../../shared/utils/ApiError.js";
 import { uuidToBytes32 } from "../../shared/utils/contentId.js";
+import { isAdmin } from "../../shared/middleware/admin.js";
 import type {
   ListSignalsQuery,
   CreateSignalInput,
@@ -173,13 +174,16 @@ export class SignalService {
 
   /**
    * Retrieves the protected content of a signal.
-   * Only accessible to users who have purchased the signal (own a receipt).
+   * Accessible to:
+   * - The predictor (creator) of the signal
+   * - Users who have purchased the signal (own a receipt)
+   * - Admin wallets (MultiSig signers)
    *
    * @param contentId - The signal's unique content ID
    * @param buyerAddress - Address of the user requesting content
    * @returns Promise resolving to the protected content
    * @throws {ApiError} 404 if signal not found
-   * @throws {ApiError} 403 if user has not purchased the signal
+   * @throws {ApiError} 403 if user has not purchased the signal and is not admin
    */
   static async getProtectedContent(
     contentId: string,
@@ -191,6 +195,11 @@ export class SignalService {
     const signal = await Signal.findOne({ contentId });
     if (!signal) {
       throw ApiError.notFound(`Signal with contentId '${contentId}' not found`);
+    }
+
+    // Check if the user is an admin (MultiSig signer)
+    if (isAdmin(normalizedBuyer)) {
+      return { content: signal.content };
     }
 
     // Check if the user is the predictor (creator)
@@ -482,5 +491,34 @@ export class SignalService {
   static async getPredictorAddress(contentId: string): Promise<string | null> {
     const signal = await Signal.findOne({ contentId }).select("predictorAddress");
     return signal?.predictorAddress ?? null;
+  }
+
+  // ============================================================================
+  // ADMIN METHODS
+  // ============================================================================
+
+  /**
+   * Deactivates a signal (admin action).
+   * Sets isActive to false, hiding it from listings.
+   * Admin should contact the predictor via their preferred contact method.
+   *
+   * @param contentId - The signal's unique content ID
+   * @returns Promise resolving to the deactivated signal
+   * @throws {ApiError} 404 if signal not found
+   */
+  static async adminDeactivate(contentId: string): Promise<PublicSignal> {
+    const signal = await Signal.findOneAndUpdate(
+      { contentId },
+      { isActive: false },
+      { new: true }
+    )
+      .select(SignalService.PUBLIC_FIELDS)
+      .populate("categoryId", "name slug icon");
+
+    if (!signal) {
+      throw ApiError.notFound(`Signal with contentId '${contentId}' not found`);
+    }
+
+    return signal as unknown as PublicSignal;
   }
 }

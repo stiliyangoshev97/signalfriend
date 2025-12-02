@@ -62,6 +62,18 @@ const envSchema = z.object({
   // Business Rules Configuration
   /** Minimum signal price in USDT (must match smart contract) */
   MIN_SIGNAL_PRICE_USDT: z.coerce.number().default(5),
+
+  // Admin Configuration
+  /** Comma-separated list of admin wallet addresses (MultiSig signers) */
+  ADMIN_ADDRESSES: z
+    .string()
+    .default("")
+    .transform((val) =>
+      val
+        .split(",")
+        .map((addr) => addr.trim().toLowerCase())
+        .filter((addr) => addr.length > 0)
+    ),
 });
 
 // Parse and validate environment variables
