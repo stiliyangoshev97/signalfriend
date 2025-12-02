@@ -158,3 +158,21 @@ export const getPredictorEarnings = asyncHandler(async (req: Request, res: Respo
     data: earnings,
   });
 });
+
+/**
+ * POST /api/predictors/:address/apply-verification
+ * Apply for profile verification.
+ * Requires 100+ sales (or 100 more sales if previously rejected).
+ */
+export const applyForVerification = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const { address } = req.params as GetPredictorByAddressParams;
+  const callerAddress = req.user!.address;
+
+  const predictor = await PredictorService.applyForVerification(address, callerAddress);
+
+  res.json({
+    success: true,
+    message: "Verification application submitted. An admin will review your profile.",
+    data: predictor,
+  });
+});

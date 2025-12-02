@@ -6,6 +6,10 @@
  * - POST /api/admin/predictors/:address/blacklist - Blacklist a predictor
  * - POST /api/admin/predictors/:address/unblacklist - Unblacklist a predictor
  * - DELETE /api/admin/signals/:contentId - Deactivate a signal
+ * - GET /api/admin/verification-requests - List pending verification requests
+ * - POST /api/admin/predictors/:address/verify - Approve verification
+ * - POST /api/admin/predictors/:address/reject - Reject verification
+ * - POST /api/admin/predictors/:address/unverify - Remove verification
  *
  * @module features/admin/admin.controller
  */
@@ -108,6 +112,97 @@ export const deleteSignal = asyncHandler(
       success: true,
       message: "Signal deactivated. Contact the predictor to explain the removal.",
       data: signal,
+    });
+  }
+);
+
+/**
+ * GET /api/admin/verification-requests
+ * Lists all pending verification requests.
+ * Admin only - requires MultiSig wallet.
+ *
+ * @returns {Object} JSON response with array of pending predictors
+ */
+export const getVerificationRequests = asyncHandler(
+  async (_req: Request, res: Response): Promise<void> => {
+    const predictors = await PredictorService.getPendingVerifications();
+
+    res.json({
+      success: true,
+      data: predictors,
+      count: predictors.length,
+    });
+  }
+);
+
+/**
+ * POST /api/admin/predictors/:address/verify
+ * Approves a predictor's verification request.
+ * Admin only - requires MultiSig wallet.
+ *
+ * @param {string} address - Ethereum wallet address
+ * @returns {Object} JSON response with updated predictor
+ * @throws {404} If predictor not found
+ * @throws {400} If no pending application
+ */
+export const verifyPredictor = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const address = req.params.address as string;
+
+    const predictor = await PredictorService.adminVerify(address);
+
+    res.json({
+      success: true,
+      message: "Predictor verified successfully. They can now upload an avatar.",
+      data: predictor,
+    });
+  }
+);
+
+/**
+ * POST /api/admin/predictors/:address/reject
+ * Rejects a predictor's verification request.
+ * Admin only - requires MultiSig wallet.
+ *
+ * @param {string} address - Ethereum wallet address
+ * @returns {Object} JSON response with updated predictor
+ * @throws {404} If predictor not found
+ * @throws {400} If no pending application
+ */
+export const rejectVerification = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const address = req.params.address as string;
+
+    const predictor = await PredictorService.adminRejectVerification(address);
+
+    res.json({
+      success: true,
+      message: "Verification rejected. Predictor needs 100 more sales to re-apply. Contact them to explain the reason.",
+      data: predictor,
+    });
+  }
+);
+
+/**
+ * POST /api/admin/predictors/:address/unverify
+ * Removes verification status from a predictor.
+ * Admin only - requires MultiSig wallet.
+ *
+ * @param {string} address - Ethereum wallet address
+ * @returns {Object} JSON response with updated predictor
+ * @throws {404} If predictor not found
+ * @throws {400} If predictor is not verified
+ */
+export const unverifyPredictor = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const address = req.params.address as string;
+
+    const predictor = await PredictorService.adminUnverify(address);
+
+    res.json({
+      success: true,
+      message: "Predictor unverified. Their avatar has been removed.",
+      data: predictor,
     });
   }
 );

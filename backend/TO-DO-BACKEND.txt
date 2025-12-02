@@ -184,6 +184,31 @@
 [x] Mounted admin routes at /api/admin in src/index.ts
 
 ================================================================================
+## PHASE 10b: Predictor Verification System ✅
+================================================================================
+[x] Added verification fields to Predictor model:
+    - isVerified (boolean) - Has verified badge
+    - verificationStatus ('none' | 'pending' | 'rejected')
+    - salesAtLastApplication (number) - For re-apply logic
+    - verificationAppliedAt (Date) - When applied
+    - displayNameChanged (boolean) - Locked after first change
+[x] Display name restrictions:
+    - Can only be changed ONCE, then locked forever
+    - Must be unique (case-insensitive)
+    - Added unique index with collation
+[x] Avatar restrictions:
+    - Only verified predictors can set avatarUrl
+    - Unverifying removes avatar automatically
+[x] Verification endpoints:
+    - POST /api/predictors/:address/apply-verification (predictor, 100+ sales)
+    - GET /api/admin/verification-requests (admin, list pending)
+    - POST /api/admin/predictors/:address/verify (admin, approve)
+    - POST /api/admin/predictors/:address/reject (admin, reject)
+    - POST /api/admin/predictors/:address/unverify (admin, remove badge)
+[x] Re-apply logic:
+    - Need 100 more sales after rejection to re-apply
+
+================================================================================
 ## PHASE 11: Deployment Prep
 ================================================================================
 [ ] Dockerfile
