@@ -19,6 +19,7 @@
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.67.0",
     "react-router-dom": "^7.10.0",
+    "siwe": "^3.0.0",
     "viem": "^2.40.4",
     "wagmi": "^2.19.5",
     "zod": "^4.1.13",
