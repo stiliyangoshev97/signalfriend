@@ -15,6 +15,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.12.0] - 2024-12-02 ✅ PREDICTOR VERIFICATION SYSTEM
+
+### Added
+- **Predictor Verification**
+  - New fields in Predictor model: `isVerified`, `verificationStatus`, `salesAtLastApplication`, `verificationAppliedAt`, `displayNameChanged`
+  - Verification status can be: `none`, `pending`, `rejected`
+  - Predictors with 100+ sales can apply for verification badge
+  - Rejected predictors need 100 MORE sales to re-apply
+
+- **Verification Endpoints**
+  - `POST /api/predictors/:address/apply-verification` - Apply for verification (100+ sales)
+  - `GET /api/admin/verification-requests` - List pending applications (admin)
+  - `POST /api/admin/predictors/:address/verify` - Approve verification (admin)
+  - `POST /api/admin/predictors/:address/reject` - Reject verification (admin)
+  - `POST /api/admin/predictors/:address/unverify` - Remove verification (admin)
+
+- **Avatar Restrictions**
+  - Only verified predictors can set `avatarUrl`
+  - Non-verified predictors get 403 error when trying to set avatar
+  - Unverifying a predictor automatically removes their avatar
+
+- **Display Name Locking**
+  - Display name can only be changed ONCE (then locked forever)
+  - Display names must be unique (case-insensitive)
+  - Added unique index with case-insensitive collation
+
+### Changed
+- `predictor.model.ts` - Added verification fields and displayNameChanged flag
+- `predictor.service.ts` - Added verification methods, updated updateProfile() with restrictions
+- `predictor.controller.ts` - Added applyForVerification handler
+- `predictor.routes.ts` - Added apply-verification route
+- `admin.controller.ts` - Added verification management handlers
+- `admin.routes.ts` - Added verification management routes
+
+---
+
 ## [0.11.0] - 2024-12-02 🔐 ADMIN FEATURES
 
 ### Added

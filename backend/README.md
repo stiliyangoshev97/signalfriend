@@ -136,7 +136,8 @@ src/
 | GET | `/api/predictors/:address` | No | Get predictor profile |
 | GET | `/api/predictors/:address/check` | No | Check if active predictor |
 | GET | `/api/predictors/:address/earnings` | Yes | Get own earnings breakdown |
-| PUT | `/api/predictors/:address` | Yes | Update own profile |
+| PUT | `/api/predictors/:address` | Yes | Update own profile (displayName locked after 1 change) |
+| POST | `/api/predictors/:address/apply-verification` | Yes | Apply for verification (100+ sales required) |
 
 ### Signals
 
@@ -194,6 +195,10 @@ src/
 | GET | `/api/admin/predictors/:address` | Admin | Get full predictor info (includes contacts) |
 | POST | `/api/admin/predictors/:address/blacklist` | Admin | Blacklist predictor in DB |
 | POST | `/api/admin/predictors/:address/unblacklist` | Admin | Remove blacklist in DB |
+| GET | `/api/admin/verification-requests` | Admin | List pending verification requests |
+| POST | `/api/admin/predictors/:address/verify` | Admin | Approve verification |
+| POST | `/api/admin/predictors/:address/reject` | Admin | Reject verification |
+| POST | `/api/admin/predictors/:address/unverify` | Admin | Remove verification badge |
 | DELETE | `/api/admin/signals/:contentId` | Admin | Deactivate signal (soft delete) |
 
 > **Note:** Admin endpoints require authentication from one of the 3 MultiSig wallet addresses configured in `ADMIN_ADDRESSES`. Blacklist operations also require a manual on-chain MultiSig transaction for full effect.

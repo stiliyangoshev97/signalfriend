@@ -1,9 +1,14 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+/** Verification status for predictor profile verification */
+export type VerificationStatus = "none" | "pending" | "rejected";
+
 export interface IPredictor extends Document {
   walletAddress: string;
   tokenId: number;
   displayName: string;
+  /** Whether displayName has been changed by user (locked after first change) */
+  displayNameChanged: boolean;
   bio: string;
   avatarUrl: string;
   socialLinks: {
@@ -19,6 +24,14 @@ export interface IPredictor extends Document {
   averageRating: number;
   totalReviews: number;
   isBlacklisted: boolean;
+  /** Whether predictor has verified badge */
+  isVerified: boolean;
+  /** Verification application status */
+  verificationStatus: VerificationStatus;
+  /** Total sales when last applied for verification (for re-apply after rejection) */
+  salesAtLastApplication: number;
+  /** Timestamp when verification was applied for */
+  verificationAppliedAt?: Date;
   joinedAt: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -41,7 +54,12 @@ const predictorSchema = new Schema<IPredictor>(
     displayName: {
       type: String,
       required: true,
+      unique: true,
       maxlength: 50,
+    },
+    displayNameChanged: {
+      type: Boolean,
+      default: false,
     },
     bio: {
       type: String,
@@ -91,6 +109,24 @@ const predictorSchema = new Schema<IPredictor>(
       default: false,
       index: true,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    verificationStatus: {
+      type: String,
+      enum: ["none", "pending", "rejected"],
+      default: "none",
+      index: true,
+    },
+    salesAtLastApplication: {
+      type: Number,
+      default: 0,
+    },
+    verificationAppliedAt: {
+      type: Date,
+    },
     joinedAt: {
       type: Date,
       required: true,
@@ -103,5 +139,10 @@ const predictorSchema = new Schema<IPredictor>(
 
 // Compound index for filtering active predictors by category
 predictorSchema.index({ isBlacklisted: 1, categoryIds: 1 });
+// Index for unique display names (case-insensitive)
+predictorSchema.index(
+  { displayName: 1 },
+  { unique: true, collation: { locale: "en", strength: 2 } }
+);
 
 export const Predictor = mongoose.model<IPredictor>("Predictor", predictorSchema);

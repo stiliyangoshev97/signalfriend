@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
 > **Last Updated:** December 2024  
-> **Current Phase:** Admin Features Complete  
-> **Project Status:** 🟢 **In Development (98/100)** - All Features + Admin Complete  
-> **Branch:** `feature/admin-features`
+> **Current Phase:** Predictor Verification Complete  
+> **Project Status:** 🟢 **In Development (99/100)** - All Features + Admin + Verification Complete  
+> **Branch:** `feature/predictor-verification`
 
 ---
 
@@ -121,9 +121,10 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
 {
   walletAddress: string,      // Unique, indexed
   tokenId: number,            // PredictorAccessPass NFT ID
-  displayName: string,
+  displayName: string,        // Unique, can only be changed ONCE
+  displayNameChanged: boolean,// True after first change (locked)
   bio: string,
-  avatarUrl: string,
+  avatarUrl: string,          // Only verified predictors can set
   socialLinks: { twitter?, telegram?, discord? },
   preferredContact: 'telegram' | 'discord',  // For admin communication
   categoryIds: ObjectId[],    // References to Category
@@ -132,6 +133,10 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
   averageRating: number,      // Calculated from reviews
   totalReviews: number,
   isBlacklisted: boolean,     // Synced from blockchain
+  isVerified: boolean,        // Has verified badge (admin approved)
+  verificationStatus: 'none' | 'pending' | 'rejected',
+  salesAtLastApplication: number,  // For re-apply logic after rejection
+  verificationAppliedAt?: Date,
   joinedAt: Date,             // From blockchain event
 }
 ```

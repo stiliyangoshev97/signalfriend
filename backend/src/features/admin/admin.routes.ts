@@ -10,6 +10,10 @@
  * - POST /api/admin/predictors/:address/blacklist - Blacklist predictor
  * - POST /api/admin/predictors/:address/unblacklist - Unblacklist predictor
  * - DELETE /api/admin/signals/:contentId - Deactivate signal
+ * - GET /api/admin/verification-requests - List pending verification requests
+ * - POST /api/admin/predictors/:address/verify - Approve verification
+ * - POST /api/admin/predictors/:address/reject - Reject verification
+ * - POST /api/admin/predictors/:address/unverify - Remove verification
  *
  * @module features/admin/admin.routes
  */
@@ -19,6 +23,10 @@ import {
   blacklistPredictor,
   unblacklistPredictor,
   deleteSignal,
+  getVerificationRequests,
+  verifyPredictor,
+  rejectVerification,
+  unverifyPredictor,
 } from "./admin.controller.js";
 import { authenticate } from "../../shared/middleware/auth.js";
 import { requireAdmin } from "../../shared/middleware/admin.js";
@@ -57,6 +65,37 @@ router.post("/predictors/:address/blacklist", blacklistPredictor);
  * Note: Also unblacklist on-chain via MultiSig for full effect.
  */
 router.post("/predictors/:address/unblacklist", unblacklistPredictor);
+
+// ============================================================================
+// Verification Management
+// ============================================================================
+
+/**
+ * GET /api/admin/verification-requests
+ * List all pending verification applications.
+ */
+router.get("/verification-requests", getVerificationRequests);
+
+/**
+ * POST /api/admin/predictors/:address/verify
+ * Approve a predictor's verification request.
+ * They will get a verified badge and can upload an avatar.
+ */
+router.post("/predictors/:address/verify", verifyPredictor);
+
+/**
+ * POST /api/admin/predictors/:address/reject
+ * Reject a predictor's verification request.
+ * They need 100 more sales to re-apply.
+ */
+router.post("/predictors/:address/reject", rejectVerification);
+
+/**
+ * POST /api/admin/predictors/:address/unverify
+ * Remove verification status from a predictor.
+ * Their avatar will also be removed.
+ */
+router.post("/predictors/:address/unverify", unverifyPredictor);
 
 // ============================================================================
 // Signal Management

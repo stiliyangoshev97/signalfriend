@@ -197,6 +197,10 @@ export class PredictorService {
   /**
    * Updates a predictor's profile.
    * Only allows updating non-critical fields (display info, social links).
+   * 
+   * Rules:
+   * - displayName can only be changed ONCE (then locked forever)
+   * - avatarUrl can only be set if predictor is verified
    *
    * @param address - The predictor's wallet address
    * @param data - Fields to update
@@ -204,6 +208,9 @@ export class PredictorService {
    * @returns Promise resolving to the updated predictor document
    * @throws {ApiError} 404 if predictor not found
    * @throws {ApiError} 403 if caller is not the predictor
+   * @throws {ApiError} 403 if trying to change locked displayName
+   * @throws {ApiError} 403 if trying to set avatarUrl when not verified
+   * @throws {ApiError} 409 if displayName is already taken
    */
   static async updateProfile(
     address: string,
@@ -239,10 +246,40 @@ export class PredictorService {
       }
     }
 
-    // Update allowed fields
-    if (data.displayName !== undefined) predictor.displayName = data.displayName;
+    // Handle displayName update (can only change once)
+    if (data.displayName !== undefined) {
+      if (predictor.displayNameChanged) {
+        throw ApiError.forbidden("Display name can only be changed once and is now locked");
+      }
+      
+      // Check if new displayName is different from current
+      if (data.displayName !== predictor.displayName) {
+        // Check uniqueness (case-insensitive)
+        const existing = await Predictor.findOne({
+          displayName: { $regex: new RegExp(`^${data.displayName}$`, "i") },
+          _id: { $ne: predictor._id },
+        });
+        if (existing) {
+          throw ApiError.conflict(`Display name '${data.displayName}' is already taken`);
+        }
+        predictor.displayName = data.displayName;
+        predictor.displayNameChanged = true;
+      }
+    }
+
+    // Handle avatarUrl update (only verified predictors)
+    if (data.avatarUrl !== undefined && data.avatarUrl !== "") {
+      if (!predictor.isVerified) {
+        throw ApiError.forbidden("Only verified predictors can set an avatar");
+      }
+      predictor.avatarUrl = data.avatarUrl;
+    } else if (data.avatarUrl === "") {
+      // Allow clearing avatar
+      predictor.avatarUrl = "";
+    }
+
+    // Update other allowed fields
     if (data.bio !== undefined) predictor.bio = data.bio;
-    if (data.avatarUrl !== undefined) predictor.avatarUrl = data.avatarUrl;
     if (data.socialLinks !== undefined) {
       predictor.socialLinks = {
         ...predictor.socialLinks,
@@ -542,6 +579,178 @@ export class PredictorService {
       throw ApiError.notFound(`Predictor with address '${address}' not found`);
     }
 
+    return predictor;
+  }
+
+  // ============================================================================
+  // VERIFICATION METHODS
+  // ============================================================================
+
+  /** Minimum sales required to apply for verification */
+  private static readonly MIN_SALES_FOR_VERIFICATION = 100;
+
+  /**
+   * Applies for profile verification.
+   * Requirements:
+   * - At least 100 sales
+   * - Not currently pending
+   * - If rejected, must have 100 more sales since last application
+   *
+   * @param address - The predictor's wallet address
+   * @param callerAddress - Address of the caller (must match predictor)
+   * @returns Promise resolving to the updated predictor
+   * @throws {ApiError} 404 if predictor not found
+   * @throws {ApiError} 403 if caller is not the predictor
+   * @throws {ApiError} 400 if requirements not met
+   */
+  static async applyForVerification(
+    address: string,
+    callerAddress: string
+  ): Promise<IPredictor> {
+    const normalizedAddress = address.toLowerCase();
+    const normalizedCaller = callerAddress.toLowerCase();
+
+    // Verify caller is the predictor
+    if (normalizedAddress !== normalizedCaller) {
+      throw ApiError.forbidden("You can only apply for verification for your own profile");
+    }
+
+    const predictor = await Predictor.findOne({ walletAddress: normalizedAddress });
+    if (!predictor) {
+      throw ApiError.notFound(`Predictor with address '${address}' not found`);
+    }
+
+    // Check if already verified
+    if (predictor.isVerified) {
+      throw ApiError.badRequest("Profile is already verified");
+    }
+
+    // Check if already pending
+    if (predictor.verificationStatus === "pending") {
+      throw ApiError.badRequest("Verification application is already pending");
+    }
+
+    // Check minimum sales requirement
+    if (predictor.totalSales < PredictorService.MIN_SALES_FOR_VERIFICATION) {
+      throw ApiError.badRequest(
+        `You need at least ${PredictorService.MIN_SALES_FOR_VERIFICATION} sales to apply for verification. Current: ${predictor.totalSales}`
+      );
+    }
+
+    // If previously rejected, check if enough new sales since last application
+    if (predictor.verificationStatus === "rejected") {
+      const salesSinceLastApplication = predictor.totalSales - predictor.salesAtLastApplication;
+      if (salesSinceLastApplication < PredictorService.MIN_SALES_FOR_VERIFICATION) {
+        const salesNeeded = PredictorService.MIN_SALES_FOR_VERIFICATION - salesSinceLastApplication;
+        throw ApiError.badRequest(
+          `You need ${salesNeeded} more sales to re-apply after rejection. Sales since last application: ${salesSinceLastApplication}`
+        );
+      }
+    }
+
+    // Apply for verification
+    predictor.verificationStatus = "pending";
+    predictor.salesAtLastApplication = predictor.totalSales;
+    predictor.verificationAppliedAt = new Date();
+
+    await predictor.save();
+    return predictor;
+  }
+
+  /**
+   * Gets all pending verification requests.
+   * Admin-only method.
+   *
+   * @returns Promise resolving to array of predictors with pending verification
+   */
+  static async getPendingVerifications(): Promise<IPredictor[]> {
+    return Predictor.find({ verificationStatus: "pending" })
+      .sort({ verificationAppliedAt: 1 }) // Oldest first
+      .populate("categoryIds", "name slug icon");
+  }
+
+  /**
+   * Approves a predictor's verification request.
+   * Admin-only method.
+   *
+   * @param address - The predictor's wallet address
+   * @returns Promise resolving to the updated predictor
+   * @throws {ApiError} 404 if predictor not found
+   * @throws {ApiError} 400 if no pending application
+   */
+  static async adminVerify(address: string): Promise<IPredictor> {
+    const normalizedAddress = address.toLowerCase();
+
+    const predictor = await Predictor.findOne({ walletAddress: normalizedAddress });
+    if (!predictor) {
+      throw ApiError.notFound(`Predictor with address '${address}' not found`);
+    }
+
+    if (predictor.verificationStatus !== "pending") {
+      throw ApiError.badRequest("No pending verification application for this predictor");
+    }
+
+    predictor.isVerified = true;
+    predictor.verificationStatus = "none"; // Reset status
+    
+    await predictor.save();
+    return predictor;
+  }
+
+  /**
+   * Rejects a predictor's verification request.
+   * Admin-only method.
+   *
+   * @param address - The predictor's wallet address
+   * @returns Promise resolving to the updated predictor
+   * @throws {ApiError} 404 if predictor not found
+   * @throws {ApiError} 400 if no pending application
+   */
+  static async adminRejectVerification(address: string): Promise<IPredictor> {
+    const normalizedAddress = address.toLowerCase();
+
+    const predictor = await Predictor.findOne({ walletAddress: normalizedAddress });
+    if (!predictor) {
+      throw ApiError.notFound(`Predictor with address '${address}' not found`);
+    }
+
+    if (predictor.verificationStatus !== "pending") {
+      throw ApiError.badRequest("No pending verification application for this predictor");
+    }
+
+    predictor.verificationStatus = "rejected";
+    predictor.salesAtLastApplication = predictor.totalSales; // Record sales at rejection
+    
+    await predictor.save();
+    return predictor;
+  }
+
+  /**
+   * Removes verification status from a predictor.
+   * Admin-only method.
+   *
+   * @param address - The predictor's wallet address
+   * @returns Promise resolving to the updated predictor
+   * @throws {ApiError} 404 if predictor not found
+   * @throws {ApiError} 400 if predictor is not verified
+   */
+  static async adminUnverify(address: string): Promise<IPredictor> {
+    const normalizedAddress = address.toLowerCase();
+
+    const predictor = await Predictor.findOne({ walletAddress: normalizedAddress });
+    if (!predictor) {
+      throw ApiError.notFound(`Predictor with address '${address}' not found`);
+    }
+
+    if (!predictor.isVerified) {
+      throw ApiError.badRequest("Predictor is not verified");
+    }
+
+    predictor.isVerified = false;
+    predictor.verificationStatus = "none"; // Reset status
+    predictor.avatarUrl = ""; // Remove avatar when unverified
+    
+    await predictor.save();
     return predictor;
   }
 }

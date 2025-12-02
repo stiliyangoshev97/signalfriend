@@ -18,6 +18,7 @@ import {
   updatePredictorProfile,
   checkPredictorStatus,
   getPredictorEarnings,
+  applyForVerification,
 } from "./predictor.controller.js";
 import { validate } from "../../shared/middleware/validation.js";
 import { authenticate } from "../../shared/middleware/auth.js";
@@ -96,6 +97,19 @@ router.put(
   validate(getPredictorByAddressSchema, "params"),
   validate(updatePredictorProfileSchema),
   updatePredictorProfile
+);
+
+/**
+ * POST /api/predictors/:address/apply-verification
+ * Apply for profile verification.
+ * Requires 100+ sales (or 100 more sales after rejection).
+ * Only the predictor can apply for their own verification.
+ */
+router.post(
+  "/:address/apply-verification",
+  authenticate,
+  validate(getPredictorByAddressSchema, "params"),
+  applyForVerification
 );
 
 export const predictorRoutes = router;
