@@ -74,6 +74,15 @@ const envSchema = z.object({
         .map((addr) => addr.trim().toLowerCase())
         .filter((addr) => addr.length > 0)
     ),
+
+  // Maintenance Mode Configuration
+  /** Enable maintenance mode (blocks all API requests except health check) */
+  MAINTENANCE_MODE: z
+    .string()
+    .default("false")
+    .transform((val) => val === "true"),
+  /** Optional ETA for maintenance end (ISO 8601 format) */
+  MAINTENANCE_END: z.string().optional(),
 });
 
 // Parse and validate environment variables
