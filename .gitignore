@@ -1,6 +1,7 @@
-# Examples folder (temporary for testing)
+# Examples folder (temporary for testing/reference)
 examples/
 backend-examples/
+frontend-example/
 
 # Foundry - Contracts Build Artifacts & Dependencies
 contracts/cache/
