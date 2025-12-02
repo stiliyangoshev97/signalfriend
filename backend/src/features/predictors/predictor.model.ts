@@ -11,6 +11,8 @@ export interface IPredictor extends Document {
     telegram?: string;
     discord?: string;
   };
+  /** Preferred contact method for admin communication */
+  preferredContact: "telegram" | "discord";
   categoryIds: mongoose.Types.ObjectId[];
   totalSignals: number;
   totalSales: number;
@@ -54,6 +56,11 @@ const predictorSchema = new Schema<IPredictor>(
       twitter: String,
       telegram: String,
       discord: String,
+    },
+    preferredContact: {
+      type: String,
+      enum: ["telegram", "discord"],
+      default: "telegram",
     },
     categoryIds: [
       {

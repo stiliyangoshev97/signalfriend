@@ -58,6 +58,10 @@ const envSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(900000),
   /** Maximum requests per window */
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(100),
+
+  // Business Rules Configuration
+  /** Minimum signal price in USDT (must match smart contract) */
+  MIN_SIGNAL_PRICE_USDT: z.coerce.number().default(5),
 });
 
 // Parse and validate environment variables

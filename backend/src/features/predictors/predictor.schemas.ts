@@ -72,6 +72,8 @@ export const updatePredictorProfileSchema = z.object({
       discord: z.string().max(100).optional().or(z.literal("")),
     })
     .optional(),
+  /** Preferred contact method for admin communication */
+  preferredContact: z.enum(["telegram", "discord"]).optional(),
   /** Category IDs the predictor specializes in */
   categoryIds: z.array(z.string()).max(5).optional(),
 });

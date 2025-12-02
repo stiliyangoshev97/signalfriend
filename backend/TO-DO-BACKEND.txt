@@ -147,6 +147,18 @@
 [x] Official BSC USDT address pre-configured for mainnet
 
 ================================================================================
+## PHASE 10.5: Predictor Enhancements ✅
+================================================================================
+[x] Added preferredContact field to Predictor model (telegram | discord)
+[x] Updated predictor.schemas.ts to allow updating preferredContact
+[x] Added MIN_SIGNAL_PRICE_USDT env variable (default: 5)
+[x] Updated signal.schemas.ts to use env variable for validation
+[x] Added earnings endpoint GET /api/predictors/:address/earnings
+[x] Updated predictor.service.ts with getEarnings() method
+[x] Updated predictor.controller.ts with getPredictorEarnings handler
+[x] Updated predictor.routes.ts with earnings route
+
+================================================================================
 ## PHASE 11: Deployment Prep
 ================================================================================
 [ ] Dockerfile

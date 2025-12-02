@@ -124,6 +124,7 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
   bio: string,
   avatarUrl: string,
   socialLinks: { twitter?, telegram?, discord? },
+  preferredContact: 'telegram' | 'discord',  // For admin communication
   categoryIds: ObjectId[],    // References to Category
   totalSignals: number,
   totalSales: number,
