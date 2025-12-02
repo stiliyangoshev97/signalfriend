@@ -209,6 +209,24 @@
     - Need 100 more sales after rejection to re-apply
 
 ================================================================================
+## PHASE 10c: Maintenance Mode ✅
+================================================================================
+[x] Added MAINTENANCE_MODE env variable (default: false)
+[x] Added MAINTENANCE_END env variable (optional ETA timestamp)
+[x] Created maintenance middleware (src/shared/middleware/maintenance.ts)
+[x] Middleware returns 503 during maintenance, allows /health endpoint
+[x] Updated .env.example with maintenance mode documentation
+
+================================================================================
+## PHASE 10d: Manual API Testing ✅ (December 2024)
+================================================================================
+[x] Health check endpoint - PASS
+[x] GET /api/categories - PASS (returns seeded categories)
+[x] GET /api/predictors - PASS (returns predictor with new verification fields)
+[x] GET /api/signals - PASS (returns test signal)
+[x] GET /api/auth/nonce - PASS (nonce generation working)
+
+================================================================================
 ## PHASE 11: Deployment Prep
 ================================================================================
 [ ] Dockerfile

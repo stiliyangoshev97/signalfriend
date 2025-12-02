@@ -15,6 +15,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.13.0] - 2024-12-02 🚧 MAINTENANCE MODE & TESTING
+
+### Added
+- **Maintenance Mode**
+  - `MAINTENANCE_MODE` environment variable (default: false)
+  - `MAINTENANCE_END` optional ETA timestamp
+  - `src/shared/middleware/maintenance.ts` - Middleware that blocks all requests
+  - Returns 503 Service Unavailable with optional ETA during maintenance
+  - Health check endpoint (`/health`) always accessible
+
+### Changed
+- `src/shared/config/env.ts` - Added maintenance mode configuration
+- `src/index.ts` - Added maintenance middleware after rate limiter
+- `.env.example` - Added maintenance mode documentation
+
+### Tested
+- ✅ Manual API testing completed (December 2024)
+  - Health check endpoint
+  - Categories endpoint (database queries)
+  - Predictors endpoint (with new verification fields)
+  - Signals endpoint
+  - Auth nonce generation
+- All core endpoints verified working
+
+---
+
 ## [0.12.0] - 2024-12-02 ✅ PREDICTOR VERIFICATION SYSTEM
 
 ### Added

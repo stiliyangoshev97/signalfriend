@@ -19,6 +19,7 @@ import { logger } from "./shared/config/logger.js";
 import { connectDatabase, disconnectDatabase } from "./shared/config/database.js";
 import { securityMiddleware, corsMiddleware } from "./shared/middleware/security.js";
 import { rateLimiter } from "./shared/middleware/rateLimiter.js";
+import { maintenanceMode } from "./shared/middleware/maintenance.js";
 import { errorHandler, notFoundHandler } from "./shared/middleware/errorHandler.js";
 import { authRoutes } from "./features/auth/auth.routes.js";
 import { webhookRoutes } from "./features/webhooks/webhook.routes.js";
@@ -47,6 +48,9 @@ app.use(cookieParser());
 
 // Rate limiting (skip for webhooks)
 app.use(/^(?!\/api\/webhooks).*$/, rateLimiter);
+
+// Maintenance mode (blocks all requests except /health)
+app.use(maintenanceMode);
 
 // Health check
 app.get("/health", (_req, res) => {
