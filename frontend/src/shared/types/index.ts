@@ -1,8 +1,47 @@
 /**
  * Shared TypeScript Types
- * 
- * Re-exports types from Zod schemas for type safety.
- * Using Zod schemas as single source of truth.
+ *
+ * Central type definitions for the SignalFriend frontend.
+ * Re-exports types inferred from Zod schemas for runtime + compile-time safety.
+ *
+ * @module shared/types
+ *
+ * ARCHITECTURE:
+ * Zod schemas in `shared/schemas/` are the single source of truth.
+ * TypeScript types are inferred from these schemas using `z.infer<>`.
+ * This ensures runtime validation matches compile-time types.
+ *
+ * TYPE CATEGORIES:
+ * - API Types      - Request/response structures, pagination
+ * - Auth Types     - Authentication (SIWE, JWT, sessions)
+ * - Domain Types   - Business entities (Signal, Predictor, etc.)
+ * - Utility Types  - Helpers (Address, AppError)
+ *
+ * USAGE EXAMPLES:
+ * ```tsx
+ * import type { Signal, Predictor, ApiResponse } from '@/shared/types';
+ *
+ * // In components
+ * interface Props {
+ *   signal: Signal;
+ *   predictor: Predictor;
+ * }
+ *
+ * // In API calls
+ * const response = await apiClient.get<ApiResponse<Signal[]>>('/api/signals');
+ * const signals: Signal[] = response.data.data;
+ *
+ * // With pagination
+ * const response = await apiClient.get<PaginatedResponse<Signal>>('/api/signals');
+ * const { data: signals, pagination } = response.data;
+ * ```
+ *
+ * LEGACY TYPES:
+ * Some auth types (AuthNonceResponse, AuthVerifyRequest, AuthVerifyResponse)
+ * are defined here for backward compatibility. These may be consolidated
+ * into the schema system in a future refactor.
+ *
+ * @see shared/schemas for Zod schema definitions
  */
 
 // ===========================================

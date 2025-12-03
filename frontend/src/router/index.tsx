@@ -1,7 +1,52 @@
 /**
  * Application Router
- * 
- * Defines all routes for the SignalFriend application.
+ *
+ * Defines all routes for the SignalFriend application using React Router v6.
+ * Routes are organized into public, authenticated, and admin sections.
+ *
+ * @module router
+ *
+ * ROUTE STRUCTURE:
+ * ```
+ * / (RootLayout)
+ * ├── /                    [PUBLIC]  Home / Landing page
+ * ├── /signals             [PUBLIC]  Signal marketplace
+ * ├── /signals/:contentId  [PUBLIC]  Signal detail page
+ * ├── /predictors          [PUBLIC]  Predictor listing
+ * ├── /predictors/:address [PUBLIC]  Predictor profile
+ * │
+ * ├── /my-signals          [AUTH]    User's purchased signals
+ * ├── /dashboard           [AUTH]    Predictor dashboard
+ * ├── /dashboard/create    [AUTH]    Create new signal
+ * ├── /profile             [AUTH]    User profile settings
+ * │
+ * └── /admin               [ADMIN]   Admin panel
+ * ```
+ *
+ * LAYOUTS:
+ * - RootLayout: Wraps all routes with Header, Footer, and Suspense boundary
+ *
+ * CODE SPLITTING:
+ * Pages can be lazy-loaded for better performance:
+ * ```tsx
+ * const HomePage = lazy(() => import('../features/home/pages/HomePage'));
+ * ```
+ *
+ * ROUTE PROTECTION:
+ * Currently using placeholder pages. When implementing real pages:
+ * - Create ProtectedRoute component for authenticated routes
+ * - Create AdminRoute component for admin routes
+ * - Check auth state and redirect unauthorized users
+ *
+ * USAGE:
+ * ```tsx
+ * // In main.tsx
+ * import { router } from '@/router';
+ *
+ * <RouterProvider router={router} />
+ * ```
+ *
+ * @see https://reactrouter.com/en/main
  */
 
 import { createBrowserRouter, Navigate } from 'react-router-dom';

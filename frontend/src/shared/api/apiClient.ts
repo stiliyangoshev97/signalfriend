@@ -1,10 +1,69 @@
 /**
  * Axios API Client
- * 
- * Centralized HTTP client with interceptors for:
- * - Adding JWT auth tokens to requests
- * - Handling response errors
- * - Global error handling
+ *
+ * Centralized HTTP client with interceptors for authentication and error handling.
+ * All API calls should go through this client for consistent behavior.
+ *
+ * @module shared/api/apiClient
+ *
+ * FEATURES:
+ * - Automatic JWT token attachment to requests
+ * - Global error handling with status-specific logic
+ * - Configurable base URL and timeout
+ * - JSON content type by default
+ *
+ * INTERCEPTORS:
+ *
+ * Request Interceptor:
+ * - Reads JWT from localStorage ('authToken')
+ * - Attaches as Bearer token to Authorization header
+ * - All authenticated API calls automatically include the token
+ *
+ * Response Interceptor:
+ * - 401 Unauthorized: Clears auth and redirects to home (except for auth endpoints)
+ * - 503 Service Unavailable: Shows maintenance message (TODO)
+ * - Other errors: Extracts user-friendly message from response
+ *
+ * USAGE EXAMPLES:
+ * ```tsx
+ * import { apiClient } from '@/shared/api';
+ *
+ * // GET request
+ * const { data } = await apiClient.get('/api/signals');
+ *
+ * // POST request with body
+ * const { data } = await apiClient.post('/api/signals', {
+ *   title: 'New Signal',
+ *   description: '...',
+ * });
+ *
+ * // With TypeScript types
+ * interface Signal { id: string; title: string; }
+ * const { data } = await apiClient.get<ApiResponse<Signal[]>>('/api/signals');
+ *
+ * // Use with React Query
+ * const { data } = useQuery({
+ *   queryKey: ['signals'],
+ *   queryFn: () => apiClient.get('/api/signals').then(res => res.data),
+ * });
+ * ```
+ *
+ * ERROR HANDLING:
+ * Errors thrown by apiClient include a message property.
+ * Use try/catch or React Query's error handling:
+ * ```tsx
+ * try {
+ *   await apiClient.post('/api/signals', data);
+ * } catch (error) {
+ *   console.error(error.message); // User-friendly message
+ * }
+ * ```
+ *
+ * CONFIGURATION:
+ * - Base URL: from API_CONFIG (env.API_BASE_URL)
+ * - Timeout: from API_CONFIG (default 15s)
+ *
+ * @see API_CONFIG for endpoint definitions
  */
 
 import axios from 'axios';

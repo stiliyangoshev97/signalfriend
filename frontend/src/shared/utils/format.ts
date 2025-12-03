@@ -1,11 +1,59 @@
 /**
  * Format Utilities
- * 
+ *
  * Helper functions for formatting data in the UI.
+ * Provides consistent formatting for addresses, currencies, numbers, and dates.
+ *
+ * @module shared/utils/format
+ *
+ * EXPORTS:
+ * - `formatAddress`      - Shorten Ethereum addresses (0x1234...5678)
+ * - `formatUSD`          - Format as USD currency ($1,234.56)
+ * - `formatNumber`       - Add thousand separators (1,234,567)
+ * - `formatRelativeTime` - Relative time (5 minutes ago, 2 days ago)
+ * - `formatDate`         - Short date format (Dec 3, 2025)
+ * - `formatDateTime`     - Date with time (Dec 3, 2025, 2:30 PM)
+ * - `getTimeRemaining`   - Countdown format (2d 5h 30m)
+ *
+ * USAGE EXAMPLES:
+ * ```tsx
+ * // Wallet addresses
+ * formatAddress('0x1234567890abcdef1234567890abcdef12345678')
+ * // → "0x1234...5678"
+ *
+ * formatAddress('0x1234...', 6)  // Custom character count
+ * // → "0x123456...345678"
+ *
+ * // Currency
+ * formatUSD(1234.5)      // → "$1,234.50"
+ * formatUSD(0.99)        // → "$0.99"
+ *
+ * // Numbers
+ * formatNumber(1000000)  // → "1,000,000"
+ *
+ * // Relative times
+ * formatRelativeTime(new Date(Date.now() - 30000))      // → "just now"
+ * formatRelativeTime(new Date(Date.now() - 3600000))    // → "1 hour ago"
+ * formatRelativeTime(new Date(Date.now() - 86400000))   // → "1 day ago"
+ *
+ * // Dates
+ * formatDate(new Date())       // → "Dec 3, 2025"
+ * formatDateTime(new Date())   // → "Dec 3, 2025, 2:30 PM"
+ *
+ * // Countdown
+ * getTimeRemaining(futureDate) // → "2d 5h 30m" or "Expired"
+ * ```
+ *
+ * LOCALIZATION:
+ * All functions use 'en-US' locale by default.
+ * Modify the locale parameter in Intl formatters to support other locales.
  */
 
 /**
  * Shorten an Ethereum address for display
+ * @param address - Full Ethereum address (0x...)
+ * @param chars - Number of characters to show on each side (default: 4)
+ * @returns Shortened address like "0x1234...5678"
  * @example formatAddress("0x1234567890abcdef1234567890abcdef12345678") => "0x1234...5678"
  */
 export function formatAddress(address: string, chars = 4): string {

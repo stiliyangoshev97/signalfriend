@@ -1,7 +1,50 @@
 /**
  * Smart Contract Addresses
- * 
- * Contract addresses for SignalFriend on BNB Chain.
+ *
+ * Deployed contract addresses for SignalFriend on BNB Chain.
+ * Contains addresses for all chains the app supports.
+ *
+ * @module shared/config/contracts
+ *
+ * CONTRACTS:
+ * - SignalFriendMarket   - Main marketplace contract (purchases, subscriptions)
+ * - PredictorAccessPass  - ERC-721 NFT for predictor registration
+ * - SignalKeyNFT         - ERC-721 receipt NFTs for signal purchases
+ * - USDT                 - Payment token (MockUSDT on testnet, real on mainnet)
+ *
+ * CHAIN SUPPORT:
+ * - BNB Chain Testnet (97)  - Development & testing
+ * - BNB Chain Mainnet (56)  - Production (addresses TBD)
+ *
+ * USAGE EXAMPLES:
+ * ```tsx
+ * import { getContractAddresses, CONTRACT_ADDRESSES } from '@/shared/config';
+ *
+ * // Get addresses for current chain
+ * function useContracts() {
+ *   const { chainId } = useAccount();
+ *   const addresses = getContractAddresses(chainId || 97);
+ *   return addresses;
+ * }
+ *
+ * // Direct access (when you know the chain)
+ * const testnetMarket = CONTRACT_ADDRESSES[97].SignalFriendMarket;
+ *
+ * // With wagmi/viem
+ * const { data } = useReadContract({
+ *   address: addresses.SignalFriendMarket,
+ *   abi: marketAbi,
+ *   functionName: 'getSignalPrice',
+ * });
+ * ```
+ *
+ * UPDATING ADDRESSES:
+ * When deploying new contracts:
+ * 1. Update addresses in this file
+ * 2. Update backend contracts/addresses.ts to match
+ * 3. Verify contracts on BscScan
+ *
+ * @see deployment-addresses.txt in contracts/ for deployment history
  */
 
 import { CHAIN_IDS } from './wagmi';

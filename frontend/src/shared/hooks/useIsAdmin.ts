@@ -1,7 +1,48 @@
 /**
  * useIsAdmin Hook
- * 
- * Checks if the connected wallet is an admin address.
+ *
+ * Checks if the currently connected wallet address is in the admin whitelist.
+ * Used to gate access to admin-only features and routes.
+ *
+ * @module shared/hooks/useIsAdmin
+ *
+ * IMPORTANT:
+ * The admin addresses list must be kept in sync with:
+ * - Backend: ADMIN_ADDRESSES in environment config
+ * - Smart Contracts: DEFAULT_ADMIN_ROLE holders
+ *
+ * USAGE EXAMPLES:
+ * ```tsx
+ * // Conditional rendering
+ * function AdminPanel() {
+ *   const isAdmin = useIsAdmin();
+ *   
+ *   if (!isAdmin) {
+ *     return <Navigate to="/" />;
+ *   }
+ *   
+ *   return <AdminDashboard />;
+ * }
+ *
+ * // In navigation
+ * function Navigation() {
+ *   const isAdmin = useIsAdmin();
+ *   
+ *   return (
+ *     <nav>
+ *       <Link to="/">Home</Link>
+ *       {isAdmin && <Link to="/admin">Admin</Link>}
+ *     </nav>
+ *   );
+ * }
+ * ```
+ *
+ * SECURITY NOTE:
+ * This is client-side only and should NOT be relied upon for security.
+ * All admin operations must be verified on the backend/smart contract level.
+ * This hook is purely for UX (hiding/showing admin UI elements).
+ *
+ * @returns {boolean} True if connected wallet is an admin, false otherwise
  */
 
 import { useAccount } from 'wagmi';
