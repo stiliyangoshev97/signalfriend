@@ -25,8 +25,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
 import { getContractAddresses, SIGNAL_FRIEND_MARKET_ABI, ERC20_ABI } from '@/shared/config';
-import { checkPurchase, fetchContentIdentifier } from '../api';
-import type { CheckPurchaseResponse } from '../api/purchase.api';
+import { checkPurchase, fetchContentIdentifier, fetchMyReceipts } from '../api';
+import type { CheckPurchaseResponse, Receipt } from '../api/purchase.api';
 
 /** USDT has 18 decimals on BNB Chain */
 const USDT_DECIMALS = 18;
@@ -36,6 +36,8 @@ export const purchaseKeys = {
   all: ['purchase'] as const,
   check: (contentId: string) => [...purchaseKeys.all, 'check', contentId] as const,
   contentId: (contentId: string) => [...purchaseKeys.all, 'contentIdentifier', contentId] as const,
+  myReceipts: (params?: { page?: number; limit?: number }) => 
+    [...purchaseKeys.all, 'myReceipts', params] as const,
 };
 
 /**
@@ -58,6 +60,34 @@ export function useCheckPurchase(contentId: string) {
     queryFn: () => checkPurchase(contentId),
     enabled: isConnected && !!contentId,
     staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+/**
+ * Hook to fetch the current user's purchased signals (receipts)
+ *
+ * @param params - Optional pagination parameters
+ * @returns Query result with array of receipts
+ *
+ * @example
+ * const { data: receipts, isLoading } = useMyReceipts({ page: 1, limit: 10 });
+ * receipts?.forEach(receipt => {
+ *   console.log(receipt.signal?.title);
+ * });
+ */
+export function useMyReceipts(params?: {
+  page?: number;
+  limit?: number;
+  sortBy?: 'purchasedAt' | 'priceUsdt';
+  sortOrder?: 'asc' | 'desc';
+}) {
+  const { isConnected } = useAccount();
+
+  return useQuery<Receipt[]>({
+    queryKey: purchaseKeys.myReceipts(params),
+    queryFn: () => fetchMyReceipts(params),
+    enabled: isConnected,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
