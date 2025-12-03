@@ -95,6 +95,17 @@ PHASE 2: AUTHENTICATION & WALLET ✅ COMPLETE
     - Shows "My Signals" and "Dashboard" only when authenticated
     - AuthButton shows correct state (Connect/Sign In/Sign Out)
 
+[✅] JSDoc Documentation (Added in v0.3.0)
+    - All UI components (Button, Input, Card, etc.)
+    - Auth feature files (hooks, API, components, store)
+    - Providers (Web3, Query, Sentry)
+    - Router files (Header, RootLayout, index)
+    - Config files (env, api.config, wagmi, contracts)
+    - Hooks (useAuth, useIsAdmin, useIsPredictor)
+    - Utils (cn, format)
+    - API client and types/schemas
+    - Each file includes examples, accessibility notes, flow diagrams
+
 [ ] Protected Routes
     - Create ProtectedRoute component
     - Redirect to home if not authenticated
