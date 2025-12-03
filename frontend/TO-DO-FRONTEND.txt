@@ -2,7 +2,7 @@
                         SIGNALFRIEND FRONTEND TO-DO LIST
 ================================================================================
 
-Last Updated: 2024-12-03
+Last Updated: 2025-12-03
 Branch: feature/frontend-scaffold
 
 ================================================================================
@@ -37,8 +37,9 @@ PHASE 1: CORE SCAFFOLD ✅ COMPLETE
     - SentryProvider (error boundary placeholder)
 
 [✅] Router Setup
-    - React Router v6 with placeholder pages
+    - React Router v7 with placeholder pages
     - RootLayout with Header/Footer
+    - Header with logo from branding assets
     - Routes: /, /signals, /predictors, /dashboard, /profile
 
 [✅] API Layer
@@ -58,15 +59,25 @@ PHASE 1: CORE SCAFFOLD ✅ COMPLETE
     - Receipt schemas
     - Category schemas
 
+[✅] Hooks
+    - useAuth hook with SIWE authentication flow
+
 [✅] Documentation
-    - README.md with setup instructions
+    - README.md with detailed setup instructions
     - PROJECT_CONTEXT.md
     - CHANGELOG.md
     - RUNBOOK.md
+    - TO-DO-FRONTEND.txt (this file)
 
 ================================================================================
 PHASE 2: AUTHENTICATION & WALLET (PRIORITY: HIGH)
 ================================================================================
+
+[✅] useAuth Hook Implementation
+    - Login with wallet signature (SIWE)
+    - Logout and disconnect wallet
+    - Loading and error states
+    - Predictor role detection
 
 [ ] Wallet Authentication Flow
     - Connect wallet button in header
