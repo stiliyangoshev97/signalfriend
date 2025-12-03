@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.0] - 2025-12-03
+
+### Added
+
+#### Route Guards for Protected Pages
+- **ProtectedRoute** - Authentication guard:
+  - Requires wallet connection (RainbowKit)
+  - Requires SIWE authentication (JWT obtained)
+  - Redirects to home with message if not authenticated
+  - Passes `from` path in state for redirect after login
+- **AdminRoute** - Admin-only guard:
+  - Extends ProtectedRoute requirements
+  - Checks wallet address against admin whitelist
+  - Shows "Access Denied" message for non-admins
+- **PredictorRoute** - Predictor-only guard:
+  - Extends ProtectedRoute requirements
+  - Checks if user is registered predictor
+  - Optional `requireVerified` prop for verified predictors only
+  - Shows verification pending message if not verified
+- **Route guards barrel export** - `src/router/guards/index.ts`
+
+### Changed
+- `/my-signals` now uses ProtectedRoute
+- `/profile` now uses ProtectedRoute
+- `/dashboard` now uses PredictorRoute
+- `/dashboard/create-signal` now uses PredictorRoute with `requireVerified`
+- `/admin` now uses AdminRoute
+- Added `/become-predictor` route (ProtectedRoute)
+- Router JSDoc updated with new route structure and guard hierarchy
+
+---
+
 ## [0.3.0] - 2025-12-03
 
 ### Added

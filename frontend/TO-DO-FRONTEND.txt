@@ -106,10 +106,13 @@ PHASE 2: AUTHENTICATION & WALLET ✅ COMPLETE
     - API client and types/schemas
     - Each file includes examples, accessibility notes, flow diagrams
 
-[ ] Protected Routes
-    - Create ProtectedRoute component
-    - Redirect to home if not authenticated
-    - Role-based access (user vs predictor vs admin)
+[✅] Protected Routes (Added in v0.4.0)
+    - ProtectedRoute - requires wallet + SIWE auth
+    - PredictorRoute - requires predictor registration
+    - PredictorRoute (requireVerified) - requires verified status
+    - AdminRoute - requires admin wallet address
+    - All guards redirect with state (from path, message)
+    - Added /become-predictor route for predictor registration
 
 [ ] User Profile Page
     - Display wallet address

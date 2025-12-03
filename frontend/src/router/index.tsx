@@ -2,26 +2,34 @@
  * Application Router
  *
  * Defines all routes for the SignalFriend application using React Router v6.
- * Routes are organized into public, authenticated, and admin sections.
+ * Routes are organized into public, authenticated, predictor, and admin sections.
  *
  * @module router
  *
  * ROUTE STRUCTURE:
  * ```
  * / (RootLayout)
- * ├── /                    [PUBLIC]  Home / Landing page
- * ├── /signals             [PUBLIC]  Signal marketplace
- * ├── /signals/:contentId  [PUBLIC]  Signal detail page
- * ├── /predictors          [PUBLIC]  Predictor listing
- * ├── /predictors/:address [PUBLIC]  Predictor profile
+ * ├── /                      [PUBLIC]     Home / Landing page
+ * ├── /signals               [PUBLIC]     Signal marketplace
+ * ├── /signals/:contentId    [PUBLIC]     Signal detail page
+ * ├── /predictors            [PUBLIC]     Predictor listing
+ * ├── /predictors/:address   [PUBLIC]     Predictor profile
  * │
- * ├── /my-signals          [AUTH]    User's purchased signals
- * ├── /dashboard           [AUTH]    Predictor dashboard
- * ├── /dashboard/create    [AUTH]    Create new signal
- * ├── /profile             [AUTH]    User profile settings
+ * ├── /my-signals            [AUTH]       User's purchased signals
+ * ├── /profile               [AUTH]       User profile settings
+ * ├── /become-predictor      [AUTH]       Predictor registration
  * │
- * └── /admin               [ADMIN]   Admin panel
+ * ├── /dashboard             [PREDICTOR]  Predictor dashboard
+ * ├── /dashboard/create      [VERIFIED]   Create new signal (verified only)
+ * │
+ * └── /admin                 [ADMIN]      Admin panel
  * ```
+ *
+ * ROUTE GUARDS:
+ * - ProtectedRoute: Requires wallet + SIWE authentication
+ * - PredictorRoute: Requires predictor registration
+ * - PredictorRoute (requireVerified): Requires verified predictor status
+ * - AdminRoute: Requires admin wallet address
  *
  * LAYOUTS:
  * - RootLayout: Wraps all routes with Header, Footer, and Suspense boundary
@@ -32,12 +40,6 @@
  * const HomePage = lazy(() => import('../features/home/pages/HomePage'));
  * ```
  *
- * ROUTE PROTECTION:
- * Currently using placeholder pages. When implementing real pages:
- * - Create ProtectedRoute component for authenticated routes
- * - Create AdminRoute component for admin routes
- * - Check auth state and redirect unauthorized users
- *
  * USAGE:
  * ```tsx
  * // In main.tsx
@@ -46,11 +48,13 @@
  * <RouterProvider router={router} />
  * ```
  *
+ * @see router/guards for route protection components
  * @see https://reactrouter.com/en/main
  */
 
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import RootLayout from './RootLayout';
+import { ProtectedRoute, AdminRoute, PredictorRoute } from './guards';
 
 // Lazy load pages for code splitting
 // import { lazy } from 'react';
@@ -96,25 +100,53 @@ export const router = createBrowserRouter([
       // ===== AUTHENTICATED ROUTES =====
       {
         path: 'my-signals',
-        element: <PlaceholderPage title="My Signals" />,
+        element: (
+          <ProtectedRoute>
+            <PlaceholderPage title="My Signals" />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'dashboard',
-        element: <PlaceholderPage title="Predictor Dashboard" />,
+        element: (
+          <PredictorRoute>
+            <PlaceholderPage title="Predictor Dashboard" />
+          </PredictorRoute>
+        ),
       },
       {
         path: 'dashboard/create-signal',
-        element: <PlaceholderPage title="Create Signal" />,
+        element: (
+          <PredictorRoute requireVerified>
+            <PlaceholderPage title="Create Signal" />
+          </PredictorRoute>
+        ),
       },
       {
         path: 'profile',
-        element: <PlaceholderPage title="My Profile" />,
+        element: (
+          <ProtectedRoute>
+            <PlaceholderPage title="My Profile" />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'become-predictor',
+        element: (
+          <ProtectedRoute>
+            <PlaceholderPage title="Become a Predictor" />
+          </ProtectedRoute>
+        ),
       },
       
       // ===== ADMIN ROUTES =====
       {
         path: 'admin',
-        element: <PlaceholderPage title="Admin Panel" />,
+        element: (
+          <AdminRoute>
+            <PlaceholderPage title="Admin Panel" />
+          </AdminRoute>
+        ),
       },
       
       // ===== CATCH ALL =====
