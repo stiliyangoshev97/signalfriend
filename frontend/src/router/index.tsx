@@ -56,10 +56,11 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import RootLayout from './RootLayout';
 import { ProtectedRoute, AdminRoute, PredictorRoute } from './guards';
 import { HomePage } from '@/features/home';
+import { SignalsPage } from '@/features/signals';
 
 // Lazy load pages for code splitting (example for future pages)
 // import { lazy } from 'react';
-// const SignalsPage = lazy(() => import('../features/signals/pages/SignalsPage'));
+// const PredictorsPage = lazy(() => import('../features/predictors/pages/PredictorsPage'));
 
 // Placeholder pages (to be replaced with actual pages)
 const PlaceholderPage = ({ title }: { title: string }) => (
@@ -83,7 +84,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'signals',
-        element: <PlaceholderPage title="Signal Marketplace" />,
+        element: <SignalsPage />,
       },
       {
         path: 'signals/:contentId',

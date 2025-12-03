@@ -23,14 +23,15 @@
 | **JSDoc Documentation** | ✅ 100% | All files documented with examples |
 | **Route Guards** | ✅ 100% | ProtectedRoute, AdminRoute, PredictorRoute |
 | **Landing Page** | ✅ 100% | Hero, Features, HowItWorks, CTA sections |
-| **Signal Marketplace** | ⏳ 0% | Not started |
+| **Signal Marketplace** | ✅ 100% | Full marketplace with filters, cards, pagination |
+| **Signal Detail Page** | ⏳ 0% | Not started |
 | **Predictor Profile** | ⏳ 0% | Not started |
 | **Purchase Flow** | ⏳ 0% | Not started |
 | **My Signals** | ⏳ 0% | Not started |
 | **Predictor Dashboard** | ⏳ 0% | Not started |
 | **Admin Panel** | ⏳ 0% | Not started |
 
-**Overall Progress: ~50%** (Infrastructure + Auth + Docs + Route Guards + Landing complete, feature pages pending)
+**Overall Progress: ~55%** (Infrastructure + Auth + Docs + Route Guards + Landing + Marketplace complete)
 
 ---
 
