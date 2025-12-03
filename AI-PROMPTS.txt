@@ -16,11 +16,13 @@ First, scan the workspace structure to see what components exist (contracts/, ba
 Then read and analyze these core documentation files:
 1. `/PROJECT.md` - Business model and overall project vision
 2. `/TO-DO.txt` - Task list with current progress
+3. `/Workflow.md` - Workflow of how we work
 
 For Smart Contracts:
 3. `/contracts/README.md` - Contracts overview
 4. `/contracts/PROJECT_CONTEXT.md` - Technical details & deployment status
 5. `/contracts/CHANGELOG.md` - Version history
+6. `/contracts/TO-DO-CONTRACTS.txt` - Contracts task tracker
 
 For Backend:
 6. `/backend/README.md` - Backend overview
