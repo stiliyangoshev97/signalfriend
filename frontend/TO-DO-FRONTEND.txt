@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-03
-Branch: feature/purchase-flow (v0.8.0)
+Branch: feature/my-purchased-signals (v0.8.2)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -175,10 +175,24 @@ PHASE 3: SIGNALS FEATURE (PRIORITY: HIGH)
       - Auto-refresh on successful purchase
     - Backend endpoint: GET /api/signals/:contentId/content-identifier
 
-[ ] My Purchased Signals
-    - List user's receipts/purchases
-    - Access protected content
-    - Leave review functionality
+[✅] My Purchased Signals - Added in v0.8.2
+    - useMyReceipts hook to fetch user's purchase receipts
+    - PurchasedSignalCard component with owned badge, purchase info, links
+    - MyPurchasedSignalsPage at /my-signals route:
+      - Grid of purchased signals
+      - Sort by date or price
+      - Empty state with marketplace CTA
+      - Loading skeleton
+      - Error handling
+    - Router updated with real page (replaces placeholder)
+    - "View Signal" links to unlocked content on detail page
+    - "View TX" links to BSCScan explorer
+
+[ ] Leave Review Functionality
+    - Review form on purchased signal
+    - Star rating (1-5)
+    - Text review (optional)
+    - Submit to backend API
 
 ================================================================================
 PHASE 4: PREDICTOR FEATURES (PRIORITY: MEDIUM)

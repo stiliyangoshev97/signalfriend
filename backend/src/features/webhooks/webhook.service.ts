@@ -273,8 +273,8 @@ export class WebhookService {
       // Convert bytes32 contentIdentifier to string (remove trailing zeros)
       const contentId = args.contentIdentifier;
 
-      // Convert price from USDT (6 decimals) to number
-      const priceUsdt = Number(formatUnits(args.signalPrice, 6));
+      // Convert price from USDT (18 decimals on BNB Chain) to number
+      const priceUsdt = Number(formatUnits(args.signalPrice, 18));
 
       logger.info({
         buyer: args.buyer,

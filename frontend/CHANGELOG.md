@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.2] - 2025-12-03
+
+### Added
+
+#### My Purchased Signals Page
+Complete page for users to view and manage their purchased signals.
+
+- **MyPurchasedSignalsPage** (`src/features/signals/pages/MyPurchasedSignalsPage.tsx`):
+  - Grid display of all user's purchased signals (receipts)
+  - Sort options: newest first, oldest first, highest price, lowest price
+  - Empty state with CTA to browse marketplace
+  - Loading skeleton for better UX
+  - Error handling with user-friendly messages
+  - Marketplace CTA for users with existing purchases
+
+- **PurchasedSignalCard** (`src/features/signals/components/PurchasedSignalCard.tsx`):
+  - Displays purchased signal info with "Owned" badge
+  - Shows: signal title, category, purchase date, price paid, token ID, predictor address
+  - "View Signal" button links to signal detail page (unlocked content)
+  - "View TX" button links to BSCScan transaction
+
+- **useMyReceipts Hook** (`src/features/signals/hooks/usePurchase.ts`):
+  - React Query hook to fetch user's purchase receipts
+  - Supports pagination and sorting parameters
+  - Query key factory pattern for cache management
+  - Only enabled when user is connected
+
+### Changed
+
+- **Router** (`src/router/index.tsx`):
+  - Replaced placeholder page with real `MyPurchasedSignalsPage`
+  - Route `/my-signals` now shows purchased signals (requires auth)
+
+- **Components Index** (`src/features/signals/components/index.ts`):
+  - Added export for `PurchasedSignalCard`
+
+- **Pages Index** (`src/features/signals/pages/index.ts`):
+  - Added export for `MyPurchasedSignalsPage`
+
+### Notes
+
+- Navigation link "My Signals" already exists in Header (for authenticated users)
+- Clicking "View Signal" on a purchased signal shows unlocked content on detail page
+- Transaction hash links to BSC Testnet explorer
+
+---
+
 ## [0.8.1] - 2025-12-03
 
 ### Fixed

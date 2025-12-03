@@ -5,3 +5,4 @@
 
 export { SignalsPage } from './SignalsPage';
 export { SignalDetailPage } from './SignalDetailPage';
+export { MyPurchasedSignalsPage } from './MyPurchasedSignalsPage';

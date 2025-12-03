@@ -26,12 +26,12 @@
 | **Signal Marketplace** | ✅ 100% | Full marketplace with filters, cards, pagination |
 | **Signal Detail Page** | ✅ 100% | Full detail view with purchase UI |
 | **Purchase Flow** | ✅ 100% | Multi-step modal with USDT approval + purchase |
+| **My Purchased Signals** | ✅ 100% | View/access purchased signals with receipts |
 | **Predictor Profile** | ⏳ 0% | Not started |
-| **My Signals** | ⏳ 0% | Not started |
 | **Predictor Dashboard** | ⏳ 0% | Not started |
 | **Admin Panel** | ⏳ 0% | Not started |
 
-**Overall Progress: ~70%** (Infrastructure + Auth + Docs + Route Guards + Landing + Marketplace + Signal Detail + Purchase Flow complete)
+**Overall Progress: ~75%** (Infrastructure + Auth + Docs + Route Guards + Landing + Marketplace + Signal Detail + Purchase Flow + My Signals complete)
 
 ---
 
@@ -183,6 +183,46 @@ Signals have a mandatory expiration date (1-30 days from creation) to keep the m
 // In SignalCard.tsx - exported for reuse
 export function getExpiryInfo(expiresAt: string): { isExpired: boolean; text: string }
 ```
+
+---
+
+## 🎫 My Purchased Signals
+
+### Overview
+Users can view all signals they've purchased at `/my-signals`. Each purchase receipt includes access to the unlocked signal content.
+
+### Route
+- **Path**: `/my-signals`
+- **Guard**: `ProtectedRoute` (requires wallet + SIWE auth)
+- **Component**: `MyPurchasedSignalsPage`
+
+### Features
+| Feature | Description |
+|---------|-------------|
+| Receipt Grid | Displays all purchased signals in responsive grid |
+| Sort Options | Newest first, oldest first, highest price, lowest price |
+| Empty State | CTA to browse marketplace when no purchases |
+| Loading State | Skeleton cards for better UX |
+| Error Handling | User-friendly error messages |
+
+### Components
+- **MyPurchasedSignalsPage** (`src/features/signals/pages/MyPurchasedSignalsPage.tsx`)
+- **PurchasedSignalCard** (`src/features/signals/components/PurchasedSignalCard.tsx`)
+
+### Hooks
+| Hook | Purpose |
+|------|---------|
+| `useMyReceipts` | Fetch user's purchase receipts with pagination/sorting |
+
+### Card Information Displayed
+- Signal title and category
+- "Owned" badge
+- Purchase date
+- Price paid
+- Token ID (NFT)
+- Predictor address (truncated)
+- "View Signal" button → Signal detail page (unlocked content)
+- "View TX" button → BSCScan transaction
 
 ---
 
