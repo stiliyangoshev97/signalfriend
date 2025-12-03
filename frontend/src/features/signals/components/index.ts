@@ -14,3 +14,4 @@ export { SignalDetailSkeleton } from './SignalDetailSkeleton';
 export { PredictorInfoCard } from './PredictorInfoCard';
 export { PurchaseCard } from './PurchaseCard';
 export { SignalContent } from './SignalContent';
+export { PurchaseModal } from './PurchaseModal';

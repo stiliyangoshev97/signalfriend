@@ -56,7 +56,13 @@ export const API_CONFIG = {
     SIGNALS: '/api/signals',
     SIGNAL_BY_ID: (id: string) => `/api/signals/${id}`,
     SIGNAL_CONTENT: (id: string) => `/api/signals/${id}/content`,
+    SIGNAL_CONTENT_IDENTIFIER: (id: string) => `/api/signals/${id}/content-identifier`,
     MY_SIGNALS: '/api/signals/my-signals',
+    
+    // Receipts
+    RECEIPTS_MINE: '/api/receipts/mine',
+    RECEIPTS_CHECK: (contentId: string) => `/api/receipts/check/${contentId}`,
+    RECEIPTS_STATS: '/api/receipts/stats',
     
     // Predictors
     PREDICTORS: '/api/predictors',

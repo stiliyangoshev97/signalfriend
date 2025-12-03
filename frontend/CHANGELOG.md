@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.0] - 2025-12-03
+
+### Added
+
+#### Purchase Flow
+Complete implementation for users to purchase signals through smart contract interaction.
+
+- **Contract ABIs** (`src/shared/config/abis/index.ts`):
+  - `SIGNAL_FRIEND_MARKET_ABI` - buySignalNFT, fee calculations, events
+  - `ERC20_ABI` - approve, allowance, balanceOf for USDT
+  - Minimal ABIs containing only functions needed by frontend
+
+- **Purchase API Functions** (`src/features/signals/api/purchase.api.ts`):
+  - `fetchContentIdentifier()` - Get bytes32 for on-chain purchase
+  - `checkPurchase()` - Check if user owns a signal
+  - `fetchMyReceipts()` - Get user's purchase history
+
+- **API Config Updates** (`src/shared/config/api.config.ts`):
+  - Added `SIGNAL_CONTENT_IDENTIFIER` endpoint
+  - Added `RECEIPTS_MINE`, `RECEIPTS_CHECK`, `RECEIPTS_STATS` endpoints
+
+- **Purchase Hooks** (`src/features/signals/hooks/usePurchase.ts`):
+  - `useCheckPurchase()` - Query hook to check signal ownership
+  - `useContentIdentifier()` - Query hook to fetch bytes32 content ID
+  - `useUSDTBalance()` - Read USDT balance with wagmi
+  - `useUSDTAllowance()` - Read USDT allowance for market contract
+  - `useApproveUSDT()` - Write hook to approve USDT spending
+  - `useBuySignal()` - Write hook to execute buySignalNFT
+  - `usePurchaseFlow()` - Combined hook managing entire purchase flow
+
+- **PurchaseModal Component** (`src/features/signals/components/PurchaseModal.tsx`):
+  - Multi-step purchase flow modal
+  - Step indicators (pending, active, complete, error states)
+  - Balance check with warning for insufficient funds
+  - USDT approval step with progress indication
+  - Purchase execution with transaction confirmation
+  - Success/error states with clear messaging
+  - Responsive and accessible design
+
+### Changed
+
+- **SignalDetailPage** (`src/features/signals/pages/SignalDetailPage.tsx`):
+  - Integrated `useCheckPurchase` hook for real ownership detection
+  - Added `showPurchaseModal` state and modal rendering
+  - Added `handlePurchaseSuccess` callback for post-purchase refresh
+  - PurchaseCard now triggers modal on click
+  - Cache invalidation on successful purchase
+
+### Backend Changes (included in this feature)
+
+- **Content Identifier Endpoint** (`backend/src/features/signals/`):
+  - Added `getContentIdentifier` controller function
+  - Added `GET /api/signals/:contentId/content-identifier` route
+  - Returns bytes32 hex string needed for on-chain purchase
+
+---
+
 ## [0.7.0] - 2025-12-03
 
 ### Added

@@ -24,13 +24,16 @@
  * 4. Render appropriate UI based on loading/error/success states
  */
 
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { format, isValid, parseISO } from 'date-fns';
-import { useSignal } from '../hooks';
+import { useQueryClient } from '@tanstack/react-query';
+import { useSignal, useCheckPurchase, signalKeys } from '../hooks';
 import { SignalDetailSkeleton } from '../components/SignalDetailSkeleton';
 import { PredictorInfoCard } from '../components/PredictorInfoCard';
 import { PurchaseCard } from '../components/PurchaseCard';
 import { SignalContent } from '../components/SignalContent';
+import { PurchaseModal } from '../components/PurchaseModal';
 
 /**
  * Risk level badge colors and labels
@@ -126,10 +129,24 @@ function ChevronRightIcon(): React.ReactElement {
  */
 export function SignalDetailPage(): React.ReactElement {
   const { contentId } = useParams<{ contentId: string }>();
+  const queryClient = useQueryClient();
   const { data: signal, isLoading, error } = useSignal(contentId || '');
+  
+  // Check if user owns this signal
+  const { data: purchaseData, refetch: refetchPurchase } = useCheckPurchase(contentId || '');
+  const isOwned = purchaseData?.hasPurchased ?? false;
+  
+  // Purchase modal state
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
-  // TODO: Check if user owns this signal (via receipt NFT)
-  const isOwned = false; // Placeholder until receipt check is implemented
+  /**
+   * Handle successful purchase - refetch data
+   */
+  const handlePurchaseSuccess = () => {
+    refetchPurchase();
+    // Invalidate signal query to refresh data
+    queryClient.invalidateQueries({ queryKey: signalKeys.detail(contentId || '') });
+  };
 
   // Loading state
   if (isLoading) {
@@ -344,10 +361,7 @@ export function SignalDetailPage(): React.ReactElement {
             isExpired={!isActive}
             isOwned={isOwned}
             contentId={signal.contentId}
-            onPurchase={() => {
-              // TODO: Implement purchase flow modal
-              console.log('Purchase clicked for:', signal.contentId);
-            }}
+            onPurchase={() => setShowPurchaseModal(true)}
           />
 
           {/* Predictor Info Card */}
@@ -409,6 +423,17 @@ export function SignalDetailPage(): React.ReactElement {
           </div>
         </div>
       </div>
+
+      {/* Purchase Modal */}
+      <PurchaseModal
+        isOpen={showPurchaseModal}
+        onClose={() => setShowPurchaseModal(false)}
+        signalTitle={signal.title}
+        priceUsdt={signal.priceUsdt}
+        contentId={signal.contentId}
+        predictorAddress={signal.predictorAddress}
+        onSuccess={handlePurchaseSuccess}
+      />
     </div>
   );
 }

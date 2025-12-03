@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-03
-Branch: feature/signal-detail-page (v0.7.0)
+Branch: feature/purchase-flow (v0.8.0)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -153,12 +153,27 @@ PHASE 3: SIGNALS FEATURE (PRIORITY: HIGH)
     - Share buttons (copy link, Twitter)
     - Error state for missing signals
 
-[ ] Purchase Flow
-    - Check USDT allowance
-    - Approve USDT if needed
-    - Call purchaseSignal contract method
-    - Show transaction status
-    - Update UI on success
+[✅] Purchase Flow - Added in v0.8.0
+    - Contract ABIs (SignalFriendMarket, ERC20) in shared/config/abis
+    - Purchase API functions (fetchContentIdentifier, checkPurchase, fetchMyReceipts)
+    - React Query hooks for purchase flow:
+      - useCheckPurchase - check if user owns signal
+      - useContentIdentifier - get bytes32 for on-chain call
+      - useUSDTBalance - check user's USDT balance
+      - useUSDTAllowance - check spending allowance
+      - useApproveUSDT - approve USDT spending
+      - useBuySignal - execute buySignalNFT contract call
+      - usePurchaseFlow - combined hook for entire flow
+    - PurchaseModal component with multi-step flow:
+      - Balance check step
+      - USDT approval step (if needed)
+      - Purchase execution step
+      - Success/error states
+    - SignalDetailPage integration:
+      - Real ownership check via useCheckPurchase
+      - Purchase modal trigger
+      - Auto-refresh on successful purchase
+    - Backend endpoint: GET /api/signals/:contentId/content-identifier
 
 [ ] My Purchased Signals
     - List user's receipts/purchases
@@ -271,7 +286,14 @@ PHASE 7: POLISH & OPTIMIZATION (PRIORITY: LOW)
 KNOWN ISSUES / BUGS
 ================================================================================
 
-[ ] None currently tracked
+[ ] BUG: SignalCard shows "Expired" for all signals
+    - Location: src/features/signals/components/SignalCard.tsx
+    - Problem: getExpiryInfo() is called with createdAt date, which is always in the past
+    - Result: All signals show "Expired" even when they are active
+    - Fix Options:
+      A) Show "Created X days ago" instead of expiry logic
+      B) Add expiresAt field to Signal model in backend and use that
+    - Priority: Medium (UI issue, purchase still works)
 
 ================================================================================
 TECHNICAL DEBT

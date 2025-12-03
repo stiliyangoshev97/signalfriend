@@ -22,6 +22,28 @@ import type {
 } from "./signal.schemas.js";
 
 /**
+ * GET /api/signals/:contentId/content-identifier
+ * Returns the bytes32 content identifier for use in on-chain purchases.
+ * This is needed to call buySignalNFT on the smart contract.
+ *
+ * @param {string} contentId - Signal content ID (UUID v4)
+ * @returns {Object} JSON response with bytes32 content identifier
+ * @throws {404} If signal not found
+ */
+export const getContentIdentifier = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { contentId } = req.params as GetSignalByContentIdParams;
+
+    const result = await SignalService.getContentIdentifier(contentId);
+
+    res.json({
+      success: true,
+      data: result,
+    });
+  }
+);
+
+/**
  * GET /api/signals
  * Lists signals with filtering, pagination, and sorting.
  * Returns public signal data only (no protected content).
