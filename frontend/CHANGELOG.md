@@ -7,6 +7,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.0] - 2025-12-03
+
+### Added
+
+#### Signal Marketplace Page
+Complete marketplace page for browsing and filtering trading signals.
+
+- **API Functions** (`src/features/signals/api/signals.api.ts`):
+  - `fetchSignals()` - Paginated signals with filters
+  - `fetchSignalById()` - Single signal by contentId
+  - `fetchCategories()` - All active categories
+  - `fetchSignalsByPredictor()` - Signals by predictor address
+  - Query string builder for filter parameters
+
+- **React Query Hooks** (`src/features/signals/hooks/useSignals.ts`):
+  - `useSignals()` - Fetch signals with filters and caching
+  - `useSignal()` - Fetch single signal with caching
+  - `useCategories()` - Fetch categories (long cache time)
+  - Query key factories for cache invalidation
+
+- **SignalCard** (`src/features/signals/components/SignalCard.tsx`):
+  - Displays signal name, description, category
+  - Risk level and potential reward badges (color-coded)
+  - Predictor info with verification badge
+  - Price in USDT, expiry time, buyer count
+  - Hover animations and link to detail page
+  - Safe handling of null/undefined values
+
+- **FilterPanel** (`src/features/signals/components/FilterPanel.tsx`):
+  - Category dropdown (grouped by mainGroup)
+  - Risk level toggle buttons (green/yellow/red)
+  - Potential reward toggle buttons (warm golden tones)
+  - Price range inputs (min/max) with dark theme
+  - Sort by dropdown (newest, price, popular)
+  - Reset filters button
+  - Logo-inspired color scheme
+
+- **SignalGrid** (`src/features/signals/components/SignalGrid.tsx`):
+  - Responsive 1-3 column grid layout
+  - Loading skeleton animation (dark theme)
+  - Empty state with friendly message
+  - Error state with message display
+
+- **Pagination** (`src/features/signals/components/Pagination.tsx`):
+  - Previous/Next buttons
+  - Page number buttons with ellipsis
+  - Results summary text
+  - Scroll to top on page change
+  - Golden accent for active page
+
+- **SignalsPage** (`src/features/signals/pages/SignalsPage.tsx`):
+  - Combines all components into marketplace
+  - URL-synced filters (shareable/bookmarkable)
+  - Mobile-friendly collapsible filter panel
+  - Page header with description
+
+- **Barrel exports**:
+  - `src/features/signals/api/index.ts`
+  - `src/features/signals/hooks/index.ts`
+  - `src/features/signals/components/index.ts`
+  - `src/features/signals/pages/index.ts`
+  - `src/features/signals/index.ts`
+
+### Fixed
+- Date parsing errors with `date-fns` (graceful handling of invalid dates)
+- Null/undefined safety in SignalCard for all signal properties
+- Color scheme now uses proper theme colors (dark-600, dark-800, dark-900, fur-cream, fur-light)
+
+### Changed
+- Router now renders `SignalsPage` at `/signals` route
+- PROJECT_CONTEXT.md updated to 55% completion
+- All marketplace components use logo-inspired color palette
+
+---
+
 ## [0.5.0] - 2025-12-03
 
 ### Added

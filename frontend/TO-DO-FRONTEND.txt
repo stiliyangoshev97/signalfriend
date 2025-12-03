@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-03
-Branch: main (v0.5.0)
+Branch: main (v0.6.0)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -132,12 +132,16 @@ PHASE 2: AUTHENTICATION & WALLET ✅ COMPLETE
 PHASE 3: SIGNALS FEATURE (PRIORITY: HIGH)
 ================================================================================
 
-[ ] Signals List Page (/signals)
-    - Fetch signals from API with pagination
-    - Filter by category, risk level, price
-    - Sort by newest, price, popularity
-    - Signal cards with preview info
-    - Loading states and error handling
+[✅] Signals List Page (/signals) - Added in v0.6.0
+    - API functions (fetchSignals, fetchCategories, etc.)
+    - React Query hooks (useSignals, useCategories)
+    - SignalCard component with risk/reward badges
+    - FilterPanel with category, risk, reward, price filters
+    - SignalGrid with loading/empty/error states
+    - Pagination component
+    - SignalsPage combining all components
+    - URL-synced filters (shareable/bookmarkable)
+    - Mobile-responsive collapsible filters
 
 [ ] Signal Detail Page (/signals/:id)
     - Full signal info (public data)
