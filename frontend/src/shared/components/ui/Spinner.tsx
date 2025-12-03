@@ -1,7 +1,58 @@
 /**
  * Spinner Component
- * 
- * Loading spinner with size variants.
+ *
+ * Animated loading spinner with multiple size variants.
+ * Uses SVG-based animation for smooth, performant loading indicators.
+ *
+ * @module shared/components/ui/Spinner
+ *
+ * FEATURES:
+ * - Three size variants: sm, md, lg
+ * - SVG-based for crisp rendering at any resolution
+ * - CSS animation (animate-spin) for smooth rotation
+ * - Brand-colored by default (brand-500)
+ * - Customizable via className prop
+ *
+ * EXPORTS:
+ * - `Spinner` - Individual spinner component
+ * - `PageLoader` - Full-page loading overlay with spinner
+ *
+ * USAGE EXAMPLES:
+ * ```tsx
+ * // Basic spinner (medium size)
+ * <Spinner />
+ *
+ * // Different sizes
+ * <Spinner size="sm" />  // 16x16px - for buttons, inline
+ * <Spinner size="md" />  // 24x24px - default
+ * <Spinner size="lg" />  // 32x32px - for larger areas
+ *
+ * // Custom color
+ * <Spinner className="text-white" />
+ *
+ * // Inside a button
+ * <Button disabled>
+ *   <Spinner size="sm" className="mr-2" />
+ *   Loading...
+ * </Button>
+ *
+ * // Full page loader (for route transitions, initial load)
+ * <PageLoader />
+ * ```
+ *
+ * SIZE REFERENCE:
+ * - sm: 16x16px (h-4 w-4) - Button loading states
+ * - md: 24x24px (h-6 w-6) - General loading states
+ * - lg: 32x32px (h-8 w-8) - Page/section loading
+ *
+ * ACCESSIBILITY:
+ * - Consider adding aria-label="Loading" to containers
+ * - PageLoader covers the entire viewport
+ *
+ * STYLING:
+ * - Uses Tailwind's animate-spin utility
+ * - Inherits text color via currentColor
+ * - Two-tone design (25% opacity track, 75% opacity indicator)
  */
 
 import { cn } from '../../utils/cn';

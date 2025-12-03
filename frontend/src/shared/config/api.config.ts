@@ -1,8 +1,46 @@
 /**
  * API Configuration
+ *
+ * Centralized configuration for backend API communication.
+ * Contains base URL, timeout settings, and all API endpoint definitions.
+ *
+ * @module shared/config/api.config
+ *
+ * ENDPOINT NAMING CONVENTION:
+ * - Plural nouns for collections: SIGNALS, PREDICTORS, CATEGORIES
+ * - _BY_ID suffix for single resource: SIGNAL_BY_ID
+ * - Verb prefix for actions: ADMIN_VERIFY, ADMIN_BLACKLIST
+ *
+ * USAGE EXAMPLES:
+ * ```tsx
+ * import { API_CONFIG } from '@/shared/config';
+ *
+ * // GET request
+ * const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SIGNALS}`);
+ *
+ * // Dynamic endpoints
+ * const signalUrl = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SIGNAL_BY_ID('123')}`;
+ *
+ * // With axios (via apiClient)
+ * import { apiClient } from '@/shared/api';
+ * const { data } = await apiClient.get(API_CONFIG.ENDPOINTS.PREDICTOR_PROFILE);
+ * ```
+ *
+ * ENDPOINT GROUPS:
+ * - Auth        - Authentication (nonce, verify)
+ * - Signals     - Signal CRUD operations
+ * - Predictors  - Predictor profiles
+ * - Categories  - Signal categories
+ * - Reviews     - Signal reviews/ratings
+ * - Admin       - Admin-only operations
+ * - Health      - API health check
+ *
+ * TIMEOUT:
+ * Default timeout is 15 seconds. Increase for large uploads.
  */
 
 import { env } from './env';
+// ...existing code...
 
 export const API_CONFIG = {
   BASE_URL: env.API_BASE_URL,

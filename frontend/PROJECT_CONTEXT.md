@@ -20,6 +20,7 @@
 | Zod Schemas | ✅ 100% | All domain schemas defined |
 | **Auth Flow** | ✅ 100% | SIWE authentication (Connect → Sign In → JWT) |
 | Logo Integration | ✅ 100% | Cute doggy logo in header/footer |
+| **JSDoc Documentation** | ✅ 100% | All files documented with examples |
 | **Landing Page** | ⏳ 0% | Not started |
 | **Signal Marketplace** | ⏳ 0% | Not started |
 | **Predictor Profile** | ⏳ 0% | Not started |
@@ -28,7 +29,7 @@
 | **Predictor Dashboard** | ⏳ 0% | Not started |
 | **Admin Panel** | ⏳ 0% | Not started |
 
-**Overall Progress: ~35%** (Infrastructure + Auth complete, pages pending)
+**Overall Progress: ~40%** (Infrastructure + Auth + Documentation complete, pages pending)
 
 ---
 

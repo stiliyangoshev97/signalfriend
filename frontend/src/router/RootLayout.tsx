@@ -1,8 +1,58 @@
 /**
  * Root Layout
- * 
- * Main layout wrapper with header, footer, and navigation.
- * Wraps all pages with consistent layout.
+ *
+ * Main layout component that wraps all pages with consistent structure.
+ * Provides header, footer, and a Suspense boundary for lazy-loaded routes.
+ *
+ * @module router/RootLayout
+ *
+ * STRUCTURE:
+ * ```
+ * ┌────────────────────────────────────────┐
+ * │               Header                   │ ← Sticky navigation
+ * ├────────────────────────────────────────┤
+ * │                                        │
+ * │               Main                     │ ← flex-1 (fills remaining space)
+ * │            <Outlet />                  │ ← Route content renders here
+ * │                                        │
+ * ├────────────────────────────────────────┤
+ * │               Footer                   │ ← Logo, copyright, social links
+ * └────────────────────────────────────────┘
+ * ```
+ *
+ * FEATURES:
+ * - Full viewport height (min-h-screen) with flexbox layout
+ * - Header sticky at top
+ * - Main content area expands to fill space (flex-1)
+ * - Footer stays at bottom even with little content
+ * - Suspense boundary with loading spinner for lazy routes
+ *
+ * SUSPENSE FALLBACK:
+ * While lazy-loaded route components are loading, displays
+ * a centered Spinner component. This prevents blank screens
+ * during code-split chunk loading.
+ *
+ * USAGE:
+ * Used as the root element in the router configuration:
+ * ```tsx
+ * createBrowserRouter([
+ *   {
+ *     path: '/',
+ *     element: <RootLayout />,
+ *     children: [
+ *       { index: true, element: <HomePage /> },
+ *       // ... other routes
+ *     ],
+ *   },
+ * ]);
+ * ```
+ *
+ * FOOTER CONTENT:
+ * - Logo and app name
+ * - Copyright notice (auto-updating year)
+ * - Social links (Discord, Twitter, GitHub)
+ *
+ * @see https://reactrouter.com/en/main/components/outlet
  */
 
 import { Outlet } from 'react-router-dom';

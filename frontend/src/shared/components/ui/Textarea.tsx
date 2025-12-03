@@ -1,7 +1,66 @@
 /**
  * Textarea Component
- * 
- * Styled textarea for dark theme with label and error support.
+ *
+ * A styled multi-line text input component designed for the dark theme.
+ * Built with accessibility in mind and seamless React Hook Form integration.
+ *
+ * @module shared/components/ui/Textarea
+ *
+ * FEATURES:
+ * - Dark theme styling with brand accent colors
+ * - Automatic label-input association via generated IDs
+ * - Error state with red border and error message display
+ * - Helper text support for additional context
+ * - Disabled state styling
+ * - Forwarded ref for React Hook Form integration
+ * - Configurable rows (defaults to 4)
+ * - Non-resizable by default (resize-none)
+ *
+ * USAGE EXAMPLES:
+ * ```tsx
+ * // Basic usage
+ * <Textarea placeholder="Enter description..." />
+ *
+ * // With label and helper text
+ * <Textarea
+ *   label="Signal Description"
+ *   helperText="Describe your trading signal in detail"
+ *   placeholder="Enter your analysis..."
+ * />
+ *
+ * // With error state
+ * <Textarea
+ *   label="Description"
+ *   error="Description must be at least 50 characters"
+ * />
+ *
+ * // With React Hook Form
+ * <Textarea
+ *   label="Content"
+ *   {...register('content', { required: 'Content is required' })}
+ *   error={errors.content?.message}
+ * />
+ *
+ * // Custom rows
+ * <Textarea
+ *   label="Long Description"
+ *   rows={8}
+ *   placeholder="Write a detailed analysis..."
+ * />
+ * ```
+ *
+ * ACCESSIBILITY:
+ * - Label automatically associated with textarea via htmlFor/id
+ * - Error messages linked to textarea for screen readers
+ * - Visual focus indicators (ring)
+ * - Disabled state is visually distinct
+ *
+ * STYLING:
+ * - Uses Tailwind CSS for styling
+ * - Integrates with project's dark theme (dark-* colors)
+ * - Brand accent color on focus (brand-500)
+ * - Error state uses error color palette
+ * - Accepts className prop for custom styling
  */
 
 import { forwardRef, type TextareaHTMLAttributes } from 'react';

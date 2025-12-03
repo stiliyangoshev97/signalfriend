@@ -1,8 +1,46 @@
 /**
  * API Response Schemas
- * 
- * Zod schemas for API responses.
- * Types are inferred from schemas - single source of truth.
+ *
+ * Zod schemas for API response structures.
+ * These wrap domain data with standard success/error formats.
+ *
+ * @module shared/schemas/api.schemas
+ *
+ * RESPONSE FORMAT:
+ * All API endpoints return a consistent structure:
+ *
+ * Success:
+ * ```json
+ * { "success": true, "data": { ... } }
+ * ```
+ *
+ * Error:
+ * ```json
+ * { "success": false, "error": "Error message", "message": "Details" }
+ * ```
+ *
+ * Paginated:
+ * ```json
+ * {
+ *   "success": true,
+ *   "data": [...],
+ *   "pagination": { "page": 1, "limit": 10, "total": 100, "totalPages": 10 }
+ * }
+ * ```
+ *
+ * USAGE:
+ * ```tsx
+ * import { apiResponseSchema, signalSchema } from '@/shared/schemas';
+ *
+ * const responseSchema = apiResponseSchema(signalSchema);
+ * const result = responseSchema.safeParse(apiResponse);
+ * ```
+ *
+ * EXPORTS:
+ * - apiResponseSchema       - Generic success wrapper factory
+ * - apiErrorResponseSchema  - Error response format
+ * - paginationSchema        - Pagination metadata
+ * - paginatedResponseSchema - Paginated success wrapper factory
  */
 
 import { z } from 'zod';

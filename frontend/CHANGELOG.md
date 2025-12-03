@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] - 2025-12-03
+
+### Added
+
+#### Comprehensive JSDoc Documentation
+- **UI Components** - All components documented with:
+  - Module description and feature list
+  - Usage examples with code snippets
+  - Props reference and variants
+  - Accessibility notes
+  - Styling information
+- **Auth Feature** - Complete documentation for:
+  - `useAuth` hook with authentication flow diagram
+  - `authApi` functions with response format
+  - `AuthButton` with state transition diagram
+  - `authStore` with selector patterns
+- **Providers** - Each provider documented with:
+  - Configuration details
+  - Nesting requirements
+  - Usage examples
+- **Config Files** - Documentation for:
+  - Environment variables and setup
+  - API endpoints and naming conventions
+  - Wagmi/RainbowKit configuration
+  - Contract addresses per chain
+- **Hooks & Utils** - Documented with:
+  - Use cases and examples
+  - Return values
+  - Security notes where applicable
+- **Types & Schemas** - Explained:
+  - Zod schema architecture
+  - Type inference patterns
+  - Usage with forms and API calls
+
+### Changed
+- PROJECT_CONTEXT.md updated to 40% completion
+- All barrel exports now include comprehensive module documentation
+
+---
+
 ## [0.2.0] - 2025-12-03
 
 ### Added

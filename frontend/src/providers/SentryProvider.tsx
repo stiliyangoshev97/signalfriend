@@ -1,8 +1,65 @@
 /**
  * Sentry Error Tracking Provider
- * 
- * Initializes Sentry for error tracking in production.
- * Provides error boundary for React errors.
+ *
+ * Initializes Sentry for error tracking and monitoring in production.
+ * Provides a React error boundary to catch and report component errors.
+ *
+ * @module providers/SentryProvider
+ *
+ * INITIALIZATION:
+ * Sentry only initializes when:
+ * - Running in production (env.IS_PROD)
+ * - VITE_SENTRY_DSN is configured
+ *
+ * FEATURES:
+ * - Automatic error capture and reporting
+ * - Performance monitoring (10% sample rate)
+ * - Session replay on errors
+ * - React error boundary with fallback UI
+ * - Sensitive data filtering (no Authorization headers)
+ *
+ * FILTERED ERRORS:
+ * The following common/noisy errors are ignored:
+ * - Browser extension errors (top.GLOBALS)
+ * - Network errors (Failed to fetch)
+ * - User wallet rejections (User rejected, User denied)
+ *
+ * USAGE:
+ * ```tsx
+ * // In App.tsx - wrap at the outermost level
+ * import { SentryProvider } from '@/providers';
+ *
+ * function App() {
+ *   return (
+ *     <SentryProvider>
+ *       <QueryProvider>
+ *         <Web3Provider>
+ *           <RouterProvider router={router} />
+ *         </Web3Provider>
+ *       </QueryProvider>
+ *     </SentryProvider>
+ *   );
+ * }
+ * ```
+ *
+ * ERROR BOUNDARY:
+ * When a React error occurs, users see a friendly error page with:
+ * - Clear error message
+ * - "Try Again" button to refresh
+ * - Option to go back to home page
+ *
+ * CONFIGURATION:
+ * Set VITE_SENTRY_DSN in your .env file to enable:
+ * ```
+ * VITE_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
+ * ```
+ *
+ * PRIVACY:
+ * - Authorization headers are stripped from error reports
+ * - Session replay respects user privacy settings
+ * - No PII is collected by default
+ *
+ * @see https://docs.sentry.io/platforms/javascript/guides/react/
  */
 
 import { useEffect, type ReactNode } from 'react';

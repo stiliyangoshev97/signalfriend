@@ -1,8 +1,77 @@
 /**
- * Modal Component
+ * ===== MODAL COMPONENT =====
  * 
- * Accessible modal/dialog with dark theme styling.
- * Uses portal to render at document root.
+ * Accessible modal/dialog component with dark theme styling.
+ * Uses React Portal to render at document root (avoids z-index issues).
+ * 
+ * Used in: Confirmation dialogs, forms, signal details, purchase flow
+ * 
+ * FEATURES:
+ * - 4 size options (sm, md, lg, xl)
+ * - Accessible with proper ARIA attributes
+ * - Keyboard support (Escape to close)
+ * - Click outside to close (backdrop click)
+ * - Body scroll lock when open
+ * - Animated entrance (fade + slide)
+ * - Optional title and description
+ * - ModalFooter sub-component for action buttons
+ * 
+ * SIZES:
+ * - sm: max-w-sm (small dialogs, confirmations)
+ * - md: max-w-md (default, most common)
+ * - lg: max-w-lg (forms, detailed content)
+ * - xl: max-w-xl (large content, complex forms)
+ * 
+ * USAGE EXAMPLES:
+ * ```tsx
+ * // Basic modal with title
+ * const [isOpen, setIsOpen] = useState(false);
+ * 
+ * <Modal
+ *   isOpen={isOpen}
+ *   onClose={() => setIsOpen(false)}
+ *   title="Confirm Purchase"
+ * >
+ *   <p>Are you sure you want to buy this signal?</p>
+ *   <ModalFooter>
+ *     <Button variant="ghost" onClick={() => setIsOpen(false)}>
+ *       Cancel
+ *     </Button>
+ *     <Button onClick={handlePurchase}>Confirm</Button>
+ *   </ModalFooter>
+ * </Modal>
+ * 
+ * // Modal with title and description
+ * <Modal
+ *   isOpen={isOpen}
+ *   onClose={handleClose}
+ *   title="Create Signal"
+ *   description="Fill in the details for your trading signal"
+ *   size="lg"
+ * >
+ *   <form>...</form>
+ * </Modal>
+ * 
+ * // Small confirmation dialog
+ * <Modal isOpen={showDelete} onClose={cancelDelete} size="sm">
+ *   <p>Delete this signal?</p>
+ *   <ModalFooter>
+ *     <Button variant="danger" onClick={confirmDelete}>Delete</Button>
+ *   </ModalFooter>
+ * </Modal>
+ * ```
+ * 
+ * ACCESSIBILITY:
+ * - role="dialog" and aria-modal="true" for screen readers
+ * - aria-labelledby links title to dialog
+ * - Escape key closes modal
+ * - Focus trap (TODO: implement for full accessibility)
+ * - Body scroll locked when modal is open
+ * 
+ * WHY USE PORTAL?
+ * - Renders modal at document.body level
+ * - Avoids z-index stacking context issues
+ * - Modal is always on top regardless of parent positioning
  */
 
 import { useEffect, type ReactNode } from 'react';
@@ -10,14 +79,21 @@ import { createPortal } from 'react-dom';
 import { cn } from '../../utils/cn';
 
 interface ModalProps {
+  /** Whether the modal is visible */
   isOpen: boolean;
+  /** Callback when modal should close */
   onClose: () => void;
+  /** Modal title (displayed in header) */
   title?: string;
+  /** Description text below title */
   description?: string;
+  /** Modal width (sm, md, lg, xl) */
   size?: 'sm' | 'md' | 'lg' | 'xl';
+  /** Modal content */
   children: ReactNode;
 }
 
+/** Size-specific max-width classes */
 const sizes = {
   sm: 'max-w-sm',
   md: 'max-w-md',
@@ -25,6 +101,16 @@ const sizes = {
   xl: 'max-w-xl',
 };
 
+/**
+ * Modal Component
+ * 
+ * @param isOpen - Controls modal visibility
+ * @param onClose - Called when user clicks backdrop, X button, or presses Escape
+ * @param title - Optional header title
+ * @param description - Optional description below title
+ * @param size - Modal width (sm, md, lg, xl)
+ * @param children - Modal content
+ */
 export function Modal({
   isOpen,
   onClose,
@@ -33,7 +119,7 @@ export function Modal({
   size = 'md',
   children,
 }: ModalProps) {
-  // Handle escape key
+  // Handle escape key and body scroll lock
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -41,6 +127,7 @@ export function Modal({
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
+      // Prevent body scroll when modal is open
       document.body.style.overflow = 'hidden';
     }
 
@@ -50,18 +137,20 @@ export function Modal({
     };
   }, [isOpen, onClose]);
 
+  // Don't render if not open
   if (!isOpen) return null;
 
+  // Render via portal to document.body
   return createPortal(
     <div className="fixed inset-0 z-50">
-      {/* Backdrop */}
+      {/* Backdrop - dark overlay, click to close */}
       <div
         className="fixed inset-0 bg-dark-950/80 backdrop-blur-sm animate-fade-in"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Modal container */}
+      {/* Modal container - centered */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <div
           className={cn(
@@ -73,7 +162,7 @@ export function Modal({
           aria-modal="true"
           aria-labelledby={title ? 'modal-title' : undefined}
         >
-          {/* Header */}
+          {/* Header (optional) */}
           {(title || description) && (
             <div className="px-6 pt-6 pb-4 border-b border-dark-700">
               {title && (
@@ -93,7 +182,7 @@ export function Modal({
           {/* Content */}
           <div className="px-6 py-4">{children}</div>
 
-          {/* Close button */}
+          {/* Close button (X) - top right */}
           <button
             onClick={onClose}
             className={cn(
@@ -124,7 +213,18 @@ export function Modal({
   );
 }
 
-// Modal footer for actions
+/**
+ * ModalFooter - Container for action buttons
+ * 
+ * Positioned at the bottom with a top border separator.
+ * Buttons are right-aligned with consistent gap spacing.
+ * 
+ * @example
+ * <ModalFooter>
+ *   <Button variant="ghost" onClick={onClose}>Cancel</Button>
+ *   <Button onClick={onConfirm}>Confirm</Button>
+ * </ModalFooter>
+ */
 export function ModalFooter({
   className,
   children,

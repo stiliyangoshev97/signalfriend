@@ -1,13 +1,82 @@
 /**
  * AuthButton Component
- * 
- * Smart button that handles the full authentication flow:
- * - Shows RainbowKit ConnectButton when not connected
- * - Shows "Sign In" button after wallet connection (pre-auth)
- * - Shows user info when authenticated
+ *
+ * Smart authentication button that handles the complete auth lifecycle.
+ * Displays different UI states based on wallet connection and authentication status.
+ *
+ * @module features/auth/components/AuthButton
+ *
+ * STATES:
+ * 1. NOT CONNECTED   → Shows RainbowKit ConnectButton
+ * 2. CONNECTED       → Shows "Sign In" button + address + wallet options
+ * 3. AUTHENTICATED   → Shows chain selector + account button + "Sign Out"
+ *
+ * FEATURES:
+ * - Seamless RainbowKit integration
+ * - Three-state authentication flow
+ * - Error display for failed authentication
+ * - Chain switching support
+ * - Responsive design (adapts to screen size)
+ * - Loading state during signing
+ *
+ * USAGE EXAMPLES:
+ * ```tsx
+ * // In header/navigation
+ * import { AuthButton } from '@/features/auth';
+ *
+ * function Header() {
+ *   return (
+ *     <header>
+ *       <Logo />
+ *       <nav>...</nav>
+ *       <AuthButton />
+ *     </header>
+ *   );
+ * }
+ * ```
+ *
+ * STATE TRANSITIONS:
+ * ```
+ * [Not Connected] ---(Connect Wallet)---> [Connected/Not Auth]
+ *                                                |
+ *                                          (Sign In)
+ *                                                |
+ *                                                v
+ *                                         [Authenticated]
+ *                                                |
+ *                                          (Sign Out)
+ *                                                |
+ *                                                v
+ *                                         [Not Connected]
+ * ```
+ *
+ * UI BREAKDOWN:
+ *
+ * State 1: Not Connected
+ * ┌─────────────────────────────┐
+ * │  [Connect Wallet]           │  ← RainbowKit button
+ * └─────────────────────────────┘
+ *
+ * State 2: Connected, Not Authenticated
+ * ┌─────────────────────────────────────────────────┐
+ * │  (error)  0x1234...5678  [Sign In]  [⋮]        │
+ * └─────────────────────────────────────────────────┘
+ *
+ * State 3: Authenticated
+ * ┌─────────────────────────────────────────────────┐
+ * │  [🔗]  [0x1234...5678]  [Sign Out]             │
+ * │  chain  account button   logout button         │
+ * └─────────────────────────────────────────────────┘
+ *
+ * DEPENDENCIES:
+ * - @rainbow-me/rainbowkit - Wallet connection UI
+ * - useAuth hook - Authentication logic
+ * - Button component - Styled buttons
+ * - formatAddress utility - Address shortening
  */
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+// ...existing code...
 import { useAuth } from '../api';
 import { Button } from '@/shared/components/ui';
 import { formatAddress } from '@/shared/utils';

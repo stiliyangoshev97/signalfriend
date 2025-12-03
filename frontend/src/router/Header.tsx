@@ -1,7 +1,49 @@
 /**
  * Header Component
- * 
- * Main navigation header with wallet connection and authentication.
+ *
+ * Main navigation header with logo, nav links, and authentication controls.
+ * Sticky positioned at the top of the viewport with backdrop blur.
+ *
+ * @module router/Header
+ *
+ * LAYOUT:
+ * ```
+ * ┌─────────────────────────────────────────────────────────────┐
+ * │  [Logo] SignalFriend    Signals  Predictors  ...   [Auth]  │
+ * └─────────────────────────────────────────────────────────────┘
+ * ```
+ *
+ * RESPONSIVE BEHAVIOR:
+ * - Desktop (md+): Full horizontal nav with all links
+ * - Mobile (<md): Nav links hidden (TODO: hamburger menu)
+ *
+ * NAVIGATION LINKS:
+ * Public (always visible):
+ * - Signals - Browse marketplace
+ * - Predictors - View all predictors
+ *
+ * Authenticated (when signed in):
+ * - My Signals - User's purchased signals
+ * - Dashboard - Predictor dashboard
+ *
+ * ACTIVE STATE:
+ * Active nav links are highlighted with:
+ * - brand-200 text color
+ * - brand-200/15 background
+ *
+ * STYLING:
+ * - Sticky top-0 with z-40 for proper layering
+ * - Semi-transparent background (bg-dark-800/95)
+ * - Backdrop blur for frosted glass effect
+ * - Border bottom for visual separation
+ * - Container with responsive padding
+ *
+ * DEPENDENCIES:
+ * - AuthButton - Handles wallet connection and SIWE auth
+ * - useAccount (wagmi) - Wallet connection state
+ * - useAuthStore - SIWE authentication state
+ *
+ * @see AuthButton for authentication flow details
  */
 
 import { Link, NavLink } from 'react-router-dom';
