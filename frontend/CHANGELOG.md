@@ -7,6 +7,99 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.0] - 2025-12-03
+
+### Added
+
+#### Signal Detail Page
+Complete detail page for viewing individual signals with purchase flow preparation.
+
+- **SignalDetailPage** (`src/features/signals/pages/SignalDetailPage.tsx`):
+  - Full signal information display with responsive layout
+  - Breadcrumb navigation (Marketplace → Category → Signal)
+  - Risk level and potential reward badges (color-coded with icons)
+  - Signal metadata: created date, expiry, buyers count, signal ID
+  - Error state with "Signal Not Found" message
+  - Loading state with skeleton
+
+- **SignalDetailSkeleton** (`src/features/signals/components/SignalDetailSkeleton.tsx`):
+  - Animated placeholder matching detail page layout
+  - Shows skeleton for header, details, content, and sidebar
+
+- **PredictorInfoCard** (`src/features/signals/components/PredictorInfoCard.tsx`):
+  - Predictor avatar with initials fallback
+  - Display name with verification badge
+  - Stats: total sales, average rating (5-star), total reviews
+  - Bio preview (if available)
+  - Link to predictor profile page
+
+- **PurchaseCard** (`src/features/signals/components/PurchaseCard.tsx`):
+  - Large price display in USDT
+  - Dynamic button states based on auth status:
+    - Not connected: "Connect Wallet to Purchase"
+    - Not signed in: "Sign In to Purchase"
+    - Ready: "Purchase Signal"
+    - Owned: "View Full Content"
+    - Expired: "Signal Expired"
+  - Purchase benefits list (instant access, NFT receipt, secure)
+  - Context-aware helper messages
+
+- **SignalContent** (`src/features/signals/components/SignalContent.tsx`):
+  - Locked state for non-owners:
+    - Lock icon with "Content Locked" message
+    - Price to unlock badge
+    - Teaser cards showing what's included
+  - Unlocked state for owners:
+    - Full signal content display
+    - Analysis & reasoning section
+    - "Unlocked" badge indicator
+
+- **Share Card**:
+  - Copy link button
+  - Twitter share button
+
+- **Router Update**:
+  - `/signals/:contentId` now renders `SignalDetailPage`
+
+### Changed
+- Updated components barrel export to include detail page components
+- Updated pages barrel export to include SignalDetailPage
+
+### Fixed
+
+#### Schema Alignment with Backend
+Fixed frontend type definitions to match actual backend API response fields.
+
+- **Signal Schema** (`src/shared/schemas/signal.schemas.ts`):
+  - `title` instead of `name`
+  - `priceUsdt` instead of `priceUSDT`
+  - `predictorAddress` instead of `predictorWallet`
+  - `totalSales` instead of `totalBuyers`
+  - `isActive` instead of `status`/`expiresAt`
+  - `content` instead of `fullContent`
+  - Added `_id`, `predictorId`, `averageRating`, `totalReviews`, `updatedAt`
+
+- **SignalCard Component**:
+  - Updated to use `signal.title`, `signal.priceUsdt`, `signal.predictorAddress`
+  - Uses `signal.isActive` for status badge
+  - Shows `signal.totalSales` instead of `totalBuyers`
+
+- **SignalDetailPage**:
+  - Updated all field references to match backend
+  - Removed expiry-based logic (backend uses `isActive`)
+  - Fixed predictor wallet address reference
+
+- **API Sort Mapping** (`src/features/signals/api/signals.api.ts`):
+  - `priceUsdt` (lowercase) for price sorting
+  - `totalSales` for popularity sorting
+
+- **Backend Seed Script** (`backend/src/scripts/seedTestSignal.ts`):
+  - Changed test contentId to valid UUID v4 format
+  - Old: `00000000-0000-0000-0000-000000000001` (invalid)
+  - New: `a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c4d5` (valid UUID v4)
+
+---
+
 ## [0.6.0] - 2025-12-03
 
 ### Added

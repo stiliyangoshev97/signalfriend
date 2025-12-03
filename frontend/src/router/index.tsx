@@ -56,7 +56,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import RootLayout from './RootLayout';
 import { ProtectedRoute, AdminRoute, PredictorRoute } from './guards';
 import { HomePage } from '@/features/home';
-import { SignalsPage } from '@/features/signals';
+import { SignalsPage, SignalDetailPage } from '@/features/signals';
 
 // Lazy load pages for code splitting (example for future pages)
 // import { lazy } from 'react';
@@ -88,7 +88,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'signals/:contentId',
-        element: <PlaceholderPage title="Signal Details" />,
+        element: <SignalDetailPage />,
       },
       {
         path: 'predictors',

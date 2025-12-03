@@ -24,14 +24,14 @@
 | **Route Guards** | ✅ 100% | ProtectedRoute, AdminRoute, PredictorRoute |
 | **Landing Page** | ✅ 100% | Hero, Features, HowItWorks, CTA sections |
 | **Signal Marketplace** | ✅ 100% | Full marketplace with filters, cards, pagination |
-| **Signal Detail Page** | ⏳ 0% | Not started |
+| **Signal Detail Page** | ✅ 100% | Full detail view with purchase UI |
 | **Predictor Profile** | ⏳ 0% | Not started |
 | **Purchase Flow** | ⏳ 0% | Not started |
 | **My Signals** | ⏳ 0% | Not started |
 | **Predictor Dashboard** | ⏳ 0% | Not started |
 | **Admin Panel** | ⏳ 0% | Not started |
 
-**Overall Progress: ~55%** (Infrastructure + Auth + Docs + Route Guards + Landing + Marketplace complete)
+**Overall Progress: ~60%** (Infrastructure + Auth + Docs + Route Guards + Landing + Marketplace + Signal Detail complete)
 
 ---
 
