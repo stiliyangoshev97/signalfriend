@@ -48,11 +48,12 @@
 import { useAccount } from 'wagmi';
 
 // Admin addresses (MultiSig wallet holders)
-// These should match ADMIN_ADDRESSES in the backend
+// These must match ADMIN_ADDRESSES in the backend .env
+// Signers from the deployed MultiSig Safe on BSC Testnet
 const ADMIN_ADDRESSES = [
-  '0x0000000000000000000000000000000000000001', // Placeholder - replace with real addresses
-  '0x0000000000000000000000000000000000000002',
-  '0x0000000000000000000000000000000000000003',
+  '0x4Cca77ba15B0D85d7B733E0838a429E7bEF42DD2', // Signer 1
+  '0xC119B9152afcC5f40C019aABd78A312d37C63926', // Signer 2
+  '0x6499fe8016cE2C2d3a21d08c3016345Edf3467F1', // Signer 3
 ].map((addr) => addr.toLowerCase());
 
 export function useIsAdmin(): boolean {

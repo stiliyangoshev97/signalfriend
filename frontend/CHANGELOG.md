@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.0] - 2025-12-03
+
+### Added
+
+#### Landing Page Implementation
+Complete marketing landing page with logo-inspired theme (warm greens, golden tones).
+
+- **HeroSection** (`src/features/home/components/HeroSection.tsx`):
+  - Main tagline: "Trusted Signals. Verified Predictors. Your Edge in Crypto."
+  - Value proposition description
+  - Dual CTA buttons (Browse Signals / Become a Predictor)
+  - Trust indicators (USDT, BNB Chain, Smart Contract security)
+  - Cute doggy mascot logo integration
+
+- **FeaturesSection** (`src/features/home/components/FeaturesSection.tsx`):
+  - 6-card responsive grid layout
+  - Key features: Verified Predictors, Auto Refunds, NFT Receipts, Multi-Category, Transparent Reviews, Secure Payments
+  - Emoji icons with themed styling
+
+- **HowItWorksSection** (`src/features/home/components/HowItWorksSection.tsx`):
+  - Tab-based UI switching between Buyer and Predictor flows
+  - Buyer journey: 5 numbered steps with icons
+  - Predictor journey: 4 numbered steps with icons
+  - Clean vertical timeline design
+
+- **CTASection** (`src/features/home/components/CTASection.tsx`):
+  - Final conversion-focused CTA
+  - Platform statistics preview (signals, predictors, earnings)
+  - Dual action buttons
+
+- **HomePage** (`src/features/home/pages/HomePage.tsx`):
+  - Combines all sections into cohesive landing page
+  - Comprehensive JSDoc documentation
+
+- **Barrel exports**:
+  - `src/features/home/components/index.ts`
+  - `src/features/home/pages/index.ts`
+  - `src/features/home/index.ts`
+
+### Changed
+- Router now renders `HomePage` at root path instead of placeholder
+- PROJECT_CONTEXT.md updated to 50% completion
+
+---
+
 ## [0.4.0] - 2025-12-03
 
 ### Added
