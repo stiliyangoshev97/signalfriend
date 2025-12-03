@@ -1,6 +1,9 @@
 /**
  * Script to create a test signal for webhook testing.
- * Run with: npx tsx src/scripts/seedTestSignal.ts
+ * 
+ * Usage:
+ *   npx tsx src/scripts/seedTestSignal.ts --dry-run  # Preview changes
+ *   npx tsx src/scripts/seedTestSignal.ts            # Apply changes
  */
 import mongoose from "mongoose";
 import { Signal } from "../features/signals/signal.model.js";
@@ -10,10 +13,17 @@ import { uuidToBytes32 } from "../shared/utils/contentId.js";
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/signalfriend";
 
+// Parse CLI arguments
+const isDryRun = process.argv.includes("--dry-run");
+
 async function seedTestSignal() {
   try {
     await mongoose.connect(MONGODB_URI);
     console.log("✅ Connected to MongoDB");
+    
+    if (isDryRun) {
+      console.log("🔍 DRY RUN MODE - No changes will be made\n");
+    }
 
     // Find the predictor created by webhook
     const predictor = await Predictor.findOne({ 
@@ -49,28 +59,37 @@ async function seedTestSignal() {
       process.exit(0);
     }
 
-    const signal = new Signal({
-      contentId,
-      predictorId: predictor._id,
-      predictorAddress: predictor.walletAddress,
-      title: "Test Signal for Webhook",
-      description: "This is a test signal created for webhook testing",
-      content: "SECRET: This is the protected content revealed after purchase!",
-      categoryId: category._id,
-      priceUsdt: 5,
-      totalSales: 0,
-      averageRating: 0,
-      totalReviews: 0,
-      isActive: true,
-    });
+    if (isDryRun) {
+      console.log("\n📋 Would create test signal:");
+      console.log("   contentId (UUID):", contentId);
+      console.log("   contentIdentifier (bytes32):", uuidToBytes32(contentId));
+      console.log("   title: Test Signal for Webhook");
+      console.log("   price: 5 USDT");
+      console.log("\n✅ Dry run complete! Run without --dry-run to create the signal.");
+    } else {
+      const signal = new Signal({
+        contentId,
+        predictorId: predictor._id,
+        predictorAddress: predictor.walletAddress,
+        title: "Test Signal for Webhook",
+        description: "This is a test signal created for webhook testing",
+        content: "SECRET: This is the protected content revealed after purchase!",
+        categoryId: category._id,
+        priceUsdt: 5,
+        totalSales: 0,
+        averageRating: 0,
+        totalReviews: 0,
+        isActive: true,
+      });
 
-    await signal.save();
+      await signal.save();
 
-    console.log("\n✅ Test signal created!");
-    console.log("   contentId (UUID):", contentId);
-    console.log("   contentIdentifier (bytes32):", uuidToBytes32(contentId));
-    console.log("\n📝 Use this bytes32 value when calling buySignalNFT on-chain:");
-    console.log("   ", uuidToBytes32(contentId));
+      console.log("\n✅ Test signal created!");
+      console.log("   contentId (UUID):", contentId);
+      console.log("   contentIdentifier (bytes32):", uuidToBytes32(contentId));
+      console.log("\n📝 Use this bytes32 value when calling buySignalNFT on-chain:");
+      console.log("   ", uuidToBytes32(contentId));
+    }
 
   } catch (error) {
     console.error("Error:", error);

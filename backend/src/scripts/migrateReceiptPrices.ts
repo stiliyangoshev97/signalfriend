@@ -9,7 +9,9 @@
  * 
  * Fix: Divide existing priceUsdt by 10^12 (difference between 18 and 6 decimals)
  * 
- * Usage: npx ts-node src/scripts/migrateReceiptPrices.ts
+ * Usage:
+ *   npx tsx src/scripts/migrateReceiptPrices.ts --dry-run  # Preview changes
+ *   npx tsx src/scripts/migrateReceiptPrices.ts            # Apply changes
  */
 
 import mongoose from "mongoose";
@@ -18,7 +20,13 @@ import { Receipt } from "../features/receipts/receipt.model.js";
 
 const DECIMAL_CORRECTION_FACTOR = 1e12; // 10^18 / 10^6 = 10^12
 
+// Parse CLI arguments
+const isDryRun = process.argv.includes("--dry-run");
+
 async function migrateReceiptPrices(): Promise<void> {
+  if (isDryRun) {
+    console.log("🔍 DRY RUN MODE - No changes will be made\n");
+  }
   console.log("🔧 Starting receipt price migration...\n");
 
   // Connect to MongoDB
@@ -41,19 +49,27 @@ async function migrateReceiptPrices(): Promise<void> {
       const newPrice = oldPrice / DECIMAL_CORRECTION_FACTOR;
 
       console.log(`  Token #${receipt.tokenId}:`);
-      console.log(`    Old price: ${oldPrice} USDT (incorrect)`);
-      console.log(`    New price: ${newPrice} USDT (corrected)`);
+      console.log(`    Current price: ${oldPrice} USDT (incorrect)`);
+      console.log(`    ${isDryRun ? "Would become" : "New price"}: ${newPrice} USDT (corrected)`);
 
-      // Update the receipt
-      await Receipt.updateOne(
-        { _id: receipt._id },
-        { $set: { priceUsdt: newPrice } }
-      );
-
-      console.log(`    ✅ Updated\n`);
+      if (!isDryRun) {
+        // Update the receipt
+        await Receipt.updateOne(
+          { _id: receipt._id },
+          { $set: { priceUsdt: newPrice } }
+        );
+        console.log(`    ✅ Updated\n`);
+      } else {
+        console.log(`    ⏭️  Skipped (dry run)\n`);
+      }
     }
 
-    console.log(`\n🎉 Migration complete! Fixed ${receipts.length} receipt(s).`);
+    if (isDryRun) {
+      console.log(`\n✅ Dry run complete! ${receipts.length} receipt(s) would be updated.`);
+      console.log(`   Run without --dry-run to apply changes.`);
+    } else {
+      console.log(`\n🎉 Migration complete! Fixed ${receipts.length} receipt(s).`);
+    }
 
   } finally {
     await mongoose.disconnect();
