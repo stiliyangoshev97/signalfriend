@@ -17,6 +17,7 @@ import {
   listSignals,
   getSignalByContentId,
   getSignalContent,
+  getContentIdentifier,
   createSignal,
   updateSignal,
   deactivateSignal,
@@ -61,6 +62,17 @@ router.get(
   "/:contentId",
   validate(getSignalByContentIdSchema, "params"),
   getSignalByContentId
+);
+
+/**
+ * GET /api/signals/:contentId/content-identifier
+ * Get the bytes32 content identifier for on-chain purchases.
+ * Public endpoint - needed before wallet can call buySignalNFT.
+ */
+router.get(
+  "/:contentId/content-identifier",
+  validate(getSignalByContentIdSchema, "params"),
+  getContentIdentifier
 );
 
 // ============================================================================

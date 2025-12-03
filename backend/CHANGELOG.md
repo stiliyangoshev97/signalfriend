@@ -15,6 +15,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.0] - 2024-12-03 📡 CONTENT IDENTIFIER ENDPOINT
+
+### Added
+- **Content Identifier Endpoint**
+  - `GET /api/signals/:contentId/content-identifier` - Public endpoint
+  - Returns bytes32 hex string needed for on-chain `buySignalNFT` call
+  - Converts UUID contentId to bytes32 format
+  - Added `getContentIdentifier` controller function
+  - Added route in `signal.routes.ts`
+
+### Technical Details
+- Frontend needs bytes32 to call `SignalFriendMarket.buySignalNFT()`
+- UUID format: `a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c4d5`
+- Bytes32 format: `0xa1b2c3d4e5f64a7b8c9de0f1a2b3c4d5000000000000000000000000`
+
+---
+
 ## [0.13.0] - 2024-12-02 🚧 MAINTENANCE MODE & TESTING
 
 ### Added

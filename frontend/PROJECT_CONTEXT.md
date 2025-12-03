@@ -25,13 +25,13 @@
 | **Landing Page** | ✅ 100% | Hero, Features, HowItWorks, CTA sections |
 | **Signal Marketplace** | ✅ 100% | Full marketplace with filters, cards, pagination |
 | **Signal Detail Page** | ✅ 100% | Full detail view with purchase UI |
+| **Purchase Flow** | ✅ 100% | Multi-step modal with USDT approval + purchase |
 | **Predictor Profile** | ⏳ 0% | Not started |
-| **Purchase Flow** | ⏳ 0% | Not started |
 | **My Signals** | ⏳ 0% | Not started |
 | **Predictor Dashboard** | ⏳ 0% | Not started |
 | **Admin Panel** | ⏳ 0% | Not started |
 
-**Overall Progress: ~60%** (Infrastructure + Auth + Docs + Route Guards + Landing + Marketplace + Signal Detail complete)
+**Overall Progress: ~70%** (Infrastructure + Auth + Docs + Route Guards + Landing + Marketplace + Signal Detail + Purchase Flow complete)
 
 ---
 
@@ -116,8 +116,46 @@ accent: {
 - `GET /api/auth/nonce?address=` - Get SIWE nonce
 - `POST /api/auth/verify` - Verify SIWE signature
 - `GET /api/signals` - List signals
+- `GET /api/signals/:contentId/content-identifier` - Get bytes32 for purchase
+- `GET /api/receipts/check/:contentId` - Check if user owns signal
 - `GET /api/predictors` - List predictors
 - `GET /api/categories` - List categories
+
+---
+
+## 💳 Purchase Flow Architecture
+
+### Flow Overview
+```
+1. User clicks "Purchase Signal"
+2. Modal opens with multi-step flow
+3. Step 1: Check USDT balance (sufficient?)
+4. Step 2: Check USDT allowance → Approve if needed
+5. Step 3: Call buySignalNFT on SignalFriendMarket
+6. Step 4: Success → Refresh page, unlock content
+```
+
+### Hooks Used
+| Hook | Purpose |
+|------|---------|
+| `useCheckPurchase` | Check if user already owns signal |
+| `useContentIdentifier` | Get bytes32 for on-chain call |
+| `useUSDTBalance` | Read user's USDT balance |
+| `useUSDTAllowance` | Check spending allowance |
+| `useApproveUSDT` | Approve USDT for market contract |
+| `useBuySignal` | Execute buySignalNFT transaction |
+| `usePurchaseFlow` | Combined hook for entire flow |
+
+### Contract ABIs (Minimal)
+Located in `src/shared/config/abis/index.ts`:
+- `SIGNAL_FRIEND_MARKET_ABI` - buySignalNFT, calculateBuyerCost
+- `ERC20_ABI` - approve, allowance, balanceOf
+
+### Cost Calculation
+- **Signal Price**: Set by predictor (min $5 USDT)
+- **Access Fee**: $0.5 USDT flat fee
+- **Total Cost**: Signal Price + Access Fee
+- **USDT Decimals**: 18 (BNB Chain)
 
 ---
 
