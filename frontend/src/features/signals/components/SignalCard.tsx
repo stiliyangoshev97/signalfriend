@@ -81,13 +81,13 @@ function capitalize(str: string | undefined | null): string {
  * SignalCard component
  * 
  * Displays a signal's key information:
- * - Name and description
+ * - Title and description
  * - Category badge
- * - Risk level and potential reward
+ * - Risk level and potential reward (if available)
  * - Price in USDT
- * - Expiry time
+ * - Active status
  * - Predictor info
- * - Total buyers
+ * - Total sales
  * 
  * @param props - Component props
  * @returns Signal card element
@@ -96,12 +96,17 @@ function capitalize(str: string | undefined | null): string {
  * <SignalCard signal={signalData} />
  */
 export function SignalCard({ signal }: SignalCardProps): React.ReactElement {
-  const { isExpired, text: expiryText } = getExpiryInfo(signal.expiresAt);
+  // Use createdAt for display since backend doesn't have expiresAt yet
+  const createdDate = signal.createdAt;
+  const { text: createdText } = getExpiryInfo(createdDate);
   
-  // Safe defaults for risk and reward
+  // Safe defaults for risk and reward (optional fields)
   const riskLevel = signal.riskLevel || 'medium';
   const potentialReward = signal.potentialReward || 'normal';
-  const predictorWallet = signal.predictorWallet || '';
+  // Backend uses predictorAddress, not predictorWallet
+  const predictorAddress = signal.predictorAddress || '';
+  // Backend uses isActive for status
+  const isActive = signal.isActive !== false;
 
   return (
     <Link
@@ -115,9 +120,9 @@ export function SignalCard({ signal }: SignalCardProps): React.ReactElement {
             {signal.category.name}
           </span>
         )}
-        {isExpired ? (
+        {!isActive ? (
           <span className="text-xs font-medium text-accent-red bg-accent-red/10 px-2 py-1 rounded-full">
-            Expired
+            Inactive
           </span>
         ) : (
           <span className="text-xs font-medium text-success-400 bg-success-400/10 px-2 py-1 rounded-full">
@@ -126,9 +131,9 @@ export function SignalCard({ signal }: SignalCardProps): React.ReactElement {
         )}
       </div>
 
-      {/* Title */}
+      {/* Title - backend uses 'title' not 'name' */}
       <h3 className="text-lg font-semibold text-fur-cream mb-2 line-clamp-2 group-hover:text-fur-light transition-colors">
-        {signal.name || 'Untitled Signal'}
+        {signal.title || 'Untitled Signal'}
       </h3>
 
       {/* Description */}
@@ -157,7 +162,7 @@ export function SignalCard({ signal }: SignalCardProps): React.ReactElement {
             {signal.predictor.displayName?.charAt(0) || 'P'}
           </div>
           <span className="text-sm text-fur-cream/80 truncate">
-            {signal.predictor.displayName || (predictorWallet ? `${predictorWallet.slice(0, 6)}...${predictorWallet.slice(-4)}` : 'Unknown')}
+            {signal.predictor.displayName || (predictorAddress ? `${predictorAddress.slice(0, 6)}...${predictorAddress.slice(-4)}` : 'Unknown')}
           </span>
           {signal.predictor.verificationStatus === 'verified' && (
             <svg className="w-4 h-4 text-fur-light" fill="currentColor" viewBox="0 0 20 20">
@@ -169,29 +174,29 @@ export function SignalCard({ signal }: SignalCardProps): React.ReactElement {
             </svg>
           )}
         </div>
-      ) : predictorWallet ? (
+      ) : predictorAddress ? (
         <div className="flex items-center gap-2 mb-4">
           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-dark-400 to-dark-600 flex items-center justify-center text-xs font-bold text-fur-cream">
             P
           </div>
           <span className="text-sm text-fur-cream/80 truncate">
-            {`${predictorWallet.slice(0, 6)}...${predictorWallet.slice(-4)}`}
+            {`${predictorAddress.slice(0, 6)}...${predictorAddress.slice(-4)}`}
           </span>
         </div>
       ) : null}
 
-      {/* Footer: Price, Expiry, Buyers */}
+      {/* Footer: Price, Created, Sales */}
       <div className="flex items-center justify-between pt-4 border-t border-dark-600">
         <div>
           <span className="text-2xl font-bold text-fur-light">
-            ${signal.priceUSDT ?? 0}
+            ${signal.priceUsdt ?? 0}
           </span>
           <span className="text-sm text-fur-cream/50 ml-1">USDT</span>
         </div>
         <div className="text-right">
-          <p className="text-xs text-fur-cream/50">{expiryText}</p>
+          <p className="text-xs text-fur-cream/50">{createdText}</p>
           <p className="text-xs text-fur-cream/60">
-            {signal.totalBuyers ?? 0} {(signal.totalBuyers ?? 0) === 1 ? 'buyer' : 'buyers'}
+            {signal.totalSales ?? 0} {(signal.totalSales ?? 0) === 1 ? 'sale' : 'sales'}
           </p>
         </div>
       </div>

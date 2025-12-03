@@ -4,3 +4,4 @@
  */
 
 export { SignalsPage } from './SignalsPage';
+export { SignalDetailPage } from './SignalDetailPage';

@@ -21,25 +21,40 @@ export const signalStatusSchema = z.enum(['active', 'expired', 'deactivated']);
 // Signal Schema
 // ===========================================
 
+/**
+ * Signal schema matching backend API response.
+ * 
+ * Note: Backend field names differ from original design:
+ * - title (not name)
+ * - priceUsdt (not priceUSDT)
+ * - predictorAddress (not predictorWallet)
+ * - totalSales (not totalBuyers)
+ */
 export const signalSchema = z.object({
+  _id: z.string().optional(),
   contentId: z.string(),
-  predictorWallet: z.string(),
-  name: z.string(),
+  predictorId: z.union([z.string(), z.object({ _id: z.string() }).passthrough()]).optional(),
+  predictorAddress: z.string(),
+  title: z.string(),
   description: z.string(),
-  categoryId: z.string(),
-  riskLevel: riskLevelSchema,
-  potentialReward: potentialRewardSchema,
-  priceUSDT: z.number(),
-  expiresAt: z.string(),
-  status: signalStatusSchema,
-  totalBuyers: z.number(),
+  categoryId: z.union([z.string(), z.object({ _id: z.string() }).passthrough()]).optional(),
+  priceUsdt: z.number(),
+  totalSales: z.number().default(0),
+  averageRating: z.number().default(0),
+  totalReviews: z.number().default(0),
+  isActive: z.boolean().default(true),
   createdAt: z.string(),
+  updatedAt: z.string().optional(),
   // Protected content (only after purchase)
-  fullContent: z.string().optional(),
-  reasoning: z.string().optional(),
-  // Populated fields
+  content: z.string().optional(),
+  // Populated fields from backend
   category: categorySchema.optional(),
   predictor: predictorSchema.optional(),
+  // Legacy fields for compatibility (optional)
+  riskLevel: riskLevelSchema.optional(),
+  potentialReward: potentialRewardSchema.optional(),
+  expiresAt: z.string().optional(),
+  status: signalStatusSchema.optional(),
 });
 
 // ===========================================

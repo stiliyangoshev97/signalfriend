@@ -36,8 +36,9 @@ async function seedTestSignal() {
 
     console.log("✅ Using category:", category.name);
 
-    // Create test signal with a known contentId
-    const contentId = "00000000-0000-0000-0000-000000000001";
+    // Create test signal with a valid UUID v4 contentId
+    // Format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx where y is 8, 9, a, or b
+    const contentId = "a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c4d5";
     
     // Check if already exists
     const existing = await Signal.findOne({ contentId });

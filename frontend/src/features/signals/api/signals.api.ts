@@ -27,11 +27,12 @@ function buildQueryString(filters: SignalFilters): string {
   if (filters.status) params.append('status', filters.status);
   if (filters.sortBy) {
     // Map frontend sort values to backend params
+    // Backend uses priceUsdt (lowercase) and totalSales (not totalBuyers)
     const sortMapping: Record<string, { sortBy: string; sortOrder: string }> = {
       'newest': { sortBy: 'createdAt', sortOrder: 'desc' },
-      'price-low': { sortBy: 'priceUSDT', sortOrder: 'asc' },
-      'price-high': { sortBy: 'priceUSDT', sortOrder: 'desc' },
-      'popular': { sortBy: 'totalBuyers', sortOrder: 'desc' },
+      'price-low': { sortBy: 'priceUsdt', sortOrder: 'asc' },
+      'price-high': { sortBy: 'priceUsdt', sortOrder: 'desc' },
+      'popular': { sortBy: 'totalSales', sortOrder: 'desc' },
     };
     const sort = sortMapping[filters.sortBy];
     if (sort) {
