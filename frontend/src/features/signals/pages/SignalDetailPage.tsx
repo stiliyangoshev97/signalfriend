@@ -205,8 +205,9 @@ export function SignalDetailPage(): React.ReactElement {
     );
   }
 
-  // Get status info - backend uses isActive, not expiresAt
-  const isActive = signal.isActive !== false;
+  // Get status info - check both isActive and expiry
+  const expiresAtDate = parseDate(signal.expiresAt);
+  const isExpired = expiresAtDate ? expiresAtDate < new Date() : false;
   const riskLevel = signal.riskLevel || 'medium';
   const potentialReward = signal.potentialReward || 'normal';
 
@@ -249,7 +250,11 @@ export function SignalDetailPage(): React.ReactElement {
                   {signal.category.name}
                 </span>
               )}
-              {!isActive ? (
+              {isExpired ? (
+                <span className="text-xs font-medium text-accent-red bg-accent-red/10 px-3 py-1 rounded-full">
+                  Expired
+                </span>
+              ) : !signal.isActive ? (
                 <span className="text-xs font-medium text-accent-red bg-accent-red/10 px-3 py-1 rounded-full">
                   Inactive
                 </span>
@@ -311,14 +316,14 @@ export function SignalDetailPage(): React.ReactElement {
               {/* Status */}
               <div>
                 <p className="text-xs text-fur-cream/50 uppercase tracking-wide mb-1">
-                  Status
+                  {isExpired ? 'Expired' : 'Expires'}
                 </p>
                 <p
                   className={`text-sm font-medium ${
-                    !isActive ? 'text-accent-red' : 'text-success-400'
+                    isExpired ? 'text-accent-red' : 'text-fur-cream'
                   }`}
                 >
-                  {isActive ? 'Active' : 'Inactive'}
+                  {expiresAtDate ? format(expiresAtDate, 'MMM d, yyyy') : 'Unknown'}
                 </p>
               </div>
 
@@ -358,7 +363,7 @@ export function SignalDetailPage(): React.ReactElement {
           {/* Purchase Card */}
           <PurchaseCard
             priceUSDT={signal.priceUsdt}
-            isExpired={!isActive}
+            isExpired={isExpired}
             isOwned={isOwned}
             contentId={signal.contentId}
             onPurchase={() => setShowPurchaseModal(true)}

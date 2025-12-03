@@ -38,14 +38,15 @@ const rewardColors: Record<string, string> = {
  * Safely parse and format expiry date
  * @param expiresAt - Date string from API
  * @returns Object with isExpired flag and display text
+ * 
+ * @note Currently unused - will be used when backend adds expiresAt field.
+ *       To use: const { isExpired, text } = getExpiryInfo(signal.expiresAt);
  */
-function getExpiryInfo(expiresAt: string): { isExpired: boolean; text: string } {
+export function getExpiryInfo(expiresAt: string): { isExpired: boolean; text: string } {
   try {
-    // Try parsing as ISO string first, then as regular Date
     const date = parseISO(expiresAt);
     
     if (!isValid(date)) {
-      // Fallback: try direct Date constructor
       const fallbackDate = new Date(expiresAt);
       if (!isValid(fallbackDate)) {
         return { isExpired: false, text: 'Unknown expiry' };
@@ -96,17 +97,16 @@ function capitalize(str: string | undefined | null): string {
  * <SignalCard signal={signalData} />
  */
 export function SignalCard({ signal }: SignalCardProps): React.ReactElement {
-  // Use createdAt for display since backend doesn't have expiresAt yet
-  const createdDate = signal.createdAt;
-  const { text: createdText } = getExpiryInfo(createdDate);
+  // Get expiry info for display
+  const { isExpired, text: expiryText } = getExpiryInfo(signal.expiresAt);
   
   // Safe defaults for risk and reward (optional fields)
   const riskLevel = signal.riskLevel || 'medium';
   const potentialReward = signal.potentialReward || 'normal';
   // Backend uses predictorAddress, not predictorWallet
   const predictorAddress = signal.predictorAddress || '';
-  // Backend uses isActive for status
-  const isActive = signal.isActive !== false;
+  // Backend uses isActive for status - also check expiry
+  const isActive = signal.isActive !== false && !isExpired;
 
   return (
     <Link
@@ -185,7 +185,7 @@ export function SignalCard({ signal }: SignalCardProps): React.ReactElement {
         </div>
       ) : null}
 
-      {/* Footer: Price, Created, Sales */}
+      {/* Footer: Price, Expiry, Sales */}
       <div className="flex items-center justify-between pt-4 border-t border-dark-600">
         <div>
           <span className="text-2xl font-bold text-fur-light">
@@ -194,7 +194,7 @@ export function SignalCard({ signal }: SignalCardProps): React.ReactElement {
           <span className="text-sm text-fur-cream/50 ml-1">USDT</span>
         </div>
         <div className="text-right">
-          <p className="text-xs text-fur-cream/50">{createdText}</p>
+          <p className={`text-xs ${isExpired ? 'text-accent-red' : 'text-fur-cream/50'}`}>{expiryText}</p>
           <p className="text-xs text-fur-cream/60">
             {signal.totalSales ?? 0} {(signal.totalSales ?? 0) === 1 ? 'sale' : 'sales'}
           </p>

@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.1] - 2025-12-03
+
+### Fixed
+
+#### Signal Expiry System - Complete Implementation
+Fixed critical bug where all signals incorrectly showed as "Expired" and implemented full signal expiration system.
+
+- **Root Cause**: `SignalCard` was using `createdAt` (always in the past) with expiry logic
+- **Solution**: Implemented proper `expiresAt` field throughout the stack with 1-30 day expiry requirement
+
+### Changed
+
+- **SignalCard** (`src/features/signals/components/SignalCard.tsx`):
+  - Now uses real `expiresAt` field from API
+  - Shows "Expires in X days" for active signals
+  - Shows "Expired" with red styling for expired signals
+  - Exported `getExpiryInfo()` utility function for reuse
+  - Removed unused `getCreatedText()` function
+
+- **SignalDetailPage** (`src/features/signals/pages/SignalDetailPage.tsx`):
+  - Added expiry date display in Signal Details section
+  - Shows "Expired" badge for expired signals (separate from "Inactive")
+  - Properly passes `isExpired` to PurchaseCard
+
+- **Signal Schema** (`src/shared/schemas/signal.schemas.ts`):
+  - Made `expiresAt` required in signal schema
+  - Updated `createSignalSchema` to use `expiryDays` (1-30 days)
+  - Added `content` field for signal creation
+  - Aligned with backend field requirements
+
+### Notes
+
+- Expired signals are hidden from marketplace but accessible via direct URL
+- Buyers who purchased before expiry can still view content
+- Backend blocks purchase attempts on expired/inactive signals
+
+---
+
 ## [0.8.0] - 2025-12-03
 
 ### Added

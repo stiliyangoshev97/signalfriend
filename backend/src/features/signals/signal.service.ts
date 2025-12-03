@@ -46,6 +46,7 @@ export interface PublicSignal {
   description: string;
   categoryId: mongoose.Types.ObjectId;
   priceUsdt: number;
+  expiresAt: Date;
   totalSales: number;
   averageRating: number;
   totalReviews: number;
@@ -89,9 +90,10 @@ export class SignalService {
     // Build filter
     const filter: Record<string, unknown> = {};
 
-    // Filter active signals
+    // Filter active signals (also excludes expired signals)
     if (active) {
       filter.isActive = true;
+      filter.expiresAt = { $gt: new Date() }; // Only non-expired signals
     }
 
     // Filter by category
@@ -226,9 +228,12 @@ export class SignalService {
    * Gets the bytes32 contentIdentifier for use in on-chain purchases.
    * The frontend needs this value to call buySignalNFT on the smart contract.
    *
+   * Only returns contentIdentifier for active, non-expired signals.
+   *
    * @param contentId - The signal's UUID contentId
    * @returns Promise resolving to the bytes32 hex string
    * @throws {ApiError} 404 if signal not found
+   * @throws {ApiError} 400 if signal is inactive or expired
    *
    * @example
    * // UUID: "550e8400-e29b-41d4-a716-446655440000"
@@ -241,6 +246,16 @@ export class SignalService {
     const signal = await Signal.findOne({ contentId });
     if (!signal) {
       throw ApiError.notFound(`Signal with contentId '${contentId}' not found`);
+    }
+
+    // Block purchase of inactive signals
+    if (!signal.isActive) {
+      throw ApiError.badRequest("This signal has been deactivated and cannot be purchased");
+    }
+
+    // Block purchase of expired signals
+    if (signal.expiresAt && signal.expiresAt < new Date()) {
+      throw ApiError.badRequest("This signal has expired and cannot be purchased");
     }
 
     // Convert UUID to bytes32 for on-chain use
@@ -290,6 +305,10 @@ export class SignalService {
     // Generate unique contentId
     const contentId = randomUUID();
 
+    // Calculate expiry date from expiryDays
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + data.expiryDays);
+
     // Create signal
     const signal = new Signal({
       contentId,
@@ -300,6 +319,7 @@ export class SignalService {
       content: data.content,
       categoryId: data.categoryId,
       priceUsdt: data.priceUsdt,
+      expiresAt,
       totalSales: 0,
       averageRating: 0,
       totalReviews: 0,

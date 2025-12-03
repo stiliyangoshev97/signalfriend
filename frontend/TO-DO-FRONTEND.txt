@@ -286,14 +286,13 @@ PHASE 7: POLISH & OPTIMIZATION (PRIORITY: LOW)
 KNOWN ISSUES / BUGS
 ================================================================================
 
-[ ] BUG: SignalCard shows "Expired" for all signals
+[✅] FIXED: SignalCard shows "Expired" for all signals (v0.8.1)
     - Location: src/features/signals/components/SignalCard.tsx
-    - Problem: getExpiryInfo() is called with createdAt date, which is always in the past
-    - Result: All signals show "Expired" even when they are active
-    - Fix Options:
-      A) Show "Created X days ago" instead of expiry logic
-      B) Add expiresAt field to Signal model in backend and use that
-    - Priority: Medium (UI issue, purchase still works)
+    - Problem: getExpiryInfo() was called with createdAt date (always in the past)
+    - Solution: Added expiresAt field to backend Signal model
+    - Predictors now set expiryDays (1-30) when creating signals
+    - SignalCard and SignalDetailPage now use real expiresAt
+    - Migration script added for existing signals
 
 ================================================================================
 TECHNICAL DEBT

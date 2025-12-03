@@ -159,6 +159,33 @@ Located in `src/shared/config/abis/index.ts`:
 
 ---
 
+## ⏰ Signal Expiration System
+
+### Overview
+Signals have a mandatory expiration date (1-30 days from creation) to keep the marketplace fresh.
+
+### Rules
+| Scenario | Behavior |
+|----------|----------|
+| **Creation** | Predictor sets `expiryDays` (1-30), backend calculates `expiresAt` |
+| **Marketplace** | Expired signals hidden from listings (`active=true` filter) |
+| **Detail Page** | Shows "Expired" badge, purchase button disabled |
+| **API Block** | `getContentIdentifier` returns 400 for expired/inactive signals |
+| **Buyer Access** | Purchases before expiry retain permanent content access |
+
+### UI Components
+- **SignalCard**: Shows "Expires in X days" or "Expired" with red styling
+- **SignalDetailPage**: Shows expiry date in Signal Details section
+- **PurchaseCard**: Disables purchase for expired signals
+
+### Utility Function
+```tsx
+// In SignalCard.tsx - exported for reuse
+export function getExpiryInfo(expiresAt: string): { isExpired: boolean; text: string }
+```
+
+---
+
 ## ⛓️ Blockchain
 
 ### Supported Chains
