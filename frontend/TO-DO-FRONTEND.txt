@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-03
-Branch: main
+Branch: main (v0.5.0)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -113,6 +113,15 @@ PHASE 2: AUTHENTICATION & WALLET ✅ COMPLETE
     - AdminRoute - requires admin wallet address
     - All guards redirect with state (from path, message)
     - Added /become-predictor route for predictor registration
+
+[✅] Landing Page (Added in v0.5.0)
+    - HeroSection with tagline, value prop, CTAs, trust indicators
+    - FeaturesSection with 6-card grid of key features
+    - HowItWorksSection with tab-based Buyer/Predictor guides
+    - CTASection with stats and final conversion CTA
+    - HomePage composing all sections
+    - Barrel exports for home feature
+    - Router updated to use HomePage at root path
 
 [ ] User Profile Page
     - Display wallet address
