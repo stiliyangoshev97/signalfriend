@@ -18,7 +18,7 @@
 | Auth Store | ✅ 100% | Zustand with persistence |
 | API Client | ✅ 100% | Axios with JWT interceptors |
 | Zod Schemas | ✅ 100% | All domain schemas defined |
-| useAuth Hook | ✅ 100% | SIWE authentication flow |
+| **Auth Flow** | ✅ 100% | SIWE authentication (Connect → Sign In → JWT) |
 | Logo Integration | ✅ 100% | Cute doggy logo in header/footer |
 | **Landing Page** | ⏳ 0% | Not started |
 | **Signal Marketplace** | ⏳ 0% | Not started |
@@ -28,7 +28,7 @@
 | **Predictor Dashboard** | ⏳ 0% | Not started |
 | **Admin Panel** | ⏳ 0% | Not started |
 
-**Overall Progress: ~30%** (Infrastructure complete, pages pending)
+**Overall Progress: ~35%** (Infrastructure + Auth complete, pages pending)
 
 ---
 

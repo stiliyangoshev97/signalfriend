@@ -1,16 +1,18 @@
 /**
  * Header Component
  * 
- * Main navigation header with wallet connection.
+ * Main navigation header with wallet connection and authentication.
  */
 
 import { Link, NavLink } from 'react-router-dom';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
+import { useAuthStore } from '@/features/auth/store';
+import { AuthButton } from '@/features/auth';
 import { cn } from '../shared/utils/cn';
 
 export function Header() {
   const { isConnected } = useAccount();
+  const { isAuthenticated } = useAuthStore();
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
@@ -43,7 +45,8 @@ export function Header() {
               Predictors
             </NavLink>
             
-            {isConnected && (
+            {/* Show user-specific nav items when authenticated */}
+            {isConnected && isAuthenticated && (
               <>
                 <NavLink to="/my-signals" className={navLinkClass}>
                   My Signals
@@ -55,16 +58,9 @@ export function Header() {
             )}
           </nav>
 
-          {/* Wallet Connection */}
+          {/* Auth Button (Connect Wallet / Sign In / User Menu) */}
           <div className="flex items-center gap-4">
-            <ConnectButton
-              chainStatus="icon"
-              showBalance={false}
-              accountStatus={{
-                smallScreen: 'avatar',
-                largeScreen: 'full',
-              }}
-            />
+            <AuthButton />
           </div>
         </div>
       </div>

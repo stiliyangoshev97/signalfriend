@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] - 2025-12-03
+
+### Added
+
+#### Complete SIWE Authentication Flow
+- **AuthButton Component** - Smart button handling full auth lifecycle:
+  - Shows RainbowKit ConnectButton when wallet not connected
+  - Shows "Sign In" button after wallet connection (pre-auth)
+  - Shows user address with "Sign Out" after authentication
+  - Error display for failed authentication attempts
+- **SIWE Message Format** - Proper Sign-In with Ethereum message:
+  - Domain, URI, nonce, chainId included
+  - Statement: "Sign in to SignalFriend - Web3 Signal Marketplace"
+- **Auth API Integration** - Proper response unwrapping for backend API
+- **Header Updates** - Nav links (My Signals, Dashboard) only show when authenticated
+
+### Changed
+- `useAuth` hook now uses React Query mutation for better async state handling
+- Header uses `AuthButton` instead of raw RainbowKit `ConnectButton`
+- Auth API functions properly unwrap `{ success, data }` response format
+
+### Fixed
+- CORS configuration updated in backend `.env` (port 5173 for Vite)
+
+---
+
 ## [0.1.0] - 2025-12-03
 
 ### Added
