@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-03
-Branch: feature/frontend-scaffold
+Branch: main
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -70,26 +70,30 @@ PHASE 1: CORE SCAFFOLD ✅ COMPLETE
     - TO-DO-FRONTEND.txt (this file)
 
 ================================================================================
-PHASE 2: AUTHENTICATION & WALLET (PRIORITY: HIGH)
+PHASE 2: AUTHENTICATION & WALLET ✅ COMPLETE
 ================================================================================
 
 [✅] useAuth Hook Implementation
     - Login with wallet signature (SIWE)
     - Logout and disconnect wallet
     - Loading and error states
-    - Predictor role detection
+    - React Query mutation for async handling
 
-[ ] Wallet Authentication Flow
-    - Connect wallet button in header
+[✅] Wallet Authentication Flow
+    - Connect wallet button in header (RainbowKit)
+    - AuthButton component (Connect → Sign In → Sign Out flow)
     - Sign message for authentication (SIWE pattern)
-    - Auto-reconnect on page refresh
-    - Handle chain switching (BSC only)
+    - Auto-reconnect on page refresh (wagmi persistence)
 
-[ ] Auth API Integration
-    - GET /auth/nonce - get signing nonce
-    - POST /auth/verify - verify signature & get JWT
+[✅] Auth API Integration
+    - GET /api/auth/nonce - get signing nonce
+    - POST /api/auth/verify - verify signature & get JWT
     - Token storage in Zustand + localStorage
-    - Auto-refresh token logic
+    - Proper API response unwrapping
+
+[✅] Header Navigation
+    - Shows "My Signals" and "Dashboard" only when authenticated
+    - AuthButton shows correct state (Connect/Sign In/Sign Out)
 
 [ ] Protected Routes
     - Create ProtectedRoute component

@@ -19,10 +19,10 @@ import * as authApi from './authApi';
  * 3. Verify signature and get JWT
  */
 export function useAuth() {
-  const { address, chainId } = useAccount();
+  const { address, chainId, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
-  const { setAuth, logout: clearAuth, isAuthenticated, predictor } = useAuthStore();
+  const { setAuth, logout: clearAuth, isAuthenticated, predictor, token } = useAuthStore();
 
   const authMutation = useMutation({
     mutationFn: async () => {
@@ -37,7 +37,7 @@ export function useAuth() {
       const message = new SiweMessage({
         domain: window.location.host,
         address,
-        statement: 'Sign in to SignalFriend',
+        statement: 'Sign in to SignalFriend - Web3 Signal Marketplace',
         uri: window.location.origin,
         version: '1',
         chainId,
@@ -71,14 +71,19 @@ export function useAuth() {
   };
 
   return {
+    // State
+    address,
+    isConnected,
+    isAuthenticated,
+    isLoading: authMutation.isPending,
+    error: authMutation.error,
+    predictor,
+    token,
+    
+    // Actions
     login: authMutation.mutate,
     loginAsync: authMutation.mutateAsync,
     logout,
-    isLoading: authMutation.isPending,
-    error: authMutation.error,
-    isAuthenticated,
-    predictor,
-    address,
   };
 }
 
