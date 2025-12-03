@@ -15,6 +15,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.15.0] - 2024-12-03 ⏰ SIGNAL EXPIRY FEATURE
+
+### Added
+- **Signal Expiry System**
+  - `expiresAt: Date` field added to Signal model (required)
+  - `expiryDays` parameter in create signal schema (1-30 days max)
+  - Signals automatically filtered from marketplace when expired
+  - Compound index on `{ isActive: 1, expiresAt: 1 }` for efficient queries
+
+- **Migration Script** (`src/scripts/migrateSignalExpiry.ts`):
+  - Adds `expiresAt` to existing signals (30 days from creation date)
+  - Run with: `npx tsx src/scripts/migrateSignalExpiry.ts`
+
+- **Purchase Protection**:
+  - `getContentIdentifier` blocks expired signals (400 error)
+  - `getContentIdentifier` blocks inactive/deactivated signals (400 error)
+  - Prevents on-chain purchase attempts for unavailable signals
+
+### Changed
+- **Signal Model** (`src/features/signals/signal.model.ts`):
+  - Added required `expiresAt: Date` field
+  - Added index on `expiresAt` for query performance
+
+- **Signal Schema** (`src/features/signals/signal.schemas.ts`):
+  - Added `expiryDays` to `createSignalSchema` (integer, 1-30)
+  
+- **Signal Service** (`src/features/signals/signal.service.ts`):
+  - `create()` calculates `expiresAt` from `expiryDays`
+  - `getAll()` filters out expired signals when `active=true`
+  - `getContentIdentifier()` validates signal is active and not expired
+  - Added `expiresAt` to `PublicSignal` interface
+
+### Business Rules
+- Predictors must set expiry when creating signals (1-30 days)
+- Predictors can deactivate signals at any time (`isActive: false`)
+- Expired/deactivated signals are hidden from marketplace (not deleted)
+- Buyers cannot purchase expired or deactivated signals
+- Buyers who purchased before expiry/deactivation retain access
+- Keeps marketplace fresh with time-sensitive content
+
+---
+
 ## [0.14.0] - 2024-12-03 📡 CONTENT IDENTIFIER ENDPOINT
 
 ### Added

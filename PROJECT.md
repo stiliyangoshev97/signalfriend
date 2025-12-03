@@ -101,8 +101,20 @@ This model stores all necessary content, metadata, and security fields for a sig
 | `riskLevel`              | Predictor-defined risk level (Low, Medium, High).                   | **High**(Filters/Browsing)                | `"Medium"`                                                                    |
 | `potentialReward`        | Predictor-defined reward potential (Normal, Medium, High).          | **High**(Filters/Browsing)                | `"High"`                                                                      |
 | `expiryDateTime`         | Time-to-live index for signal removal.                              | **High** (Displaying countdown)           | `2025-12-10T15:00:00Z`                                                        |
+| `isActive`               | Predictor can deactivate signals manually.                          | **Internal** (Filtering)                  | `true` or `false`                                                             |
 | `reasoning`              | Predictor's detailed justification for the trade.                   | **Low (Hidden)**(Unlocked after purchase) | "The 4-hour RSI shows a bullish divergence from the daily chart..."           |
 | `fullContent`            | The *exact* trade parameters (entry, exit, stop-loss, duration).    | **Low (Hidden)**(Unlocked after purchase) | "Entry: $63,500. TP: $68,100. SL: $62,900."                                   |
+
+#### Signal Expiration Rules (Implemented v0.15.0)
+
+| Rule | Description |
+| ---- | ----------- |
+| **Creation** | Predictors must set `expiryDays` (1-30) when creating a signal. Backend calculates `expiresAt` date. |
+| **Marketplace** | Expired signals (`expiresAt < now`) are automatically hidden from marketplace listings. |
+| **Deactivation** | Predictors can manually deactivate signals at any time by setting `isActive: false`. |
+| **Purchase Block** | Expired and deactivated signals cannot be purchased (API returns 400 error). |
+| **Buyer Access** | Buyers who purchased before expiry/deactivation retain permanent access to signal content. |
+| **Direct URL** | Expired/deactivated signals can still be viewed via direct URL (shows "Expired" badge). |
 
 ### 3. 🧾 Receipt Model (The Unique Link)
 

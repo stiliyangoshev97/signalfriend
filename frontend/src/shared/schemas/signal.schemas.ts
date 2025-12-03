@@ -39,6 +39,7 @@ export const signalSchema = z.object({
   description: z.string(),
   categoryId: z.union([z.string(), z.object({ _id: z.string() }).passthrough()]).optional(),
   priceUsdt: z.number(),
+  expiresAt: z.string(), // Required - when signal expires (max 30 days from creation)
   totalSales: z.number().default(0),
   averageRating: z.number().default(0),
   totalReviews: z.number().default(0),
@@ -53,7 +54,6 @@ export const signalSchema = z.object({
   // Legacy fields for compatibility (optional)
   riskLevel: riskLevelSchema.optional(),
   potentialReward: potentialRewardSchema.optional(),
-  expiresAt: z.string().optional(),
   status: signalStatusSchema.optional(),
 });
 
@@ -62,32 +62,28 @@ export const signalSchema = z.object({
 // ===========================================
 
 export const createSignalSchema = z.object({
-  name: z
+  title: z
     .string()
     .min(10, 'Title must be at least 10 characters')
     .max(100, 'Title must be at most 100 characters'),
   description: z
     .string()
     .min(20, 'Description must be at least 20 characters')
-    .max(500, 'Description must be at most 500 characters'),
+    .max(1000, 'Description must be at most 1000 characters'),
+  content: z
+    .string()
+    .min(50, 'Signal content must be at least 50 characters')
+    .max(10000, 'Signal content must be at most 10000 characters'),
   categoryId: z.string().min(1, 'Please select a category'),
-  riskLevel: riskLevelSchema,
-  potentialReward: potentialRewardSchema,
-  priceUSDT: z
+  priceUsdt: z
     .number()
     .min(5, 'Minimum price is $5 USDT')
-    .max(10000, 'Maximum price is $10,000 USDT'),
-  expiresAt: z.string().refine((val) => new Date(val) > new Date(), {
-    message: 'Expiry date must be in the future',
-  }),
-  fullContent: z
-    .string()
-    .min(50, 'Full content must be at least 50 characters')
-    .max(5000, 'Full content must be at most 5000 characters'),
-  reasoning: z
-    .string()
-    .min(50, 'Reasoning must be at least 50 characters')
-    .max(5000, 'Reasoning must be at most 5000 characters'),
+    .max(100000, 'Maximum price is $100,000 USDT'),
+  expiryDays: z
+    .number()
+    .int('Expiry must be a whole number of days')
+    .min(1, 'Signal must be active for at least 1 day')
+    .max(30, 'Signal can be active for at most 30 days'),
 });
 
 // ===========================================

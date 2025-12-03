@@ -31,6 +31,8 @@ export interface ISignal extends Document {
   categoryId: mongoose.Types.ObjectId;
   /** Price in USDT */
   priceUsdt: number;
+  /** When the signal expires and can no longer be purchased */
+  expiresAt: Date;
   /** Total number of purchases */
   totalSales: number;
   /** Average rating from reviews (0-5) */
@@ -94,6 +96,11 @@ const signalSchema = new Schema<ISignal>(
       required: true,
       min: 0,
     },
+    expiresAt: {
+      type: Date,
+      required: true,
+      index: true,
+    },
     totalSales: {
       type: Number,
       default: 0,
@@ -123,5 +130,6 @@ const signalSchema = new Schema<ISignal>(
 signalSchema.index({ isActive: 1, categoryId: 1 });
 signalSchema.index({ isActive: 1, predictorId: 1 });
 signalSchema.index({ isActive: 1, createdAt: -1 });
+signalSchema.index({ isActive: 1, expiresAt: 1 }); // For filtering non-expired signals
 
 export const Signal = mongoose.model<ISignal>("Signal", signalSchema);
