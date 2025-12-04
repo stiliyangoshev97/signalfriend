@@ -151,11 +151,15 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
   description: string,
   content: string,            // Protected signal content
   categoryId: ObjectId,
+  mainGroup: string,          // Denormalized from Category for efficient filtering
   priceUsdt: number,
+  expiresAt: Date,            // When signal can no longer be purchased
   totalSales: number,
   averageRating: number,
   totalReviews: number,
   isActive: boolean,
+  riskLevel: enum,            // low, medium, high
+  potentialReward: enum,      // normal, medium, high
 }
 ```
 
@@ -202,13 +206,26 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
 ### Category Model
 ```typescript
 {
-  name: string,               // Unique
-  slug: string,               // URL-friendly
+  name: string,               // Subcategory name (unique within mainGroup)
+  slug: string,               // URL-friendly identifier (unique globally)
+  mainGroup: string,          // Main category: "Crypto", "Traditional Finance", "Macro / Other"
   description: string,
   icon: string,
   isActive: boolean,
   sortOrder: number,
 }
+
+// Main Groups (verticals)
+MAIN_GROUPS = {
+  CRYPTO: "Crypto",
+  TRADITIONAL_FINANCE: "Traditional Finance", 
+  MACRO_OTHER: "Macro / Other",
+}
+
+// 19 subcategories across 3 main groups:
+// Crypto (9): Bitcoin, Ethereum, Altcoins, DeFi, NFTs, Layer 1/2, Meme Coins, Futures/Perpetuals, Other
+// Traditional Finance (6): US Stocks - Tech, US Stocks - General, Forex - Majors, Commodities - Metals, Commodities - Energy, Other
+// Macro / Other (4): Economic Data, Geopolitical Events, Sports, Other
 ```
 
 ---

@@ -168,6 +168,91 @@ npx tsx src/scripts/seedTestSignal.ts
 
 ---
 
+## 🔄 Migration Scripts
+
+Migration scripts are used to update database schema or data. All migration scripts support a `--dry-run` flag to preview changes before applying them.
+
+### Category Migration (v0.16.0)
+
+Migrates flat categories to hierarchical mainGroup/subcategory structure.
+
+```bash
+# Step 1: Drop old unique index on category name (required before migration)
+npx tsx src/scripts/dropOldCategoryIndexes.ts
+
+# Step 2: Preview migration changes (DRY RUN - no changes made)
+npx tsx src/scripts/migrateCategories.ts --dry-run
+
+# Step 3: Apply migration (DESTRUCTIVE - backs up nothing, deletes old categories)
+npx tsx src/scripts/migrateCategories.ts
+```
+
+**What it does:**
+- Deletes all existing flat categories (Crypto, Forex, Stocks, etc.)
+- Creates 19 new subcategories across 3 main groups (Crypto, Traditional Finance, Macro / Other)
+- Updates existing signals to point to appropriate new categories
+- Sets `mainGroup` field on all signals
+
+### Sales Count Recalculation
+
+Recalculates `totalSales` for signals and predictors from actual receipt records.
+
+```bash
+# Preview changes (DRY RUN)
+npx tsx src/scripts/recalculateSalesCounts.ts --dry-run
+
+# Apply changes
+npx tsx src/scripts/recalculateSalesCounts.ts
+```
+
+**When to use:** If sales counts are stuck at 0 or out of sync with actual receipts.
+
+### Receipt Price Migration
+
+Adds `priceUsdt` field to receipts that are missing it.
+
+```bash
+# Preview changes (DRY RUN)
+npx tsx src/scripts/migrateReceiptPrices.ts --dry-run
+
+# Apply changes
+npx tsx src/scripts/migrateReceiptPrices.ts
+```
+
+### Risk/Reward Migration
+
+Adds `riskLevel` and `potentialReward` fields to signals created before these fields existed.
+
+```bash
+# Preview changes (DRY RUN)
+npx tsx src/scripts/migrateRiskReward.ts --dry-run
+
+# Apply changes
+npx tsx src/scripts/migrateRiskReward.ts
+```
+
+### Signal Expiry Migration
+
+Adds `expiresAt` field to signals created before expiry feature.
+
+```bash
+# Preview changes (DRY RUN)
+npx tsx src/scripts/migrateSignalExpiry.ts --dry-run
+
+# Apply changes
+npx tsx src/scripts/migrateSignalExpiry.ts
+```
+
+### Seed Missing Predictors
+
+Creates predictor records for wallets that have signals but no predictor profile.
+
+```bash
+npx tsx src/scripts/seedMissingPredictors.ts
+```
+
+---
+
 ## 🧪 Testing
 
 ### Run All Tests

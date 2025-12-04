@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.10.0] - 2025-12-04
+
+### Added
+
+#### Category/Subcategory System
+- **Category Schema** (`src/shared/schemas/category.schemas.ts`):
+  - Added `mainGroup`, `slug`, `icon`, and `sortOrder` fields to match backend structure
+  - Categories now support hierarchical organization
+
+- **Signal Schema** (`src/shared/schemas/signal.schemas.ts`):
+  - Added `mainGroup` field (denormalized from category for efficient filtering)
+
+- **CreateSignalModal** (`src/features/predictors/components/CreateSignalModal.tsx`):
+  - Implemented two-step category selection:
+    1. Select main category group (Crypto, Traditional Finance, Macro / Other)
+    2. Select specific subcategory within that group
+  - Subcategory dropdown is disabled until main group is selected
+  - Selecting a different main group automatically clears the subcategory selection
+
+- **FilterPanel** (`src/features/signals/components/FilterPanel.tsx`):
+  - Implemented two-step category filtering in marketplace:
+    1. Select main category group to filter by vertical
+    2. Optionally select specific subcategory for more granular filtering
+  - Subcategory dropdown appears after selecting main group
+  - "All in [Group]" option to show all signals in a main category
+  - Reset button clears both main group and subcategory selections
+
+- **MySignalCard** (`src/features/predictors/components/MySignalCard.tsx`):
+  - Added category display showing "MainGroup > Subcategory" format
+  - Example: "Crypto > Bitcoin", "Traditional Finance > Forex - Majors"
+  - Category displayed below expiry date, at bottom left of signal card
+  - Removed category badge from header (cleaner design)
+
+- **SignalCard** (`src/features/signals/components/SignalCard.tsx`):
+  - Updated to show full category path "MainGroup > Subcategory" format
+
+- **SignalDetailPage** (`src/features/signals/pages/SignalDetailPage.tsx`):
+  - Updated to display full category path in signal details
+
+### Category Structure
+The new hierarchical category system supports:
+- **Crypto** (9): Bitcoin, Ethereum, Altcoins, DeFi, NFTs, Layer 1/2, Meme Coins, Futures/Perpetuals, Other
+- **Traditional Finance** (6): US Stocks - Tech, US Stocks - General, Forex - Majors, Commodities - Metals, Commodities - Energy, Other  
+- **Macro / Other** (4): Economic Data, Geopolitical Events, Sports, Other
+
+---
+
 ## [0.9.8] - 2025-12-04
 
 ### Fixed

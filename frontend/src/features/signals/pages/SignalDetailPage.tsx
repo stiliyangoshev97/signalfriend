@@ -242,7 +242,7 @@ export function SignalDetailPage(): React.ReactElement {
               to={`/signals?category=${signal.categoryId}`}
               className="text-fur-cream/60 hover:text-fur-light transition-colors"
             >
-              {signal.category.name}
+              {signal.category.mainGroup || signal.mainGroup} &gt; {signal.category.name}
             </Link>
             <ChevronRightIcon />
           </>
@@ -261,7 +261,7 @@ export function SignalDetailPage(): React.ReactElement {
             <div className="flex flex-wrap items-center gap-2 mb-4">
               {signal.category && (
                 <span className="text-xs font-medium text-fur-light bg-fur-light/10 px-3 py-1 rounded-full">
-                  {signal.category.name}
+                  {signal.category.mainGroup || signal.mainGroup} &gt; {signal.category.name}
                 </span>
               )}
               {isExpired ? (

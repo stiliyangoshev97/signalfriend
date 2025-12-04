@@ -29,6 +29,8 @@ export interface ISignal extends Document {
   content: string;
   /** Reference to the signal's category */
   categoryId: mongoose.Types.ObjectId;
+  /** Main category group (denormalized from Category for read performance) */
+  mainGroup: string;
   /** Price in USDT */
   priceUsdt: number;
   /** When the signal expires and can no longer be purchased */
@@ -95,6 +97,11 @@ const signalSchema = new Schema<ISignal>(
       required: true,
       index: true,
     },
+    mainGroup: {
+      type: String,
+      required: false, // Optional for backward compatibility with existing signals
+      index: true,
+    },
     priceUsdt: {
       type: Number,
       required: true,
@@ -144,6 +151,7 @@ const signalSchema = new Schema<ISignal>(
 
 // Compound indexes for common queries
 signalSchema.index({ isActive: 1, categoryId: 1 });
+signalSchema.index({ isActive: 1, mainGroup: 1 }); // New index for mainGroup filtering
 signalSchema.index({ isActive: 1, predictorId: 1 });
 signalSchema.index({ isActive: 1, createdAt: -1 });
 signalSchema.index({ isActive: 1, expiresAt: 1 }); // For filtering non-expired signals

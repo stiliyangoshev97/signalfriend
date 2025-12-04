@@ -15,6 +15,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.16.0] - 2025-12-04 📂 CATEGORY/SUBCATEGORY SYSTEM
+
+### Added
+- **Category Model** (`src/features/categories/category.model.ts`):
+  - Added `mainGroup` field to Category model for hierarchical categorization
+  - Added `MAIN_GROUPS` constant export with: Crypto, Traditional Finance, Macro / Other
+  - Updated `DEFAULT_CATEGORIES` with 19 subcategories across 3 main groups:
+    - **Crypto** (9): Bitcoin, Ethereum, Altcoins, DeFi, NFTs, Layer 1/2, Meme Coins, Futures/Perpetuals, Other
+    - **Traditional Finance** (6): US Stocks - Tech, US Stocks - General, Forex - Majors, Commodities - Metals, Commodities - Energy, Other
+    - **Macro / Other** (4): Economic Data, Geopolitical Events, Sports, Other
+  - Changed `name` from unique to compound unique index with `mainGroup`
+  - Renamed "Sports Betting Models" to "Sports" for legal compliance
+
+- **Signal Model** (`src/features/signals/signal.model.ts`):
+  - Added `mainGroup` field (denormalized from Category for read performance)
+  - Added compound index on `isActive` + `mainGroup` for efficient filtering
+
+- **Signal Service** (`src/features/signals/signal.service.ts`):
+  - Signal creation now stores `mainGroup` from category for efficient filtering
+  - `getByPredictor()` now transforms signals to include `category` object (matching `getAll()` format)
+  - Category populate now includes `mainGroup` field in all endpoints
+
+- **Migration Scripts**:
+  - `src/scripts/migrateCategories.ts` - Migrate categories to new mainGroup structure
+  - `src/scripts/dropOldCategoryIndexes.ts` - Drop old unique index on category name
+
+### Changed
+- **Category Schemas** (`src/features/categories/category.schemas.ts`):
+  - Added `mainGroup` to create and update schemas
+
+### Migration Guide
+```bash
+# Step 1: Drop old unique index on category name
+npx tsx src/scripts/dropOldCategoryIndexes.ts
+
+# Step 2: Preview migration changes
+npx tsx src/scripts/migrateCategories.ts --dry-run
+
+# Step 3: Apply migration
+npx tsx src/scripts/migrateCategories.ts
+```
+
+---
+
 ## [0.15.8] - 2025-12-04 🔧 SALES COUNT MIGRATION SCRIPT
 
 ### Added

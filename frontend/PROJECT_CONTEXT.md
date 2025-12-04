@@ -249,7 +249,7 @@ const { data: contentData } = useSignalContent(contentId, isOwned);
 | `useMyReceipts` | Fetch user's purchase receipts with pagination/sorting |
 
 ### Card Information Displayed
-- Signal title and category
+- Signal title and category (format: "MainGroup > Subcategory", e.g., "Crypto > Bitcoin")
 - "Owned" badge
 - Purchase date
 - Price paid
@@ -257,6 +257,45 @@ const { data: contentData } = useSignalContent(contentId, isOwned);
 - Predictor address (truncated)
 - "View Signal" button → Signal detail page (unlocked content)
 - "View TX" button → BSCScan transaction
+
+---
+
+## 🏷️ Category System
+
+### Hierarchical Categories
+Categories are organized into 3 main groups with subcategories:
+
+| Main Group | Subcategories |
+|------------|---------------|
+| **Crypto** | Bitcoin, Ethereum, Altcoins, DeFi, NFTs, Layer 1/2, Meme Coins, Futures/Perpetuals, Other |
+| **Traditional Finance** | US Stocks - Tech, US Stocks - General, Forex - Majors, Commodities - Metals, Commodities - Energy, Other |
+| **Macro / Other** | Economic Data, Geopolitical Events, Sports, Other |
+
+### Display Format
+Categories are displayed as `"MainGroup > Subcategory"` throughout the UI:
+- Signal cards: "Crypto > Bitcoin"
+- Filter panel: Two-step selection (main group first, then subcategory)
+- Create signal modal: Two dropdowns for selection
+
+### Data Structure
+```typescript
+// Category
+{
+  _id: string;
+  name: string;        // Subcategory name (e.g., "Bitcoin")
+  mainGroup: string;   // Main group (e.g., "Crypto")
+  slug: string;        // URL-friendly (e.g., "crypto-bitcoin")
+  icon?: string;
+  sortOrder?: number;
+}
+
+// Signal includes denormalized mainGroup for efficient filtering
+{
+  categoryId: string;
+  mainGroup: string;   // Denormalized from category
+  category?: Category; // Populated when fetched
+}
+```
 
 ---
 

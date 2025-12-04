@@ -3,10 +3,11 @@
  * @module features/signals/components/FilterPanel
  * @description
  * Sidebar filter panel for the signal marketplace.
- * Allows filtering by category, risk level, potential reward, and price range.
+ * Allows filtering by category (two-step: mainGroup then subcategory), 
+ * risk level, potential reward, and price range.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { SignalFilters, Category } from '@/shared/types';
 
 /** Props for FilterPanel component */
@@ -51,21 +52,52 @@ export function FilterPanel({
   const [localFilters, setLocalFilters] = useState<SignalFilters>(filters);
   const [minPrice, setMinPrice] = useState<string>(filters.minPrice?.toString() || '');
   const [maxPrice, setMaxPrice] = useState<string>(filters.maxPrice?.toString() || '');
+  const [selectedMainGroup, setSelectedMainGroup] = useState<string>('');
 
   // Group categories by mainGroup
-  const groupedCategories = categories.reduce((acc, cat) => {
-    const group = cat.mainGroup || 'Other';
-    if (!acc[group]) acc[group] = [];
-    acc[group].push(cat);
-    return acc;
-  }, {} as Record<string, Category[]>);
+  const categoryGroups = useMemo(() => {
+    const subcategoriesByGroup: Record<string, Category[]> = {};
+    const mainGroupsSet = new Set<string>();
+    
+    for (const cat of categories) {
+      const group = cat.mainGroup || 'Other';
+      mainGroupsSet.add(group);
+      if (!subcategoriesByGroup[group]) {
+        subcategoriesByGroup[group] = [];
+      }
+      subcategoriesByGroup[group].push(cat);
+    }
+    
+    return {
+      mainGroups: Array.from(mainGroupsSet),
+      subcategoriesByGroup,
+    };
+  }, [categories]);
 
-  // Sync local filters with props
+  // Get subcategories for selected main group
+  const subcategories = selectedMainGroup 
+    ? categoryGroups.subcategoriesByGroup[selectedMainGroup] || []
+    : [];
+
+  // Sync local filters with props (but NOT selectedMainGroup from category changes)
   useEffect(() => {
     setLocalFilters(filters);
     setMinPrice(filters.minPrice?.toString() || '');
     setMaxPrice(filters.maxPrice?.toString() || '');
   }, [filters]);
+
+  // Only sync mainGroup from category on initial load or external filter changes
+  // Don't reset mainGroup when we intentionally clear the category
+  useEffect(() => {
+    if (filters.category) {
+      const selectedCat = categories.find(c => c._id === filters.category);
+      if (selectedCat?.mainGroup && selectedCat.mainGroup !== selectedMainGroup) {
+        setSelectedMainGroup(selectedCat.mainGroup);
+      }
+    }
+    // Note: We intentionally don't reset selectedMainGroup when category is cleared
+    // This allows users to select a mainGroup and then pick a subcategory
+  }, [filters.category, categories]);
 
   const updateFilter = <K extends keyof SignalFilters>(
     key: K,
@@ -95,11 +127,13 @@ export function FilterPanel({
     setLocalFilters(emptyFilters);
     setMinPrice('');
     setMaxPrice('');
+    setSelectedMainGroup(''); // Also reset the main group selection
     onFilterChange(emptyFilters);
   };
 
   const hasActiveFilters =
     localFilters.category ||
+    selectedMainGroup || // Also consider mainGroup as active filter
     localFilters.riskLevel ||
     localFilters.potentialReward ||
     localFilters.minPrice !== undefined ||
@@ -120,29 +154,55 @@ export function FilterPanel({
         )}
       </div>
 
-      {/* Category Filter */}
-      <div>
-        <label className="block text-sm font-medium text-fur-cream/80 mb-2">
-          Category
-        </label>
-        <select
-          value={localFilters.category || ''}
-          onChange={(e) => updateFilter('category', e.target.value || undefined)}
-          className="w-full bg-dark-900 border border-dark-600 rounded-lg px-3 py-2.5 text-fur-cream text-sm focus:outline-none focus:ring-2 focus:ring-fur-light/50 focus:border-fur-light transition-all appearance-none cursor-pointer"
-          disabled={isLoadingCategories}
-          style={{ colorScheme: 'dark' }}
-        >
-          <option value="">All Categories</option>
-          {Object.entries(groupedCategories).map(([group, cats]) => (
-            <optgroup key={group} label={group}>
-              {cats.map((cat) => (
+      {/* Category Filter - Two-step selection */}
+      <div className="space-y-3">
+        {/* Main Group Selection */}
+        <div>
+          <label className="block text-sm font-medium text-fur-cream/80 mb-2">
+            Category Group
+          </label>
+          <select
+            value={selectedMainGroup}
+            onChange={(e) => {
+              const newGroup = e.target.value;
+              setSelectedMainGroup(newGroup);
+              // Clear subcategory when main group changes
+              updateFilter('category', undefined);
+            }}
+            className="w-full bg-dark-900 border border-dark-600 rounded-lg px-3 py-2.5 text-fur-cream text-sm focus:outline-none focus:ring-2 focus:ring-fur-light/50 focus:border-fur-light transition-all appearance-none cursor-pointer"
+            disabled={isLoadingCategories}
+            style={{ colorScheme: 'dark' }}
+          >
+            <option value="">All Categories</option>
+            {categoryGroups.mainGroups.map((group) => (
+              <option key={group} value={group}>
+                {group}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Subcategory Selection (only shown when main group is selected) */}
+        {selectedMainGroup && (
+          <div>
+            <label className="block text-sm font-medium text-fur-cream/80 mb-2">
+              Subcategory
+            </label>
+            <select
+              value={localFilters.category || ''}
+              onChange={(e) => updateFilter('category', e.target.value || undefined)}
+              className="w-full bg-dark-900 border border-dark-600 rounded-lg px-3 py-2.5 text-fur-cream text-sm focus:outline-none focus:ring-2 focus:ring-fur-light/50 focus:border-fur-light transition-all appearance-none cursor-pointer"
+              style={{ colorScheme: 'dark' }}
+            >
+              <option value="">All in {selectedMainGroup}</option>
+              {subcategories.map((cat) => (
                 <option key={cat._id} value={cat._id}>
                   {cat.name}
                 </option>
               ))}
-            </optgroup>
-          ))}
-        </select>
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Risk Level Filter */}

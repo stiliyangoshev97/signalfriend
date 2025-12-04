@@ -3,10 +3,10 @@
  * @module features/predictors/components/CreateSignalModal
  * @description
  * Modal form for predictors to create new signals.
- * Includes validation, category selection, and price input.
+ * Includes validation, two-step category selection, and price input.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Modal, Button, Input, Textarea, Select, Spinner } from '@/shared/components/ui';
@@ -52,12 +52,41 @@ export function CreateSignalModal({
   onSuccess,
 }: CreateSignalModalProps): React.ReactElement {
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [selectedMainGroup, setSelectedMainGroup] = useState<string>('');
   
   // Fetch categories for dropdown
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   
   // Create signal mutation
   const { mutate: createSignal, isPending: isCreating } = useCreateSignal();
+
+  // Group categories by mainGroup
+  const categoryGroups = useMemo(() => {
+    if (!categories) return { mainGroups: [], subcategoriesByGroup: {} };
+    
+    const subcategoriesByGroup: Record<string, typeof categories> = {};
+    const mainGroupsSet = new Set<string>();
+    
+    for (const cat of categories) {
+      if (cat.mainGroup) {
+        mainGroupsSet.add(cat.mainGroup);
+        if (!subcategoriesByGroup[cat.mainGroup]) {
+          subcategoriesByGroup[cat.mainGroup] = [];
+        }
+        subcategoriesByGroup[cat.mainGroup].push(cat);
+      }
+    }
+    
+    return {
+      mainGroups: Array.from(mainGroupsSet),
+      subcategoriesByGroup,
+    };
+  }, [categories]);
+
+  // Get subcategories for selected main group
+  const subcategories = selectedMainGroup 
+    ? categoryGroups.subcategoriesByGroup[selectedMainGroup] || []
+    : [];
   
   // Form setup with Zod validation
   const {
@@ -65,6 +94,7 @@ export function CreateSignalModal({
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors, isValid },
   } = useForm<CreateSignalData>({
     resolver: zodResolver(createSignalSchema),
@@ -97,6 +127,7 @@ export function CreateSignalModal({
     if (!isOpen) {
       reset();
       setSubmitError(null);
+      setSelectedMainGroup('');
     }
   }, [isOpen, reset]);
   
@@ -180,25 +211,57 @@ export function CreateSignalModal({
 
         {/* Category & Price Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Category */}
-          <div>
-            {categoriesLoading ? (
-              <div className="h-10 bg-dark-700 rounded-lg flex items-center justify-center">
-                <Spinner size="sm" />
+          {/* Two-step Category Selection */}
+          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Main Group (Step 1) */}
+            <div>
+              {categoriesLoading ? (
+                <div className="h-10 bg-dark-700 rounded-lg flex items-center justify-center">
+                  <Spinner size="sm" />
+                </div>
+              ) : (
+                <Select
+                  label="Category Group"
+                  placeholder="Select a category group"
+                  value={selectedMainGroup}
+                  onChange={(e) => {
+                    setSelectedMainGroup(e.target.value);
+                    // Reset subcategory when main group changes
+                    setValue('categoryId', '', { shouldValidate: true });
+                  }}
+                  options={categoryGroups.mainGroups.map((group) => ({
+                    value: group,
+                    label: group,
+                  }))}
+                />
+              )}
+              <div className="mt-1 text-xs text-fur-cream/50">
+                First, choose the main category
               </div>
-            ) : (
+            </div>
+
+            {/* Subcategory (Step 2) */}
+            <div>
               <Select
-                label="Category"
-                placeholder="Select a category"
-                options={categories?.map((category) => ({
+                label="Subcategory"
+                placeholder={selectedMainGroup ? "Select a subcategory" : "Select a group first"}
+                disabled={!selectedMainGroup}
+                options={subcategories.map((category) => ({
                   value: category._id,
                   label: category.name,
-                })) || []}
+                }))}
                 {...register('categoryId')}
                 error={errors.categoryId?.message}
               />
-            )}
+              <div className="mt-1 text-xs text-fur-cream/50">
+                Then, select the specific subcategory
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Price Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           {/* Price */}
           <div>
