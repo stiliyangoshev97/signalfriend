@@ -98,18 +98,6 @@ export function PurchaseCard({
       };
     }
 
-    if (isOwned) {
-      return {
-        text: 'View Full Content',
-        disabled: false,
-        variant: 'primary' as const,
-        action: () => {
-          // Scroll to content section
-          document.getElementById('signal-content')?.scrollIntoView({ behavior: 'smooth' });
-        },
-      };
-    }
-
     if (!isConnected) {
       return {
         text: 'Connect Wallet to Purchase',
@@ -135,6 +123,31 @@ export function PurchaseCard({
   };
 
   const buttonState = getButtonState();
+
+  // Special layout for owned signals - centered price with owned message, no button
+  if (isOwned) {
+    return (
+      <div className="bg-dark-800 border border-dark-600 rounded-xl p-6">
+        {/* Centered Price Display */}
+        <div className="text-center">
+          <p className="text-sm text-fur-cream/60 mb-1">Price</p>
+          <div className="flex items-baseline justify-center gap-2">
+            <span className="text-4xl font-bold text-fur-light">
+              ${priceUSDT}
+            </span>
+            <span className="text-lg text-fur-cream/60">USDT</span>
+          </div>
+        </div>
+
+        {/* Owned Message */}
+        <div className="mt-4">
+          <p className="text-sm text-success-400 text-center">
+            ✓ You own this signal
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-dark-800 border border-dark-600 rounded-xl p-6">
@@ -171,12 +184,6 @@ export function PurchaseCard({
         {!isExpired && !isActive && (
           <p className="text-sm text-accent-red text-center">
             This signal has been deactivated by the predictor.
-          </p>
-        )}
-
-        {isOwned && (
-          <p className="text-sm text-success-400 text-center">
-            ✓ You own this signal
           </p>
         )}
 

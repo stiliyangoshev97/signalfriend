@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.7] - 2025-12-04
+
+### Fixed
+
+#### Signal Deactivate/Reactivate Cache Invalidation
+- **usePredictorDashboard Hook** (`src/features/predictors/hooks/usePredictorDashboard.ts`):
+  - Fixed `useDeactivateSignal` and `useReactivateSignal` not updating UI after mutation
+  - **Root cause**: Query invalidation used exact params `{}` but dashboard queries use specific params
+  - Now invalidates ALL predictor signals queries regardless of params
+  - Also invalidates marketplace signals list so changes are immediately visible to other users
+  - Also invalidates signal detail page cache
+
+### Changed
+
+#### Predictor Dashboard UI Improvements
+- **PredictorDashboardPage** (`src/features/predictors/pages/PredictorDashboardPage.tsx`):
+  - Renamed "My Signals" section to "Published Signals" to avoid confusion with purchased signals
+  - Replaced browser's `window.confirm` with a styled confirmation modal for signal deactivation
+  - Modal includes warning icon, signal title, explanation text, and Cancel/Deactivate buttons
+
+- **MySignalCard** (`src/features/predictors/components/MySignalCard.tsx`):
+  - Updated `onDeactivate` callback to pass signal title for modal display
+  - Type signature changed from `(contentId: string) => void` to `(contentId: string, title?: string) => void`
+
+- **PurchaseCard** (`src/features/signals/components/PurchaseCard.tsx`):
+  - Removed "View Full Content" button when user owns the signal
+  - Owned signals now show centered price with "✓ You own this signal" message
+  - Cleaner, less confusing UI for owned signals
+
+### Why These Changes
+- **Cache Bug**: React Query uses full query keys including params for cache matching; invalidating with different params didn't work
+- "My Signals" was ambiguous - could mean published or purchased signals
+- Browser confirm dialogs look out of place and don't match the app's design
+- The "View Full Content" button on owned signals was confusing since content is already visible
+
+---
+
 ## [0.9.6] - 2025-12-04
 
 ### Fixed

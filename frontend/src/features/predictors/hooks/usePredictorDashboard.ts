@@ -215,8 +215,17 @@ export function useDeactivateSignal() {
   return useMutation({
     mutationFn: (contentId: string) => deactivateSignal(contentId),
     onSuccess: () => {
+      // Invalidate ALL predictor signals queries (any params)
       queryClient.invalidateQueries({
-        queryKey: predictorKeys.signals(address!, {}),
+        queryKey: [...predictorKeys.all, 'signals', address!],
+      });
+      // Also invalidate marketplace signals list so deactivated signal is removed
+      queryClient.invalidateQueries({
+        queryKey: ['signals', 'list'],
+      });
+      // Invalidate signal detail page cache
+      queryClient.invalidateQueries({
+        queryKey: ['signals', 'detail'],
       });
     },
   });
@@ -234,8 +243,17 @@ export function useReactivateSignal() {
   return useMutation({
     mutationFn: (contentId: string) => reactivateSignal(contentId),
     onSuccess: () => {
+      // Invalidate ALL predictor signals queries (any params)
       queryClient.invalidateQueries({
-        queryKey: predictorKeys.signals(address!, {}),
+        queryKey: [...predictorKeys.all, 'signals', address!],
+      });
+      // Also invalidate marketplace signals list so reactivated signal appears
+      queryClient.invalidateQueries({
+        queryKey: ['signals', 'list'],
+      });
+      // Invalidate signal detail page cache
+      queryClient.invalidateQueries({
+        queryKey: ['signals', 'detail'],
       });
     },
   });
