@@ -205,14 +205,23 @@ export const deactivateSignal = asyncHandler(
  *
  * @param {string} address - Predictor wallet address
  * @query {string} [includeInactive=false] - Include inactive signals
+ * @query {string} [sortBy=createdAt] - Sort field (createdAt, priceUsdt, totalSales)
+ * @query {string} [sortOrder=desc] - Sort direction (asc, desc)
  * @returns {Object} JSON response with predictor's signals
  */
 export const getSignalsByPredictor = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const address = req.params.address as string;
     const includeInactive = req.query.includeInactive === "true";
+    const sortBy = (req.query.sortBy as string) || "createdAt";
+    const sortOrder = (req.query.sortOrder as "asc" | "desc") || "desc";
 
-    const signals = await SignalService.getByPredictor(address, includeInactive);
+    const signals = await SignalService.getByPredictor(
+      address,
+      includeInactive,
+      sortBy,
+      sortOrder
+    );
 
     res.json({
       success: true,

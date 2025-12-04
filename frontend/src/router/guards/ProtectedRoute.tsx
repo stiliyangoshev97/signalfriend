@@ -48,6 +48,8 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { useAuthStore } from '@/features/auth/store';
+import { useSessionSync } from '@/features/auth';
+import { Spinner } from '@/shared/components/ui';
 
 interface ProtectedRouteProps {
   /** Child components to render when authenticated */
@@ -61,8 +63,25 @@ export function ProtectedRoute({
   redirectTo = '/' 
 }: ProtectedRouteProps) {
   const location = useLocation();
-  const { isConnected } = useAccount();
+  const { isConnected, status } = useAccount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const { isLoading: isSessionLoading } = useSessionSync();
+  
+  // Check if wagmi is still initializing
+  const isWagmiInitializing = status === 'connecting' || status === 'reconnecting';
+
+  // Show loading spinner while reconnecting, validating session, or waiting for store hydration
+  if (isWagmiInitializing || isSessionLoading || !hasHydrated) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="mt-4 text-fur-cream/60">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Not connected - redirect to home
   if (!isConnected) {

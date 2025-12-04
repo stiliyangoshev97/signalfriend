@@ -51,6 +51,7 @@ export const API_CONFIG = {
     // Auth
     AUTH_NONCE: '/api/auth/nonce',
     AUTH_VERIFY: '/api/auth/verify',
+    AUTH_ME: '/api/auth/me',
     
     // Signals
     SIGNALS: '/api/signals',
@@ -68,7 +69,7 @@ export const API_CONFIG = {
     PREDICTORS: '/api/predictors',
     PREDICTOR_BY_ADDRESS: (address: string) => `/api/predictors/${address}`,
     PREDICTOR_PROFILE: '/api/predictors/me',
-    PREDICTOR_SIGNALS: (address: string) => `/api/predictors/${address}/signals`,
+    PREDICTOR_SIGNALS: (address: string) => `/api/signals/predictor/${address}`,
     
     // Categories
     CATEGORIES: '/api/categories',

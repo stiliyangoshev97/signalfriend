@@ -19,13 +19,42 @@ export interface NonceResponse {
 }
 
 /**
+ * Predictor data returned in auth responses.
+ * Subset of full predictor data for frontend auth state.
+ */
+export interface AuthPredictor {
+  _id: string;
+  walletAddress: string;
+  tokenId: number;
+  displayName: string;
+  bio: string;
+  avatarUrl: string;
+  socialLinks: {
+    twitter?: string;
+    telegram?: string;
+    discord?: string;
+  };
+  preferredContact: string;
+  categoryIds: string[];
+  totalSignals: number;
+  totalSales: number;
+  averageRating: number;
+  totalReviews: number;
+  isVerified: boolean;
+  isBlacklisted: boolean;
+  joinedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
  * Response type for POST /api/auth/verify endpoint.
  */
 export interface VerifyResponse {
   /** JWT token for authenticated requests */
   token: string;
-  /** Verified wallet address */
-  address: Address;
+  /** Predictor data if the user is a registered predictor, null otherwise */
+  predictor: AuthPredictor | null;
 }
 
 /**

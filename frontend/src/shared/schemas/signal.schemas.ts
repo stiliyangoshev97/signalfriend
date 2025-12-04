@@ -78,7 +78,11 @@ export const createSignalSchema = z.object({
   priceUsdt: z
     .number()
     .min(5, 'Minimum price is $5 USDT')
-    .max(100000, 'Maximum price is $100,000 USDT'),
+    .max(100000, 'Maximum price is $100,000 USDT')
+    .refine(
+      (val) => Number.isInteger(val * 100),
+      'Price can have at most 2 decimal places (e.g., 10.50)'
+    ),
   expiryDays: z
     .number()
     .int('Expiry must be a whole number of days')

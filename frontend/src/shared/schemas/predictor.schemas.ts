@@ -14,21 +14,33 @@ import { z } from 'zod';
 export const verificationStatusSchema = z.enum(['none', 'pending', 'verified', 'rejected']);
 
 export const predictorSchema = z.object({
+  _id: z.string().optional(),
   walletAddress: z.string(),
+  tokenId: z.number().optional(),
   displayName: z.string().nullable(),
   bio: z.string().nullable(),
   avatarUrl: z.string().nullable(),
-  isBlacklisted: z.boolean(),
-  isVerified: z.boolean(),
-  verificationStatus: verificationStatusSchema,
-  totalSalesCount: z.number(),
+  socialLinks: z.object({
+    twitter: z.string().optional(),
+    telegram: z.string().optional(),
+    discord: z.string().optional(),
+  }).optional(),
+  preferredContact: z.string().optional(),
+  categoryIds: z.array(z.string()).optional(),
+  totalSignals: z.number().optional(),
+  totalSales: z.number().optional(),
   averageRating: z.number(),
   totalReviews: z.number(),
+  isBlacklisted: z.boolean(),
+  isVerified: z.boolean(),
+  verificationStatus: verificationStatusSchema.optional(),
   joinedAt: z.string(),
-  // Hidden fields (only visible to owner/admin)
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  // Legacy field names (for backward compatibility)
+  totalSalesCount: z.number().optional(),
   telegram: z.string().optional(),
   discord: z.string().optional(),
-  preferredContact: z.enum(['telegram', 'discord']).optional(),
 });
 
 // ===========================================

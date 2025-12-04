@@ -76,12 +76,14 @@ interface AuthState {
   token: string | null;
   predictor: Predictor | null;
   isAuthenticated: boolean;
+  _hasHydrated: boolean;
   
   // Actions
   setAuth: (token: string, predictor: Predictor | null) => void;
   setPredictor: (predictor: Predictor | null) => void;
   updatePredictor: (updates: Partial<Predictor>) => void;
   logout: () => void;
+  setHasHydrated: (hasHydrated: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -91,6 +93,7 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       predictor: null,
       isAuthenticated: false,
+      _hasHydrated: false,
 
       /**
        * Set authentication after SIWE verification
@@ -136,6 +139,13 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
         });
       },
+      
+      /**
+       * Set hydration status
+       */
+      setHasHydrated: (hasHydrated) => {
+        set({ _hasHydrated: hasHydrated });
+      },
     }),
     {
       name: 'auth-storage',
@@ -144,14 +154,32 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         predictor: state.predictor,
       }),
-      // Rehydrate isAuthenticated from token
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.isAuthenticated = !!state.token;
-        }
+      // onRehydrateStorage is called BEFORE rehydration starts
+      // It returns a function that's called AFTER rehydration finishes
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.error('[Auth Store] Rehydration error:', error);
+          }
+          if (state) {
+            // Derive isAuthenticated from token
+            state.isAuthenticated = !!state.token;
+            // Set hydration flag directly on state
+            state._hasHydrated = true;
+          }
+        };
       },
     }
   )
 );
+
+// Set hydration flag after store is created (handles case where no data was stored)
+// This runs synchronously after the store is created
+setTimeout(() => {
+  const state = useAuthStore.getState();
+  if (!state._hasHydrated) {
+    useAuthStore.setState({ _hasHydrated: true });
+  }
+}, 0);
 
 export default useAuthStore;

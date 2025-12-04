@@ -87,8 +87,8 @@ interface ModalProps {
   title?: string;
   /** Description text below title */
   description?: string;
-  /** Modal width (sm, md, lg, xl) */
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  /** Modal width (sm, md, lg, xl, 2xl) */
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   /** Modal content */
   children: ReactNode;
 }
@@ -99,6 +99,7 @@ const sizes = {
   md: 'max-w-md',
   lg: 'max-w-lg',
   xl: 'max-w-xl',
+  '2xl': 'max-w-2xl',
 };
 
 /**
@@ -151,11 +152,11 @@ export function Modal({
       />
 
       {/* Modal container - centered */}
-      <div className="fixed inset-0 flex items-center justify-center p-4">
+      <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
         <div
           className={cn(
-            'w-full bg-dark-800 border border-dark-700 rounded-xl shadow-2xl',
-            'animate-slide-up',
+            'relative w-full bg-dark-800 border border-dark-700 rounded-xl shadow-2xl',
+            'animate-slide-up max-h-[90vh] flex flex-col',
             sizes[size]
           )}
           role="dialog"
@@ -164,7 +165,7 @@ export function Modal({
         >
           {/* Header (optional) */}
           {(title || description) && (
-            <div className="px-6 pt-6 pb-4 border-b border-dark-700">
+            <div className="px-6 pt-6 pb-4 border-b border-dark-700 flex-shrink-0">
               {title && (
                 <h2
                   id="modal-title"
@@ -179,8 +180,8 @@ export function Modal({
             </div>
           )}
 
-          {/* Content */}
-          <div className="px-6 py-4">{children}</div>
+          {/* Content - scrollable */}
+          <div className="px-6 py-4 overflow-y-auto flex-1">{children}</div>
 
           {/* Close button (X) - top right */}
           <button
@@ -188,7 +189,7 @@ export function Modal({
             className={cn(
               'absolute top-4 right-4 p-2 rounded-lg',
               'text-dark-400 hover:text-dark-100 hover:bg-dark-700',
-              'transition-colors duration-200'
+              'transition-colors duration-200 z-10'
             )}
             aria-label="Close modal"
           >

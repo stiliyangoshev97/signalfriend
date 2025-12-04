@@ -35,5 +35,5 @@
 // Auth feature exports
 export { useAuthStore } from './store';
 // ...existing code...
-export { useAuth, getNonce, verifySignature } from './api';
+export { useAuth, useSessionSync, getNonce, verifySignature, validateSession } from './api';
 export { AuthButton } from './components';

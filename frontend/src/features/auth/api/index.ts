@@ -1,2 +1,2 @@
 export * from './authApi';
-export { useAuth } from './authHooks';
+export { useAuth, useSessionSync } from './authHooks';
