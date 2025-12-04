@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.10.1] - 2025-12-04
+
+### Fixed
+
+#### MainGroup Filtering Bug
+- **FilterPanel** (`src/features/signals/components/FilterPanel.tsx`):
+  - Fixed bug where selecting a Category Group (e.g., "Traditional Finance") without a subcategory showed all signals instead of filtering by that main group
+  - Now correctly sets `mainGroup` filter when selecting a category group
+  - Clears `mainGroup` filter when selecting "All Categories"
+
+- **Signal Filters Schema** (`src/shared/schemas/signal.schemas.ts`):
+  - Added `mainGroup` field to `signalFiltersSchema` for filtering by category group
+
+- **Signals API** (`src/features/signals/api/signals.api.ts`):
+  - Added `mainGroup` parameter to query string builder
+  - Sends `?mainGroup=Traditional%20Finance` etc. when filtering by category group
+
+---
+
 ## [0.10.0] - 2025-12-04
 
 ### Added

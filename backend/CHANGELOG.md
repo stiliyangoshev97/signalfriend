@@ -15,6 +15,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.16.1] - 2025-12-04
+
+### Added
+
+#### MainGroup Signal Filtering
+- **Signal Schemas** (`src/features/signals/signal.schemas.ts`):
+  - Added `mainGroup` query parameter to `listSignalsSchema`
+  - Allows filtering signals by category group without selecting a specific subcategory
+
+- **Signal Service** (`src/features/signals/signal.service.ts`):
+  - Added `mainGroup` filter support in `getAll()` method
+  - When `mainGroup` is provided without `categoryId`, filters signals by their mainGroup field
+  - Example: `GET /api/signals?mainGroup=Traditional%20Finance` returns all TradFi signals
+
+---
+
 ## [0.16.0] - 2025-12-04 📂 CATEGORY/SUBCATEGORY SYSTEM
 
 ### Added

@@ -211,6 +211,119 @@ The color scheme is extracted from our cute doggy mascot logo:
 
 ---
 
+## 🏗️ Building from Scratch - Code Review Guide
+
+This section helps reviewers understand the frontend architecture and where to start.
+
+### Entry Point
+
+The application starts at **`src/main.tsx`**:
+1. Renders `<App />` with React 19 root
+2. App.tsx wraps everything in providers (see below)
+3. React Router handles navigation
+
+### Provider Hierarchy
+
+**`src/App.tsx`** sets up providers in this order:
+```tsx
+<QueryClientProvider>      {/* React Query for server state */}
+  <WagmiProvider>          {/* Blockchain wallet state */}
+    <RainbowKitProvider>   {/* Wallet connection UI */}
+      <AuthProvider>       {/* SIWE auth state (Zustand) */}
+        <RouterProvider /> {/* React Router v7 */}
+      </AuthProvider>
+    </RainbowKitProvider>
+  </WagmiProvider>
+</QueryClientProvider>
+```
+
+### Core Architecture
+
+```
+src/
+├── main.tsx                    # 👈 START HERE - React entry
+├── App.tsx                     # Provider setup
+├── index.css                   # Tailwind imports + global styles
+├── features/                   # Domain modules (review in order)
+│   ├── auth/                   # 1️⃣ SIWE authentication
+│   ├── signals/                # 2️⃣ Signal marketplace
+│   ├── predictors/             # 3️⃣ Predictor profiles & dashboard
+│   └── admin/                  # 4️⃣ Admin panel
+├── shared/                     # Shared code
+│   ├── api/                    # Axios client + interceptors
+│   ├── components/ui/          # Reusable UI components
+│   ├── config/                 # API config, contract addresses
+│   ├── hooks/                  # useAuth, useContract hooks
+│   ├── schemas/                # Zod validation schemas
+│   └── types/                  # TypeScript type definitions
+├── providers/                  # Context providers setup
+│   ├── Web3Provider.tsx        # Wagmi + RainbowKit config
+│   └── AuthProvider.tsx        # SIWE auth context
+└── router/                     # React Router configuration
+    └── index.tsx               # Route definitions
+```
+
+### Feature Module Structure
+
+Each feature follows a consistent pattern:
+```
+features/signals/
+├── components/           # UI components
+│   ├── SignalCard.tsx
+│   ├── FilterPanel.tsx
+│   └── ...
+├── hooks/                # React Query hooks
+│   ├── useSignals.ts
+│   └── usePurchase.ts
+├── pages/                # Route pages
+│   ├── SignalsPage.tsx
+│   └── SignalDetailPage.tsx
+├── api/                  # API functions
+│   └── signals.api.ts
+└── index.ts              # Barrel export
+```
+
+### Recommended Review Order
+
+1. **`src/providers/Web3Provider.tsx`** - Wallet setup
+2. **`src/features/auth/`** - SIWE authentication flow
+3. **`src/shared/api/client.ts`** - Axios client with JWT
+4. **`src/features/signals/hooks/useSignals.ts`** - React Query pattern
+5. **`src/features/signals/pages/SignalsPage.tsx`** - Main marketplace
+6. **`src/features/predictors/`** - Dashboard for predictors
+
+### Key Components
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| SignalCard | `features/signals/components/` | Signal preview in marketplace |
+| MySignalCard | `features/predictors/components/` | Predictor's own signal view |
+| FilterPanel | `features/signals/components/` | Two-step category filtering |
+| CreateSignalModal | `features/predictors/components/` | Signal creation form |
+| PurchaseButton | `features/signals/components/` | USDT approval + purchase flow |
+
+### State Management
+
+| Type | Tool | Usage |
+|------|------|-------|
+| Server state | React Query | API data fetching & caching |
+| Auth state | Zustand | JWT token, user info |
+| Wallet state | Wagmi | Connected address, chain |
+| Form state | React Hook Form | Form inputs, validation |
+| UI state | useState | Component-local state |
+
+### Key Hooks
+
+| Hook | File | Purpose |
+|------|------|---------|
+| `useAuth` | `features/auth/hooks/` | Auth state & SIWE flow |
+| `useSignals` | `features/signals/hooks/` | Fetch signal list |
+| `useBuySignal` | `features/signals/hooks/` | Purchase flow |
+| `useMySignals` | `features/predictors/hooks/` | Predictor's signals |
+| `useCategories` | `features/signals/hooks/` | Category list |
+
+---
+
 ## 🔐 Authentication
 
 SignalFriend uses **Sign-In with Ethereum (SIWE)** for authentication:
