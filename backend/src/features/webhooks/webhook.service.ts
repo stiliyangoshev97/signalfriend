@@ -167,6 +167,10 @@ export class WebhookService {
         await this.handlePredictorBlacklisted(log);
         break;
 
+      case EVENT_SIGNATURES.PredictorNFTMinted.toLowerCase():
+        await this.handlePredictorNFTMinted(log);
+        break;
+
       default:
         logger.debug({
           topic: topic0,
@@ -358,6 +362,82 @@ export class WebhookService {
     } catch (error) {
       if (error instanceof Error && error.message.includes("not found")) {
         logger.warn({ txHash, error: error.message }, "Predictor not found for blacklist event");
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Handles PredictorNFTMinted events from PredictorAccessPass contract.
+   * Creates a new Predictor record when minted via owner mint (MultiSig).
+   *
+   * This handler covers the case when a predictor is minted directly via
+   * the PredictorAccessPass contract's proposeOwnerMint function, bypassing
+   * the SignalFriendMarket's joinAsPredictor function (which emits PredictorJoined).
+   *
+   * Event signature: PredictorNFTMinted(address indexed predictor, uint256 indexed tokenId, bool isOwnerMint)
+   *
+   * @param log - The normalized event log data
+   */
+  static async handlePredictorNFTMinted(log: EventLog): Promise<void> {
+    const txHash = log.transactionHash;
+
+    try {
+      // Decode the event using viem
+      const decoded = decodeEventLog({
+        abi: predictorAccessPassAbi,
+        data: log.data as Hex,
+        topics: log.topics as [Hex, ...Hex[]],
+      });
+
+      if (decoded.eventName !== "PredictorNFTMinted") {
+        logger.warn({ txHash, decoded: decoded.eventName }, "Unexpected event name in PredictorNFTMinted handler");
+        return;
+      }
+
+      const args = decoded.args as {
+        predictor: Address;
+        tokenId: bigint;
+        isOwnerMint: boolean;
+      };
+
+      logger.info({
+        predictor: args.predictor,
+        tokenId: Number(args.tokenId),
+        isOwnerMint: args.isOwnerMint,
+        txHash,
+      }, "Processing PredictorNFTMinted event");
+
+      // Only process owner mints - regular mints are already handled by PredictorJoined event
+      // from SignalFriendMarket which includes referral info
+      if (!args.isOwnerMint) {
+        logger.debug({
+          predictor: args.predictor,
+          tokenId: Number(args.tokenId),
+          txHash,
+        }, "Skipping non-owner mint (already handled by PredictorJoined event)");
+        return;
+      }
+
+      // Create predictor record for owner mint
+      await PredictorService.createFromEvent({
+        walletAddress: args.predictor,
+        tokenId: Number(args.tokenId),
+        joinedAt: new Date(),
+      });
+
+      logger.info({
+        predictor: args.predictor,
+        tokenId: Number(args.tokenId),
+        isOwnerMint: args.isOwnerMint,
+        txHash,
+      }, "Predictor record created successfully from owner mint");
+
+    } catch (error) {
+      // Check if it's a conflict error (predictor already exists) - this is OK for idempotency
+      if (error instanceof Error && error.message.includes("already exists")) {
+        logger.info({ txHash }, "Predictor already exists, skipping (idempotent)");
+        return;
       }
       throw error;
     }

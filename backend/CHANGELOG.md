@@ -15,6 +15,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.16.2] - 2025-12-05 🔧 OWNER MINT PREDICTOR INDEXING FIX
+
+### Added
+- **Webhook Schemas** (`src/features/webhooks/webhook.schemas.ts`):
+  - Added `PredictorNFTMinted` event signature to `EVENT_SIGNATURES`
+  - Event: `PredictorNFTMinted(address indexed predictor, uint256 indexed tokenId, bool isOwnerMint)`
+  - Signature: `0x7cfc4d30050d18b034fe455eba1875eafe455de2dab7696a1fc7f8918d409f12`
+
+- **Webhook Service** (`src/features/webhooks/webhook.service.ts`):
+  - Added `handlePredictorNFTMinted()` handler for owner mint events
+  - Handler processes mints from `PredictorAccessPass.proposeOwnerMint()` (MultiSig)
+  - Only creates predictor record for `isOwnerMint=true` (regular mints handled by `PredictorJoined`)
+  - Idempotent: skips if predictor already exists in database
+
+### Changed
+- **Minimum Signal Price** reduced from $5 USDT to $1 USDT
+  - `src/shared/config/env.ts`: Default `MIN_SIGNAL_PRICE_USDT` changed to 1
+  - `.env.example`: Updated example value to 1
+  - Must match smart contract value (update via MultiSig `proposeUpdateMinSignalPrice`)
+
+### Fixed
+- **Critical Bug**: Predictors minted via MultiSig `proposeOwnerMint` were not being indexed
+  - **Root Cause**: Owner mints bypass `SignalFriendMarket.joinAsPredictor()` which emits `PredictorJoined`
+  - Owner mints go directly to `PredictorAccessPass` which emits `PredictorNFTMinted`
+  - Backend was only listening for `PredictorJoined`, missing owner mints entirely
+  - **Impact**: Premium clients minted via MultiSig couldn't use the platform (not recognized as predictors)
+
+- **Price Decimal Validation Bug** (`src/features/signals/signal.schemas.ts`):
+  - Fixed bug where prices like 1.1, 5.1, 7.12 were incorrectly rejected
+  - **Root Cause**: JavaScript floating-point precision issue (`1.1 * 100 = 110.00000000000001`)
+  - **Fix**: Changed from `Number.isInteger(val * 100)` to tolerance-based check
+
+### Technical Details
+| Event | Contract | When Emitted |
+|-------|----------|--------------|
+| `PredictorJoined` | SignalFriendMarket | Regular $20 USDT registration via `joinAsPredictor()` |
+| `PredictorNFTMinted` | PredictorAccessPass | ALL mints (both regular and owner mint) |
+
+The fix adds handling for `PredictorNFTMinted` but only processes owner mints (`isOwnerMint=true`) to avoid duplicate predictor creation for regular registrations.
+
+---
+
 ## [0.16.1] - 2025-12-04
 
 ### Added

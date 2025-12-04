@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** December 2024  
+> **Last Updated:** December 5, 2025  
 > **Current Phase:** Manual Testing Complete, Maintenance Mode Added  
 > **Project Status:** 🟢 **Ready for Frontend (100/100)** - All Features Complete & Tested  
-> **Branch:** `main`
+> **Branch:** `fix/owner-mint-predictor-indexing`
 
 ---
 
@@ -85,11 +85,13 @@ backend/
 | `PredictorJoined` | `0x2f2789d1da7b490fc20c28c5014f1fdd449737869b924042025cd634b2248cc4` |
 | `SignalPurchased` | `0x906c548d19aa6c7ed9e105a3d02cb6a435b802903a30000aa9ad5e01d93ef647` |
 | `PredictorBlacklisted` | `0xad6b8655f145f95522485d58e7cd8ca2689dbe89691511217c7cc914b1226005` |
+| `PredictorNFTMinted` | `0x7cfc4d30050d18b034fe455eba1875eafe455de2dab7696a1fc7f8918d409f12` |
 
 ### Events to Index (via Alchemy Webhooks)
 | Event | Contract | Action |
 |-------|----------|--------|
-| `PredictorJoined` | SignalFriendMarket | Create Predictor record |
+| `PredictorJoined` | SignalFriendMarket | Create Predictor record (regular $20 registration) |
+| `PredictorNFTMinted` | PredictorAccessPass | Create Predictor record (owner mint via MultiSig only) |
 | `SignalPurchased` | SignalFriendMarket | Create Receipt record |
 | `PredictorBlacklisted` | PredictorAccessPass | Update Predictor.isBlacklisted |
 

@@ -79,10 +79,10 @@ export const createSignalSchema = z.object({
   categoryId: z.string().min(1, 'Please select a category'),
   priceUsdt: z
     .number()
-    .min(5, 'Minimum price is $5 USDT')
+    .min(1, 'Minimum price is $1 USDT')
     .max(100000, 'Maximum price is $100,000 USDT')
     .refine(
-      (val) => Number.isInteger(val * 100),
+      (val) => Math.abs(Math.round(val * 100) - val * 100) < 0.0001,
       'Price can have at most 2 decimal places (e.g., 10.50)'
     ),
   expiryDays: z
