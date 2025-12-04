@@ -261,7 +261,7 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
 | GET | `/api/signals/predictor/:address` | No | Get predictor's signals |
 | GET | `/api/signals/:contentId` | No | Get signal metadata |
 | GET | `/api/signals/:contentId/content` | Yes | Get protected content |
-| GET | `/api/signals/:contentId/content-identifier` | No | Get bytes32 for purchase |
+| GET | `/api/signals/:contentId/content-identifier` | Yes | Get bytes32 for purchase (blocks self-purchase) |
 | POST | `/api/signals` | Yes | Create signal (predictor) |
 | PUT | `/api/signals/:contentId` | Yes | Update own signal |
 | DELETE | `/api/signals/:contentId` | Yes | Deactivate own signal |

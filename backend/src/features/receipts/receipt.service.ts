@@ -286,9 +286,9 @@ export class ReceiptService {
 
     await receipt.save();
 
-    // Update signal sales count
+    // Update signal sales count (use lookupContentId which is the UUID format)
     await Signal.updateOne(
-      { contentId: data.contentId },
+      { contentId: lookupContentId },
       { $inc: { totalSales: 1 } }
     );
 

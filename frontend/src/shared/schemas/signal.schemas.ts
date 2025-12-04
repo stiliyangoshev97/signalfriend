@@ -108,6 +108,8 @@ export const signalFiltersSchema = z.object({
   sortBy: z.enum(['newest', 'price-low', 'price-high', 'popular']).optional(),
   page: z.number().optional(),
   limit: z.number().optional(),
+  /** Exclude signals already purchased by this address */
+  excludeBuyerAddress: z.string().optional(),
 });
 
 // ===========================================

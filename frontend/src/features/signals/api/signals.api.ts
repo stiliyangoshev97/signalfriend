@@ -25,6 +25,7 @@ function buildQueryString(filters: SignalFilters): string {
   if (filters.maxPrice !== undefined) params.append('maxPrice', filters.maxPrice.toString());
   if (filters.predictor) params.append('predictorAddress', filters.predictor);
   if (filters.status) params.append('status', filters.status);
+  if (filters.excludeBuyerAddress) params.append('excludeBuyerAddress', filters.excludeBuyerAddress);
   if (filters.sortBy) {
     // Map frontend sort values to backend params
     // Backend uses priceUsdt (lowercase) and totalSales (not totalBuyers)

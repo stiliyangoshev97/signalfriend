@@ -15,6 +15,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.15.7] - 2025-12-04 🛒 HIDE PURCHASED SIGNALS & FIX SALES COUNT
+
+### Added
+- **Signal Schemas** (`src/features/signals/signal.schemas.ts`):
+  - Added `excludeBuyerAddress` optional query param to list signals endpoint
+  - Allows filtering out signals already purchased by a specific wallet address
+
+### Changed
+- **Signal Service** (`src/features/signals/signal.service.ts`):
+  - `getAll()` now accepts `excludeBuyerAddress` filter
+  - Queries Receipt collection to find buyer's purchased contentIds
+  - Excludes those signals from the returned list
+
+### Fixed
+- **Receipt Service** (`src/features/receipts/receipt.service.ts`):
+  - Fixed bug where sales count was always 0 after purchase
+  - Line 291: Changed `data.contentId` (bytes32 hash) to `lookupContentId` (UUID)
+  - Signal.totalSales now correctly increments on each purchase
+
+### Why These Changes
+- **Hide Purchased**: Users don't need to see signals they already own in marketplace
+- **Sales Count**: Webhook was receiving bytes32 contentId but trying to update by UUID, so update never matched
+
+---
+
+## [0.15.6] - 2025-12-04 🛡️ SELF-PURCHASE PREVENTION
+
+### Changed
+- **Signal Routes** (`src/features/signals/signal.routes.ts`):
+  - `GET /api/signals/:contentId/content-identifier` now requires authentication
+  - Previously public, now protected to enable self-purchase validation
+
+- **Signal Controller** (`src/features/signals/signal.controller.ts`):
+  - `getContentIdentifier` now passes caller's wallet address to service
+  - Enables backend to block predictors from purchasing their own signals
+
+- **Signal Service** (`src/features/signals/signal.service.ts`):
+  - `getContentIdentifier()` accepts optional `callerAddress` parameter
+  - Returns 400 error if caller is the signal's predictor
+  - Error message: "You cannot purchase your own signal"
+
+### Why This Change
+Predictors should not be able to buy their own signals. While the frontend also blocks this, the backend validation ensures security even if someone bypasses the UI.
+
+---
+
 ## [0.15.5] - 2025-12-04 📊 RISK LEVEL & POTENTIAL REWARD
 
 ### Added
