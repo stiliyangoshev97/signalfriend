@@ -19,6 +19,7 @@ function buildQueryString(filters: SignalFilters): string {
   const params = new URLSearchParams();
 
   if (filters.category) params.append('categoryId', filters.category);
+  if (filters.mainGroup) params.append('mainGroup', filters.mainGroup);
   if (filters.riskLevel) params.append('riskLevel', filters.riskLevel);
   if (filters.potentialReward) params.append('potentialReward', filters.potentialReward);
   if (filters.minPrice !== undefined) params.append('minPrice', filters.minPrice.toString());

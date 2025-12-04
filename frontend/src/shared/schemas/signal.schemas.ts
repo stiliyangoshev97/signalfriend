@@ -100,6 +100,8 @@ export const createSignalSchema = z.object({
 
 export const signalFiltersSchema = z.object({
   category: z.string().optional(),
+  /** Filter by main category group (e.g., "Crypto", "Traditional Finance") */
+  mainGroup: z.string().optional(),
   riskLevel: riskLevelSchema.optional(),
   potentialReward: potentialRewardSchema.optional(),
   minPrice: z.number().optional(),

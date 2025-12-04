@@ -60,6 +60,9 @@ export function CreateSignalModal({
   // Create signal mutation
   const { mutate: createSignal, isPending: isCreating } = useCreateSignal();
 
+  // Define explicit main group order (Crypto → Traditional Finance → Macro / Other)
+  const MAIN_GROUP_ORDER = ['Crypto', 'Traditional Finance', 'Macro / Other'];
+
   // Group categories by mainGroup
   const categoryGroups = useMemo(() => {
     if (!categories) return { mainGroups: [], subcategoriesByGroup: {} };
@@ -77,8 +80,18 @@ export function CreateSignalModal({
       }
     }
     
+    // Sort main groups according to predefined order
+    const sortedMainGroups = Array.from(mainGroupsSet).sort((a, b) => {
+      const indexA = MAIN_GROUP_ORDER.indexOf(a);
+      const indexB = MAIN_GROUP_ORDER.indexOf(b);
+      // If not in predefined order, put at end
+      const orderA = indexA === -1 ? MAIN_GROUP_ORDER.length : indexA;
+      const orderB = indexB === -1 ? MAIN_GROUP_ORDER.length : indexB;
+      return orderA - orderB;
+    });
+    
     return {
-      mainGroups: Array.from(mainGroupsSet),
+      mainGroups: sortedMainGroups,
       subcategoriesByGroup,
     };
   }, [categories]);

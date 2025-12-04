@@ -54,6 +54,9 @@ export function FilterPanel({
   const [maxPrice, setMaxPrice] = useState<string>(filters.maxPrice?.toString() || '');
   const [selectedMainGroup, setSelectedMainGroup] = useState<string>('');
 
+  // Define explicit main group order
+  const MAIN_GROUP_ORDER = ['Crypto', 'Traditional Finance', 'Macro / Other'];
+
   // Group categories by mainGroup
   const categoryGroups = useMemo(() => {
     const subcategoriesByGroup: Record<string, Category[]> = {};
@@ -68,8 +71,18 @@ export function FilterPanel({
       subcategoriesByGroup[group].push(cat);
     }
     
+    // Sort main groups according to predefined order
+    const sortedMainGroups = Array.from(mainGroupsSet).sort((a, b) => {
+      const indexA = MAIN_GROUP_ORDER.indexOf(a);
+      const indexB = MAIN_GROUP_ORDER.indexOf(b);
+      // If not in predefined order, put at end
+      const orderA = indexA === -1 ? MAIN_GROUP_ORDER.length : indexA;
+      const orderB = indexB === -1 ? MAIN_GROUP_ORDER.length : indexB;
+      return orderA - orderB;
+    });
+    
     return {
-      mainGroups: Array.from(mainGroupsSet),
+      mainGroups: sortedMainGroups,
       subcategoriesByGroup,
     };
   }, [categories]);
@@ -133,7 +146,8 @@ export function FilterPanel({
 
   const hasActiveFilters =
     localFilters.category ||
-    selectedMainGroup || // Also consider mainGroup as active filter
+    localFilters.mainGroup || // Check mainGroup in filters
+    selectedMainGroup || // Also consider local mainGroup selection
     localFilters.riskLevel ||
     localFilters.potentialReward ||
     localFilters.minPrice !== undefined ||
@@ -167,7 +181,16 @@ export function FilterPanel({
               const newGroup = e.target.value;
               setSelectedMainGroup(newGroup);
               // Clear subcategory when main group changes
-              updateFilter('category', undefined);
+              // Set mainGroup filter so backend filters by group
+              const newFilters = { ...localFilters, page: 1 };
+              delete newFilters.category;
+              if (newGroup) {
+                newFilters.mainGroup = newGroup;
+              } else {
+                delete newFilters.mainGroup;
+              }
+              setLocalFilters(newFilters);
+              onFilterChange(newFilters);
             }}
             className="w-full bg-dark-900 border border-dark-600 rounded-lg px-3 py-2.5 text-fur-cream text-sm focus:outline-none focus:ring-2 focus:ring-fur-light/50 focus:border-fur-light transition-all appearance-none cursor-pointer"
             disabled={isLoadingCategories}

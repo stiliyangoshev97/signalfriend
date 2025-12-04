@@ -24,6 +24,8 @@ const contentIdRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-
 export const listSignalsSchema = z.object({
   /** Filter by category ID */
   categoryId: z.string().optional(),
+  /** Filter by main category group (e.g., "Crypto", "Traditional Finance") */
+  mainGroup: z.string().optional(),
   /** Filter by predictor address */
   predictorAddress: z
     .string()
