@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-05
-Branch: fix/owner-mint-predictor-indexing (v0.10.5)
+Branch: feature/predictor-list-page (v0.11.0)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -207,10 +207,13 @@ PHASE 3: SIGNALS FEATURE (PRIORITY: HIGH)
 PHASE 4: PREDICTOR FEATURES (PRIORITY: MEDIUM)
 ================================================================================
 
-[ ] Predictor List Page (/predictors)
-    - Fetch predictors with stats
-    - Filter by rating, verification
-    - Predictor cards with avatars
+[✅] Predictor List Page (/predictors) - Added in v0.11.0
+    - Fetch predictors with stats via usePredictors hook
+    - Filter by search, quick filters (Top Sellers, Best Rated, New)
+    - Sort by sales, rating, signals, newest
+    - PredictorCard with avatar, stats, rank badges
+    - Pagination with URL-synced filters
+    - Mobile-responsive filter panel
 
 [ ] Predictor Profile Page (/predictors/:wallet)
     - Full profile info

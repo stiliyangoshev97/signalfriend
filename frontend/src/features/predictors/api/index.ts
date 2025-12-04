@@ -25,3 +25,11 @@ export {
   deactivateSignal,
   reactivateSignal,
 } from './signals.api';
+
+// Predictor listings
+export {
+  fetchPredictors,
+  fetchTopPredictors,
+  type PredictorFilters,
+  type PredictorsListResponse,
+} from './predictorsList.api';

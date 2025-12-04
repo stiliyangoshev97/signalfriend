@@ -57,7 +57,7 @@ import RootLayout from './RootLayout';
 import { ProtectedRoute, AdminRoute, PredictorRoute } from './guards';
 import { HomePage } from '@/features/home';
 import { SignalsPage, SignalDetailPage, MyPurchasedSignalsPage } from '@/features/signals';
-import { PredictorDashboardPage } from '@/features/predictors';
+import { PredictorDashboardPage, PredictorsPage } from '@/features/predictors';
 
 // Lazy load pages for code splitting (example for future pages)
 // import { lazy } from 'react';
@@ -93,7 +93,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'predictors',
-        element: <PlaceholderPage title="Predictors" />,
+        element: <PredictorsPage />,
       },
       {
         path: 'predictors/:address',
