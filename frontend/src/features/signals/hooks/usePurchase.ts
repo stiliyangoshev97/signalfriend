@@ -35,11 +35,11 @@ const USDT_DECIMALS = 18;
 /** Query key factory for purchase-related queries */
 export const purchaseKeys = {
   all: ['purchase'] as const,
-  check: (contentId: string) => [...purchaseKeys.all, 'check', contentId] as const,
+  check: (contentId: string, address?: string) => [...purchaseKeys.all, 'check', contentId, address] as const,
   contentId: (contentId: string) => [...purchaseKeys.all, 'contentIdentifier', contentId] as const,
-  content: (contentId: string) => [...purchaseKeys.all, 'content', contentId] as const,
-  myReceipts: (params?: { page?: number; limit?: number }) => 
-    [...purchaseKeys.all, 'myReceipts', params] as const,
+  content: (contentId: string, address?: string) => [...purchaseKeys.all, 'content', contentId, address] as const,
+  myReceipts: (address: string, params?: { page?: number; limit?: number }) => 
+    [...purchaseKeys.all, 'myReceipts', address, params] as const,
 };
 
 /**
@@ -57,14 +57,15 @@ export const purchaseKeys = {
  * }
  */
 export function useCheckPurchase(contentId: string) {
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
   // Double-check that authToken exists in localStorage (prevents stale state issues)
   const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
 
   return useQuery<CheckPurchaseResponse>({
-    queryKey: purchaseKeys.check(contentId),
+    // Include address in query key to ensure cache invalidation on wallet switch
+    queryKey: purchaseKeys.check(contentId, address),
     queryFn: () => checkPurchase(contentId),
     // Only check purchase status when:
     // 1. Wallet is connected
@@ -93,14 +94,15 @@ export function useCheckPurchase(contentId: string) {
  * }
  */
 export function useSignalContent(contentId: string, isOwned: boolean = false) {
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
   // Double-check that authToken exists in localStorage (prevents stale state issues)
   const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
 
   return useQuery<SignalContentResponse>({
-    queryKey: purchaseKeys.content(contentId),
+    // Include address in query key to ensure cache invalidation on wallet switch
+    queryKey: purchaseKeys.content(contentId, address),
     queryFn: () => fetchSignalContent(contentId),
     // Only fetch protected content when:
     // 1. Wallet is connected
@@ -132,13 +134,14 @@ export function useMyReceipts(params?: {
   sortBy?: 'purchasedAt' | 'priceUsdt';
   sortOrder?: 'asc' | 'desc';
 }) {
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
   const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
 
   return useQuery<Receipt[]>({
-    queryKey: purchaseKeys.myReceipts(params),
+    // Include address in query key to ensure cache invalidation on wallet switch
+    queryKey: purchaseKeys.myReceipts(address ?? '', params),
     queryFn: () => fetchMyReceipts(params),
     // Only fetch receipts when user is authenticated
     enabled: isConnected && hasHydrated && isAuthenticated && hasToken,
@@ -288,6 +291,7 @@ export function useApproveUSDT(chainId: number = 97) {
 export function useBuySignal(chainId: number = 97) {
   const addresses = getContractAddresses(chainId);
   const queryClient = useQueryClient();
+  const { address } = useAccount();
   const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
@@ -319,8 +323,8 @@ export function useBuySignal(chainId: number = 97) {
       args: [params.predictorAddress, priceWei, maxCommission, params.contentIdentifier],
     });
 
-    // Invalidate purchase check cache after successful purchase
-    queryClient.invalidateQueries({ queryKey: purchaseKeys.check(params.contentId) });
+    // Invalidate purchase check cache after successful purchase (include address for proper cache key)
+    queryClient.invalidateQueries({ queryKey: purchaseKeys.check(params.contentId, address) });
 
     return result;
   };

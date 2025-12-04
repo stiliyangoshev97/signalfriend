@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.8] - 2025-12-04
+
+### Fixed
+
+#### My Signals Page Not Refreshing on Wallet Switch
+- **usePurchase Hook** (`src/features/signals/hooks/usePurchase.ts`):
+  - Fixed "My Signals" page showing previous wallet's data after switching accounts
+  - **Root cause**: Query keys didn't include wallet address, so React Query returned cached data from old wallet
+  - Added `address` to query keys for `useMyReceipts`, `useCheckPurchase`, and `useSignalContent`
+  - Updated `purchaseKeys` factory to include address parameter
+  - Updated `useBuySignal` to include address when invalidating cache
+
+- **SignalDetailPage** (`src/features/signals/pages/SignalDetailPage.tsx`):
+  - Updated `handlePurchaseSuccess` to include address when invalidating content cache
+
+#### Spurious 401 "No token provided" Errors in Backend Logs
+- **usePredictorDashboard Hook** (`src/features/predictors/hooks/usePredictorDashboard.ts`):
+  - Fixed predictor hooks (`useMySignals`, `useMyEarnings`, `usePredictorProfile`) making API calls before auth is ready
+  - **Root cause**: These hooks only checked `isConnected && !!address` but not `isAuthenticated`
+  - Added auth checks: `hasHydrated`, `isAuthenticated`, `hasToken` (same pattern as purchase hooks)
+  - Queries now wait for auth state to be fully ready before calling protected endpoints
+
+### Why These Fixes
+- **Wallet Switch Cache**: React Query caches data by query key. Without address in the key, switching wallets returned stale cached data. Same pattern already used in predictor dashboard hooks (which worked correctly).
+- **401 Errors**: Protected endpoints were being called before JWT was available. While route guards prevented unauthorized access, the React Query hooks could fire before auth state synchronized, causing harmless but noisy 401 errors in backend logs.
+
+---
+
 ## [0.9.7] - 2025-12-04
 
 ### Fixed
