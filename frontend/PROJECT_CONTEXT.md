@@ -247,6 +247,47 @@ const { data: contentData } = useSignalContent(contentId, isOwned);
 
 ---
 
+## ⚠️ Backend Field Mapping (Important!)
+
+### Mongoose Populate vs Frontend Types
+The backend uses Mongoose references with `Id` suffix (e.g., `categoryId`, `signalId`, `predictorId`). When populated, Mongoose keeps data in the original field name, but the frontend expects cleaner names.
+
+**Backend transforms these in service layer:**
+
+| Backend Field | Transformed To | Used By |
+|---------------|----------------|---------|
+| `categoryId` | `category` | Signals |
+| `predictorId` | `predictor` | Signals |
+| `signalId` | `signal` | Receipts |
+
+### Example Pattern
+```typescript
+// Backend service transforms after query
+const rawSignals = await Signal.find().populate("categoryId").lean();
+const signals = rawSignals.map(({ categoryId, predictorId, ...rest }) => ({
+  ...rest,
+  category: categoryId || null,
+  predictor: predictorId || null,
+}));
+```
+
+### Common Bug
+If you see "Untitled Signal", "Uncategorized", or missing data on the frontend, check if the backend is transforming the populated field names correctly.
+
+---
+
+## 🏆 Signal Marketplace Sorting
+
+### Default Sort Order
+Signals are always sorted by quality first:
+1. `averageRating` (descending) - Best rated first
+2. `totalSales` (descending) - Most sales second
+3. User's sort preference (tertiary)
+
+This ensures the best signals (highly rated with good sales) appear first without requiring user action.
+
+---
+
 ## ⛓️ Blockchain
 
 ### Supported Chains

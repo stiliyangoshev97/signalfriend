@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.2] - 2025-12-04
+
+### Fixed
+
+#### My Signals Page - "Untitled Signal" and "Uncategorized" Bug
+- **Problem**: Purchased signals on My Signals page showed "Untitled Signal" and "Uncategorized" instead of actual data.
+- **Root Cause**: Backend populated `signalId` field via Mongoose, but frontend expected `signal` field.
+- **Solution**: Backend now transforms `signalId` → `signal` and nested `categoryId` → `category` in receipt responses.
+- **Backend PR**: fix/my-signals-display
+
+#### Signal Category Not Displaying on Signal Cards
+- **Problem**: Signal cards in marketplace and detail page weren't showing category badges.
+- **Root Cause**: Backend returned `categoryId` (populated object), frontend expected `category`.
+- **Solution**: Backend now transforms `categoryId` → `category` and `predictorId` → `predictor` in signal responses.
+- **Backend PR**: fix/signal-category-and-filters
+
+### Changed
+
+#### Default Signal Sorting
+- Signals now sorted by: `averageRating` (desc) → `totalSales` (desc) → user's preference
+- Best rated signals with most sales appear first in marketplace
+- No UI changes required - handled by backend
+
+---
+
 ## [0.9.1] - 2025-12-04
 
 ### Fixed

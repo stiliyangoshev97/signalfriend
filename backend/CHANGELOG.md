@@ -15,6 +15,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.15.4] - 2025-12-04 🏆 SIGNAL SORTING & CATEGORY DISPLAY
+
+### Changed
+- **Signal Service** (`src/features/signals/signal.service.ts`):
+  - Default sort now prioritizes: `averageRating` (desc) → `totalSales` (desc) → user's preference
+  - Best rated signals with most sales appear first in marketplace
+  - Added `TransformedSignal` interface for proper typing
+  - `getAll()` transforms `categoryId` → `category` and `predictorId` → `predictor`
+  - `getByContentId()` applies same transformation for signal detail page
+  - Uses `.lean()` for better performance in queries
+
+### Why This Change
+- Categories weren't displaying on signal cards because frontend expected `category` but backend returned `categoryId`
+- Signals should show best-rated with most sales first to highlight quality content
+
+---
+
+## [0.15.3] - 2025-12-04 🎯 MY SIGNALS PAGE FIX
+
+### Changed
+- **Receipt Service** (`src/features/receipts/receipt.service.ts`):
+  - `getMyReceipts()` now transforms `signalId` → `signal` in response
+  - Nested `categoryId` transformed to `category` for consistency
+  - Uses `.lean()` for better performance
+
+### Fixed
+- My Signals page showing "Uncategorized" and "Untitled Signal" for purchased signals
+- Root cause: Mongoose populate puts data in `signalId` field, frontend expected `signal`
+
+---
+
 ## [0.15.2] - 2025-12-04 🔐 AUTH VERIFY RETURNS PREDICTOR
 
 ### Changed
