@@ -74,12 +74,41 @@ export class ReceiptService {
             path: "categoryId",
             select: "name slug icon",
           },
-        }),
+        })
+        .lean(),
       Receipt.countDocuments({ buyerAddress: normalizedAddress }),
     ]);
 
+    // Transform receipts to rename signalId -> signal and categoryId -> category
+    const transformedReceipts = receipts.map((receipt) => {
+      const { signalId, ...rest } = receipt;
+      const signalData = signalId as {
+        title?: string;
+        description?: string;
+        categoryId?: { name?: string; slug?: string; icon?: string };
+        predictorAddress?: string;
+      } | null;
+
+      return {
+        ...rest,
+        signal: signalData
+          ? {
+              title: signalData.title,
+              description: signalData.description,
+              category: signalData.categoryId
+                ? {
+                    name: signalData.categoryId.name,
+                    slug: signalData.categoryId.slug,
+                    icon: signalData.categoryId.icon,
+                  }
+                : undefined,
+            }
+          : undefined,
+      };
+    });
+
     return {
-      receipts,
+      receipts: transformedReceipts as unknown as IReceipt[],
       pagination: {
         total,
         page,
