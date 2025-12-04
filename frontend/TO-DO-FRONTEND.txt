@@ -316,6 +316,22 @@ KNOWN ISSUES / BUGS
     - SignalCard and SignalDetailPage now use real expiresAt
     - Migration script added for existing signals
 
+[✅] FIXED: Unauthenticated users redirected from signal detail page (v0.9.6)
+    - Location: src/features/signals/hooks/usePurchase.ts, src/shared/api/apiClient.ts
+    - Problem: Protected API hooks fired before auth store hydrated, causing 401s
+    - Solution: Added hasHydrated + hasToken checks to all protected hooks
+    - Also updated apiClient to not redirect on 401 for public endpoints
+
+[✅] FIXED: Price input can't enter trailing decimals (v0.9.6)
+    - Location: src/features/predictors/components/CreateSignalModal.tsx
+    - Problem: type="number" with valueAsNumber strips trailing zeros on each keystroke
+    - Solution: Changed to type="text" with inputMode="decimal" + custom validation
+
+[✅] FIXED: SignalCard layout inconsistent (footer at different heights) (v0.9.6)
+    - Location: src/features/signals/components/SignalCard.tsx
+    - Problem: Variable title lengths and verbose expiry text caused cards to have different heights
+    - Solution: Added h-full + mt-auto, min-h on title, abbreviated expiry format (e.g., "Expires in 8h")
+
 ================================================================================
 TECHNICAL DEBT
 ================================================================================

@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.6] - 2025-12-04
+
+### Fixed
+
+#### Public Signal Detail Page (Unauthenticated Access)
+- **usePurchase Hook** (`src/features/signals/hooks/usePurchase.ts`):
+  - Added `isAuthenticated` and `_hasHydrated` checks from `useAuthStore`
+  - Added `hasToken` check against localStorage to prevent stale state issues
+  - Updated `useCheckPurchase`, `useSignalContent`, `useMyReceipts`, and `useContentIdentifier`
+  - All protected API queries now wait for auth store hydration before enabling
+  - Prevents 401 errors that would redirect unauthenticated users away from public pages
+
+- **API Client** (`src/shared/api/apiClient.ts`):
+  - Updated 401 response interceptor to not redirect for public endpoints
+  - Added `isPublicEndpoint` check for `/signals`, `/categories`, `/predictors`
+  - Excludes `/content` endpoint which requires authentication
+  - Only auto-logout for protected endpoints
+
+#### Price Input Decimal Handling
+- **CreateSignalModal** (`src/features/predictors/components/CreateSignalModal.tsx`):
+  - Changed price input from `type="number"` to `type="text"` with `inputMode="decimal"`
+  - Fixed bug where trailing zeros/decimals were blocked (e.g., 8.3, 8.30)
+  - Added custom `onKeyDown` handler to filter invalid characters
+  - Uses `setValueAs` to convert string to number on form submit
+  - Blocks comma input, users must use period for decimals
+
+#### SignalCard Layout Consistency
+- **SignalCard** (`src/features/signals/components/SignalCard.tsx`):
+  - Removed description from card (description shown on detail page only)
+  - Changed container to `flex flex-col h-full` for consistent card heights
+  - Added `mt-auto` to footer to push it to bottom regardless of content length
+  - Added `min-h-[3.5rem]` to title for consistent title area height
+  - Added `whitespace-nowrap` to expiry and sales text to prevent wrapping
+  - Footer elements (price, expiry, sales) now align consistently across all cards
+
+- **Expiry Display** (`getExpiryInfo` function):
+  - Changed from verbose "Expires in about 8 hours" to compact "Expires in 8h"
+  - Uses abbreviated time units: `d` (days), `h` (hours), `m` (minutes)
+  - Prevents text wrapping that caused inconsistent card heights
+  - Clearer and more scannable format
+
+### Why These Changes
+- **Public Access**: Signal detail pages should be viewable without logging in
+- **Stale Auth State**: Queries could fire before auth store hydrated from localStorage, causing spurious 401s
+- **Price Decimals**: `type="number"` with `valueAsNumber` strips trailing decimals on each keystroke
+- **Card Layout**: Variable content lengths and long expiry text caused footer elements to appear at different heights
+
+---
+
 ## [0.9.5] - 2025-12-04
 
 ### Fixed

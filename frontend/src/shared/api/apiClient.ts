@@ -126,10 +126,16 @@ apiClient.interceptors.response.use(
 
     if (status === 401) {
       // Token expired or invalid - clear auth
-      const isAuthEndpoint = error.config?.url?.includes('/auth/');
+      const requestUrl = error.config?.url || '';
+      const isAuthEndpoint = requestUrl.includes('/auth/');
+      // Public endpoints that shouldn't trigger redirect on 401
+      const isPublicEndpoint = 
+        requestUrl.includes('/signals') && !requestUrl.includes('/content') ||
+        requestUrl.includes('/categories') ||
+        requestUrl.includes('/predictors');
       
-      if (!isAuthEndpoint) {
-        // Only auto-logout for non-auth endpoints
+      if (!isAuthEndpoint && !isPublicEndpoint) {
+        // Only auto-logout for protected endpoints
         localStorage.removeItem('authToken');
         localStorage.removeItem('auth-storage');
         

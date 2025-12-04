@@ -26,6 +26,7 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { parseUnits, formatUnits } from 'viem';
 import { getContractAddresses, SIGNAL_FRIEND_MARKET_ABI, ERC20_ABI } from '@/shared/config';
 import { checkPurchase, fetchContentIdentifier, fetchMyReceipts, fetchSignalContent } from '../api';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import type { CheckPurchaseResponse, Receipt, SignalContentResponse } from '../api/purchase.api';
 
 /** USDT has 18 decimals on BNB Chain */
@@ -42,7 +43,9 @@ export const purchaseKeys = {
 };
 
 /**
- * Hook to check if the current user has purchased a signal
+ * Hook to check if the current user has purchased a signal.
+ * Only runs when user is authenticated (has JWT token) to prevent
+ * 401 errors that would redirect unauthenticated users away from public pages.
  *
  * @param contentId - Signal's content ID
  * @returns Query result with purchase status
@@ -55,18 +58,28 @@ export const purchaseKeys = {
  */
 export function useCheckPurchase(contentId: string) {
   const { isConnected } = useAccount();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  // Double-check that authToken exists in localStorage (prevents stale state issues)
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
 
   return useQuery<CheckPurchaseResponse>({
     queryKey: purchaseKeys.check(contentId),
     queryFn: () => checkPurchase(contentId),
-    enabled: isConnected && !!contentId,
+    // Only check purchase status when:
+    // 1. Wallet is connected
+    // 2. Auth store has hydrated (prevents stale state)
+    // 3. User is authenticated in store
+    // 4. authToken exists in localStorage (belt-and-suspenders check)
+    // 5. contentId is provided
+    enabled: isConnected && hasHydrated && isAuthenticated && hasToken && !!contentId,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }
 
 /**
  * Hook to fetch the protected content of a purchased signal.
- * Only fetches when user has purchased the signal (isOwned = true).
+ * Only fetches when user is authenticated and has purchased the signal (isOwned = true).
  *
  * @param contentId - Signal's content ID
  * @param isOwned - Whether the user has purchased this signal
@@ -81,11 +94,22 @@ export function useCheckPurchase(contentId: string) {
  */
 export function useSignalContent(contentId: string, isOwned: boolean = false) {
   const { isConnected } = useAccount();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  // Double-check that authToken exists in localStorage (prevents stale state issues)
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
 
   return useQuery<SignalContentResponse>({
     queryKey: purchaseKeys.content(contentId),
     queryFn: () => fetchSignalContent(contentId),
-    enabled: isConnected && !!contentId && isOwned,
+    // Only fetch protected content when:
+    // 1. Wallet is connected
+    // 2. Auth store has hydrated
+    // 3. User is authenticated in store
+    // 4. authToken exists in localStorage
+    // 5. contentId is provided
+    // 6. User owns the signal
+    enabled: isConnected && hasHydrated && isAuthenticated && hasToken && !!contentId && isOwned,
     staleTime: 1000 * 60 * 30, // 30 minutes - content doesn't change
   });
 }
@@ -109,11 +133,15 @@ export function useMyReceipts(params?: {
   sortOrder?: 'asc' | 'desc';
 }) {
   const { isConnected } = useAccount();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
 
   return useQuery<Receipt[]>({
     queryKey: purchaseKeys.myReceipts(params),
     queryFn: () => fetchMyReceipts(params),
-    enabled: isConnected,
+    // Only fetch receipts when user is authenticated
+    enabled: isConnected && hasHydrated && isAuthenticated && hasToken,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
@@ -125,10 +153,16 @@ export function useMyReceipts(params?: {
  * @returns Query result with bytes32 content identifier
  */
 export function useContentIdentifier(contentId: string) {
+  const { isConnected } = useAccount();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
+
   return useQuery({
     queryKey: purchaseKeys.contentId(contentId),
     queryFn: () => fetchContentIdentifier(contentId),
-    enabled: !!contentId,
+    // Only fetch when authenticated (endpoint requires auth)
+    enabled: isConnected && hasHydrated && isAuthenticated && hasToken && !!contentId,
     staleTime: Infinity, // Content ID never changes
   });
 }
