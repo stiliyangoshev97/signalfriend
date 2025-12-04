@@ -16,9 +16,10 @@
  * ```
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Modal, Button, Spinner } from '@/shared/components/ui';
 import { usePurchaseFlow } from '../hooks';
+import { parseWalletError } from '@/shared/utils';
 
 /** Props for PurchaseModal component */
 interface PurchaseModalProps {
@@ -126,6 +127,12 @@ export function PurchaseModal({
     priceUsdt,
     predictorAddress: predictorAddress as `0x${string}`,
   });
+
+  // Parse error into user-friendly message
+  const parsedError = useMemo(() => {
+    if (!error) return null;
+    return parseWalletError(error);
+  }, [error]);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -304,16 +311,28 @@ export function PurchaseModal({
         )}
 
         {/* Error Display */}
-        {error && (
-          <div className="bg-accent-red/10 border border-accent-red/30 rounded-lg p-4">
+        {parsedError && (
+          <div className={`rounded-lg p-4 ${
+            parsedError.isUserAction 
+              ? 'bg-yellow-500/10 border border-yellow-500/30' 
+              : 'bg-accent-red/10 border border-accent-red/30'
+          }`}>
             <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-accent-red mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              {parsedError.isUserAction ? (
+                <svg className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 text-accent-red mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
               <div>
-                <p className="text-accent-red font-medium">Transaction Failed</p>
+                <p className={`font-medium ${parsedError.isUserAction ? 'text-yellow-500' : 'text-accent-red'}`}>
+                  {parsedError.title}
+                </p>
                 <p className="text-sm text-fur-cream/60 mt-1">
-                  {(error as Error)?.message || 'An error occurred. Please try again.'}
+                  {parsedError.message}
                 </p>
               </div>
             </div>

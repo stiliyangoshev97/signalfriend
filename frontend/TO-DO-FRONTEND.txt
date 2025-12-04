@@ -190,6 +190,13 @@ PHASE 3: SIGNALS FEATURE (PRIORITY: HIGH)
     - "View Signal" links to unlocked content on detail page
     - "View TX" links to BSCScan explorer
 
+[✅] User-Friendly Transaction Errors - Added in v0.10.4
+    - walletErrors.ts utility for parsing wallet errors
+    - Detects user rejection, insufficient funds, network errors
+    - PurchaseModal shows clean error messages instead of raw technical data
+    - User rejections shown as yellow "Transaction Cancelled" (not scary red)
+    - parseWalletError() and isUserRejectionError() exported for reuse
+
 [ ] Leave Review Functionality
     - Review form on purchased signal
     - Star rating (1-5)

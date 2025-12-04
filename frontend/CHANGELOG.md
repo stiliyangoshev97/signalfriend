@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.10.4] - 2025-12-04
+
+### Added
+
+#### User-Friendly Transaction Error Messages
+- **walletErrors.ts** (`src/shared/utils/walletErrors.ts`):
+  - New utility for parsing wallet/transaction errors into user-friendly messages
+  - Detects user rejection, insufficient funds, network errors, and contract reverts
+  - Exports `parseWalletError()` and `isUserRejectionError()` functions
+  - Returns structured error with `title`, `message`, and `isUserAction` flag
+
+- **PurchaseModal** (`src/features/signals/components/PurchaseModal.tsx`):
+  - Integrated wallet error parsing for cleaner error display
+  - User rejections now show as yellow "Transaction Cancelled" (not a scary red error)
+  - Actual errors still show as red with appropriate messaging
+  - No more long technical error messages overflowing the modal
+
+#### Error Message Types
+| Error Type | Title | Color |
+|------------|-------|-------|
+| User rejected | "Transaction Cancelled" | Yellow |
+| Insufficient funds | "Insufficient Balance" | Red |
+| Network error | "Network Error" | Red |
+| Contract revert | "Transaction Failed" | Red |
+| Unknown | "Transaction Failed" | Red |
+
+---
+
 ## [0.10.3] - 2025-12-04
 
 ### Fixed
