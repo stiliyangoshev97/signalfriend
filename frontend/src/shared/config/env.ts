@@ -62,6 +62,10 @@ export const env = {
   // Feature Flags
   ENABLE_TESTNET: import.meta.env.VITE_ENABLE_TESTNET === 'true',
   
+  // Development Flags
+  /** Bypass predictor check for dashboard testing (DEV ONLY) */
+  DEV_BYPASS_PREDICTOR_CHECK: import.meta.env.VITE_DEV_BYPASS_PREDICTOR_CHECK === 'true',
+  
   // Environment
   IS_DEV: import.meta.env.DEV,
   IS_PROD: import.meta.env.PROD,

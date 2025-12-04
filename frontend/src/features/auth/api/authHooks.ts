@@ -78,12 +78,78 @@
  * - JWT has expiration (24h default)
  */
 
-import { useMutation } from '@tanstack/react-query';
-// ...existing code...
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAccount, useSignMessage, useDisconnect } from 'wagmi';
 import { SiweMessage } from 'siwe';
 import { useAuthStore } from '../store';
 import * as authApi from './authApi';
+import { useEffect } from 'react';
+
+/**
+ * Hook to validate and sync session on app mount/reconnect
+ * 
+ * Handles the case where:
+ * - Page refreshes and zustand has stored auth
+ * - But wagmi is still reconnecting
+ * - Or the token might have expired
+ * 
+ * This hook:
+ * 1. Waits for wagmi to finish connecting
+ * 2. Validates the stored token with the backend
+ * 3. Clears auth if token is invalid or wallet changed
+ */
+export function useSessionSync() {
+  const { address, isConnected, status } = useAccount();
+  const { token, logout } = useAuthStore();
+  
+  // Check if wagmi is still initializing (connecting/reconnecting)
+  const isWagmiInitializing = status === 'connecting' || status === 'reconnecting';
+  
+  // Validate token with backend when we have a token and are connected
+  const { data: sessionData, isError: sessionInvalid, isLoading: isValidating } = useQuery({
+    queryKey: ['auth', 'session', token],
+    queryFn: () => authApi.validateSession(),
+    enabled: !!token && isConnected && !isWagmiInitializing,
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (renamed from cacheTime)
+  });
+  
+  // Clear auth if session is invalid (token expired, etc.)
+  useEffect(() => {
+    if (sessionInvalid && token) {
+      logout();
+    }
+  }, [sessionInvalid, token, logout]);
+  
+  // Clear auth if wallet address changed (user switched accounts)
+  useEffect(() => {
+    if (
+      isConnected && 
+      !isWagmiInitializing && 
+      sessionData?.address && 
+      address &&
+      sessionData.address.toLowerCase() !== address.toLowerCase()
+    ) {
+      logout();
+    }
+  }, [isConnected, isWagmiInitializing, sessionData?.address, address, logout]);
+  
+  // Clear auth if wallet disconnected but we still have auth state
+  // IMPORTANT: Only do this AFTER wagmi has finished initializing
+  useEffect(() => {
+    if (!isWagmiInitializing && !isConnected && token) {
+      logout();
+    }
+  }, [isWagmiInitializing, isConnected, token, logout]);
+  
+  return {
+    /** True while wagmi is reconnecting or we're validating the session */
+    isLoading: isWagmiInitializing || (!!token && isValidating),
+    /** True if session validation failed */
+    isSessionInvalid: sessionInvalid,
+  };
+}
 
 /**
  * Hook for SIWE authentication flow

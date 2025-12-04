@@ -57,6 +57,7 @@ import RootLayout from './RootLayout';
 import { ProtectedRoute, AdminRoute, PredictorRoute } from './guards';
 import { HomePage } from '@/features/home';
 import { SignalsPage, SignalDetailPage, MyPurchasedSignalsPage } from '@/features/signals';
+import { PredictorDashboardPage } from '@/features/predictors';
 
 // Lazy load pages for code splitting (example for future pages)
 // import { lazy } from 'react';
@@ -112,7 +113,7 @@ export const router = createBrowserRouter([
         path: 'dashboard',
         element: (
           <PredictorRoute>
-            <PlaceholderPage title="Predictor Dashboard" />
+            <PredictorDashboardPage />
           </PredictorRoute>
         ),
       },
@@ -120,7 +121,7 @@ export const router = createBrowserRouter([
         path: 'dashboard/create-signal',
         element: (
           <PredictorRoute requireVerified>
-            <PlaceholderPage title="Create Signal" />
+            <PredictorDashboardPage />
           </PredictorRoute>
         ),
       },

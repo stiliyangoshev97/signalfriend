@@ -13,8 +13,9 @@ import { SiweMessage, generateNonce } from "siwe";
 import jwt from "jsonwebtoken";
 import { env } from "../../shared/config/env.js";
 import { ApiError } from "../../shared/utils/ApiError.js";
+import { Predictor } from "../predictors/predictor.model.js";
 import type { Address } from "viem";
-import type { NonceStore, NonceResponse, VerifyResponse } from "./auth.types.js";
+import type { NonceStore, NonceResponse, VerifyResponse, AuthPredictor } from "./auth.types.js";
 
 /**
  * In-memory nonce store for SIWE authentication.
@@ -104,9 +105,40 @@ export class AuthService {
       { expiresIn: "7d" }
     );
 
+    // Look up predictor data (if user is a registered predictor)
+    let predictor: AuthPredictor | null = null;
+    const predictorDoc = await Predictor.findOne({ walletAddress: normalizedAddress });
+    
+    if (predictorDoc) {
+      predictor = {
+        _id: predictorDoc._id.toString(),
+        walletAddress: predictorDoc.walletAddress,
+        tokenId: predictorDoc.tokenId,
+        displayName: predictorDoc.displayName,
+        bio: predictorDoc.bio,
+        avatarUrl: predictorDoc.avatarUrl,
+        socialLinks: {
+          twitter: predictorDoc.socialLinks?.twitter,
+          telegram: predictorDoc.socialLinks?.telegram,
+          discord: predictorDoc.socialLinks?.discord,
+        },
+        preferredContact: predictorDoc.preferredContact,
+        categoryIds: predictorDoc.categoryIds.map((id) => id.toString()),
+        totalSignals: predictorDoc.totalSignals,
+        totalSales: predictorDoc.totalSales,
+        averageRating: predictorDoc.averageRating,
+        totalReviews: predictorDoc.totalReviews,
+        isVerified: predictorDoc.isVerified,
+        isBlacklisted: predictorDoc.isBlacklisted,
+        joinedAt: predictorDoc.joinedAt.toISOString(),
+        createdAt: predictorDoc.createdAt.toISOString(),
+        updatedAt: predictorDoc.updatedAt.toISOString(),
+      };
+    }
+
     return {
       token,
-      address: fields.address as Address,
+      predictor,
     };
   }
 

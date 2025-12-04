@@ -15,6 +15,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.15.2] - 2025-12-04 🔐 AUTH VERIFY RETURNS PREDICTOR
+
+### Changed
+- **Auth Service** (`src/features/auth/auth.service.ts`):
+  - `verify()` now returns predictor data along with JWT token
+  - Looks up predictor by wallet address after signature verification
+  - Returns `{ token, predictor }` instead of `{ token, address }`
+  - Predictor is `null` if user is not a registered predictor
+
+- **Auth Types** (`src/features/auth/auth.types.ts`):
+  - Added `AuthPredictor` interface for predictor data in auth responses
+  - Updated `VerifyResponse` to include `predictor: AuthPredictor | null`
+  - Removed `address` from response (frontend gets it from predictor or JWT)
+
+- **Signal Schema** (`src/features/signals/signal.schemas.ts`):
+  - Added max 2 decimal places validation for `priceUsdt` field
+
+### Why This Change
+The frontend needs predictor data immediately after login to:
+1. Store in auth state for route guards
+2. Persist to localStorage for session restoration
+3. Avoid extra API call to fetch predictor profile
+
+Previously, the frontend had to call `/api/predictors/:address` after login to get predictor data, and on page refresh the predictor data was lost because it wasn't persisted.
+
+---
+
+## [0.15.1] - 2024-12-04 🔧 MISSING PREDICTORS SCRIPT
+
+### Added
+- **Missing Predictors Script** (`src/scripts/seedMissingPredictors.ts`):
+  - Seeds predictor records for wallets registered on-chain before webhooks were connected
+  - Fetches token IDs from blockchain using `getPredictorTokenId()` contract function
+  - Supports `--dry-run` flag to preview changes
+  - Run with: `npx tsx src/scripts/seedMissingPredictors.ts`
+  - Run preview: `npx tsx src/scripts/seedMissingPredictors.ts --dry-run`
+
+### Fixed
+- 6 missing predictor records can now be added to MongoDB for wallets that registered before webhook setup
+
+---
+
 ## [0.15.0] - 2024-12-03 ⏰ SIGNAL EXPIRY FEATURE
 
 ### Added

@@ -2,8 +2,8 @@
                         SIGNALFRIEND FRONTEND TO-DO LIST
 ================================================================================
 
-Last Updated: 2025-12-03
-Branch: feature/my-purchased-signals (v0.8.2)
+Last Updated: 2025-12-04
+Branch: feature/predictor-dashboard (v0.9.0)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -84,10 +84,12 @@ PHASE 2: AUTHENTICATION & WALLET ✅ COMPLETE
     - AuthButton component (Connect → Sign In → Sign Out flow)
     - Sign message for authentication (SIWE pattern)
     - Auto-reconnect on page refresh (wagmi persistence)
+    - Session sync on refresh (useSessionSync hook) - Fixed in v0.9.0
 
 [✅] Auth API Integration
     - GET /api/auth/nonce - get signing nonce
     - POST /api/auth/verify - verify signature & get JWT
+    - GET /api/auth/me - validate session token - Added in v0.9.0
     - Token storage in Zustand + localStorage
     - Proper API response unwrapping
 
@@ -215,20 +217,26 @@ PHASE 4: PREDICTOR FEATURES (PRIORITY: MEDIUM)
     - Call registerPredictor contract method
     - Update role in backend
 
-[ ] Predictor Dashboard (/dashboard - predictor only)
-    - Sales statistics
-    - Revenue charts
-    - Active signals management
-    - Create new signal form
+[✅] Predictor Dashboard (/dashboard - predictor only) - Added in v0.9.0
+    - Dashboard stats overview (signals, sales, earnings, rating)
+    - My Signals grid with filter tabs (all/active/inactive)
+    - Signal management (view, deactivate, reactivate)
+    - Create Signal modal (available to all predictors)
+    - API functions for signal CRUD operations
+    - React Query hooks (useMySignals, useMyEarnings, useCreateSignal, etc.)
+    - DashboardStats component with animated stat cards
+    - MySignalCard component with expiry tracking
+    - CreateSignalModal with full form validation
+    - Verification badge display for verified predictors
+    - Empty state with CTA for first signal
+    - Router updated with real PredictorDashboardPage
 
-[ ] Create Signal Form
-    - Multi-step form wizard
-    - Category selection
-    - Risk/reward settings
-    - Pricing
-    - Protected content editor
-    - Preview before publish
-    - Submit to API
+[✅] Auth Persistence Fix - Fixed in v0.9.0
+    - Backend now returns predictor data on /api/auth/verify
+    - Predictor data persisted to localStorage with JWT
+    - Route guards wait for Zustand hydration before redirect
+    - useSessionSync validates token on page refresh
+    - No more redirect flash or manual reconnect needed
 
 ================================================================================
 PHASE 5: REVIEWS & RATINGS (PRIORITY: MEDIUM)

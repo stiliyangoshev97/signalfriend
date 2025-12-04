@@ -45,9 +45,19 @@
  */
 
 import { apiClient } from '../../../shared/api';
-// ...existing code...
 import { API_CONFIG } from '../../../shared/config';
 import type { AuthNonceResponse, AuthVerifyRequest, AuthVerifyResponse, ApiResponse } from '../../../shared/types';
+
+/**
+ * Validate the current session/token
+ * Returns the authenticated user's address if valid
+ */
+export async function validateSession(): Promise<{ address: string }> {
+  const response = await apiClient.get<ApiResponse<{ address: string }>>(
+    API_CONFIG.ENDPOINTS.AUTH_ME
+  );
+  return response.data.data;
+}
 
 /**
  * Get a nonce for SIWE authentication

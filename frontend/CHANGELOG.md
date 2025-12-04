@@ -7,6 +7,168 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.0] - 2025-12-04
+
+### Added
+
+#### Predictor Dashboard
+Complete dashboard for predictors to manage their signals and view statistics.
+
+- **PredictorDashboardPage** (`src/features/predictors/pages/PredictorDashboardPage.tsx`):
+  - Dashboard stats overview (total signals, active signals, total sales, earnings, rating)
+  - My Signals grid with filter tabs (All/Active/Inactive)
+  - Signal management actions (view, deactivate, reactivate)
+  - Create Signal button (available to all predictors)
+  - Verification status display with badge
+  - Empty state with CTA to create first signal
+  - Loading skeletons for better UX
+
+- **DashboardStats** (`src/features/predictors/components/DashboardStats.tsx`):
+  - Four-card stats grid (signals, sales, earnings, rating)
+  - Star rating display with review count
+  - Active/inactive signal breakdown
+  - Loading state with skeleton animation
+
+- **MySignalCard** (`src/features/predictors/components/MySignalCard.tsx`):
+  - Signal card for dashboard with status indicators
+  - Stats display (price, sales, earnings)
+  - Expiry tracking with warning for soon-to-expire signals
+  - Action buttons (view, deactivate/reactivate)
+  - Hover effects for action visibility
+
+- **CreateSignalModal** (`src/features/predictors/components/CreateSignalModal.tsx`):
+  - Full form for creating new signals
+  - Title, description, and protected content fields
+  - Category selection dropdown
+  - Price input with validation ($5 minimum)
+  - Expiry duration slider (1-30 days)
+  - Price breakdown showing buyer cost and predictor earnings
+  - Character counters for text fields
+  - Form validation with Zod + React Hook Form
+  - Loading and error states
+
+- **Predictor API Functions** (`src/features/predictors/api/`):
+  - `fetchMyProfile()` - Get current predictor profile
+  - `fetchPredictorByAddress()` - Get predictor by wallet
+  - `fetchMySignals()` - Get predictor's signals with filters
+  - `fetchPredictorEarnings()` - Get earnings breakdown
+  - `updatePredictorProfile()` - Update profile fields
+  - `applyForVerification()` - Apply for verified badge
+  - `createSignal()` - Create new signal
+  - `updateSignal()` - Update existing signal
+  - `deactivateSignal()` - Soft delete signal
+  - `reactivateSignal()` - Restore deactivated signal
+
+- **Predictor Hooks** (`src/features/predictors/hooks/`):
+  - `useMySignals()` - Fetch own signals with React Query
+  - `useMyEarnings()` - Fetch earnings breakdown
+  - `usePredictorProfile()` - Fetch predictor profile
+  - `useUpdateProfile()` - Mutation for profile updates
+  - `useApplyForVerification()` - Mutation for verification
+  - `useCreateSignal()` - Mutation for signal creation
+  - `useUpdateSignal()` - Mutation for signal updates
+  - `useDeactivateSignal()` - Mutation for deactivation
+  - `useReactivateSignal()` - Mutation for reactivation
+  - `predictorKeys` - Query key factory for caching
+
+- **Auth Session Sync** (`src/features/auth/api/authHooks.ts`):
+  - `useSessionSync()` - Validates stored token on page refresh
+  - Handles wagmi reconnection race condition
+  - Clears auth if token expired or wallet changed
+  - Prevents redirect flash on protected routes
+
+- **Session Validation API** (`src/features/auth/api/authApi.ts`):
+  - `validateSession()` - Check if current JWT is still valid
+  - Uses new `AUTH_ME` endpoint
+
+### Changed
+
+- **Router** (`src/router/index.tsx`):
+  - Replaced placeholder with real `PredictorDashboardPage`
+  - Route `/dashboard` now shows predictor dashboard
+  - Route `/dashboard/create-signal` redirects to dashboard
+
+- **Modal Component** (`src/shared/components/ui/Modal.tsx`):
+  - Added '2xl' size option (max-w-2xl) for larger forms
+  - Made modal content scrollable with `max-h-[90vh]`
+  - Improved layout with flex-col and flex-shrink-0 for header
+  - Content area now uses `overflow-y-auto` and `flex-1`
+
+- **ProtectedRoute Guard** (`src/router/guards/ProtectedRoute.tsx`):
+  - Added loading state during wallet reconnection
+  - Uses `useSessionSync` to validate auth before redirect
+  - Shows spinner while reconnecting/validating
+
+- **PredictorRoute Guard** (`src/router/guards/PredictorRoute.tsx`):
+  - Added loading state during wallet reconnection
+  - Uses `useSessionSync` to validate auth before redirect
+  - Shows spinner while reconnecting/validating
+  - Waits for Zustand store hydration before redirect decisions
+
+- **Auth Store** (`src/features/auth/store/authStore.ts`):
+  - Added `_hasHydrated` flag to track localStorage rehydration
+  - Derives `isAuthenticated` from token on rehydration
+  - Properly persists and restores predictor data
+
+- **Predictor Schema** (`src/shared/schemas/predictor.schemas.ts`):
+  - Updated to match backend response structure
+  - Added `_id`, `tokenId`, `socialLinks`, `categoryIds` fields
+  - Made `verificationStatus` optional for compatibility
+
+- **API Config** (`src/shared/config/api.config.ts`):
+  - Added `AUTH_ME` endpoint for session validation
+  - Fixed `PREDICTOR_SIGNALS` endpoint path
+
+- **Signal Schema** (`src/shared/schemas/signal.schemas.ts`):
+  - Added max 2 decimal places validation for price input
+
+- **CreateSignalModal** (`src/features/predictors/components/CreateSignalModal.tsx`):
+  - Blocks comma key input in price field (enforces period for decimals)
+  - Updated placeholder to "5.00" with helper text
+
+### Fixed
+
+- **Auth persistence on page refresh**: Fixed issue where predictor data was lost after refresh. The backend `/api/auth/verify` endpoint now returns predictor data along with the JWT token, which gets properly persisted and restored from localStorage.
+
+- **Route guard race condition**: Fixed redirect flash on page refresh by waiting for both wagmi reconnection AND Zustand hydration before making auth decisions.
+
+- **Modal sizing**: CreateSignalModal now uses `size="2xl"` for better form display with all fields visible.
+
+- **Price validation**: Prevents entering prices with more than 2 decimal places on both frontend and backend.
+
+### File Structure
+
+```
+src/features/predictors/
+├── api/
+│   ├── index.ts
+│   ├── predictors.api.ts    # Profile & stats API
+│   └── signals.api.ts       # Signal CRUD API
+├── components/
+│   ├── index.ts
+│   ├── DashboardStats.tsx   # Stats cards component
+│   ├── MySignalCard.tsx     # Signal card for dashboard
+│   └── CreateSignalModal.tsx # Create signal form modal
+├── hooks/
+│   ├── index.ts
+│   └── usePredictorDashboard.ts # React Query hooks
+├── pages/
+│   ├── index.ts
+│   └── PredictorDashboardPage.tsx
+├── types/
+└── index.ts                 # Feature barrel export
+```
+
+### Notes
+
+- All predictors can create signals (verification is for extra privileges only)
+- Verified predictors get a badge and future premium features
+- Signals can be deactivated but not deleted (preserves buyer access)
+- Expired signals cannot be reactivated
+- Platform takes 5% commission on signal sales
+
+---
+
 ## [0.8.2] - 2025-12-03
 
 ### Added

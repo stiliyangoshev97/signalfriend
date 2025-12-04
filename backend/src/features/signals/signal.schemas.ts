@@ -78,8 +78,15 @@ export const createSignalSchema = z.object({
   content: z.string().min(1).max(10000),
   /** Category ID */
   categoryId: z.string(),
-  /** Price in USDT (min from env, default 5 USDT) */
-  priceUsdt: z.number().min(env.MIN_SIGNAL_PRICE_USDT).max(100000),
+  /** Price in USDT (min from env, default 5 USDT, max 2 decimal places) */
+  priceUsdt: z
+    .number()
+    .min(env.MIN_SIGNAL_PRICE_USDT)
+    .max(100000)
+    .refine(
+      (val) => Number.isInteger(val * 100),
+      "Price can have at most 2 decimal places"
+    ),
   /** Number of days until signal expires (1-30 days) */
   expiryDays: z.number().int().min(1).max(30),
 });

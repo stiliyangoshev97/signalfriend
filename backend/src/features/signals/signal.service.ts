@@ -467,11 +467,15 @@ export class SignalService {
    *
    * @param predictorAddress - The predictor's wallet address
    * @param includeInactive - Whether to include inactive signals
+   * @param sortBy - Field to sort by (default: createdAt)
+   * @param sortOrder - Sort direction (default: desc)
    * @returns Promise resolving to array of signals (public fields)
    */
   static async getByPredictor(
     predictorAddress: string,
-    includeInactive: boolean = false
+    includeInactive: boolean = false,
+    sortBy: string = "createdAt",
+    sortOrder: "asc" | "desc" = "desc"
   ): Promise<PublicSignal[]> {
     const normalizedAddress = predictorAddress.toLowerCase();
     const filter: Record<string, unknown> = {
@@ -482,9 +486,14 @@ export class SignalService {
       filter.isActive = true;
     }
 
+    // Build sort object
+    const allowedSortFields = ["createdAt", "priceUsdt", "totalSales", "averageRating"];
+    const sortField = allowedSortFields.includes(sortBy) ? sortBy : "createdAt";
+    const sortDirection = sortOrder === "asc" ? 1 : -1;
+
     const signals = await Signal.find(filter)
       .select(SignalService.PUBLIC_FIELDS)
-      .sort({ createdAt: -1 })
+      .sort({ [sortField]: sortDirection })
       .populate("categoryId", "name slug icon");
 
     return signals as unknown as PublicSignal[];
