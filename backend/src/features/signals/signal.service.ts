@@ -40,7 +40,7 @@ export interface TransformedSignal {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
-  category: { name: string; slug: string; icon?: string } | null;
+  category: { name: string; slug: string; icon?: string; mainGroup?: string } | null;
   predictor: { displayName?: string; avatarUrl?: string; averageRating?: number; walletAddress?: string } | null;
 }
 
@@ -185,7 +185,7 @@ export class SignalService {
         .sort(sort)
         .skip(skip)
         .limit(limit)
-        .populate("categoryId", "name slug icon")
+        .populate("categoryId", "name slug icon mainGroup")
         .populate("predictorId", "displayName avatarUrl averageRating")
         .lean(),
       Signal.countDocuments(filter),
@@ -224,7 +224,7 @@ export class SignalService {
   static async getByContentId(contentId: string): Promise<Record<string, unknown>> {
     const rawSignal = await Signal.findOne({ contentId })
       .select(SignalService.PUBLIC_FIELDS)
-      .populate("categoryId", "name slug icon")
+      .populate("categoryId", "name slug icon mainGroup")
       .populate("predictorId", "displayName avatarUrl averageRating walletAddress")
       .lean();
 
@@ -384,7 +384,7 @@ export class SignalService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + data.expiryDays);
 
-    // Create signal
+    // Create signal with denormalized mainGroup for efficient filtering
     const signal = new Signal({
       contentId,
       predictorId: predictor._id,
@@ -393,6 +393,7 @@ export class SignalService {
       description: data.description,
       content: data.content,
       categoryId: data.categoryId,
+      mainGroup: category.mainGroup, // Denormalized for read performance
       priceUsdt: data.priceUsdt,
       expiresAt,
       riskLevel: data.riskLevel,
@@ -553,7 +554,7 @@ export class SignalService {
     includeInactive: boolean = false,
     sortBy: string = "createdAt",
     sortOrder: "asc" | "desc" = "desc"
-  ): Promise<PublicSignal[]> {
+  ): Promise<TransformedSignal[]> {
     const normalizedAddress = predictorAddress.toLowerCase();
     const filter: Record<string, unknown> = {
       predictorAddress: normalizedAddress,
@@ -568,12 +569,25 @@ export class SignalService {
     const sortField = allowedSortFields.includes(sortBy) ? sortBy : "createdAt";
     const sortDirection = sortOrder === "asc" ? 1 : -1;
 
-    const signals = await Signal.find(filter)
+    const rawSignals = await Signal.find(filter)
       .select(SignalService.PUBLIC_FIELDS)
       .sort({ [sortField]: sortDirection })
-      .populate("categoryId", "name slug icon");
+      .populate("categoryId", "name slug icon mainGroup")
+      .populate("predictorId", "displayName avatarUrl averageRating")
+      .lean();
 
-    return signals as unknown as PublicSignal[];
+    // Transform field names for frontend compatibility
+    // Backend uses categoryId/predictorId, frontend expects category/predictor
+    const signals = rawSignals.map((signal) => {
+      const { categoryId, predictorId, ...rest } = signal as Record<string, unknown>;
+      return {
+        ...rest,
+        category: categoryId || null,
+        predictor: predictorId || null,
+      } as TransformedSignal;
+    });
+
+    return signals;
   }
 
   /**
@@ -619,7 +633,7 @@ export class SignalService {
       { new: true }
     )
       .select(SignalService.PUBLIC_FIELDS)
-      .populate("categoryId", "name slug icon");
+      .populate("categoryId", "name slug icon mainGroup");
 
     if (!signal) {
       throw ApiError.notFound(`Signal with contentId '${contentId}' not found`);

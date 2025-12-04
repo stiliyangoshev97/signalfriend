@@ -38,6 +38,7 @@ export const signalSchema = z.object({
   title: z.string(),
   description: z.string(),
   categoryId: z.union([z.string(), z.object({ _id: z.string() }).passthrough()]).optional(),
+  mainGroup: z.string().optional(), // Denormalized from category for efficient filtering
   priceUsdt: z.number(),
   expiresAt: z.string(), // Required - when signal expires (max 30 days from creation)
   totalSales: z.number().default(0),

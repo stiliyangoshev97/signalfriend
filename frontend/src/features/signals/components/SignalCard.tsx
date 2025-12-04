@@ -130,8 +130,8 @@ export function SignalCard({ signal }: SignalCardProps): React.ReactElement {
       {/* Header: Category & Status */}
       <div className="flex items-center justify-between mb-3">
         {signal.category ? (
-          <span className="text-xs font-medium text-fur-light bg-fur-light/10 px-2 py-1 rounded-full">
-            {signal.category.name}
+          <span className="text-xs font-medium text-fur-light bg-fur-light/10 px-2 py-1 rounded-full truncate max-w-[60%]" title={`${signal.category.mainGroup || signal.mainGroup} > ${signal.category.name}`}>
+            {signal.category.mainGroup || signal.mainGroup} &gt; {signal.category.name}
           </span>
         ) : (
           <span className="text-xs font-medium text-fur-cream/50 bg-dark-700 px-2 py-1 rounded-full">

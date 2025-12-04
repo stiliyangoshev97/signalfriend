@@ -49,6 +49,8 @@ export const createCategorySchema = z.object({
     .min(1, "Slug is required")
     .max(50)
     .regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens"),
+  /** Main category group (e.g., "Crypto", "Traditional Finance", "Macro / Other") */
+  mainGroup: z.string().min(1, "Main group is required").max(50),
   /** Category description (max 200 characters) */
   description: z.string().max(200).optional().default(""),
   /** Emoji or icon character (max 10 characters) */
@@ -66,6 +68,8 @@ export const createCategorySchema = z.object({
 export const updateCategorySchema = z.object({
   /** Updated display name */
   name: z.string().min(1).max(50).optional(),
+  /** Updated main group */
+  mainGroup: z.string().min(1).max(50).optional(),
   /** Updated description */
   description: z.string().max(200).optional(),
   /** Updated icon */

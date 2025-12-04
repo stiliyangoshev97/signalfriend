@@ -14,9 +14,12 @@ import { z } from 'zod';
 export const categorySchema = z.object({
   _id: z.string(),
   name: z.string(),
+  slug: z.string().optional(),
   mainGroup: z.string(),
   description: z.string(),
+  icon: z.string().optional(),
   isActive: z.boolean(),
+  sortOrder: z.number().optional(),
 });
 
 // ===========================================
