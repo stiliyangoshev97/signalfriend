@@ -8,7 +8,7 @@
  *
  * USAGE:
  * ```tsx
- * import { cn, formatAddress, formatUSD } from '@/shared/utils';
+ * import { cn, formatAddress, formatUSD, parseWalletError } from '@/shared/utils';
  * ```
  *
  * AVAILABLE EXPORTS:
@@ -20,8 +20,11 @@
  * - formatDate           - Short date format
  * - formatDateTime       - Date with time
  * - getTimeRemaining     - Countdown timer format
+ * - parseWalletError     - Parse wallet errors to user-friendly messages
+ * - isUserRejectionError - Check if error was user rejection
  */
 
 // Shared utilities exports
 export * from './format';
 export { cn } from './cn';
+export * from './walletErrors';

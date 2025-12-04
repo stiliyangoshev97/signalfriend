@@ -352,6 +352,25 @@ This ensures the best signals (highly rated with good sales) appear first withou
 - SignalKeyNFT: `0xfb26Df6101e1a52f9477f52F54b91b99fb016aed`
 - MockUSDT: `0xF87d17a5ca95F3f992f82Baabf4eBC5301A178a5`
 
+### Wallet Error Handling
+Transaction errors are parsed into user-friendly messages using `parseWalletError()` utility.
+
+| Error Type | Title | Color | Is User Action |
+|------------|-------|-------|----------------|
+| User rejected | "Transaction Cancelled" | Yellow | Yes |
+| Insufficient funds | "Insufficient Balance" | Red | No |
+| Network error | "Network Error" | Red | No |
+| Contract revert | "Transaction Failed" | Red | No |
+| Unknown | "Transaction Failed" | Red | No |
+
+```tsx
+// Usage in components
+import { parseWalletError } from '@/shared/utils';
+
+const { title, message, isUserAction } = parseWalletError(error);
+// isUserAction = true means user intentionally cancelled (not an error)
+```
+
 ---
 
 ## 📝 Conventions
