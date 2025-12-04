@@ -203,19 +203,45 @@ export function CreateSignalModal({
           {/* Price */}
           <div>
             <Input
-              type="number"
+              type="text"
+              inputMode="decimal"
               label="Price (USDT)"
               placeholder="5.00"
-              min={5}
-              max={100000}
-              step={0.01}
               onKeyDown={(e) => {
+                // Block comma and non-numeric characters except period and control keys
+                const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+                const isNumber = /^[0-9]$/.test(e.key);
+                const isPeriod = e.key === '.';
+                const isAllowedKey = allowedKeys.includes(e.key);
+                const isSelectAll = (e.ctrlKey || e.metaKey) && e.key === 'a';
+                const isCopy = (e.ctrlKey || e.metaKey) && e.key === 'c';
+                const isPaste = (e.ctrlKey || e.metaKey) && e.key === 'v';
+                const isCut = (e.ctrlKey || e.metaKey) && e.key === 'x';
+                
                 // Block comma - users should use period for decimals
                 if (e.key === ',') {
                   e.preventDefault();
+                  return;
+                }
+                
+                // Allow only numbers, period (once), and control keys
+                if (!isNumber && !isPeriod && !isAllowedKey && !isSelectAll && !isCopy && !isPaste && !isCut) {
+                  e.preventDefault();
+                  return;
+                }
+                
+                // Only allow one period
+                if (isPeriod && (e.target as HTMLInputElement).value.includes('.')) {
+                  e.preventDefault();
                 }
               }}
-              {...register('priceUsdt', { valueAsNumber: true })}
+              {...register('priceUsdt', {
+                setValueAs: (v) => {
+                  if (v === '' || v === undefined || v === null) return undefined;
+                  const num = parseFloat(v);
+                  return isNaN(num) ? undefined : num;
+                },
+              })}
               error={errors.priceUsdt?.message}
             />
             <div className="mt-1 text-xs text-fur-cream/50">

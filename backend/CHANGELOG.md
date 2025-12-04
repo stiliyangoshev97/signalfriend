@@ -15,6 +15,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.15.8] - 2025-12-04 🔧 SALES COUNT MIGRATION SCRIPT
+
+### Added
+- **Migration Script** (`src/scripts/recalculateSalesCounts.ts`):
+  - Script to recalculate totalSales for all signals and predictors from receipts
+  - Aggregates Receipt collection by contentId and predictorAddress
+  - Updates Signal.totalSales and Predictor.totalSales based on actual receipt count
+  - Also resets signals/predictors with no sales to 0
+  - Supports `--dry-run` flag to preview changes without applying them
+
+### Usage
+```bash
+# Preview changes
+npx tsx src/scripts/recalculateSalesCounts.ts --dry-run
+
+# Apply changes
+npx tsx src/scripts/recalculateSalesCounts.ts
+```
+
+### Why This Script
+The sales count fix in v0.15.7 only fixes new purchases. Existing data where sales counts are stuck at 0 needs this migration to recalculate from actual receipt records.
+
+---
+
 ## [0.15.7] - 2025-12-04 🛒 HIDE PURCHASED SIGNALS & FIX SALES COUNT
 
 ### Added

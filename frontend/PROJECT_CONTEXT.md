@@ -179,9 +179,16 @@ Signals have a mandatory expiration date (1-30 days from creation) to keep the m
 | **Buyer Access** | Purchases before expiry retain permanent content access |
 
 ### UI Components
-- **SignalCard**: Shows "Expires in X days" or "Expired" with red styling
+- **SignalCard**: Shows compact expiry (e.g., "Expires in 8h", "Expires in 29d") or "Expired" with red styling
 - **SignalDetailPage**: Shows expiry date in Signal Details section
 - **PurchaseCard**: Disables purchase for expired signals
+
+### Expiry Display Format
+The `getExpiryInfo` function returns abbreviated time formats for consistent card layouts:
+- Days: `Expires in 29d`
+- Hours: `Expires in 8h`
+- Minutes: `Expires in 45m`
+- Expired: `Expired` (red text)
 
 ### Utility Function
 ```tsx
@@ -197,12 +204,13 @@ export function getExpiryInfo(expiresAt: string): { isExpired: boolean; text: st
 Users can view all signals they've purchased at `/my-signals`. Each purchase receipt includes access to the unlocked signal content.
 
 ### Protected Content Flow
-Signal content is protected and only revealed to owners:
+Signal content is protected and only revealed to owners. The hooks include multiple guards to prevent 401 errors:
 
-1. **Public Signal Data**: `/api/signals/:contentId` returns metadata only (no `content` field)
-2. **Check Ownership**: `useCheckPurchase(contentId)` checks if user has a receipt
-3. **Fetch Content**: `useSignalContent(contentId, isOwned)` fetches from `/api/signals/:contentId/content` only when `isOwned=true`
-4. **Display**: `SignalContent` component shows locked/unlocked state
+1. **Auth Guards**: All protected hooks check `isConnected`, `hasHydrated`, `isAuthenticated`, and `hasToken` before making API calls
+2. **Public Signal Data**: `/api/signals/:contentId` returns metadata only (no `content` field)
+3. **Check Ownership**: `useCheckPurchase(contentId)` checks if user has a receipt (only when authenticated)
+4. **Fetch Content**: `useSignalContent(contentId, isOwned)` fetches from `/api/signals/:contentId/content` only when `isOwned=true` and authenticated
+5. **Display**: `SignalContent` component shows locked/unlocked state
 
 ```tsx
 // SignalDetailPage.tsx - Protected content flow
