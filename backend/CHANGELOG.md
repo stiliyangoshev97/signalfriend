@@ -15,6 +15,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.15.5] - 2025-12-04 📊 RISK LEVEL & POTENTIAL REWARD
+
+### Added
+- **Signal Model** (`src/features/signals/signal.model.ts`):
+  - Added `riskLevel` field: "low" | "medium" | "high" (required, indexed)
+  - Added `potentialReward` field: "normal" | "medium" | "high" (required, indexed)
+  
+- **Signal Schemas** (`src/features/signals/signal.schemas.ts`):
+  - Added `riskLevel` and `potentialReward` to create signal schema (required)
+  - Added `riskLevel` and `potentialReward` to list query params (optional filters)
+
+- **Signal Service** (`src/features/signals/signal.service.ts`):
+  - Added filtering support for `riskLevel` and `potentialReward` in `getAll()`
+  - Marketplace can now filter signals by risk level and potential reward
+
+- **Migration Script** (`src/scripts/migrateRiskReward.ts`):
+  - Created migration to update existing signals with default values (medium/medium)
+  - Supports `--dry-run` flag to preview changes without modifying database
+  - Run with: `npx tsx src/scripts/migrateRiskReward.ts` or `npx tsx src/scripts/migrateRiskReward.ts --dry-run`
+
+### Migration
+- Executed migration: 5 existing signals updated with `riskLevel: "medium"` and `potentialReward: "medium"`
+
+---
+
 ## [0.15.4] - 2025-12-04 🏆 SIGNAL SORTING & CATEGORY DISPLAY
 
 ### Changed

@@ -76,6 +76,8 @@ export function CreateSignalModal({
       categoryId: '',
       priceUsdt: 5,
       expiryDays: 7,
+      riskLevel: 'medium',
+      potentialReward: 'medium',
     },
   });
   
@@ -241,6 +243,77 @@ export function CreateSignalModal({
           </div>
           <div className="mt-1 text-xs text-fur-cream/50">
             Signal will be available for purchase for this duration (1-30 days)
+          </div>
+        </div>
+
+        {/* Risk Level & Potential Reward */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Risk Level */}
+          <div>
+            <label className="block text-sm font-medium text-fur-cream mb-2">
+              Risk Level
+            </label>
+            <div className="flex gap-2">
+              {(['low', 'medium', 'high'] as const).map((level) => (
+                <label
+                  key={level}
+                  className={`flex-1 text-center px-3 py-2 rounded-lg border cursor-pointer transition-all ${
+                    watch('riskLevel') === level
+                      ? level === 'low'
+                        ? 'bg-green-500/20 border-green-500 text-green-400'
+                        : level === 'medium'
+                        ? 'bg-yellow-500/20 border-yellow-500 text-yellow-400'
+                        : 'bg-red-500/20 border-red-500 text-red-400'
+                      : 'bg-dark-700 border-dark-600 text-fur-cream/70 hover:border-dark-500'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    value={level}
+                    {...register('riskLevel')}
+                    className="sr-only"
+                  />
+                  <span className="text-sm font-medium capitalize">{level}</span>
+                </label>
+              ))}
+            </div>
+            <div className="mt-1 text-xs text-fur-cream/50">
+              Your assessment of the risk involved
+            </div>
+          </div>
+
+          {/* Potential Reward */}
+          <div>
+            <label className="block text-sm font-medium text-fur-cream mb-2">
+              Potential Reward
+            </label>
+            <div className="flex gap-2">
+              {(['normal', 'medium', 'high'] as const).map((reward) => (
+                <label
+                  key={reward}
+                  className={`flex-1 text-center px-3 py-2 rounded-lg border cursor-pointer transition-all ${
+                    watch('potentialReward') === reward
+                      ? reward === 'normal'
+                        ? 'bg-fur-cream/10 border-fur-cream/50 text-fur-cream'
+                        : reward === 'medium'
+                        ? 'bg-fur-light/20 border-fur-light text-fur-light'
+                        : 'bg-purple-500/20 border-purple-500 text-purple-400'
+                      : 'bg-dark-700 border-dark-600 text-fur-cream/70 hover:border-dark-500'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    value={reward}
+                    {...register('potentialReward')}
+                    className="sr-only"
+                  />
+                  <span className="text-sm font-medium capitalize">{reward}</span>
+                </label>
+              ))}
+            </div>
+            <div className="mt-1 text-xs text-fur-cream/50">
+              Expected return potential
+            </div>
           </div>
         </div>
 

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.3] - 2025-12-04
+
+### Added
+
+#### Risk Level & Potential Reward for Signal Creation
+- **Create Signal Modal** (`src/features/predictors/components/CreateSignalModal.tsx`):
+  - Added Risk Level selection: Low / Medium / High (button group)
+  - Added Potential Reward selection: Normal / Medium / High (button group)
+  - Both fields are required when creating a signal
+  - Styled to match existing modal design
+
+- **Signal Schema** (`src/shared/schemas/signal.schemas.ts`):
+  - Added `riskLevel` field: "low" | "medium" | "high" (required)
+  - Added `potentialReward` field: "normal" | "medium" | "high" (required)
+
+### Why This Change
+- Filters for risk level and potential reward existed in the UI but signals couldn't be created with these values
+- Now predictors can properly categorize their signals by risk and reward levels
+- Users can filter the marketplace by these criteria
+
+---
+
 ## [0.9.2] - 2025-12-04
 
 ### Fixed

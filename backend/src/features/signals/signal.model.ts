@@ -41,6 +41,10 @@ export interface ISignal extends Document {
   totalReviews: number;
   /** Whether the signal is active (soft delete) */
   isActive: boolean;
+  /** Risk level assessment by predictor */
+  riskLevel: "low" | "medium" | "high";
+  /** Potential reward assessment by predictor */
+  potentialReward: "normal" | "medium" | "high";
   /** Timestamp when signal was created */
   createdAt: Date;
   /** Timestamp when signal was last updated */
@@ -118,6 +122,18 @@ const signalSchema = new Schema<ISignal>(
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
+    },
+    riskLevel: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      required: true,
+      index: true,
+    },
+    potentialReward: {
+      type: String,
+      enum: ["normal", "medium", "high"],
+      required: true,
       index: true,
     },
   },

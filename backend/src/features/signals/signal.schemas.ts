@@ -52,6 +52,10 @@ export const listSignalsSchema = z.object({
   minPrice: z.coerce.number().min(0).optional(),
   /** Maximum price filter */
   maxPrice: z.coerce.number().min(0).optional(),
+  /** Filter by risk level */
+  riskLevel: z.enum(["low", "medium", "high"]).optional(),
+  /** Filter by potential reward */
+  potentialReward: z.enum(["normal", "medium", "high"]).optional(),
 });
 
 /**
@@ -89,6 +93,10 @@ export const createSignalSchema = z.object({
     ),
   /** Number of days until signal expires (1-30 days) */
   expiryDays: z.number().int().min(1).max(30),
+  /** Risk level assessment */
+  riskLevel: z.enum(["low", "medium", "high"]),
+  /** Potential reward assessment */
+  potentialReward: z.enum(["normal", "medium", "high"]),
 });
 
 /**

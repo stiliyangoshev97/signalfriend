@@ -104,6 +104,8 @@ export class SignalService {
       search,
       minPrice,
       maxPrice,
+      riskLevel,
+      potentialReward,
     } = query;
 
     // Build filter
@@ -139,6 +141,16 @@ export class SignalService {
       if (maxPrice !== undefined) {
         (filter.priceUsdt as Record<string, number>).$lte = maxPrice;
       }
+    }
+
+    // Filter by risk level
+    if (riskLevel) {
+      filter.riskLevel = riskLevel;
+    }
+
+    // Filter by potential reward
+    if (potentialReward) {
+      filter.potentialReward = potentialReward;
     }
 
     // Build sort - always prioritize by rating and sales first (best signals on top)
@@ -362,6 +374,8 @@ export class SignalService {
       categoryId: data.categoryId,
       priceUsdt: data.priceUsdt,
       expiresAt,
+      riskLevel: data.riskLevel,
+      potentialReward: data.potentialReward,
       totalSales: 0,
       averageRating: 0,
       totalReviews: 0,
