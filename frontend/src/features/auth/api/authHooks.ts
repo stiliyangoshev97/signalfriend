@@ -83,7 +83,7 @@ import { useAccount, useSignMessage, useDisconnect } from 'wagmi';
 import { SiweMessage } from 'siwe';
 import { useAuthStore } from '../store';
 import * as authApi from './authApi';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 /**
  * Hook to validate and sync session on app mount/reconnect
@@ -92,18 +92,56 @@ import { useEffect } from 'react';
  * - Page refreshes and zustand has stored auth
  * - But wagmi is still reconnecting
  * - Or the token might have expired
+ * - Or user switched wallets without disconnecting
  * 
  * This hook:
  * 1. Waits for wagmi to finish connecting
  * 2. Validates the stored token with the backend
  * 3. Clears auth if token is invalid or wallet changed
+ * 4. IMMEDIATELY clears auth if wallet address changes (prevents JWT/wallet mismatch)
  */
 export function useSessionSync() {
   const { address, isConnected, status } = useAccount();
   const { token, logout } = useAuthStore();
   
+  // Track the previous address to detect wallet switches
+  const previousAddressRef = useRef<string | undefined>(undefined);
+  
   // Check if wagmi is still initializing (connecting/reconnecting)
   const isWagmiInitializing = status === 'connecting' || status === 'reconnecting';
+  
+  // CRITICAL: Auto-logout on wallet address change
+  // This prevents JWT/wallet mismatch where backend auth uses old wallet
+  // but blockchain transactions use new wallet
+  useEffect(() => {
+    // Skip during initial connection
+    if (isWagmiInitializing) return;
+    
+    // Initialize previous address on first render when connected
+    if (previousAddressRef.current === undefined && address) {
+      previousAddressRef.current = address.toLowerCase();
+      return;
+    }
+    
+    // Detect wallet switch: address changed while we have a token
+    if (
+      token &&
+      previousAddressRef.current &&
+      address &&
+      previousAddressRef.current !== address.toLowerCase()
+    ) {
+      console.log('[Auth] Wallet changed, logging out to prevent auth mismatch');
+      console.log(`[Auth] Previous: ${previousAddressRef.current}, New: ${address.toLowerCase()}`);
+      logout();
+    }
+    
+    // Update previous address
+    if (address) {
+      previousAddressRef.current = address.toLowerCase();
+    } else {
+      previousAddressRef.current = undefined;
+    }
+  }, [address, token, logout, isWagmiInitializing]);
   
   // Validate token with backend when we have a token and are connected
   const { data: sessionData, isError: sessionInvalid, isLoading: isValidating } = useQuery({
@@ -122,7 +160,8 @@ export function useSessionSync() {
     }
   }, [sessionInvalid, token, logout]);
   
-  // Clear auth if wallet address changed (user switched accounts)
+  // Clear auth if wallet address from JWT doesn't match connected wallet
+  // This is a secondary check after backend validation
   useEffect(() => {
     if (
       isConnected && 
@@ -131,6 +170,7 @@ export function useSessionSync() {
       address &&
       sessionData.address.toLowerCase() !== address.toLowerCase()
     ) {
+      console.log('[Auth] JWT address mismatch with connected wallet, logging out');
       logout();
     }
   }, [isConnected, isWagmiInitializing, sessionData?.address, address, logout]);
