@@ -7,6 +7,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.11.0] - 2025-12-05
+
+### Added
+
+#### Predictor List Page (Public Leaderboard)
+Complete public-facing predictor directory with filtering, sorting, and pagination.
+
+- **API Layer** (`src/features/predictors/api/predictorsList.api.ts`):
+  - `fetchPredictors()` function with filters, sorting, and pagination
+  - Type definitions for `PredictorFilters`, `PredictorSortOption`
+  - Handles backend response format transformation
+
+- **React Query Hooks** (`src/features/predictors/hooks/usePredictors.ts`):
+  - `usePredictors()` hook with automatic caching and refetching
+  - Stale time of 30 seconds for optimal UX
+
+- **PredictorCard** (`src/features/predictors/components/PredictorCard.tsx`):
+  - Displays predictor avatar, name, verification badge
+  - Shows stats: total signals, total sales, average rating
+  - Rank badges with gold/silver/bronze styling for top 3
+  - Links to predictor profile page
+
+- **PredictorGrid** (`src/features/predictors/components/PredictorGrid.tsx`):
+  - Responsive grid layout (1-4 columns based on screen size)
+  - Loading skeleton with 8 placeholder cards
+  - Empty state when no predictors found
+  - Error state with retry button
+
+- **PredictorFilterPanel** (`src/features/predictors/components/PredictorFilterPanel.tsx`):
+  - Search by name input
+  - Quick filter buttons: Top Sellers, Best Rated, New Predictors
+  - Sort dropdown: Default, Most Sales, Highest Rated, Most Signals, Newest
+  - Styled consistently with signals FilterPanel
+
+- **PredictorsPage** (`src/features/predictors/pages/PredictorsPage.tsx`):
+  - Main page with header, filters, grid, and pagination
+  - URL-synced filters for shareable links
+  - Mobile-responsive filter toggle
+  - Pagination with proper page size handling
+
+- **Router** (`src/router/index.tsx`):
+  - Updated `/predictors` route to use real PredictorsPage
+
+### Changed
+
+#### Avatar Initials for Default Names
+- **PredictorCard**: Now shows "P" initial for predictors with default names
+  - Uses `displayNameChanged` field to detect custom vs default names
+  - Previously showed "P#" (initials from "Predictor #X")
+
+- **Predictor Schema** (`src/shared/schemas/predictor.schemas.ts`):
+  - Added `displayNameChanged: z.boolean().optional()` field
+
+---
+
 ## [0.10.5] - 2025-12-05
 
 ### Changed

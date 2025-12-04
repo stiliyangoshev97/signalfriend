@@ -15,6 +15,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.16.3] - 2025-12-05 🖼️ AVATAR URL POLICY CHANGE
+
+### Changed
+- **Predictor Profile Updates** (`src/features/predictors/predictor.service.ts`):
+  - **All predictors can now set avatar URLs**, not just verified ones
+  - Removed `if (!predictor.isVerified)` restriction on avatar URL updates
+  - Removed code that cleared `avatarUrl` when unverifying a predictor
+  - **Policy**: Abuse of avatar feature = blacklist (reactive moderation vs preventive restriction)
+
+### Rationale
+- Verification is primarily for business features (premium placement, trust badges)
+- Profile customization (avatar) should be available to all predictors
+- Easier for new predictors to build their brand identity from day one
+- Admin blacklist provides sufficient abuse prevention
+
+---
+
 ## [0.16.2] - 2025-12-05 🔧 OWNER MINT PREDICTOR INDEXING FIX
 
 ### Added

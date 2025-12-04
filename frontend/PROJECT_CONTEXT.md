@@ -28,6 +28,7 @@
 | **Purchase Flow** | ✅ 100% | Multi-step modal with USDT approval + purchase |
 | **My Purchased Signals** | ✅ 100% | View/access purchased signals with receipts |
 | **Predictor Dashboard** | ✅ 100% | Stats, signal management, create signal modal |
+| **Predictor List Page** | ✅ 100% | Public leaderboard with filters, pagination |
 | **Predictor Profile** | ⏳ 0% | Not started |
 | **Admin Panel** | ⏳ 0% | Not started |
 

@@ -200,7 +200,7 @@ export class PredictorService {
    * 
    * Rules:
    * - displayName can only be changed ONCE (then locked forever)
-   * - avatarUrl can only be set if predictor is verified
+   * - avatarUrl can be set by any predictor (abuse = blacklist)
    *
    * @param address - The predictor's wallet address
    * @param data - Fields to update
@@ -209,7 +209,6 @@ export class PredictorService {
    * @throws {ApiError} 404 if predictor not found
    * @throws {ApiError} 403 if caller is not the predictor
    * @throws {ApiError} 403 if trying to change locked displayName
-   * @throws {ApiError} 403 if trying to set avatarUrl when not verified
    * @throws {ApiError} 409 if displayName is already taken
    */
   static async updateProfile(
@@ -267,11 +266,8 @@ export class PredictorService {
       }
     }
 
-    // Handle avatarUrl update (only verified predictors)
+    // Handle avatarUrl update (all predictors can set avatar)
     if (data.avatarUrl !== undefined && data.avatarUrl !== "") {
-      if (!predictor.isVerified) {
-        throw ApiError.forbidden("Only verified predictors can set an avatar");
-      }
       predictor.avatarUrl = data.avatarUrl;
     } else if (data.avatarUrl === "") {
       // Allow clearing avatar
@@ -748,7 +744,7 @@ export class PredictorService {
 
     predictor.isVerified = false;
     predictor.verificationStatus = "none"; // Reset status
-    predictor.avatarUrl = ""; // Remove avatar when unverified
+    // Note: Avatar is NOT removed - all predictors can have avatars now
     
     await predictor.save();
     return predictor;

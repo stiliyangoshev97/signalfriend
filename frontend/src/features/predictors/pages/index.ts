@@ -4,3 +4,4 @@
  */
 
 export { PredictorDashboardPage } from './PredictorDashboardPage';
+export { PredictorsPage } from './PredictorsPage';

@@ -15,3 +15,10 @@ export {
   useDeactivateSignal,
   useReactivateSignal,
 } from './usePredictorDashboard';
+
+// Predictor listings
+export {
+  predictorListKeys,
+  usePredictors,
+  useTopPredictors,
+} from './usePredictors';

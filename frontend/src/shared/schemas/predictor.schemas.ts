@@ -18,6 +18,7 @@ export const predictorSchema = z.object({
   walletAddress: z.string(),
   tokenId: z.number().optional(),
   displayName: z.string().nullable(),
+  displayNameChanged: z.boolean().optional(),
   bio: z.string().nullable(),
   avatarUrl: z.string().nullable(),
   socialLinks: z.object({
