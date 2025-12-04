@@ -51,9 +51,10 @@ export const signalSchema = z.object({
   // Populated fields from backend
   category: categorySchema.optional(),
   predictor: predictorSchema.optional(),
+  // Risk and reward assessment by predictor
+  riskLevel: riskLevelSchema,
+  potentialReward: potentialRewardSchema,
   // Legacy fields for compatibility (optional)
-  riskLevel: riskLevelSchema.optional(),
-  potentialReward: potentialRewardSchema.optional(),
   status: signalStatusSchema.optional(),
 });
 
@@ -88,6 +89,8 @@ export const createSignalSchema = z.object({
     .int('Expiry must be a whole number of days')
     .min(1, 'Signal must be active for at least 1 day')
     .max(30, 'Signal can be active for at most 30 days'),
+  riskLevel: riskLevelSchema,
+  potentialReward: potentialRewardSchema,
 });
 
 // ===========================================
