@@ -7,6 +7,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.5] - 2025-12-04
+
+### Fixed
+
+#### Hide Purchased Signals from Marketplace
+- **SignalsPage** (`src/features/signals/pages/SignalsPage.tsx`):
+  - When user is connected, marketplace excludes signals they've already purchased
+  - Uses `excludeBuyerAddress` query param to filter out owned signals
+  - Unauthenticated users still see all available signals
+
+- **SignalFilters Schema** (`src/shared/schemas/signal.schemas.ts`):
+  - Added `excludeBuyerAddress` optional field for hiding purchased signals
+
+- **Signals API** (`src/features/signals/api/signals.api.ts`):
+  - Updated `buildQueryString` to include `excludeBuyerAddress` param
+
+#### Inactive Signal Handling
+- **PurchaseCard** (`src/features/signals/components/PurchaseCard.tsx`):
+  - Added `isActive` prop to detect deactivated signals
+  - Disables purchase button with "Signal Unavailable" message
+  - Shows info that signal has been deactivated by the predictor
+
+#### CreateSignalModal Duration Slider
+- **CreateSignalModal** (`src/features/predictors/components/CreateSignalModal.tsx`):
+  - Fixed text overlap on duration slider for values >= 10 days
+  - Increased min-width from 80px to 100px for day count display
+
+#### Consistent Potential Reward Colors
+- **SignalCard** (`src/features/signals/components/SignalCard.tsx`):
+  - Changed badge colors to warm theme: fur-cream / fur-light / fur-main
+- **SignalDetailPage** (`src/features/signals/pages/SignalDetailPage.tsx`):
+  - Changed badge colors to match SignalCard and FilterPanel
+
+### Why These Changes
+- **Hide Purchased**: Users shouldn't see signals they already own in the marketplace
+- **Inactive Signals**: Users were able to start approval but purchase would fail
+- **Duration Slider**: "11 days", "12 days" etc. was getting clipped
+- **Color Consistency**: All potential reward indicators now use the same warm color palette
+
+---
+
+## [0.9.4] - 2025-12-04
+
+### Fixed
+
+#### Self-Purchase Prevention
+- **PurchaseCard** (`src/features/signals/components/PurchaseCard.tsx`):
+  - Added `isOwnSignal` prop to detect if current user is the signal's predictor
+  - Disables purchase button with "This Is Your Signal" message
+  - Shows info message directing predictors to view from dashboard
+
+- **SignalDetailPage** (`src/features/signals/pages/SignalDetailPage.tsx`):
+  - Added wallet address check to detect if user is the signal owner
+  - Passes `isOwnSignal` prop to PurchaseCard
+  - Predictors can still view their own signal content (for preview)
+
+#### Potential Reward Filter Colors
+- **FilterPanel** (`src/features/signals/components/FilterPanel.tsx`):
+  - Fixed color mismatch between filter buttons and SignalCard badges
+  - Filter colors now match signal card badge colors:
+    - Normal: Gray (was cream)
+    - Medium: Blue (was golden)
+    - High: Purple (was orange)
+
+### Why These Changes
+- **Self-Purchase**: Predictors should not be able to buy their own signals. This is enforced on both frontend (disabled button) and backend (API rejection).
+- **Color Consistency**: Users selecting "High" reward in filters expected to see purple badges on cards, but previously the filter button was orange and cards showed purple. Now they match.
+
+---
+
 ## [0.9.3] - 2025-12-04
 
 ### Added

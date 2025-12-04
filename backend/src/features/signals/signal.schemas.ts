@@ -29,6 +29,11 @@ export const listSignalsSchema = z.object({
     .string()
     .regex(ethereumAddressRegex, "Invalid Ethereum address")
     .optional(),
+  /** Exclude signals already purchased by this address */
+  excludeBuyerAddress: z
+    .string()
+    .regex(ethereumAddressRegex, "Invalid Ethereum address")
+    .optional(),
   /** Only show active signals (default: true) */
   active: z
     .string()

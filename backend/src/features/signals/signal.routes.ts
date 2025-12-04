@@ -67,10 +67,11 @@ router.get(
 /**
  * GET /api/signals/:contentId/content-identifier
  * Get the bytes32 content identifier for on-chain purchases.
- * Public endpoint - needed before wallet can call buySignalNFT.
+ * Auth required to prevent predictors from purchasing their own signals.
  */
 router.get(
   "/:contentId/content-identifier",
+  authenticate,
   validate(getSignalByContentIdSchema, "params"),
   getContentIdentifier
 );

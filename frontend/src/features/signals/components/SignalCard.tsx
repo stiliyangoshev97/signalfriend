@@ -26,12 +26,12 @@ const riskColors: Record<string, string> = {
 };
 
 /**
- * Potential reward badge colors
+ * Potential reward badge colors - matches filter panel theme
  */
 const rewardColors: Record<string, string> = {
-  normal: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
-  medium: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  high: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+  normal: 'bg-fur-cream/10 text-fur-cream border-fur-cream/30',
+  medium: 'bg-fur-light/20 text-fur-light border-fur-light/30',
+  high: 'bg-fur-main/20 text-fur-main border-fur-main/30',
 };
 
 /**

@@ -6,8 +6,9 @@
  * Combines filter panel, signal grid, and pagination.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useAccount } from 'wagmi';
 import { useSignals, useCategories } from '../hooks';
 import { FilterPanel, SignalGrid, Pagination } from '../components';
 import type { SignalFilters } from '@/shared/types';
@@ -81,12 +82,19 @@ export function SignalsPage(): React.ReactElement {
     parseFiltersFromParams(searchParams)
   );
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  
+  // Get connected wallet address to exclude already purchased signals
+  const { address } = useAccount();
 
-  // Fetch signals with current filters
-  const { data, isLoading, error } = useSignals({
+  // Build query filters including excludeBuyerAddress when user is connected
+  const queryFilters = useMemo(() => ({
     ...filters,
     limit: 12, // Show 12 per page
-  });
+    ...(address && { excludeBuyerAddress: address }),
+  }), [filters, address]);
+
+  // Fetch signals with current filters
+  const { data, isLoading, error } = useSignals(queryFilters);
 
   // Fetch categories for filter dropdown
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();

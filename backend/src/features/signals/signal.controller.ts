@@ -25,16 +25,20 @@ import type {
  * GET /api/signals/:contentId/content-identifier
  * Returns the bytes32 content identifier for use in on-chain purchases.
  * This is needed to call buySignalNFT on the smart contract.
+ * Auth required to prevent predictors from purchasing their own signals.
  *
  * @param {string} contentId - Signal content ID (UUID v4)
  * @returns {Object} JSON response with bytes32 content identifier
  * @throws {404} If signal not found
+ * @throws {400} If signal is inactive, expired, or user is the predictor
  */
 export const getContentIdentifier = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const { contentId } = req.params as GetSignalByContentIdParams;
+    // Get caller's address from authenticated user
+    const callerAddress = req.user?.address;
 
-    const result = await SignalService.getContentIdentifier(contentId);
+    const result = await SignalService.getContentIdentifier(contentId, callerAddress);
 
     res.json({
       success: true,

@@ -96,6 +96,7 @@ export class SignalService {
     const {
       categoryId,
       predictorAddress,
+      excludeBuyerAddress,
       active,
       sortBy,
       sortOrder,
@@ -125,6 +126,18 @@ export class SignalService {
     // Filter by predictor address
     if (predictorAddress) {
       filter.predictorAddress = predictorAddress.toLowerCase();
+    }
+
+    // Exclude signals already purchased by this buyer
+    if (excludeBuyerAddress) {
+      const normalizedBuyer = excludeBuyerAddress.toLowerCase();
+      // Get all contentIds this buyer has purchased
+      const purchasedContentIds = await Receipt.distinct("contentId", {
+        buyerAddress: normalizedBuyer,
+      });
+      if (purchasedContentIds.length > 0) {
+        filter.contentId = { $nin: purchasedContentIds };
+      }
     }
 
     // Search by title (case-insensitive)
@@ -283,18 +296,21 @@ export class SignalService {
    * The frontend needs this value to call buySignalNFT on the smart contract.
    *
    * Only returns contentIdentifier for active, non-expired signals.
+   * Blocks predictors from purchasing their own signals.
    *
    * @param contentId - The signal's UUID contentId
+   * @param callerAddress - The address of the user requesting the content identifier (optional, for self-purchase check)
    * @returns Promise resolving to the bytes32 hex string
    * @throws {ApiError} 404 if signal not found
-   * @throws {ApiError} 400 if signal is inactive or expired
+   * @throws {ApiError} 400 if signal is inactive, expired, or caller is the predictor
    *
    * @example
    * // UUID: "550e8400-e29b-41d4-a716-446655440000"
    * // Returns: "0x550e8400e29b41d4a7164466554400000000000000000000000000000000"
    */
   static async getContentIdentifier(
-    contentId: string
+    contentId: string,
+    callerAddress?: string
   ): Promise<{ contentIdentifier: string }> {
     // Verify signal exists
     const signal = await Signal.findOne({ contentId });
@@ -310,6 +326,11 @@ export class SignalService {
     // Block purchase of expired signals
     if (signal.expiresAt && signal.expiresAt < new Date()) {
       throw ApiError.badRequest("This signal has expired and cannot be purchased");
+    }
+
+    // Block predictors from purchasing their own signals
+    if (callerAddress && signal.predictorAddress.toLowerCase() === callerAddress.toLowerCase()) {
+      throw ApiError.badRequest("You cannot purchase your own signal");
     }
 
     // Convert UUID to bytes32 for on-chain use

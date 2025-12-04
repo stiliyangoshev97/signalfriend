@@ -135,6 +135,11 @@ accent: {
 6. Step 4: Success → Refresh page, unlock content
 ```
 
+### Self-Purchase Prevention
+Predictors cannot purchase their own signals. This is enforced at two levels:
+- **Frontend**: `PurchaseCard` checks if `address === signal.predictorAddress` and disables the purchase button
+- **Backend**: `getContentIdentifier` endpoint returns 400 error if caller is the signal's predictor
+
 ### Hooks Used
 | Hook | Purpose |
 |------|---------|

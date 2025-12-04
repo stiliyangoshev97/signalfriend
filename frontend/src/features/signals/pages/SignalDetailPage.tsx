@@ -28,6 +28,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { format, isValid, parseISO } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
 import { useSignal, useCheckPurchase, useSignalContent, signalKeys, purchaseKeys } from '../hooks';
 import { SignalDetailSkeleton } from '../components/SignalDetailSkeleton';
 import { PredictorInfoCard } from '../components/PredictorInfoCard';
@@ -54,19 +55,19 @@ const riskConfig: Record<string, { color: string; label: string }> = {
 };
 
 /**
- * Potential reward badge colors and labels
+ * Potential reward badge colors and labels - matches filter panel theme
  */
 const rewardConfig: Record<string, { color: string; label: string }> = {
   normal: {
-    color: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+    color: 'bg-fur-cream/10 text-fur-cream border-fur-cream/30',
     label: 'Normal Reward',
   },
   medium: {
-    color: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    color: 'bg-fur-light/20 text-fur-light border-fur-light/30',
     label: 'Medium Reward',
   },
   high: {
-    color: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+    color: 'bg-fur-main/20 text-fur-main border-fur-main/30',
     label: 'High Reward',
   },
 };
@@ -130,14 +131,22 @@ function ChevronRightIcon(): React.ReactElement {
 export function SignalDetailPage(): React.ReactElement {
   const { contentId } = useParams<{ contentId: string }>();
   const queryClient = useQueryClient();
+  const { address } = useAccount();
   const { data: signal, isLoading, error } = useSignal(contentId || '');
   
   // Check if user owns this signal
   const { data: purchaseData, refetch: refetchPurchase } = useCheckPurchase(contentId || '');
   const isOwned = purchaseData?.hasPurchased ?? false;
   
-  // Fetch protected content if user owns the signal
-  const { data: contentData } = useSignalContent(contentId || '', isOwned);
+  // Check if current user is the signal's predictor (seller)
+  const isOwnSignal = Boolean(
+    address && 
+    signal?.predictorAddress && 
+    address.toLowerCase() === signal.predictorAddress.toLowerCase()
+  );
+  
+  // Fetch protected content if user owns the signal OR is the predictor
+  const { data: contentData } = useSignalContent(contentId || '', isOwned || isOwnSignal);
   
   // Purchase modal state
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
@@ -369,7 +378,9 @@ export function SignalDetailPage(): React.ReactElement {
           <PurchaseCard
             priceUSDT={signal.priceUsdt}
             isExpired={isExpired}
+            isActive={signal.isActive !== false}
             isOwned={isOwned}
+            isOwnSignal={isOwnSignal}
             contentId={signal.contentId}
             onPurchase={() => setShowPurchaseModal(true)}
           />

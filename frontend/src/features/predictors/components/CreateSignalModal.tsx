@@ -237,7 +237,7 @@ export function CreateSignalModal({
               {...register('expiryDays', { valueAsNumber: true })}
               className="flex-1 h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-fur-light"
             />
-            <span className="text-lg font-semibold text-fur-light w-16 text-right">
+            <span className="text-lg font-semibold text-fur-light min-w-[100px] text-right whitespace-nowrap">
               {watch('expiryDays') || 7} days
             </span>
           </div>
@@ -297,7 +297,7 @@ export function CreateSignalModal({
                         ? 'bg-fur-cream/10 border-fur-cream/50 text-fur-cream'
                         : reward === 'medium'
                         ? 'bg-fur-light/20 border-fur-light text-fur-light'
-                        : 'bg-purple-500/20 border-purple-500 text-purple-400'
+                        : 'bg-fur-main/20 border-fur-main text-fur-main'
                       : 'bg-dark-700 border-dark-600 text-fur-cream/70 hover:border-dark-500'
                   }`}
                 >
