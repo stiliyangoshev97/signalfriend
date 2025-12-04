@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.10.2] - 2025-12-04
+
+### Fixed
+
+#### Auto-Logout on Wallet Change (Critical Security Fix)
+- **useSessionSync Hook** (`src/features/auth/api/authHooks.ts`):
+  - Fixed critical bug where switching wallets without disconnecting caused JWT/wallet mismatch
+  - When user switches MetaMask account, auth is now immediately cleared
+  - Prevents scenario where backend auth uses old wallet but blockchain tx uses new wallet
+  - Added `useRef` to track previous wallet address and detect changes
+  - Logs wallet change events for debugging
+
+- **App.tsx** (`src/App.tsx`):
+  - Now calls `useSessionSync()` globally at the app root
+  - Previously only ran in route guards (ProtectedRoute, PredictorRoute)
+  - Ensures wallet change detection works on ALL pages, not just protected routes
+
+### Why This Fix
+Previously, when a user:
+1. Logged in with Wallet A (JWT stored with address A)
+2. Switched to Wallet B in MetaMask (without disconnecting)
+3. Tried to purchase a signal
+
+The backend would check JWT (address A) and think user is the predictor, while the blockchain transaction would use Wallet B. This caused:
+- "You cannot purchase your own signal" errors for legitimate purchases
+- Potential for unexpected behavior where USDT was withdrawn from wrong wallet
+
+Now the app immediately logs out when wallet address changes, forcing re-authentication.
+
+---
+
 ## [0.10.1] - 2025-12-04
 
 ### Fixed
