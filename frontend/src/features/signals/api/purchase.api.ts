@@ -6,6 +6,7 @@
  * - Getting bytes32 content identifier for on-chain purchase
  * - Checking if user has purchased a signal
  * - Getting user's purchase receipts
+ * - Fetching protected signal content (after purchase)
  */
 
 import { apiClient } from '@/shared/api';
@@ -48,6 +49,13 @@ export interface Receipt {
     description: string;
     category?: { name: string };
   };
+}
+
+/**
+ * Response from protected content endpoint
+ */
+export interface SignalContentResponse {
+  content: string;
 }
 
 /**
@@ -117,5 +125,28 @@ export async function fetchMyReceipts(params?: {
     : API_CONFIG.ENDPOINTS.RECEIPTS_MINE;
 
   const response = await apiClient.get<ApiResponse<Receipt[]>>(url);
+  return response.data.data;
+}
+
+/**
+ * Fetch the protected content of a purchased signal.
+ * Requires authentication and ownership (receipt) of the signal.
+ *
+ * @param contentId - Signal's UUID content ID
+ * @returns Promise resolving to the protected content
+ * @throws 401 if not authenticated
+ * @throws 403 if user has not purchased the signal
+ * @throws 404 if signal not found
+ *
+ * @example
+ * const { content } = await fetchSignalContent('abc123-def456');
+ * console.log('Protected content:', content);
+ */
+export async function fetchSignalContent(
+  contentId: string
+): Promise<SignalContentResponse> {
+  const response = await apiClient.get<ApiResponse<SignalContentResponse>>(
+    API_CONFIG.ENDPOINTS.SIGNAL_CONTENT(contentId)
+  );
   return response.data.data;
 }

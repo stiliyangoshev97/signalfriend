@@ -28,7 +28,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { format, isValid, parseISO } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
-import { useSignal, useCheckPurchase, signalKeys } from '../hooks';
+import { useSignal, useCheckPurchase, useSignalContent, signalKeys, purchaseKeys } from '../hooks';
 import { SignalDetailSkeleton } from '../components/SignalDetailSkeleton';
 import { PredictorInfoCard } from '../components/PredictorInfoCard';
 import { PurchaseCard } from '../components/PurchaseCard';
@@ -136,6 +136,9 @@ export function SignalDetailPage(): React.ReactElement {
   const { data: purchaseData, refetch: refetchPurchase } = useCheckPurchase(contentId || '');
   const isOwned = purchaseData?.hasPurchased ?? false;
   
+  // Fetch protected content if user owns the signal
+  const { data: contentData } = useSignalContent(contentId || '', isOwned);
+  
   // Purchase modal state
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
@@ -146,6 +149,8 @@ export function SignalDetailPage(): React.ReactElement {
     refetchPurchase();
     // Invalidate signal query to refresh data
     queryClient.invalidateQueries({ queryKey: signalKeys.detail(contentId || '') });
+    // Invalidate content query so it fetches the protected content
+    queryClient.invalidateQueries({ queryKey: purchaseKeys.content(contentId || '') });
   };
 
   // Loading state
@@ -352,7 +357,7 @@ export function SignalDetailPage(): React.ReactElement {
           {/* Signal Content (locked or unlocked) */}
           <SignalContent
             isOwned={isOwned}
-            fullContent={signal.content}
+            fullContent={contentData?.content}
             reasoning={undefined}
             priceUSDT={signal.priceUsdt}
           />
