@@ -25,9 +25,28 @@ import type {
   UpdateSignalInput,
 } from "./signal.schemas.js";
 
+/** Transformed signal for API response (with category/predictor instead of categoryId/predictorId) */
+export interface TransformedSignal {
+  _id: mongoose.Types.ObjectId;
+  contentId: string;
+  predictorAddress: string;
+  title: string;
+  description: string;
+  priceUsdt: number;
+  expiresAt: Date;
+  totalSales: number;
+  averageRating: number;
+  totalReviews: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  category: { name: string; slug: string; icon?: string } | null;
+  predictor: { displayName?: string; avatarUrl?: string; averageRating?: number; walletAddress?: string } | null;
+}
+
 /** Signal list response with pagination metadata */
 export interface SignalListResponse {
-  signals: Partial<ISignal>[];
+  signals: TransformedSignal[];
   pagination: {
     total: number;
     page: number;
@@ -122,25 +141,41 @@ export class SignalService {
       }
     }
 
-    // Build sort
+    // Build sort - always prioritize by rating and sales first (best signals on top)
+    // Then apply user's sort preference as secondary sort
+    // This ensures highly-rated signals with good sales always appear first
     const sort: Record<string, 1 | -1> = {
-      [sortBy]: sortOrder === "asc" ? 1 : -1,
+      averageRating: -1, // Best rated first
+      totalSales: -1, // Most sales second
+      [sortBy]: sortOrder === "asc" ? 1 : -1, // User's preference third
     };
 
     // Calculate skip for pagination
     const skip = (page - 1) * limit;
 
     // Execute query with pagination (exclude protected content)
-    const [signals, total] = await Promise.all([
+    const [rawSignals, total] = await Promise.all([
       Signal.find(filter)
         .select(SignalService.PUBLIC_FIELDS)
         .sort(sort)
         .skip(skip)
         .limit(limit)
         .populate("categoryId", "name slug icon")
-        .populate("predictorId", "displayName avatarUrl averageRating"),
+        .populate("predictorId", "displayName avatarUrl averageRating")
+        .lean(),
       Signal.countDocuments(filter),
     ]);
+
+    // Transform field names for frontend compatibility
+    // Backend uses categoryId/predictorId, frontend expects category/predictor
+    const signals = rawSignals.map((signal) => {
+      const { categoryId, predictorId, ...rest } = signal as Record<string, unknown>;
+      return {
+        ...rest,
+        category: categoryId || null,
+        predictor: predictorId || null,
+      } as TransformedSignal;
+    });
 
     return {
       signals,
@@ -161,17 +196,24 @@ export class SignalService {
    * @returns Promise resolving to public signal data
    * @throws {ApiError} 404 if signal not found
    */
-  static async getByContentId(contentId: string): Promise<PublicSignal> {
-    const signal = await Signal.findOne({ contentId })
+  static async getByContentId(contentId: string): Promise<Record<string, unknown>> {
+    const rawSignal = await Signal.findOne({ contentId })
       .select(SignalService.PUBLIC_FIELDS)
       .populate("categoryId", "name slug icon")
-      .populate("predictorId", "displayName avatarUrl averageRating walletAddress");
+      .populate("predictorId", "displayName avatarUrl averageRating walletAddress")
+      .lean();
 
-    if (!signal) {
+    if (!rawSignal) {
       throw ApiError.notFound(`Signal with contentId '${contentId}' not found`);
     }
 
-    return signal as unknown as PublicSignal;
+    // Transform field names for frontend compatibility
+    const { categoryId, predictorId, ...rest } = rawSignal as Record<string, unknown>;
+    return {
+      ...rest,
+      category: categoryId || null,
+      predictor: predictorId || null,
+    };
   }
 
   /**
