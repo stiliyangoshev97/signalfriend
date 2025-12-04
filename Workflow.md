@@ -8,4 +8,6 @@ For any scripts you create always add a dry-run option as well if they change ac
 
 Important: only modify the project_context, readme.md, changelog.md, to-do.txt of the techs we are working on (frontend, backend, etc..) 
 
+For any new packages, dependencies, technologies (react, express, etc..), write them down with their respective version in requirements.txt file.
+
 Additionally we have a PROJECT.md which describes the use of the full app we are building. If we introduce new things or decide to not use something, we should reflect it there, but keep in mind thats a not-technical file, its mostly the roadmap for the app, includes technologies needed and logic, decisions about the app. 
