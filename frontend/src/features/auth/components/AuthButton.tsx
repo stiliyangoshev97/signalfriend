@@ -80,6 +80,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAuth } from '../api';
 import { Button } from '@/shared/components/ui';
 import { formatAddress } from '@/shared/utils';
+import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
 
 export function AuthButton() {
   const { 
@@ -91,6 +92,7 @@ export function AuthButton() {
     logout,
     error,
   } = useAuth();
+  const isAdmin = useIsAdmin();
 
   // Not connected - show RainbowKit connect button
   if (!isConnected) {
@@ -122,6 +124,16 @@ export function AuthButton() {
             title={error.message}
           >
             {error.message}
+          </span>
+        )}
+        
+        {/* Multisig wallet indicator (before sign in) */}
+        {isAdmin && (
+          <span 
+            className="px-2 py-1 text-xs font-medium bg-fur-main/20 text-fur-main border border-fur-main/30 rounded-lg hidden sm:inline"
+            title="Multisig signer wallet detected"
+          >
+            🔐 Multisig
           </span>
         )}
         
@@ -159,6 +171,16 @@ export function AuthButton() {
   // Fully authenticated - show user info with logout
   return (
     <div className="flex items-center gap-3">
+      {/* Multisig wallet indicator */}
+      {isAdmin && (
+        <span 
+          className="px-2 py-1 text-xs font-medium bg-fur-main/20 text-fur-main border border-fur-main/30 rounded-lg"
+          title="Connected with multisig signer wallet"
+        >
+          🔐 Multisig
+        </span>
+      )}
+      
       {/* User avatar/address via RainbowKit for wallet management */}
       <ConnectButton.Custom>
         {({ account, chain, openAccountModal, openChainModal }) => (

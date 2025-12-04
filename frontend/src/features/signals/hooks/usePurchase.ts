@@ -80,20 +80,21 @@ export function useCheckPurchase(contentId: string) {
 
 /**
  * Hook to fetch the protected content of a purchased signal.
- * Only fetches when user is authenticated and has purchased the signal (isOwned = true).
+ * Only fetches when user is authenticated and has purchased the signal (isOwned = true),
+ * OR when the user is an admin (multisig wallet holder).
  *
  * @param contentId - Signal's content ID
- * @param isOwned - Whether the user has purchased this signal
+ * @param canAccess - Whether the user can access this content (owned, is creator, or is admin)
  * @returns Query result with protected content
  *
  * @example
  * const { data: purchaseData } = useCheckPurchase(contentId);
- * const { data: contentData } = useSignalContent(contentId, purchaseData?.hasPurchased);
+ * const { data: contentData } = useSignalContent(contentId, purchaseData?.hasPurchased || isAdmin);
  * if (contentData) {
  *   console.log('Protected content:', contentData.content);
  * }
  */
-export function useSignalContent(contentId: string, isOwned: boolean = false) {
+export function useSignalContent(contentId: string, canAccess: boolean = false) {
   const { address, isConnected } = useAccount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
@@ -110,8 +111,8 @@ export function useSignalContent(contentId: string, isOwned: boolean = false) {
     // 3. User is authenticated in store
     // 4. authToken exists in localStorage
     // 5. contentId is provided
-    // 6. User owns the signal
-    enabled: isConnected && hasHydrated && isAuthenticated && hasToken && !!contentId && isOwned,
+    // 6. User can access the content (owns signal, is creator, or is admin)
+    enabled: isConnected && hasHydrated && isAuthenticated && hasToken && !!contentId && canAccess,
     staleTime: 1000 * 60 * 30, // 30 minutes - content doesn't change
   });
 }
