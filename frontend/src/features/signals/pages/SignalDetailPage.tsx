@@ -158,8 +158,8 @@ export function SignalDetailPage(): React.ReactElement {
     refetchPurchase();
     // Invalidate signal query to refresh data
     queryClient.invalidateQueries({ queryKey: signalKeys.detail(contentId || '') });
-    // Invalidate content query so it fetches the protected content
-    queryClient.invalidateQueries({ queryKey: purchaseKeys.content(contentId || '') });
+    // Invalidate content query so it fetches the protected content (include address for cache key)
+    queryClient.invalidateQueries({ queryKey: purchaseKeys.content(contentId || '', address) });
   };
 
   // Loading state

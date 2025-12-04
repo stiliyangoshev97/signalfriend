@@ -15,6 +15,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import {
   fetchMySignals,
   fetchPredictorEarnings,
@@ -54,11 +55,15 @@ export function useMySignals(params?: {
   sortOrder?: 'asc' | 'desc';
 }) {
   const { address, isConnected } = useAccount();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
 
   return useQuery({
     queryKey: predictorKeys.signals(address ?? '', params),
     queryFn: () => fetchMySignals(address!, params),
-    enabled: isConnected && !!address,
+    // Only fetch when authenticated to prevent 401 errors
+    enabled: isConnected && !!address && hasHydrated && isAuthenticated && hasToken,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }
@@ -74,11 +79,15 @@ export function useMySignals(params?: {
  */
 export function useMyEarnings() {
   const { address, isConnected } = useAccount();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
 
   return useQuery({
     queryKey: predictorKeys.earnings(address ?? ''),
     queryFn: () => fetchPredictorEarnings(address!),
-    enabled: isConnected && !!address,
+    // Only fetch when authenticated to prevent 401 errors
+    enabled: isConnected && !!address && hasHydrated && isAuthenticated && hasToken,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
@@ -91,12 +100,16 @@ export function useMyEarnings() {
  */
 export function usePredictorProfile(address?: string) {
   const { address: connectedAddress, isConnected } = useAccount();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
   const targetAddress = address ?? connectedAddress;
 
   return useQuery({
     queryKey: predictorKeys.profile(targetAddress ?? ''),
     queryFn: () => fetchPredictorByAddress(targetAddress!),
-    enabled: isConnected && !!targetAddress,
+    // Only fetch when authenticated to prevent 401 errors
+    enabled: isConnected && !!targetAddress && hasHydrated && isAuthenticated && hasToken,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
