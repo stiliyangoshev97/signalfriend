@@ -12,7 +12,7 @@
 
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
-import { Card, Button, Badge } from '@/shared/components/ui';
+import { Card, Button, Badge, Modal } from '@/shared/components/ui';
 import { useAuthStore } from '@/features/auth/store';
 import { useIsVerifiedPredictor } from '@/shared/hooks';
 import { 
@@ -100,6 +100,8 @@ export function PredictorDashboardPage(): React.ReactElement {
   // State
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [signalFilter, setSignalFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [deactivateModalOpen, setDeactivateModalOpen] = useState(false);
+  const [signalToDeactivate, setSignalToDeactivate] = useState<{ contentId: string; title: string } | null>(null);
   
   // Data fetching
   const { 
@@ -143,9 +145,16 @@ export function PredictorDashboardPage(): React.ReactElement {
   const totalReviews = predictor?.totalReviews || signals.reduce((sum, s) => sum + s.totalReviews, 0);
   
   // Handlers
-  const handleDeactivate = (contentId: string) => {
-    if (window.confirm('Are you sure you want to deactivate this signal? It will be hidden from the marketplace.')) {
-      deactivateSignal(contentId);
+  const handleDeactivate = (contentId: string, title?: string) => {
+    setSignalToDeactivate({ contentId, title: title || 'this signal' });
+    setDeactivateModalOpen(true);
+  };
+  
+  const confirmDeactivate = () => {
+    if (signalToDeactivate) {
+      deactivateSignal(signalToDeactivate.contentId);
+      setDeactivateModalOpen(false);
+      setSignalToDeactivate(null);
     }
   };
   
@@ -203,10 +212,10 @@ export function PredictorDashboardPage(): React.ReactElement {
         />
       </div>
 
-      {/* My Signals Section */}
+      {/* Published Signals Section */}
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h2 className="text-xl font-semibold text-fur-cream">My Signals</h2>
+          <h2 className="text-xl font-semibold text-fur-cream">Published Signals</h2>
           
           {/* Filter Tabs */}
           <div className="flex gap-2">
@@ -275,6 +284,56 @@ export function PredictorDashboardPage(): React.ReactElement {
         onClose={() => setShowCreateModal(false)}
         onSuccess={handleCreateSuccess}
       />
+
+      {/* Deactivate Confirmation Modal */}
+      <Modal
+        isOpen={deactivateModalOpen}
+        onClose={() => {
+          setDeactivateModalOpen(false);
+          setSignalToDeactivate(null);
+        }}
+        title="Deactivate Signal"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-center w-16 h-16 mx-auto bg-accent-red/10 rounded-full">
+            <svg className="w-8 h-8 text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div className="text-center">
+            <p className="text-fur-cream mb-2">
+              Are you sure you want to deactivate{' '}
+              <span className="font-semibold text-fur-light">
+                "{signalToDeactivate?.title}"
+              </span>
+              ?
+            </p>
+            <p className="text-sm text-fur-cream/60">
+              This signal will be hidden from the marketplace. Existing buyers will still have access to the content.
+            </p>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <Button
+              variant="secondary"
+              className="flex-1"
+              onClick={() => {
+                setDeactivateModalOpen(false);
+                setSignalToDeactivate(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              className="flex-1"
+              onClick={confirmDeactivate}
+              disabled={isDeactivating}
+            >
+              {isDeactivating ? 'Deactivating...' : 'Deactivate'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

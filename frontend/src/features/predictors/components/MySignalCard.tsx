@@ -17,7 +17,7 @@ interface MySignalCardProps {
   /** The signal to display */
   signal: Signal;
   /** Callback when deactivate is clicked */
-  onDeactivate?: (contentId: string) => void;
+  onDeactivate?: (contentId: string, title?: string) => void;
   /** Callback when reactivate is clicked */
   onReactivate?: (contentId: string) => void;
   /** Whether an action is in progress */
@@ -220,7 +220,7 @@ export function MySignalCard({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onDeactivate?.(signal.contentId)}
+              onClick={() => onDeactivate?.(signal.contentId, signal.title)}
               disabled={isActionPending}
               className="text-error-400 hover:text-error-300 hover:bg-error-500/10"
             >
