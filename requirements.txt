@@ -1,0 +1,173 @@
+# ============================================================================
+# SignalFriend - Project Dependencies & Versions
+# ============================================================================
+# This file documents all dependencies for deployment and PC migration.
+# Last Updated: December 5, 2025
+# ============================================================================
+
+# ============================================================================
+# RUNTIME REQUIREMENTS
+# ============================================================================
+
+Node.js             >= 20.0.0          # Runtime (currently v22.17.1)
+npm                 >= 10.0.0          # Package manager (currently v11.4.2)
+
+# ============================================================================
+# SMART CONTRACTS (Foundry + Solidity)
+# ============================================================================
+
+Foundry             1.2.3-stable       # forge, cast, anvil, chisel
+Solidity            0.8.24             # Solc compiler version
+OpenZeppelin        5.5.0              # @openzeppelin/contracts
+forge-std           1.11.0             # Foundry standard library
+
+# Installation:
+# curl -L https://foundry.paradigm.xyz | bash
+# foundryup
+# cd contracts && forge install
+
+# ============================================================================
+# BACKEND DEPENDENCIES (Express + MongoDB + Viem)
+# ============================================================================
+
+# --- Production Dependencies ---
+express             ^4.21.1            # Web framework
+mongoose            ^8.8.3             # MongoDB ODM
+viem                ^2.21.44           # Ethereum client
+zod                 ^3.23.8            # Schema validation
+pino                ^10.1.0            # Logging
+pino-pretty         ^13.1.2            # Pretty log output (dev)
+siwe                ^2.3.2             # Sign-In with Ethereum
+jsonwebtoken        ^9.0.2             # JWT authentication
+dotenv              ^16.4.5            # Environment variables
+cors                ^2.8.5             # CORS middleware
+helmet              ^8.0.0             # Security headers
+express-rate-limit  ^7.4.1             # Rate limiting
+cookie-parser       ^1.4.7             # Cookie parsing
+
+# --- Dev Dependencies ---
+typescript          ^5.6.3             # TypeScript compiler
+tsx                 ^4.19.2            # TypeScript execution
+vitest              ^2.1.5             # Testing framework
+eslint              ^9.15.0            # Linting
+prettier            ^3.4.1             # Code formatting
+@vitest/coverage-v8 ^2.1.5             # Test coverage
+
+# Type definitions:
+@types/node         ^22.9.3
+@types/express      ^5.0.0
+@types/cors         ^2.8.17
+@types/jsonwebtoken ^9.0.7
+@types/cookie-parser ^1.4.7
+@typescript-eslint/eslint-plugin ^8.15.0
+@typescript-eslint/parser ^8.15.0
+
+# Installation:
+# cd backend && npm install
+
+# ============================================================================
+# FRONTEND DEPENDENCIES (React + Vite + Web3)
+# ============================================================================
+
+# --- Core Framework ---
+react               ^19.2.0            # UI library
+react-dom           ^19.2.0            # React DOM
+react-router-dom    ^7.10.0            # Routing
+vite                ^7.2.4             # Build tool
+
+# --- Web3 Stack ---
+wagmi               ^2.19.5            # React hooks for Ethereum
+viem                ^2.40.4            # Ethereum client
+@rainbow-me/rainbowkit ^2.2.9          # Wallet connection UI
+siwe                ^3.0.0             # Sign-In with Ethereum
+
+# --- State & Data Management ---
+zustand             ^5.0.9             # Global state management
+@tanstack/react-query ^5.90.11         # Server state / data fetching
+axios               ^1.13.2            # HTTP client
+
+# --- Forms & Validation ---
+react-hook-form     ^7.67.0            # Form management
+@hookform/resolvers ^5.2.2             # Form resolvers
+zod                 ^4.1.13            # Schema validation
+
+# --- Styling ---
+tailwindcss         ^3.4.3             # Utility-first CSS
+postcss             ^8.4.38            # CSS processing
+autoprefixer        ^10.4.17           # CSS vendor prefixes
+
+# --- Monitoring ---
+@sentry/react       ^10.28.0           # Error tracking
+
+# --- Dev Dependencies ---
+typescript          ~5.9.3             # TypeScript compiler
+eslint              ^9.39.1            # Linting
+@vitejs/plugin-react ^5.1.1            # React plugin for Vite
+
+# Type definitions:
+@types/node         ^24.10.1
+@types/react        ^19.2.5
+@types/react-dom    ^19.2.3
+
+# Installation:
+# cd frontend && npm install
+
+# ============================================================================
+# DATABASE
+# ============================================================================
+
+MongoDB             >= 6.0             # Database (local or Atlas)
+                                       # Connection via mongoose
+
+# ============================================================================
+# EXTERNAL SERVICES
+# ============================================================================
+
+Alchemy             -                  # RPC + Webhooks (API Key required)
+WalletConnect       -                  # Wallet connection (Project ID required)
+Sentry              -                  # Error monitoring (DSN required)
+
+# ============================================================================
+# BLOCKCHAIN (Target Chain)
+# ============================================================================
+
+BNB Chain Testnet   Chain ID: 97       # Development
+BNB Chain Mainnet   Chain ID: 56       # Production
+
+# RPC URLs:
+# Testnet: https://bsc-testnet-rpc.publicnode.com
+# Mainnet: https://bsc-rpc.publicnode.com
+
+# ============================================================================
+# QUICK SETUP COMMANDS
+# ============================================================================
+
+# 1. Install Node.js 20+ (https://nodejs.org)
+# 2. Install Foundry:
+#    curl -L https://foundry.paradigm.xyz | bash && foundryup
+
+# 3. Clone and install:
+#    git clone <repo>
+#    cd SignalFriend
+
+# 4. Backend:
+#    cd backend
+#    npm install
+#    cp .env.example .env
+#    # Edit .env with your values
+#    npm run dev
+
+# 5. Frontend:
+#    cd frontend
+#    npm install
+#    cp .env.example .env.local
+#    # Edit .env.local with your values
+#    npm run dev
+
+# 6. Contracts:
+#    cd contracts
+#    forge install
+#    forge build
+#    forge test
+
+# ============================================================================
