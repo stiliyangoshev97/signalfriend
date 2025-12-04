@@ -31,7 +31,7 @@ interface CreateSignalModalProps {
  * - Title and description fields
  * - Protected signal content (only visible after purchase)
  * - Category selection
- * - Price in USDT (minimum $5)
+ * - Price in USDT (minimum $1)
  * - Expiry duration (1-30 days)
  * - Form validation with Zod
  * - Loading states and error handling
@@ -321,7 +321,7 @@ export function CreateSignalModal({
               error={errors.priceUsdt?.message}
             />
             <div className="mt-1 text-xs text-fur-cream/50">
-              Minimum $5 USDT • Use period (.) for decimals, e.g., 10.50
+              Minimum $1 USDT • Use period (.) for decimals, e.g., 10.50
             </div>
           </div>
         </div>

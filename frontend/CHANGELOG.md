@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.10.5] - 2025-12-05
+
+### Changed
+
+#### Minimum Signal Price Reduced to $1 USDT
+- **Signal Schema** (`src/shared/schemas/signal.schemas.ts`):
+  - Changed `priceUsdt` minimum from 5 to 1
+  - Updated error message to "Minimum price is $1 USDT"
+
+- **CreateSignalModal** (`src/features/predictors/components/CreateSignalModal.tsx`):
+  - Updated JSDoc comment to reflect $1 minimum
+  - Updated helper text from "Minimum $5 USDT" to "Minimum $1 USDT"
+
+### Fixed
+
+#### Price Decimal Validation Bug
+- **Signal Schema** (`src/shared/schemas/signal.schemas.ts`):
+  - Fixed bug where prices like 1.1, 5.1, 7.12 were incorrectly rejected
+  - **Root Cause**: JavaScript floating-point precision issue
+    - `1.1 * 100 = 110.00000000000001` (not an integer!)
+    - `1.2 * 100 = 120` (is an integer)
+  - **Fix**: Changed from `Number.isInteger(val * 100)` to tolerance-based check
+  - Now correctly allows all prices with up to 2 decimal places
+
+---
+
 ## [0.10.4] - 2025-12-04
 
 ### Added

@@ -141,4 +141,6 @@ export const EVENT_SIGNATURES = {
   SignalPurchased: "0x906c548d19aa6c7ed9e105a3d02cb6a435b802903a30000aa9ad5e01d93ef647" as const,
   /** PredictorBlacklisted(address indexed predictor, bool status) */
   PredictorBlacklisted: "0xad6b8655f145f95522485d58e7cd8ca2689dbe89691511217c7cc914b1226005" as const,
+  /** PredictorNFTMinted(address indexed predictor, uint256 indexed tokenId, bool isOwnerMint) - From PredictorAccessPass contract */
+  PredictorNFTMinted: "0x7cfc4d30050d18b034fe455eba1875eafe455de2dab7696a1fc7f8918d409f12" as const,
 } as const;

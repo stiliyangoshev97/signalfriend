@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 4 December 2025
+> Last Updated: 5 December 2025
 
 ---
 

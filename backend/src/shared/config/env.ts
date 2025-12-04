@@ -61,7 +61,7 @@ const envSchema = z.object({
 
   // Business Rules Configuration
   /** Minimum signal price in USDT (must match smart contract) */
-  MIN_SIGNAL_PRICE_USDT: z.coerce.number().default(5),
+  MIN_SIGNAL_PRICE_USDT: z.coerce.number().default(1),
 
   // Admin Configuration
   /** Comma-separated list of admin wallet addresses (MultiSig signers) */
