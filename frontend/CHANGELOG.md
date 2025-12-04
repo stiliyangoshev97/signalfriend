@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.1] - 2025-12-04
+
+### Fixed
+
+#### Protected Signal Content Not Showing After Purchase
+- **Problem**: After purchasing a signal, the "Signal Content" section showed "No additional content available" instead of the actual protected content.
+- **Root Cause**: `SignalDetailPage` was passing `signal.content` to `SignalContent` component, but the `/api/signals/:contentId` endpoint returns public data only (excludes `content` field for security).
+- **Solution**: Added new API function and hook to fetch protected content separately.
+
+**Files Changed:**
+- `src/features/signals/api/purchase.api.ts`:
+  - Added `fetchSignalContent()` function to call `/api/signals/:contentId/content`
+  - Added `SignalContentResponse` interface
+  
+- `src/features/signals/hooks/usePurchase.ts`:
+  - Added `useSignalContent()` hook that fetches protected content only when user owns the signal
+  - Added `content` key to `purchaseKeys` factory
+
+- `src/features/signals/pages/SignalDetailPage.tsx`:
+  - Added `useSignalContent` hook to fetch protected content when `isOwned=true`
+  - Passes `contentData?.content` to `SignalContent` instead of `signal.content`
+  - Added `purchaseKeys.content` invalidation on purchase success
+
+---
+
 ## [0.9.0] - 2025-12-04
 
 ### Added

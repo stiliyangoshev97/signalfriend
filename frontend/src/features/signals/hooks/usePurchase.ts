@@ -25,8 +25,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
 import { getContractAddresses, SIGNAL_FRIEND_MARKET_ABI, ERC20_ABI } from '@/shared/config';
-import { checkPurchase, fetchContentIdentifier, fetchMyReceipts } from '../api';
-import type { CheckPurchaseResponse, Receipt } from '../api/purchase.api';
+import { checkPurchase, fetchContentIdentifier, fetchMyReceipts, fetchSignalContent } from '../api';
+import type { CheckPurchaseResponse, Receipt, SignalContentResponse } from '../api/purchase.api';
 
 /** USDT has 18 decimals on BNB Chain */
 const USDT_DECIMALS = 18;
@@ -36,6 +36,7 @@ export const purchaseKeys = {
   all: ['purchase'] as const,
   check: (contentId: string) => [...purchaseKeys.all, 'check', contentId] as const,
   contentId: (contentId: string) => [...purchaseKeys.all, 'contentIdentifier', contentId] as const,
+  content: (contentId: string) => [...purchaseKeys.all, 'content', contentId] as const,
   myReceipts: (params?: { page?: number; limit?: number }) => 
     [...purchaseKeys.all, 'myReceipts', params] as const,
 };
@@ -60,6 +61,32 @@ export function useCheckPurchase(contentId: string) {
     queryFn: () => checkPurchase(contentId),
     enabled: isConnected && !!contentId,
     staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+/**
+ * Hook to fetch the protected content of a purchased signal.
+ * Only fetches when user has purchased the signal (isOwned = true).
+ *
+ * @param contentId - Signal's content ID
+ * @param isOwned - Whether the user has purchased this signal
+ * @returns Query result with protected content
+ *
+ * @example
+ * const { data: purchaseData } = useCheckPurchase(contentId);
+ * const { data: contentData } = useSignalContent(contentId, purchaseData?.hasPurchased);
+ * if (contentData) {
+ *   console.log('Protected content:', contentData.content);
+ * }
+ */
+export function useSignalContent(contentId: string, isOwned: boolean = false) {
+  const { isConnected } = useAccount();
+
+  return useQuery<SignalContentResponse>({
+    queryKey: purchaseKeys.content(contentId),
+    queryFn: () => fetchSignalContent(contentId),
+    enabled: isConnected && !!contentId && isOwned,
+    staleTime: 1000 * 60 * 30, // 30 minutes - content doesn't change
   });
 }
 

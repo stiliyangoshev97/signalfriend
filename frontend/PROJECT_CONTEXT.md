@@ -191,6 +191,27 @@ export function getExpiryInfo(expiresAt: string): { isExpired: boolean; text: st
 ### Overview
 Users can view all signals they've purchased at `/my-signals`. Each purchase receipt includes access to the unlocked signal content.
 
+### Protected Content Flow
+Signal content is protected and only revealed to owners:
+
+1. **Public Signal Data**: `/api/signals/:contentId` returns metadata only (no `content` field)
+2. **Check Ownership**: `useCheckPurchase(contentId)` checks if user has a receipt
+3. **Fetch Content**: `useSignalContent(contentId, isOwned)` fetches from `/api/signals/:contentId/content` only when `isOwned=true`
+4. **Display**: `SignalContent` component shows locked/unlocked state
+
+```tsx
+// SignalDetailPage.tsx - Protected content flow
+const { data: purchaseData } = useCheckPurchase(contentId);
+const isOwned = purchaseData?.hasPurchased ?? false;
+const { data: contentData } = useSignalContent(contentId, isOwned);
+
+<SignalContent
+  isOwned={isOwned}
+  fullContent={contentData?.content}  // Only has value when owned
+  priceUSDT={signal.priceUsdt}
+/>
+```
+
 ### Route
 - **Path**: `/my-signals`
 - **Guard**: `ProtectedRoute` (requires wallet + SIWE auth)
