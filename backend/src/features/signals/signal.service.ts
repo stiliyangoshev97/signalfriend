@@ -95,6 +95,7 @@ export class SignalService {
   static async getAll(query: ListSignalsQuery): Promise<SignalListResponse> {
     const {
       categoryId,
+      mainGroup,
       predictorAddress,
       excludeBuyerAddress,
       active,
@@ -121,6 +122,11 @@ export class SignalService {
     // Filter by category
     if (categoryId) {
       filter.categoryId = categoryId;
+    }
+
+    // Filter by main category group (when no specific subcategory is selected)
+    if (mainGroup && !categoryId) {
+      filter.mainGroup = mainGroup;
     }
 
     // Filter by predictor address

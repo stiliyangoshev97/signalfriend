@@ -261,6 +261,93 @@ npm run dev
 | SignalKeyNFT | `0xfb26Df6101e1a52f9477f52F54b91b99fb016aed` |
 | MockUSDT | `0xF87d17a5ca95F3f992f82Baabf4eBC5301A178a5` |
 
+---
+
+## 🏗️ Building from Scratch - Code Review Guide
+
+This section helps reviewers understand the codebase architecture and where to start.
+
+### Entry Point
+
+The application starts at **`src/index.ts`**:
+1. Loads environment variables via `src/shared/config/env.ts` (Zod validation)
+2. Connects to MongoDB via `src/shared/config/db.ts`
+3. Creates Express app with middleware (CORS, JSON, request logging)
+4. Mounts feature routers under `/api/v1/`
+5. Sets up global error handler
+6. Starts HTTP server
+
+### Core Architecture
+
+```
+src/
+├── index.ts                    # 👈 START HERE - App bootstrap
+├── contracts/                  # Blockchain integration
+│   ├── addresses.ts            # Contract addresses by chainId
+│   ├── clients.ts              # Viem public client setup
+│   └── abis/                   # Contract ABI JSON files
+├── features/                   # Domain modules (review these in order)
+│   ├── auth/                   # 1️⃣ SIWE + JWT authentication
+│   ├── categories/             # 2️⃣ Signal categories (simple CRUD)
+│   ├── predictors/             # 3️⃣ Predictor profiles
+│   ├── signals/                # 4️⃣ Core business logic - signals
+│   ├── receipts/               # 5️⃣ Purchase receipts
+│   ├── reviews/                # 6️⃣ Ratings & reviews
+│   ├── reports/                # 7️⃣ Scam reporting
+│   ├── webhooks/               # 8️⃣ Alchemy event indexing
+│   └── admin/                  # 9️⃣ Admin operations
+└── shared/                     # Shared utilities
+    ├── config/                 # env.ts, db.ts, logger.ts
+    ├── middleware/             # auth, validation, errors
+    ├── services/               # blockchain.service.ts
+    └── utils/                  # ApiError, asyncHandler
+```
+
+### Feature Module Structure
+
+Each feature follows a consistent pattern:
+```
+features/signals/
+├── signal.model.ts       # Mongoose schema & model
+├── signal.schemas.ts     # Zod validation schemas
+├── signal.service.ts     # Business logic (static methods)
+├── signal.controller.ts  # Express route handlers
+├── signal.routes.ts      # Router definition
+└── index.ts              # Barrel export
+```
+
+### Recommended Review Order
+
+1. **`src/shared/config/env.ts`** - Environment validation
+2. **`src/shared/utils/ApiError.ts`** - Error handling pattern
+3. **`src/features/auth/`** - Authentication flow (SIWE)
+4. **`src/features/signals/signal.model.ts`** - Core data model
+5. **`src/features/signals/signal.service.ts`** - Business logic
+6. **`src/features/webhooks/`** - Blockchain event indexing
+
+### Key Concepts
+
+| Concept | File | Description |
+|---------|------|-------------|
+| Auth flow | `auth/auth.service.ts` | SIWE nonce → verify → JWT |
+| Protected content | `signals/signal.service.ts` | Content only revealed to purchasers |
+| ContentId bridge | `shared/utils/contentId.ts` | UUID ↔ bytes32 conversion |
+| Event indexing | `webhooks/webhook.service.ts` | Alchemy GraphQL → MongoDB |
+| Admin check | `shared/middleware/admin.ts` | MultiSig wallet verification |
+
+### Database Models
+
+| Model | Collection | Key Fields |
+|-------|------------|------------|
+| Category | categories | name, mainGroup, slug |
+| Predictor | predictors | walletAddress, displayName, isVerified |
+| Signal | signals | contentId, content (protected), categoryId |
+| Receipt | receipts | tokenId, contentId, buyerAddress |
+| Review | reviews | tokenId, rating (1-5), comment |
+| Report | reports | tokenId, reason, description |
+
+---
+
 ## Scripts
 
 ```bash
