@@ -35,6 +35,7 @@ import { PredictorInfoCard } from '../components/PredictorInfoCard';
 import { PurchaseCard } from '../components/PurchaseCard';
 import { SignalContent } from '../components/SignalContent';
 import { PurchaseModal } from '../components/PurchaseModal';
+import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
 
 /**
  * Risk level badge colors and labels
@@ -132,6 +133,7 @@ export function SignalDetailPage(): React.ReactElement {
   const { contentId } = useParams<{ contentId: string }>();
   const queryClient = useQueryClient();
   const { address } = useAccount();
+  const isAdmin = useIsAdmin();
   const { data: signal, isLoading, error } = useSignal(contentId || '');
   
   // Check if user owns this signal
@@ -145,8 +147,9 @@ export function SignalDetailPage(): React.ReactElement {
     address.toLowerCase() === signal.predictorAddress.toLowerCase()
   );
   
-  // Fetch protected content if user owns the signal OR is the predictor
-  const { data: contentData } = useSignalContent(contentId || '', isOwned || isOwnSignal);
+  // Fetch protected content if user owns the signal, is the predictor, OR is admin (multisig wallet)
+  const canAccessContent = isOwned || isOwnSignal || isAdmin;
+  const { data: contentData } = useSignalContent(contentId || '', canAccessContent);
   
   // Purchase modal state
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
@@ -365,7 +368,7 @@ export function SignalDetailPage(): React.ReactElement {
 
           {/* Signal Content (locked or unlocked) */}
           <SignalContent
-            isOwned={isOwned}
+            isOwned={canAccessContent}
             fullContent={contentData?.content}
             reasoning={undefined}
             priceUSDT={signal.priceUsdt}

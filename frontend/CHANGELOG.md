@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.10.3] - 2025-12-04
+
+### Fixed
+
+#### Multisig Wallet Access to Protected Signal Content
+- **SignalDetailPage** (`src/features/signals/pages/SignalDetailPage.tsx`):
+  - Fixed bug where multisig signer wallets couldn't view protected signal content
+  - Now checks `isAdmin` status in addition to `isOwned` and `isOwnSignal`
+  - Admins (multisig signers) can access any signal's protected content for review
+
+- **useSignalContent Hook** (`src/features/signals/hooks/usePurchase.ts`):
+  - Renamed `isOwned` parameter to `canAccess` for clarity
+  - Updated documentation to reflect that admins can also access content
+
+### Added
+
+#### Visual Indicator for Multisig Wallets
+- **AuthButton** (`src/features/auth/components/AuthButton.tsx`):
+  - Added "🔐 Multisig" badge when connected with a multisig signer wallet
+  - Shows in both "connected but not signed in" and "fully authenticated" states
+  - Helps during testing to identify which wallet is connected
+  - Badge has distinctive fur-main color styling with tooltip explanation
+
+---
+
 ## [0.10.2] - 2025-12-04
 
 ### Fixed
