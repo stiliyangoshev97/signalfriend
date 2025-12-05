@@ -14,6 +14,8 @@ import { isValid, parseISO } from 'date-fns';
 interface SignalCardProps {
   /** The signal to display */
   signal: Signal;
+  /** Whether the current user has purchased this signal */
+  isPurchased?: boolean;
 }
 
 /**
@@ -110,7 +112,7 @@ function capitalize(str: string | undefined | null): string {
  * @example
  * <SignalCard signal={signalData} />
  */
-export function SignalCard({ signal }: SignalCardProps): React.ReactElement {
+export function SignalCard({ signal, isPurchased = false }: SignalCardProps): React.ReactElement {
   // Get expiry info for display
   const { isExpired, text: expiryText } = getExpiryInfo(signal.expiresAt);
   
@@ -138,7 +140,15 @@ export function SignalCard({ signal }: SignalCardProps): React.ReactElement {
             Uncategorized
           </span>
         )}
-        {!isActive ? (
+        {/* Status Badge - Purchased takes priority over Active/Inactive */}
+        {isPurchased ? (
+          <span className="text-xs font-medium text-green-400 bg-green-500/20 px-2 py-1 rounded-full flex items-center gap-1 border border-green-500/30">
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            Purchased
+          </span>
+        ) : !isActive ? (
           <span className="text-xs font-medium text-accent-red bg-accent-red/10 px-2 py-1 rounded-full">
             Inactive
           </span>

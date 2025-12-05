@@ -13,7 +13,7 @@ import { useAccount } from 'wagmi';
 import { Avatar, Badge, Button } from '@/shared/components/ui';
 import { formatAddress } from '@/shared/utils/format';
 import { FilterPanel, SignalGrid, Pagination } from '@/features/signals/components';
-import { useCategories } from '@/features/signals/hooks';
+import { useCategories, useMyPurchasedContentIds } from '@/features/signals/hooks';
 import {
   usePublicPredictorProfile,
   usePublicPredictorSignals,
@@ -153,24 +153,29 @@ export function PredictorProfilePage(): React.ReactElement {
   );
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
-  // Get connected wallet to exclude already purchased signals
+  // Get connected wallet to check purchased signals
   const { address: connectedWallet } = useAccount();
 
   // Fetch predictor profile
   const { data: predictor, isLoading: profileLoading, error: profileError } = usePublicPredictorProfile(address);
 
-  // Build query filters
+  // Build query filters - DON'T exclude purchased signals on profile page
+  // We want to show all signals with a "Purchased" badge for owned ones
   const queryFilters = useMemo(() => ({
     ...filters,
     limit: 12,
-    ...(connectedWallet && { excludeBuyerAddress: connectedWallet }),
-  }), [filters, connectedWallet]);
+    // Note: excludeBuyerAddress is intentionally NOT included here
+    // On predictor profiles, we show ALL signals (purchased ones get a badge)
+  }), [filters]);
 
   // Fetch predictor's signals
   const { data: signalsData, isLoading: signalsLoading, error: signalsError } = usePublicPredictorSignals(
     address,
     queryFilters
   );
+
+  // Fetch user's purchased content IDs (only when authenticated)
+  const { data: purchasedContentIds } = useMyPurchasedContentIds(!!connectedWallet);
 
   // Fetch categories for filter dropdown
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
@@ -397,6 +402,7 @@ export function PredictorProfilePage(): React.ReactElement {
                 signals={signalsData?.data || []}
                 isLoading={signalsLoading}
                 error={signalsError?.message}
+                purchasedContentIds={purchasedContentIds}
               />
 
               {signalsData?.pagination && (

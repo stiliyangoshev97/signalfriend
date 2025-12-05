@@ -17,6 +17,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] - 2025-12-05 🛒 PURCHASED SIGNALS DISPLAY FIX
+
+### Added
+- **Receipts API** (`src/features/signals/api/receipts.api.ts`):
+  - `getMyReceipts(params)` - Fetch user's purchase history with pagination
+  - `getMyPurchasedContentIds()` - Fetch all purchased content IDs (handles pagination)
+
+- **Receipts Hook** (`src/features/signals/hooks/useReceipts.ts`):
+  - `useMyPurchasedContentIds(enabled)` - Query hook to get purchased content IDs
+  - Only runs when user is authenticated
+  - 5-minute stale time for caching
+
+### Changed
+- **SignalCard** (`src/features/signals/components/SignalCard.tsx`):
+  - Added optional `isPurchased` prop
+  - Displays "Purchased" badge with checkmark icon when true
+  - Badge takes priority over Active/Inactive status display
+
+- **SignalGrid** (`src/features/signals/components/SignalGrid.tsx`):
+  - Added optional `purchasedContentIds` prop
+  - Creates Set for O(1) lookup of purchased signals
+  - Passes `isPurchased` prop to each SignalCard
+
+- **PredictorProfilePage** (`src/features/predictors/pages/PredictorProfilePage.tsx`):
+  - Removed `excludeBuyerAddress` filter - now shows ALL signals from predictor
+  - Fetches user's purchased content IDs when authenticated
+  - Passes purchased IDs to SignalGrid for badge display
+
+### Fixed
+- **Bug**: Predictor profile showed "No signals found" when user purchased all signals
+- **Root Cause**: `excludeBuyerAddress` filter was hiding purchased signals
+- **Solution**: Show all signals with "Purchased" badge for owned ones
+
+---
+
 ## [0.1.0] - 2025-12-05 ⭐ PERMANENT RATING SYSTEM
 
 ### Added

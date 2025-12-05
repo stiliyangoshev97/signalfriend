@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 5 December 2025
+> Last Updated: 5 December 2025 (v0.1.1 - Purchased Signals Display Fix)
 
 ---
 
@@ -297,6 +297,47 @@ Categories are displayed as `"MainGroup > Subcategory"` throughout the UI:
   category?: Category; // Populated when fetched
 }
 ```
+
+---
+
+## 🛒 Purchased Signals Display
+
+### Overview
+Purchased signals are displayed with a "Purchased" badge throughout the app. This helps users identify signals they already own, especially on predictor profile pages.
+
+### Key Features
+| Feature | Description |
+|---------|-------------|
+| **"Purchased" Badge** | Gold badge with checkmark displayed on owned signal cards |
+| **Show All Signals** | Predictor profiles show ALL signals (not just unpurchased) |
+| **Badge Priority** | "Purchased" badge takes priority over "Active" status badge |
+
+### Components
+| Component | Change | Purpose |
+|-----------|--------|---------|
+| `SignalCard` | Added `isPurchased` prop | Display "Purchased" badge |
+| `SignalGrid` | Added `purchasedContentIds` prop | Pass purchase status to cards |
+| `PredictorProfilePage` | Fetch purchased IDs | Enable badge display |
+
+### API Functions
+```typescript
+// src/features/signals/api/receipts.api.ts
+getMyReceipts(params)         // Fetch user's purchase history
+getMyPurchasedContentIds()    // Get all purchased content IDs (paginated)
+```
+
+### React Query Hooks
+```typescript
+// src/features/signals/hooks/useReceipts.ts
+useMyPurchasedContentIds(enabled)  // Fetch purchased IDs when authenticated
+```
+
+### Integration Flow
+1. `PredictorProfilePage` fetches signals WITHOUT `excludeBuyerAddress` filter
+2. `useMyPurchasedContentIds` hook fetches user's purchased content IDs
+3. `SignalGrid` receives `purchasedContentIds` prop
+4. Creates Set for O(1) lookup, passes `isPurchased` to each `SignalCard`
+5. `SignalCard` shows "Purchased" badge when `isPurchased === true`
 
 ---
 
