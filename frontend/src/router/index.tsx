@@ -57,7 +57,7 @@ import RootLayout from './RootLayout';
 import { ProtectedRoute, AdminRoute, PredictorRoute } from './guards';
 import { HomePage } from '@/features/home';
 import { SignalsPage, SignalDetailPage, MyPurchasedSignalsPage } from '@/features/signals';
-import { PredictorDashboardPage, PredictorsPage } from '@/features/predictors';
+import { PredictorDashboardPage, PredictorsPage, PredictorProfilePage } from '@/features/predictors';
 
 // Lazy load pages for code splitting (example for future pages)
 // import { lazy } from 'react';
@@ -97,7 +97,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'predictors/:address',
-        element: <PlaceholderPage title="Predictor Profile" />,
+        element: <PredictorProfilePage />,
       },
       
       // ===== AUTHENTICATED ROUTES =====

@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-05
-Branch: feature/predictor-list-page (v0.11.0)
+Branch: feature/predictor-profile-page (v0.12.0)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -197,11 +197,10 @@ PHASE 3: SIGNALS FEATURE (PRIORITY: HIGH)
     - User rejections shown as yellow "Transaction Cancelled" (not scary red)
     - parseWalletError() and isUserRejectionError() exported for reuse
 
-[ ] Leave Review Functionality
-    - Review form on purchased signal
-    - Star rating (1-5)
-    - Text review (optional)
-    - Submit to backend API
+[ ] Leave Rating Functionality
+    - Rating form on purchased signal (star rating 1-5 only, no text)
+    - Submit rating to backend API
+    - One rating per purchase (enforced by tokenId)
 
 ================================================================================
 PHASE 4: PREDICTOR FEATURES (PRIORITY: MEDIUM)
@@ -215,11 +214,13 @@ PHASE 4: PREDICTOR FEATURES (PRIORITY: MEDIUM)
     - Pagination with URL-synced filters
     - Mobile-responsive filter panel
 
-[ ] Predictor Profile Page (/predictors/:wallet)
-    - Full profile info
-    - Statistics (signals, sales, rating)
-    - List of active signals
-    - Reviews section
+[✅] Predictor Profile Page (/predictors/:wallet) - Added in v0.12.0
+    - Full profile info (avatar, name, bio, verification badge)
+    - Statistics (Signals, Sales, Avg Rating, Votes)
+    - Active signals grid with full FilterPanel (same as marketplace)
+    - URL-synced filters, pagination, mobile-responsive
+    - Twitter social link display
+    - No text reviews (rating only to avoid moderation issues)
 
 [ ] Become a Predictor Flow
     - Check if user owns PredictorAccessPass NFT
@@ -249,19 +250,22 @@ PHASE 4: PREDICTOR FEATURES (PRIORITY: MEDIUM)
     - No more redirect flash or manual reconnect needed
 
 ================================================================================
-PHASE 5: REVIEWS & RATINGS (PRIORITY: MEDIUM)
+PHASE 5: RATINGS (PRIORITY: MEDIUM)
 ================================================================================
 
-[ ] Review System
-    - Star rating component
-    - Review form after purchase
-    - Submit review to API
-    - Display reviews on predictor page
+NOTE: Rating system is STAR RATING ONLY (1-5 stars), no text reviews.
+This avoids moderation issues (spam links, inappropriate content).
+
+[ ] Rating System
+    - Star rating component (1-5 stars)
+    - Rating form after purchase (simple star selection)
+    - Submit rating to API
+    - Display average rating and vote count on predictor cards/profiles
 
 [ ] Rating Display
-    - Average rating badge
-    - Rating breakdown chart
-    - Recent reviews list
+    - Average rating badge (already shown)
+    - Total votes count (already shown)
+    - Rating breakdown chart (optional - shows distribution of 1-5 star votes)
 
 ================================================================================
 PHASE 6: ADMIN FEATURES (PRIORITY: LOW)

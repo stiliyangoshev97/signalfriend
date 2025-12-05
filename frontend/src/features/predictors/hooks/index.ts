@@ -22,3 +22,10 @@ export {
   usePredictors,
   useTopPredictors,
 } from './usePredictors';
+
+// Public predictor profile page
+export {
+  publicPredictorKeys,
+  usePublicPredictorProfile,
+  usePublicPredictorSignals,
+} from './usePredictorProfilePage';

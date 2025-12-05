@@ -33,3 +33,9 @@ export {
   type PredictorFilters,
   type PredictorsListResponse,
 } from './predictorsList.api';
+
+// Predictor profile page
+export {
+  fetchPredictorProfile,
+  fetchPredictorSignalsPublic,
+} from './predictorProfile.api';

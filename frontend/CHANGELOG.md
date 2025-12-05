@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.12.0] - 2025-12-05
+
+### Added
+
+#### Predictor Profile Page (`/predictors/:address`)
+Complete public profile page for individual predictors.
+
+- **API Layer** (`src/features/predictors/api/predictorProfile.api.ts`):
+  - `fetchPredictorProfile()` - Get predictor's public profile
+  - `fetchPredictorSignalsPublic()` - Get predictor's signals with filters/pagination
+
+- **React Query Hooks** (`src/features/predictors/hooks/usePredictorProfilePage.ts`):
+  - `usePublicPredictorProfile()` - Fetch predictor profile data
+  - `usePublicPredictorSignals()` - Fetch predictor's signals with filters
+
+- **PredictorProfilePage** (`src/features/predictors/pages/PredictorProfilePage.tsx`):
+  - Profile header with avatar, name, verification badge
+  - Stats display: Signals, Sales, Avg Rating, Votes
+  - Bio and Twitter social link
+  - Active signals grid with full FilterPanel (same as marketplace)
+  - Mobile-responsive layout with collapsible filters
+  - URL-synced filters for shareable links
+  - Back navigation to predictors list
+  - Loading skeleton and not found states
+
+- **Router** (`src/router/index.tsx`):
+  - Updated `/predictors/:address` route to use real PredictorProfilePage
+
+### Changed
+
+#### Clearer Rating Labels
+- **PredictorProfilePage & PredictorCard**:
+  - "Rating" → "Avg Rating" (average star score, e.g., "4.5 ⭐")
+  - "Ratings" → "Votes" (total number of ratings received)
+  - Different icons for each stat to improve visual distinction
+  - "X reviews" → "X votes" in PredictorCard
+
+### Design Decisions
+
+#### No Text Reviews (Rating Only)
+- Removed review text functionality to avoid moderation issues (spam links, inappropriate content)
+- Users can only rate predictors (1-5 stars), no written reviews
+- Simplifies the platform and reduces moderation burden
+
+---
+
 ## [0.11.0] - 2025-12-05
 
 ### Added
