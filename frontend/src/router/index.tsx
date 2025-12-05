@@ -57,7 +57,7 @@ import RootLayout from './RootLayout';
 import { ProtectedRoute, AdminRoute, PredictorRoute } from './guards';
 import { HomePage } from '@/features/home';
 import { SignalsPage, SignalDetailPage, MyPurchasedSignalsPage } from '@/features/signals';
-import { PredictorDashboardPage, PredictorsPage, PredictorProfilePage } from '@/features/predictors';
+import { PredictorDashboardPage, PredictorsPage, PredictorProfilePage, BecomePredictorPage } from '@/features/predictors';
 
 // Lazy load pages for code splitting (example for future pages)
 // import { lazy } from 'react';
@@ -135,11 +135,9 @@ export const router = createBrowserRouter([
       },
       {
         path: 'become-predictor',
-        element: (
-          <ProtectedRoute>
-            <PlaceholderPage title="Become a Predictor" />
-          </ProtectedRoute>
-        ),
+        // No ProtectedRoute - page handles auth state internally
+        // Shows connect/sign-in prompt to unauthenticated users
+        element: <BecomePredictorPage />,
       },
       
       // ===== ADMIN ROUTES =====

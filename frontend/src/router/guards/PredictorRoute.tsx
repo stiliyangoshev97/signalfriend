@@ -9,57 +9,31 @@
  * REQUIREMENTS:
  * - Wallet must be connected
  * - User must be authenticated (SIWE)
- * - User must be a registered predictor (owns PredictorAccessPass NFT)
+ * - User must be a registered predictor (owns PredictorAccessPass NFT OR has backend record)
  *
  * OPTIONS:
  * - requireVerified: If true, also requires predictor to be verified by admin
  *
  * BEHAVIOR:
  * - If not authenticated → Redirect to home
- * - If authenticated but not predictor → Redirect to become-predictor page
+ * - If has NFT → Allow access (trust on-chain state)
+ * - If no NFT and no backend record → Redirect to become-predictor
  * - If predictor but not verified (when required) → Show verification pending message
  * - If all checks pass → Render children
- *
- * USAGE:
- * ```tsx
- * // Basic predictor route (any predictor)
- * {
- *   path: 'dashboard',
- *   element: (
- *     <PredictorRoute>
- *       <PredictorDashboard />
- *     </PredictorRoute>
- *   ),
- * }
- *
- * // Verified predictor only (for creating signals)
- * {
- *   path: 'dashboard/create-signal',
- *   element: (
- *     <PredictorRoute requireVerified>
- *       <CreateSignalPage />
- *     </PredictorRoute>
- *   ),
- * }
- * ```
- *
- * PREDICTOR REGISTRATION FLOW:
- * 1. User connects wallet
- * 2. User authenticates (SIWE)
- * 3. User mints PredictorAccessPass NFT
- * 4. Backend records predictor registration
- * 5. Admin verifies predictor (optional, for full access)
  *
  * @see ProtectedRoute for basic authentication guard
  * @see useIsPredictor for predictor status check
  */
 
+import { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { useAuthStore } from '@/features/auth/store';
 import { useSessionSync } from '@/features/auth';
 import { useIsPredictor, useIsVerifiedPredictor } from '@/shared/hooks';
 import { Spinner } from '@/shared/components/ui';
+import { usePredictorNFTBalance } from '@/features/predictors/hooks';
+import { fetchPredictorByAddress } from '@/features/predictors/api';
 
 interface PredictorRouteProps {
   /** Child components to render when authorized */
@@ -76,18 +50,42 @@ export function PredictorRoute({
   redirectTo = '/' 
 }: PredictorRouteProps) {
   const location = useLocation();
-  const { isConnected, status } = useAccount();
+  const { address, isConnected, status } = useAccount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const setPredictor = useAuthStore((state) => state.setPredictor);
   const isPredictor = useIsPredictor();
   const isVerified = useIsVerifiedPredictor();
   const { isLoading: isSessionLoading } = useSessionSync();
   
+  // Check NFT ownership on-chain (this is the source of truth)
+  const { balance: nftBalance, isLoading: isCheckingNFT } = usePredictorNFTBalance();
+  const hasNFT = (nftBalance ?? 0n) > 0n;
+  
   // Check if wagmi is still initializing
   const isWagmiInitializing = status === 'connecting' || status === 'reconnecting';
 
+  // If user has NFT but no predictor in auth store, fetch and update it
+  // This handles the case after becoming a predictor where auth store hasn't been updated yet
+  useEffect(() => {
+    if (hasNFT && !isPredictor && address && isAuthenticated) {
+      // Fetch predictor profile and update auth store
+      fetchPredictorByAddress(address)
+        .then((predictor) => {
+          if (predictor) {
+            setPredictor(predictor);
+          }
+        })
+        .catch((err) => {
+          // Predictor might not be in backend yet (webhook delay)
+          // This is fine - we still allow access based on NFT ownership
+          console.log('[PredictorRoute] Could not fetch predictor profile:', err.message);
+        });
+    }
+  }, [hasNFT, isPredictor, address, isAuthenticated, setPredictor]);
+
   // Show loading spinner while reconnecting, validating session, or waiting for store hydration
-  if (isWagmiInitializing || isSessionLoading || !hasHydrated) {
+  if (isWagmiInitializing || isSessionLoading || !hasHydrated || isCheckingNFT) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
         <div className="text-center">
@@ -126,46 +124,78 @@ export function PredictorRoute({
     );
   }
 
-  // Authenticated but not a predictor - redirect to become-predictor
-  if (!isPredictor) {
-    return (
-      <Navigate 
-        to="/become-predictor"
-        state={{ 
-          from: location.pathname,
-          message: 'You need to register as a predictor to access this page.' 
-        }} 
-        replace 
-      />
-    );
-  }
-
-  // Predictor but not verified (when verification required)
-  if (requireVerified && !isVerified) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center">
-        <div className="text-center max-w-md px-4">
-          <div className="text-6xl mb-4">⏳</div>
-          <h1 className="text-2xl font-bold text-fur-cream mb-2">
-            Verification Required
-          </h1>
-          <p className="text-gray-main mb-4">
-            Your predictor account is pending verification. 
-            Once an admin verifies your account, you'll be able to access this feature.
-          </p>
-          <a 
-            href="/dashboard" 
-            className="text-brand-200 hover:text-brand-100 underline"
-          >
-            Return to Dashboard
-          </a>
+  // TRUST NFT OWNERSHIP: If user has NFT, they are a predictor - let them through
+  // This provides instant access after becoming a predictor without needing to re-auth
+  if (hasNFT) {
+    // Predictor but not verified (when verification required)
+    if (requireVerified && !isVerified) {
+      return (
+        <div className="min-h-[70vh] flex items-center justify-center">
+          <div className="text-center max-w-md px-4">
+            <div className="text-6xl mb-4">⏳</div>
+            <h1 className="text-2xl font-bold text-fur-cream mb-2">
+              Verification Required
+            </h1>
+            <p className="text-gray-main mb-4">
+              Your predictor account is pending verification. 
+              Once an admin verifies your account, you'll be able to access this feature.
+            </p>
+            <a 
+              href="/dashboard" 
+              className="text-brand-200 hover:text-brand-100 underline"
+            >
+              Return to Dashboard
+            </a>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
+
+    // Authorized predictor - render children or outlet
+    return children ? <>{children}</> : <Outlet />;
   }
 
-  // Authorized predictor - render children or outlet
-  return children ? <>{children}</> : <Outlet />;
+  // No NFT - also check backend predictor status (in case NFT check failed)
+  if (isPredictor) {
+    // Predictor but not verified (when verification required)
+    if (requireVerified && !isVerified) {
+      return (
+        <div className="min-h-[70vh] flex items-center justify-center">
+          <div className="text-center max-w-md px-4">
+            <div className="text-6xl mb-4">⏳</div>
+            <h1 className="text-2xl font-bold text-fur-cream mb-2">
+              Verification Required
+            </h1>
+            <p className="text-gray-main mb-4">
+              Your predictor account is pending verification. 
+              Once an admin verifies your account, you'll be able to access this feature.
+            </p>
+            <a 
+              href="/dashboard" 
+              className="text-brand-200 hover:text-brand-100 underline"
+            >
+              Return to Dashboard
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    // Authorized predictor - render children or outlet
+    return children ? <>{children}</> : <Outlet />;
+  }
+
+  // Not a predictor at all - redirect to become-predictor
+  return (
+    <Navigate 
+      to="/become-predictor"
+      state={{ 
+        from: location.pathname,
+        message: 'You need to register as a predictor to access this page.' 
+      }} 
+      replace 
+    />
+  );
 }
 
 export default PredictorRoute;

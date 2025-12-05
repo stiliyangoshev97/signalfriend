@@ -29,3 +29,14 @@ export {
   usePublicPredictorProfile,
   usePublicPredictorSignals,
 } from './usePredictorProfilePage';
+
+// Become a predictor flow
+export {
+  usePredictorNFTBalance,
+  usePlatformParameters,
+  useUSDTBalanceForPredictor,
+  useUSDTAllowanceForPredictor,
+  useApproveUSDTForPredictor,
+  useJoinAsPredictor,
+  useBecomePredictor,
+} from './useBecomePredictor';

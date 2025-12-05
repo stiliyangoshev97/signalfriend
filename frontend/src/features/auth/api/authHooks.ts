@@ -85,6 +85,7 @@ import { useAuthStore } from '../store';
 import * as authApi from './authApi';
 import { useEffect, useRef } from 'react';
 import { router } from '@/router';
+import { parseWalletError, type ParsedWalletError } from '@/shared/utils/walletErrors';
 
 /**
  * Hook to validate and sync session on app mount/reconnect
@@ -268,6 +269,11 @@ export function useAuth() {
     disconnect();
   };
 
+  // Parse error into user-friendly message
+  const parsedError: ParsedWalletError | null = authMutation.error 
+    ? parseWalletError(authMutation.error) 
+    : null;
+
   return {
     // State
     address,
@@ -275,6 +281,10 @@ export function useAuth() {
     isAuthenticated,
     isLoading: authMutation.isPending,
     error: authMutation.error,
+    /** Parsed error with user-friendly title and message */
+    parsedError,
+    /** True if error was user rejection (not a real error) */
+    isUserRejection: parsedError?.isUserAction ?? false,
     predictor,
     token,
     
@@ -282,6 +292,8 @@ export function useAuth() {
     login: authMutation.mutate,
     loginAsync: authMutation.mutateAsync,
     logout,
+    /** Reset the error state */
+    resetError: authMutation.reset,
   };
 }
 

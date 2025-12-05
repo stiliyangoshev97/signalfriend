@@ -17,6 +17,143 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.1] - 2025-12-05 🔧 PREDICTOR SYNC & AUTH ERROR FIX
+
+### Fixed
+- **Dashboard Redirect Loop**: Fixed issue where new predictors were redirected to home page when accessing dashboard
+  - **Root Cause**: `PredictorRoute` was calling `clearAuth()` when detecting NFT but no predictor record, which set `isAuthenticated=false` and triggered redirect to home before re-auth could complete.
+  - **Solution**: Removed automatic `clearAuth()` call. Instead, show a "Sign In to Activate" prompt that lets user manually trigger re-authentication without clearing current auth state first.
+
+- **Dashboard "Syncing" Loop**: Fixed issue where predictor dashboard was stuck on "Syncing Your Account..." message
+  - **Root Cause**: After minting NFT, the auth store had old data (no predictor record). Query invalidation didn't help because predictor data comes from SIWE login, not a separate query.
+  - **Solution**: `PredictorRoute` now detects NFT ownership and prompts user to sign in again to get fresh predictor data from backend.
+
+- **Auth Sign-In Rejection Error**: Added user-friendly error handling for wallet signature rejection
+  - Previously showed raw `UserRejectedRequestError` in console
+  - Now shows "Sign In Cancelled" with friendly message
+  - **Root Cause**: `PredictorRoute` was calling `logout()` which clears auth AND disconnects wallet
+  - **Solution**: Now uses `clearAuth()` from auth store directly, which only clears auth state without disconnecting wallet
+
+### Changed
+- **PredictorRoute Guard** (`src/router/guards/PredictorRoute.tsx`):
+  - Added NFT ownership check as fallback for backend sync delays
+  - Shows "Sign In to Activate" button when NFT detected but no predictor record
+  - Auto-triggers re-authentication flow when NFT is detected
+  - Uses `useAuth` hook for re-authentication instead of query invalidation
+
+- **useAuth Hook** (`src/features/auth/api/authHooks.ts`):
+  - Added `parsedError` field with user-friendly error messages
+  - Added `isUserRejection` boolean for UI conditional styling
+  - Added `resetError` function to clear error state
+  - Uses shared `parseWalletError` utility for consistent error handling
+
+- **BecomePredictorPage** (`src/features/predictors/pages/BecomePredictorPage.tsx`):
+  - `AuthPromptContent` now accepts and displays auth errors
+  - Shows yellow "cancelled" styling for user rejections vs red for real errors
+
+---
+
+## [0.2.0] - 2025-12-05 🚀 BECOME A PREDICTOR FLOW
+
+### Added
+- **BecomePredictorPage** (`src/features/predictors/pages/BecomePredictorPage.tsx`):
+  - Complete registration flow for becoming a predictor
+  - Benefits overview (earn from signals, build reputation, referral rewards, NFT pass)
+  - USDT balance check with clear messaging for insufficient funds
+  - Optional referral toggle with address input (supports URL param `?ref=0x...`)
+  - Multi-step flow: Review → Approve USDT (if needed) → Register → Success
+  - Step indicator showing progress
+  - Wallet error handling with user-friendly messages
+  - Auto-redirect to dashboard after successful registration
+  - Detection of existing predictor status (shows "Already a Predictor" message)
+  - **Public access with auth prompt**: Page is accessible without authentication
+    - Shows "Connect Wallet" prompt for disconnected users
+    - Shows "Sign In" prompt for connected but unauthenticated users
+    - User-friendly error messages for sign-in rejection (yellow warning, not red error)
+    - Shows full registration flow only for authenticated users
+
+- **useBecomePredictor Hook** (`src/features/predictors/hooks/useBecomePredictor.ts`):
+  - `usePredictorNFTBalance` - Check if user owns PredictorAccessPass NFT
+  - `usePlatformParameters` - Read join fee from contract
+  - `useUSDTBalanceForPredictor` - Check USDT balance
+  - `useUSDTAllowanceForPredictor` - Check USDT allowance for market contract
+  - `useApproveUSDTForPredictor` - Approve USDT spending
+  - `useJoinAsPredictor` - Call joinAsPredictor contract method
+  - `useBecomePredictor` - Combined hook for complete flow
+  - **Delayed cache invalidation pattern**: Uses `useEffect` with multiple timeouts
+    (2s, 5s, 10s) to handle webhook processing delays and API rate limits
+    (same pattern as `usePurchase.ts` - see PATTERN REFERENCE below)
+
+- **Contract ABIs** (`src/shared/config/abis/index.ts`):
+  - Added `PREDICTOR_ACCESS_PASS_ABI` with `balanceOf` function
+  - Added `joinAsPredictor` to `SIGNAL_FRIEND_MARKET_ABI`
+  - Added `getPlatformParameters` to `SIGNAL_FRIEND_MARKET_ABI`
+  - Added `PredictorJoined` event to `SIGNAL_FRIEND_MARKET_ABI`
+
+- **PredictorRoute Guard Enhancement** (`src/router/guards/PredictorRoute.tsx`):
+  - Now checks NFT ownership on-chain as fallback when backend record doesn't exist
+  - Shows "Syncing Your Account..." message when NFT owned but webhook hasn't processed
+  - Auto-refreshes predictor data with delayed invalidations (2s, 5s, 10s)
+  - Prevents redirect loop when user has NFT but backend hasn't synced yet
+
+- **Auth Error Handling** (`src/features/auth/api/authHooks.ts`):
+  - Added `parsedError` field with user-friendly title and message
+  - Added `isUserRejection` flag to differentiate user cancellation from errors
+  - Added `resetError` function to clear error state
+  - Sign-in rejection now shows yellow warning instead of scary red error
+
+### Changed
+- Updated router to use real `BecomePredictorPage` (was placeholder)
+- Removed `ProtectedRoute` wrapper from `/become-predictor` route (page handles auth internally)
+- Updated hooks barrel export to include new become-predictor hooks
+
+### Fixed
+- **Bug**: Dashboard redirect loop when user mints NFT but backend webhook hasn't processed
+  - **Root Cause**: `PredictorRoute` only checked backend predictor record, not NFT ownership
+  - **Solution**: Added on-chain NFT check as fallback, show sync message while waiting
+
+- **Bug**: Raw technical error shown when user rejects sign-in request
+  - **Root Cause**: `useAuth` returned raw error without parsing
+  - **Solution**: Added `parseWalletError` to return user-friendly messages
+
+### Technical Notes
+
+#### PATTERN REFERENCE: Delayed Cache Invalidation for Webhook Delays
+
+When blockchain transactions succeed but the backend webhook hasn't processed yet
+(due to rate limits or slow processing), the UI won't reflect the new state.
+
+**Solution**: Use `useEffect` with multiple delayed `queryClient.invalidateQueries()` calls:
+
+```typescript
+// In useBecomePredictor.ts and usePurchase.ts
+useEffect(() => {
+  if (isJoinConfirmed) {
+    // Immediate invalidation
+    queryClient.invalidateQueries({ queryKey: ['predictor'] });
+    
+    // Delayed invalidations for webhook processing
+    const timeouts = [
+      setTimeout(() => queryClient.invalidateQueries({ queryKey: ['predictor'] }), 2000),
+      setTimeout(() => queryClient.invalidateQueries({ queryKey: ['predictor'] }), 5000),
+      setTimeout(() => queryClient.invalidateQueries({ queryKey: ['predictor'] }), 10000),
+    ];
+    
+    return () => timeouts.forEach(clearTimeout);
+  }
+}, [isJoinConfirmed]);
+```
+
+**Why this works**:
+1. Blockchain confirmation is instant, but webhook may be delayed
+2. Multiple retries at 2s, 5s, 10s ensure we catch the update
+3. React Query's `invalidateQueries` only refetches if the query is active
+4. Cleanup function prevents memory leaks if component unmounts
+
+**When to use**: Any flow where on-chain transaction must sync with backend via webhooks
+
+---
+
 ## [0.1.4] - 2025-12-05 🔄 RATING & PURCHASE CACHE FIX
 
 ### Changed
