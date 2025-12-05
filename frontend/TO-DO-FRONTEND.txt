@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-05
-Branch: fix/signal-detail-predictor-sales (v0.12.1)
+Branch: fix/predictor-signals-display (v0.1.1)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -207,6 +207,15 @@ PHASE 3: SIGNALS FEATURE (PRIORITY: HIGH)
     - Cannot update or delete ratings (prevents manipulation)
     - Submit rating to backend API
     - One rating per purchase (enforced by tokenId)
+
+[✅] Purchased Signals Display - Added in v0.1.1 (fix/predictor-signals-display)
+    - Receipts API (receipts.api.ts) with getMyReceipts, getMyPurchasedContentIds
+    - React Query hook (useReceipts.ts) with useMyPurchasedContentIds
+    - SignalCard updated with isPurchased prop and "Purchased" badge
+    - SignalGrid updated with purchasedContentIds prop for O(1) lookup
+    - PredictorProfilePage now shows ALL signals (removed excludeBuyerAddress filter)
+    - Purchased signals display "Purchased" badge instead of "Active"
+    - Fixed bug where predictor profile showed "No signals found" after purchasing all
 
 ================================================================================
 PHASE 4: PREDICTOR FEATURES (PRIORITY: MEDIUM)

@@ -6,3 +6,4 @@
 export * from './signals.api';
 export * from './purchase.api';
 export * from './reviews.api';
+export * from './receipts.api';

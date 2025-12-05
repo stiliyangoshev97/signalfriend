@@ -16,6 +16,8 @@ interface SignalGridProps {
   isLoading?: boolean;
   /** Error message if fetch failed */
   error?: string | null;
+  /** Content IDs of signals the user has purchased (optional) */
+  purchasedContentIds?: string[];
 }
 
 /**
@@ -142,7 +144,10 @@ export function SignalGrid({
   signals,
   isLoading,
   error,
+  purchasedContentIds,
 }: SignalGridProps): React.ReactElement {
+  // Create a Set for O(1) lookup of purchased signals
+  const purchasedSet = new Set(purchasedContentIds || []);
   // Loading state
   if (isLoading) {
     return (
@@ -176,7 +181,11 @@ export function SignalGrid({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {signals.map((signal) => (
-        <SignalCard key={signal.contentId} signal={signal} />
+        <SignalCard
+          key={signal.contentId}
+          signal={signal}
+          isPurchased={purchasedSet.has(signal.contentId)}
+        />
       ))}
     </div>
   );
