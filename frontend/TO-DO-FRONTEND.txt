@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-05
-Branch: fix/predictor-signals-display (v0.1.1)
+Branch: fix/rating-and-purchase-refresh (v0.1.4)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -379,6 +379,19 @@ KNOWN ISSUES / BUGS
     - Root cause: Hook checked !!connectedWallet but API requires SIWE authentication
     - Solution: Changed to check isAuthenticated from useAuthStore instead of wallet connection
     - Also improved useSessionSync to only track addresses when authenticated
+
+[✅] FIXED: Rating submission doesn't update UI without page refresh (v0.1.4)
+    - Location: src/features/signals/hooks/useReviews.ts
+    - Problem: After rating a signal, predictor profile and signal detail didn't show updated rating
+    - Root cause: Only review-specific queries were invalidated, not signal/predictor queries
+    - Solution: useCreateReview now invalidates signal detail, predictor profile, and signal lists
+
+[✅] FIXED: Purchase not reflected in UI when API rate-limited (v0.1.4)
+    - Location: src/features/signals/hooks/usePurchase.ts
+    - Problem: Blockchain transaction succeeded but UI didn't update due to API rate limiting
+    - Root cause: Cache invalidation happened immediately, but webhook might not have processed yet
+    - Solution: Added multiple delayed cache invalidations (2s, 5s, 10s) after purchase confirmation
+    - Test: Use scripts/trigger-rate-limit.sh to simulate rate limiting during purchase
 
 ================================================================================
 TECHNICAL DEBT

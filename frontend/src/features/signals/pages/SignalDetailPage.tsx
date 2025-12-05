@@ -380,6 +380,8 @@ export function SignalDetailPage(): React.ReactElement {
             <RatingSection
               tokenId={purchaseData.receipt.tokenId}
               signalTitle={signal.title}
+              contentId={signal.contentId}
+              predictorAddress={signal.predictor?.walletAddress}
             />
           )}
         </div>

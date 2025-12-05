@@ -24,9 +24,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
+import { useEffect, useRef } from 'react';
 import { getContractAddresses, SIGNAL_FRIEND_MARKET_ABI, ERC20_ABI } from '@/shared/config';
 import { checkPurchase, fetchContentIdentifier, fetchMyReceipts, fetchSignalContent } from '../api';
 import { useAuthStore } from '@/features/auth/store/authStore';
+import { signalKeys } from './useSignals';
 import type { CheckPurchaseResponse, Receipt, SignalContentResponse } from '../api/purchase.api';
 
 /** USDT has 18 decimals on BNB Chain */
@@ -376,6 +378,11 @@ export function usePurchaseFlow(params: {
   chainId?: number;
 }) {
   const { contentId, priceUsdt, predictorAddress, chainId = 97 } = params;
+  const queryClient = useQueryClient();
+  const { address } = useAccount();
+  
+  // Track if we've already invalidated caches for this purchase
+  const hasInvalidatedRef = useRef(false);
 
   // Access fee is 0.5 USDT
   const ACCESS_FEE = 0.5;
@@ -405,6 +412,52 @@ export function usePurchaseFlow(params: {
     isPurchaseConfirmed,
     purchaseError,
   } = useBuySignal(chainId);
+
+  // IMPORTANT: Invalidate caches after purchase confirmation
+  // This handles the case where the webhook might be delayed or rate-limited
+  // We invalidate multiple times with delays to ensure the backend has processed the purchase
+  useEffect(() => {
+    if (isPurchaseConfirmed && !hasInvalidatedRef.current) {
+      hasInvalidatedRef.current = true;
+      
+      // Helper to invalidate all purchase-related queries
+      const invalidatePurchaseQueries = () => {
+        // Invalidate purchase check for this signal
+        queryClient.invalidateQueries({ 
+          queryKey: purchaseKeys.check(contentId, address) 
+        });
+        // Invalidate signal detail to show updated purchase status
+        queryClient.invalidateQueries({ 
+          queryKey: signalKeys.detail(contentId) 
+        });
+        // Invalidate user's receipts list
+        queryClient.invalidateQueries({ 
+          queryKey: ['receipts'] 
+        });
+        // Invalidate signal content (now accessible)
+        queryClient.invalidateQueries({ 
+          queryKey: purchaseKeys.content(contentId, address) 
+        });
+      };
+      
+      // Immediate invalidation
+      invalidatePurchaseQueries();
+      
+      // Delayed invalidations to handle webhook processing delays
+      // The backend webhook might take a moment to process the blockchain event
+      const delays = [2000, 5000, 10000]; // 2s, 5s, 10s
+      delays.forEach(delay => {
+        setTimeout(() => {
+          invalidatePurchaseQueries();
+        }, delay);
+      });
+    }
+  }, [isPurchaseConfirmed, contentId, address, queryClient]);
+
+  // Reset invalidation flag when contentId changes (new purchase flow)
+  useEffect(() => {
+    hasInvalidatedRef.current = false;
+  }, [contentId]);
 
   // Derived state
   const hasEnoughBalance = balanceNumber >= totalCost;
