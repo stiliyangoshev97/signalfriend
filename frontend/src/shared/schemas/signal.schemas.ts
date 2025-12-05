@@ -75,7 +75,7 @@ export const createSignalSchema = z.object({
   content: z
     .string()
     .min(50, 'Signal content must be at least 50 characters')
-    .max(10000, 'Signal content must be at most 10000 characters'),
+    .max(1000, 'Signal content must be at most 1000 characters'),
   categoryId: z.string().min(1, 'Please select a category'),
   priceUsdt: z
     .number()

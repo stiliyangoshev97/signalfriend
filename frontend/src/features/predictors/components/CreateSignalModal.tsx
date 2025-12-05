@@ -216,8 +216,8 @@ export function CreateSignalModal({
               </svg>
               Protected - only buyers can see this
             </span>
-            <span className={contentValue.length > 10000 ? 'text-error-400' : ''}>
-              {contentValue.length}/10000
+            <span className={contentValue.length > 1000 ? 'text-error-400' : ''}>
+              {contentValue.length}/1000
             </span>
           </div>
         </div>

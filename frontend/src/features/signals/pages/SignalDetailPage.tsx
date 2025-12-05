@@ -284,12 +284,12 @@ export function SignalDetailPage(): React.ReactElement {
             </div>
 
             {/* Title - backend uses 'title' not 'name' */}
-            <h1 className="text-2xl sm:text-3xl font-bold text-fur-cream mb-4">
+            <h1 className="text-2xl sm:text-3xl font-bold text-fur-cream mb-4 break-words">
               {signal.title}
             </h1>
 
             {/* Description */}
-            <p className="text-fur-cream/70 leading-relaxed mb-6">
+            <p className="text-fur-cream/70 leading-relaxed mb-6 break-words">
               {signal.description}
             </p>
 

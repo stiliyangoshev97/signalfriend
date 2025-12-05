@@ -178,7 +178,7 @@ export function SignalContent({
             Full Signal
           </h4>
           <div className="bg-dark-900/50 border border-dark-600 rounded-lg p-4">
-            <p className="text-fur-cream whitespace-pre-wrap">{fullContent}</p>
+            <p className="text-fur-cream whitespace-pre-wrap break-words">{fullContent}</p>
           </div>
         </div>
       )}
@@ -190,7 +190,7 @@ export function SignalContent({
             Analysis & Reasoning
           </h4>
           <div className="bg-dark-900/50 border border-dark-600 rounded-lg p-4">
-            <p className="text-fur-cream/80 whitespace-pre-wrap">{reasoning}</p>
+            <p className="text-fur-cream/80 whitespace-pre-wrap break-words">{reasoning}</p>
           </div>
         </div>
       )}
