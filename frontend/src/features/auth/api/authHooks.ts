@@ -84,6 +84,7 @@ import { SiweMessage } from 'siwe';
 import { useAuthStore } from '../store';
 import * as authApi from './authApi';
 import { useEffect, useRef } from 'react';
+import { router } from '@/router';
 
 /**
  * Hook to validate and sync session on app mount/reconnect
@@ -98,14 +99,19 @@ import { useEffect, useRef } from 'react';
  * 1. Waits for wagmi to finish connecting
  * 2. Validates the stored token with the backend
  * 3. Clears auth if token is invalid or wallet changed
- * 4. IMMEDIATELY clears auth if wallet address changes (prevents JWT/wallet mismatch)
+ * 4. IMMEDIATELY clears auth AND redirects to home if wallet address changes
+ *    (prevents JWT/wallet mismatch and stale data from previous wallet)
  */
 export function useSessionSync() {
   const { address, isConnected, status } = useAccount();
   const { token, logout } = useAuthStore();
   
   // Track the previous address to detect wallet switches
+  // Only track when user is authenticated to avoid false positives
   const previousAddressRef = useRef<string | undefined>(undefined);
+  
+  // Track if we've already handled a wallet change (to prevent duplicate redirects)
+  const hasHandledWalletChangeRef = useRef<boolean>(false);
   
   // Check if wagmi is still initializing (connecting/reconnecting)
   const isWagmiInitializing = status === 'connecting' || status === 'reconnecting';
@@ -117,28 +123,39 @@ export function useSessionSync() {
     // Skip during initial connection
     if (isWagmiInitializing) return;
     
-    // Initialize previous address on first render when connected
-    if (previousAddressRef.current === undefined && address) {
-      previousAddressRef.current = address.toLowerCase();
-      return;
+    // Reset the wallet change handler when user signs in again
+    if (token && hasHandledWalletChangeRef.current) {
+      hasHandledWalletChangeRef.current = false;
     }
     
-    // Detect wallet switch: address changed while we have a token
-    if (
-      token &&
-      previousAddressRef.current &&
-      address &&
-      previousAddressRef.current !== address.toLowerCase()
-    ) {
-      console.log('[Auth] Wallet changed, logging out to prevent auth mismatch');
-      console.log(`[Auth] Previous: ${previousAddressRef.current}, New: ${address.toLowerCase()}`);
-      logout();
+    // Only track addresses when user is authenticated
+    // This prevents false wallet change detection when browsing without auth
+    if (token && address) {
+      // Initialize previous address when first authenticated
+      if (previousAddressRef.current === undefined) {
+        previousAddressRef.current = address.toLowerCase();
+        return;
+      }
+      
+      // Detect wallet switch: address changed while authenticated
+      if (
+        previousAddressRef.current !== address.toLowerCase() &&
+        !hasHandledWalletChangeRef.current
+      ) {
+        console.log('[Auth] Wallet changed while authenticated, logging out');
+        console.log(`[Auth] Previous: ${previousAddressRef.current}, New: ${address.toLowerCase()}`);
+        hasHandledWalletChangeRef.current = true;
+        logout();
+        // Navigate to home page to force fresh data load with new wallet
+        router.navigate('/');
+        return;
+      }
     }
     
-    // Update previous address
-    if (address) {
-      previousAddressRef.current = address.toLowerCase();
-    } else {
+    // Clear previous address when user logs out (no token)
+    // This ensures we don't falsely detect a "wallet change" when navigating
+    // between pages without being authenticated
+    if (!token) {
       previousAddressRef.current = undefined;
     }
   }, [address, token, logout, isWagmiInitializing]);

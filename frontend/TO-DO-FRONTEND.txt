@@ -366,6 +366,20 @@ KNOWN ISSUES / BUGS
     - Problem: Signal detail API only populated minimal predictor fields (missing totalSales, totalReviews, bio, isVerified)
     - Solution: Backend now populates all PredictorInfoCard fields; frontend uses totalSales with fallback
 
+[✅] FIXED: Stale data shown after wallet switch (v0.1.2)
+    - Location: src/features/auth/api/authHooks.ts (useSessionSync)
+    - Problem: When user switched wallets, they were logged out but stayed on current page with stale data
+    - Example: Predictor profile showed "Purchased" badges for signals bought by OLD wallet
+    - Solution: useSessionSync now redirects to home page on wallet change via router.navigate('/')
+    - User must sign in again with new wallet to get fresh data
+
+[✅] FIXED: 401 error when visiting predictor profile with connected but unsigned wallet (v0.1.3)
+    - Location: src/features/predictors/pages/PredictorProfilePage.tsx
+    - Problem: useMyPurchasedContentIds hook was enabled when wallet was connected (not signed in)
+    - Root cause: Hook checked !!connectedWallet but API requires SIWE authentication
+    - Solution: Changed to check isAuthenticated from useAuthStore instead of wallet connection
+    - Also improved useSessionSync to only track addresses when authenticated
+
 ================================================================================
 TECHNICAL DEBT
 ================================================================================
