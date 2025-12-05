@@ -7,9 +7,10 @@
  * - GET /api/reviews/predictor/:address - Public, get predictor reviews
  * - GET /api/reviews/check/:tokenId - Public, check if review exists
  * - GET /api/reviews/:tokenId - Public, get review by token ID
- * - POST /api/reviews - Auth required, create review
- * - PUT /api/reviews/:tokenId - Auth required, update own review
- * - DELETE /api/reviews/:tokenId - Auth required, delete own review
+ * - POST /api/reviews - Auth required, create review (PERMANENT - no updates/deletes)
+ *
+ * NOTE: Ratings are PERMANENT. PUT and DELETE endpoints have been intentionally
+ * removed to ensure rating integrity and prevent manipulation.
  *
  * @module features/reviews/review.routes
  */
@@ -20,8 +21,6 @@ import {
   getMyReviews,
   getReviewByTokenId,
   createReview,
-  updateReview,
-  deleteReview,
   checkReviewExists,
 } from "./review.controller.js";
 import { validate } from "../../shared/middleware/validation.js";
@@ -32,7 +31,6 @@ import {
   signalContentIdSchema,
   predictorAddressSchema,
   createReviewSchema,
-  updateReviewSchema,
   reviewTokenIdSchema,
 } from "./review.schemas.js";
 
@@ -106,32 +104,14 @@ router.get(
  * POST /api/reviews
  * Create a new review for a purchased signal.
  * Caller must own the SignalKeyNFT (tokenId).
+ * 
+ * NOTE: Ratings are PERMANENT. Once submitted, they cannot be updated or deleted.
+ * This ensures rating integrity and prevents manipulation.
  */
 router.post("/", authenticate, validate(createReviewSchema), createReview);
 
-/**
- * PUT /api/reviews/:tokenId
- * Update an existing review.
- * Only the original reviewer can update.
- */
-router.put(
-  "/:tokenId",
-  authenticate,
-  validate(reviewTokenIdSchema, "params"),
-  validate(updateReviewSchema),
-  updateReview
-);
-
-/**
- * DELETE /api/reviews/:tokenId
- * Delete a review.
- * Only the original reviewer can delete.
- */
-router.delete(
-  "/:tokenId",
-  authenticate,
-  validate(reviewTokenIdSchema, "params"),
-  deleteReview
-);
+// NOTE: PUT and DELETE endpoints have been intentionally removed.
+// Ratings are permanent to ensure integrity and prevent manipulation.
+// Once a buyer rates a signal, that rating is final.
 
 export const reviewRoutes = router;

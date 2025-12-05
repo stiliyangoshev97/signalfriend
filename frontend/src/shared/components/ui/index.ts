@@ -37,3 +37,4 @@ export { Select } from './Select';
 export { Textarea } from './Textarea';
 export { Spinner, PageLoader } from './Spinner';
 export { Avatar } from './Avatar';
+export { StarRating } from './StarRating';

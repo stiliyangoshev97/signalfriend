@@ -294,9 +294,7 @@ MAIN_GROUPS = {
 | GET | `/api/reviews/predictor/:address` | No | Get predictor ratings |
 | GET | `/api/reviews/check/:tokenId` | No | Check if rating exists |
 | GET | `/api/reviews/:tokenId` | No | Get rating by ID |
-| POST | `/api/reviews` | Yes | Create rating (1-5 score) |
-| PUT | `/api/reviews/:tokenId` | Yes | Update own rating |
-| DELETE | `/api/reviews/:tokenId` | Yes | Delete own rating |
+| POST | `/api/reviews` | Yes | Create rating (1-5 score, PERMANENT) |
 | POST | `/api/reports` | Yes | Create report (scam/false signal) |
 | GET | `/api/reports/mine` | Yes | Get user's reports |
 | GET | `/api/reports/signal/:contentId` | No | Get signal reports |

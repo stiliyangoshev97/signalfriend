@@ -4,12 +4,13 @@
  * Provides operations for ratings including:
  * - Listing ratings for signals and predictors
  * - Creating ratings (one per purchase, enforced by tokenId)
- * - Updating and deleting own ratings
  * - Statistics calculation for signals and predictors
  *
- * Key constraint: Only buyers who own a SignalKeyNFT can rate.
- * One rating per tokenId ensures one rating per purchase.
- * Note: This is RATING only (1-5 stars), no text reviews.
+ * Key constraints:
+ * - Only buyers who own a SignalKeyNFT can rate
+ * - One rating per tokenId ensures one rating per purchase
+ * - RATINGS ARE PERMANENT - no updates or deletes allowed
+ * - This is RATING only (1-5 stars), no text reviews
  *
  * @module features/reviews/review.service
  */
@@ -22,7 +23,6 @@ import type {
   ListSignalReviewsQuery,
   ListPredictorReviewsQuery,
   CreateReviewInput,
-  UpdateReviewInput,
 } from "./review.schemas.js";
 
 /** Review list response with pagination metadata */
@@ -182,78 +182,13 @@ export class ReviewService {
     return review;
   }
 
-  /**
-   * Updates an existing rating.
-   * Only the original rater can update their rating.
-   *
-   * @param tokenId - The SignalKeyNFT token ID
-   * @param data - Fields to update (score only)
-   * @param callerAddress - Address of the caller (must be rater)
-   * @returns Promise resolving to the updated rating
-   * @throws {ApiError} 404 if rating not found
-   * @throws {ApiError} 403 if caller is not the rater
-   */
-  static async update(
-    tokenId: number,
-    data: UpdateReviewInput,
-    callerAddress: string
-  ): Promise<IReview> {
-    const normalizedCaller = callerAddress.toLowerCase();
-
-    const review = await Review.findOne({ tokenId });
-    if (!review) {
-      throw ApiError.notFound(`Rating with tokenId '${tokenId}' not found`);
-    }
-
-    if (review.buyerAddress !== normalizedCaller) {
-      throw ApiError.forbidden("You can only update your own ratings");
-    }
-
-    const oldScore = review.score;
-
-    // Update score
-    if (data.score !== undefined) review.score = data.score;
-
-    await review.save();
-
-    // If score changed, recalculate ratings
-    if (data.score !== undefined && data.score !== oldScore) {
-      await ReviewService.updateSignalRating(review.contentId);
-      await ReviewService.updatePredictorRating(review.predictorAddress);
-    }
-
-    return review;
-  }
-
-  /**
-   * Deletes a rating.
-   * Only the original rater can delete their rating.
-   *
-   * @param tokenId - The SignalKeyNFT token ID
-   * @param callerAddress - Address of the caller (must be rater)
-   * @throws {ApiError} 404 if rating not found
-   * @throws {ApiError} 403 if caller is not the rater
-   */
-  static async delete(tokenId: number, callerAddress: string): Promise<void> {
-    const normalizedCaller = callerAddress.toLowerCase();
-
-    const review = await Review.findOne({ tokenId });
-    if (!review) {
-      throw ApiError.notFound(`Rating with tokenId '${tokenId}' not found`);
-    }
-
-    if (review.buyerAddress !== normalizedCaller) {
-      throw ApiError.forbidden("You can only delete your own ratings");
-    }
-
-    const { contentId, predictorAddress } = review;
-
-    await review.deleteOne();
-
-    // Recalculate ratings after deletion
-    await ReviewService.updateSignalRating(contentId);
-    await ReviewService.updatePredictorRating(predictorAddress);
-  }
+  // ============================================================================
+  // DEPRECATED METHODS - Ratings are now permanent
+  // ============================================================================
+  // The following methods are intentionally removed to ensure rating integrity.
+  // Once a buyer submits a rating, it cannot be changed or deleted.
+  // This prevents manipulation and ensures predictors are held accountable.
+  // ============================================================================
 
   /**
    * Gets a review by token ID.

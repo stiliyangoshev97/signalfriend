@@ -51,26 +51,35 @@ export const getMyReceipts = asyncHandler(
 /**
  * GET /api/receipts/check/:contentId
  * Checks if the authenticated user has purchased a specific signal.
+ * Returns receipt data (including tokenId) if purchased, for rating functionality.
  * Requires authentication.
  *
  * @param {string} contentId - Signal content ID (UUID v4)
- * @returns {Object} JSON response with hasPurchased boolean
+ * @returns {Object} JSON response with hasPurchased boolean and optional receipt
  */
 export const checkPurchase = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const { contentId } = req.params as GetSignalContentIdParams;
     const buyerAddress = req.user!.address;
 
-    const hasPurchased = await ReceiptService.hasPurchased(
-      contentId,
-      buyerAddress
-    );
+    // Get the full receipt if it exists (needed for rating by tokenId)
+    const receipt = await ReceiptService.getReceipt(contentId, buyerAddress);
+    const hasPurchased = !!receipt;
 
     res.json({
       success: true,
       data: {
         contentId,
         hasPurchased,
+        // Include receipt data for rating functionality
+        ...(receipt && {
+          receipt: {
+            tokenId: receipt.tokenId,
+            contentId: receipt.contentId,
+            purchasedAt: receipt.purchasedAt,
+            transactionHash: receipt.transactionHash,
+          },
+        }),
       },
     });
   }

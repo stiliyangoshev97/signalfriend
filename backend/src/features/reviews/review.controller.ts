@@ -6,9 +6,11 @@
  * - GET /api/reviews/predictor/:address - Get reviews for a predictor
  * - GET /api/reviews/mine - Get user's own reviews
  * - GET /api/reviews/:tokenId - Get review by token ID
- * - POST /api/reviews - Create review (auth required)
- * - PUT /api/reviews/:tokenId - Update review (auth required)
- * - DELETE /api/reviews/:tokenId - Delete review (auth required)
+ * - GET /api/reviews/check/:tokenId - Check if review exists
+ * - POST /api/reviews - Create review (auth required, PERMANENT)
+ *
+ * NOTE: Ratings are PERMANENT. PUT and DELETE endpoints have been intentionally
+ * removed to ensure rating integrity and prevent manipulation.
  *
  * @module features/reviews/review.controller
  */
@@ -21,7 +23,6 @@ import type {
   SignalContentIdParams,
   PredictorAddressParams,
   CreateReviewInput,
-  UpdateReviewInput,
   ReviewTokenIdParams,
 } from "./review.schemas.js";
 
@@ -134,6 +135,8 @@ export const getReviewByTokenId = asyncHandler(
  * POST /api/reviews
  * Creates a new review for a purchased signal.
  * Requires authentication. Caller must own the SignalKeyNFT.
+ * 
+ * NOTE: Ratings are PERMANENT. Once submitted, they cannot be changed or deleted.
  *
  * @body {CreateReviewInput} Review data including tokenId and score
  * @returns {Object} JSON response with created review
@@ -155,55 +158,11 @@ export const createReview = asyncHandler(
   }
 );
 
-/**
- * PUT /api/reviews/:tokenId
- * Updates an existing review.
- * Requires authentication. Only the original reviewer can update.
- *
- * @param {number} tokenId - SignalKeyNFT token ID
- * @body {UpdateReviewInput} Fields to update
- * @returns {Object} JSON response with updated review
- * @throws {404} If review not found
- * @throws {403} If caller is not the reviewer
- */
-export const updateReview = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    const { tokenId } = req.params as unknown as ReviewTokenIdParams;
-    const data = req.body as UpdateReviewInput;
-    const callerAddress = req.user!.address;
-
-    const review = await ReviewService.update(tokenId, data, callerAddress);
-
-    res.json({
-      success: true,
-      data: review,
-    });
-  }
-);
-
-/**
- * DELETE /api/reviews/:tokenId
- * Deletes a review.
- * Requires authentication. Only the original reviewer can delete.
- *
- * @param {number} tokenId - SignalKeyNFT token ID
- * @returns {Object} JSON response confirming deletion
- * @throws {404} If review not found
- * @throws {403} If caller is not the reviewer
- */
-export const deleteReview = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    const { tokenId } = req.params as unknown as ReviewTokenIdParams;
-    const callerAddress = req.user!.address;
-
-    await ReviewService.delete(tokenId, callerAddress);
-
-    res.json({
-      success: true,
-      message: "Review deleted successfully",
-    });
-  }
-);
+// ============================================================================
+// REMOVED: updateReview and deleteReview
+// Ratings are PERMANENT to ensure integrity and prevent manipulation.
+// Once a buyer submits a rating, it cannot be changed or deleted.
+// ============================================================================
 
 /**
  * GET /api/reviews/check/:tokenId

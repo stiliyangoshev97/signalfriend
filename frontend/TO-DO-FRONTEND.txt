@@ -197,8 +197,14 @@ PHASE 3: SIGNALS FEATURE (PRIORITY: HIGH)
     - User rejections shown as yellow "Transaction Cancelled" (not scary red)
     - parseWalletError() and isUserRejectionError() exported for reuse
 
-[ ] Leave Rating Functionality
-    - Rating form on purchased signal (star rating 1-5 only, no text)
+[✅] Leave Rating Functionality - Added in v0.1.0 (feature/rating-system)
+    - StarRating component (shared/components/ui) with interactive + read-only modes
+    - Reviews API (reviews.api.ts) with checkReviewExists, getReviewByTokenId, createReview
+    - React Query hooks (useReviews.ts) with useCheckReview, useGetReview, useCreateReview
+    - RatingSection component with confirmation dialog (ratings are PERMANENT)
+    - Integrated into SignalDetailPage below SignalContent for purchased signals
+    - Ratings tied to SignalKeyNFT tokenId (one rating per purchase)
+    - Cannot update or delete ratings (prevents manipulation)
     - Submit rating to backend API
     - One rating per purchase (enforced by tokenId)
 

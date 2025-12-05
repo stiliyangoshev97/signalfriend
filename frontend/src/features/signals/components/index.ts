@@ -15,6 +15,7 @@ export { PredictorInfoCard } from './PredictorInfoCard';
 export { PurchaseCard } from './PurchaseCard';
 export { SignalContent } from './SignalContent';
 export { PurchaseModal } from './PurchaseModal';
+export { RatingSection } from './RatingSection';
 
 // Purchased signals components
 export { PurchasedSignalCard } from './PurchasedSignalCard';

@@ -300,6 +300,50 @@ Categories are displayed as `"MainGroup > Subcategory"` throughout the UI:
 
 ---
 
+## ⭐ Signal Rating System
+
+### Overview
+Users can rate purchased signals with a 1-5 star rating. Ratings are **permanent** and cannot be changed or deleted once submitted. This ensures rating integrity and prevents manipulation.
+
+### Key Rules
+| Rule | Description |
+|------|-------------|
+| **One Rating Per Purchase** | Each SignalKeyNFT tokenId can only be rated once |
+| **Permanent** | Ratings cannot be updated or deleted after submission |
+| **Buyers Only** | Only signal purchasers can rate (not predictors or admins) |
+| **Confirmation Required** | Users must confirm before submitting due to permanence |
+
+### Components
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `StarRating` | `src/shared/components/ui/StarRating.tsx` | Interactive/read-only star display |
+| `RatingSection` | `src/features/signals/components/RatingSection.tsx` | Rating form for purchased signals |
+
+### API Functions
+```typescript
+// src/features/signals/api/reviews.api.ts
+checkReviewExists(tokenId: number)  // Check if already rated
+getReviewByTokenId(tokenId: number) // Get existing review
+createReview({ tokenId, score })    // Submit permanent rating
+```
+
+### React Query Hooks
+```typescript
+// src/features/signals/hooks/useReviews.ts
+useCheckReview(tokenId)   // Check if review exists
+useGetReview(tokenId)     // Get review details
+useCreateReview()         // Submit rating mutation
+```
+
+### Integration
+The `RatingSection` is displayed on `SignalDetailPage` below the signal content, only when:
+- User has purchased the signal (`isOwned === true`)
+- Purchase receipt has a valid `tokenId`
+- User is NOT the predictor viewing their own signal
+- User is NOT an admin
+
+---
+
 ## ⚠️ Backend Field Mapping (Important!)
 
 ### Mongoose Populate vs Frontend Types

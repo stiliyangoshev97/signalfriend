@@ -15,6 +15,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.16.5] - 2025-12-05 ⭐ PERMANENT RATING SYSTEM
+
+### Changed
+- **Review System Made Permanent** - Ratings can no longer be updated or deleted:
+  - **Routes** (`src/features/reviews/review.routes.ts`):
+    - Removed `PUT /reviews/:tokenId` route
+    - Removed `DELETE /reviews/:tokenId` route
+    - Only `POST /reviews` remains for creating ratings
+  - **Service** (`src/features/reviews/review.service.ts`):
+    - Removed `update()` method
+    - Removed `delete()` method
+    - Added documentation noting ratings are permanent
+  - **Controller** (`src/features/reviews/review.controller.ts`):
+    - Removed `updateReview` controller function
+    - Removed `deleteReview` controller function
+
+- **Receipts Check Endpoint Enhanced** (`src/features/receipts/receipt.controller.ts`):
+  - `GET /api/receipts/check/:contentId` now returns full receipt data when purchased
+  - Includes `tokenId`, `purchasedAt`, `transactionHash` in response
+  - Enables frontend rating system to know which tokenId to rate
+
+### Rationale
+- **Rating Integrity**: Permanent ratings prevent manipulation
+- **Trust**: Users can rely on ratings being authentic and unaltered
+- **Fairness**: Predictors cannot be unfairly targeted by rating changes
+
+---
+
 ## [0.16.4] - 2025-12-05 🔧 SIGNAL DETAIL PREDICTOR DATA FIX
 
 ### Fixed
