@@ -231,7 +231,7 @@ export class SignalService {
     const rawSignal = await Signal.findOne({ contentId })
       .select(SignalService.PUBLIC_FIELDS)
       .populate("categoryId", "name slug icon mainGroup")
-      .populate("predictorId", "displayName avatarUrl averageRating walletAddress")
+      .populate("predictorId", "displayName avatarUrl averageRating totalSales totalReviews bio isVerified verificationStatus walletAddress")
       .lean();
 
     if (!rawSignal) {

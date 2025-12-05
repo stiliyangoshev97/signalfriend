@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-05
-Branch: feature/predictor-profile-page (v0.12.0)
+Branch: fix/signal-detail-predictor-sales (v0.12.1)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -345,6 +345,11 @@ KNOWN ISSUES / BUGS
     - Location: src/features/signals/components/SignalCard.tsx
     - Problem: Variable title lengths and verbose expiry text caused cards to have different heights
     - Solution: Added h-full + mt-auto, min-h on title, abbreviated expiry format (e.g., "Expires in 8h")
+
+[✅] FIXED: Predictor sales not showing on signal detail page (v0.12.1)
+    - Location: Backend signal.service.ts + frontend PredictorInfoCard.tsx
+    - Problem: Signal detail API only populated minimal predictor fields (missing totalSales, totalReviews, bio, isVerified)
+    - Solution: Backend now populates all PredictorInfoCard fields; frontend uses totalSales with fallback
 
 ================================================================================
 TECHNICAL DEBT

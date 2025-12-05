@@ -3,7 +3,7 @@
 > **Last Updated:** December 5, 2025  
 > **Current Phase:** Manual Testing Complete, Maintenance Mode Added  
 > **Project Status:** 🟢 **Ready for Frontend (100/100)** - All Features Complete & Tested  
-> **Branch:** `fix/owner-mint-predictor-indexing`
+> **Branch:** `fix/signal-detail-predictor-sales`
 
 ---
 
