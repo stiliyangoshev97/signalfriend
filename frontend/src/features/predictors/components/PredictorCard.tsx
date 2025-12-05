@@ -147,7 +147,7 @@ export function PredictorCard({ predictor, rank }: PredictorCardProps): React.Re
             {formatRating(predictor.averageRating)}
           </div>
           <div className="text-xs text-gray-main">
-            {predictor.totalReviews > 0 ? `${predictor.totalReviews} reviews` : 'Rating'}
+            {predictor.totalReviews > 0 ? `${predictor.totalReviews} votes` : 'Avg Rating'}
           </div>
         </div>
       </div>

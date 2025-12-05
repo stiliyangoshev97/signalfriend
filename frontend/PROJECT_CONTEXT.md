@@ -29,10 +29,10 @@
 | **My Purchased Signals** | ✅ 100% | View/access purchased signals with receipts |
 | **Predictor Dashboard** | ✅ 100% | Stats, signal management, create signal modal |
 | **Predictor List Page** | ✅ 100% | Public leaderboard with filters, pagination |
-| **Predictor Profile** | ⏳ 0% | Not started |
+| **Predictor Profile** | ✅ 100% | Full profile with signals grid, filters |
 | **Admin Panel** | ⏳ 0% | Not started |
 
-**Overall Progress: ~80%** (Infrastructure + Auth + Landing + Marketplace + Purchase Flow + Dashboard complete)
+**Overall Progress: ~85%** (Infrastructure + Auth + Landing + Marketplace + Purchase Flow + Dashboard + Predictor Pages complete)
 
 ---
 
