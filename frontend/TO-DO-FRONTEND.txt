@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-05
-Branch: fix/rating-and-purchase-refresh (v0.1.4)
+Branch: feature/become-predictor (v0.2.0)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -237,11 +237,37 @@ PHASE 4: PREDICTOR FEATURES (PRIORITY: MEDIUM)
     - Twitter social link display
     - No text reviews (rating only to avoid moderation issues)
 
-[ ] Become a Predictor Flow
-    - Check if user owns PredictorAccessPass NFT
-    - If not, show purchase option
-    - Call registerPredictor contract method
-    - Update role in backend
+[✅] Become a Predictor Flow - Added in v0.2.0
+    - BecomePredictorPage with complete registration flow
+    - Benefits overview (earn from signals, reputation, referrals, NFT pass)
+    - Check if user already owns PredictorAccessPass NFT
+    - USDT balance and allowance checking
+    - Optional referral address input with toggle (supports URL param ?ref=0x...)
+    - Multi-step flow: Review → Approve USDT → Register → Success
+    - Call joinAsPredictor on SignalFriendMarket contract
+    - Predictor record created via backend webhook on PredictorJoined event
+    - Redirect to dashboard after successful registration
+    - PUBLIC PAGE with internal auth handling:
+      - Not connected → Shows "Connect Wallet" button (RainbowKit)
+      - Connected but not signed in → Shows "Sign In" button
+      - Already predictor → Shows "Already a Predictor" message
+      - Authenticated, not predictor → Shows full registration flow
+    - Delayed cache invalidation for webhook processing:
+      - Uses useEffect with setTimeout at 2s, 5s, 10s intervals
+      - Same pattern as usePurchase.ts for rate limit handling
+      - ESLint disable comments needed for react-hooks/set-state-in-effect
+    - Contract ABIs added:
+      - PREDICTOR_ACCESS_PASS_ABI (balanceOf)
+      - joinAsPredictor, getPlatformParameters in SIGNAL_FRIEND_MARKET_ABI
+      - PredictorJoined event
+    - Hooks created in useBecomePredictor.ts:
+      - usePredictorNFTBalance
+      - usePlatformParameters
+      - useUSDTBalanceForPredictor
+      - useUSDTAllowanceForPredictor
+      - useApproveUSDTForPredictor
+      - useJoinAsPredictor
+      - useBecomePredictor (combined)
 
 [✅] Predictor Dashboard (/dashboard - predictor only) - Added in v0.9.0
     - Dashboard stats overview (signals, sales, earnings, rating)

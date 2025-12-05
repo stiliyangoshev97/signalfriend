@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 5 December 2025 (v0.1.1 - Purchased Signals Display Fix)
+> Last Updated: 5 December 2025 (v0.2.1 - Predictor Sync & Auth Error Fix)
 
 ---
 
@@ -26,6 +26,7 @@
 | **Signal Marketplace** | ✅ 100% | Full marketplace with filters, cards, pagination |
 | **Signal Detail Page** | ✅ 100% | Full detail view with purchase UI |
 | **Purchase Flow** | ✅ 100% | Multi-step modal with USDT approval + purchase |
+| **Become a Predictor** | ✅ 100% | Full registration flow with auth prompt |
 | **My Purchased Signals** | ✅ 100% | View/access purchased signals with receipts |
 | **Predictor Dashboard** | ✅ 100% | Stats, signal management, create signal modal |
 | **Predictor List Page** | ✅ 100% | Public leaderboard with filters, pagination |
@@ -423,6 +424,125 @@ Signals are always sorted by quality first:
 3. User's sort preference (tertiary)
 
 This ensures the best signals (highly rated with good sales) appear first without requiring user action.
+
+---
+
+## 🎭 Become a Predictor Flow
+
+### Overview
+Users can register as predictors at `/become-predictor`. The page is **publicly accessible** and handles authentication state internally, showing appropriate prompts for unauthenticated users.
+
+### Route Configuration
+```tsx
+// No ProtectedRoute wrapper - page handles auth internally
+<Route path="/become-predictor" element={<BecomePredictorPage />} />
+```
+
+### Authentication States
+| State | UI Displayed |
+|-------|--------------|
+| **Not connected** | "Connect Wallet" button via RainbowKit |
+| **Connected, not signed in** | "Sign In with Wallet" button |
+| **Authenticated, already predictor** | "Already a Predictor" message + dashboard link |
+| **Authenticated, not predictor** | Full registration flow |
+
+### Registration Flow Steps
+1. **Info Step**: Review benefits, check USDT balance, optional referral
+2. **Approve Step** (if needed): Approve USDT spending
+3. **Join Step**: Call `joinAsPredictor` on contract
+4. **Success Step**: Confirmation + redirect to dashboard
+
+### Key Components
+| Component | Purpose |
+|-----------|---------|
+| `AuthPromptContent` | Shows connect/sign-in prompt |
+| `InfoStepContent` | Benefits, balance check, referral toggle |
+| `TransactionStepContent` | Approve/join transaction UI |
+| `SuccessStepContent` | Success message |
+| `StepIndicator` | Visual progress indicator |
+
+### Hooks
+| Hook | Purpose |
+|------|---------|
+| `usePredictorNFTBalance` | Check if user owns PredictorAccessPass NFT |
+| `usePlatformParameters` | Read join fee from contract |
+| `useUSDTBalanceForPredictor` | Check USDT balance |
+| `useUSDTAllowanceForPredictor` | Check USDT allowance |
+| `useApproveUSDTForPredictor` | Approve USDT spending |
+| `useJoinAsPredictor` | Call joinAsPredictor |
+| `useBecomePredictor` | Combined hook for full flow |
+
+### Referral System
+- Optional referral toggle in UI
+- Supports URL parameter: `/become-predictor?ref=0x...`
+- Uses `zeroAddress` when no referrer (required by contract)
+- Referrer receives reward from platform parameters
+
+---
+
+## 🔄 Delayed Cache Invalidation Pattern (IMPORTANT!)
+
+### Problem
+When blockchain transactions succeed, the backend webhook may not process immediately due to:
+- API rate limits
+- Network delays
+- Webhook queue processing time
+
+This causes the UI to show stale data (e.g., "Purchase" button still showing after successful purchase).
+
+### Solution
+Use `useEffect` with multiple delayed `queryClient.invalidateQueries()` calls to retry fetching until webhook processes.
+
+### Implementation Pattern
+```typescript
+// Used in useBecomePredictor.ts and usePurchase.ts
+useEffect(() => {
+  if (isTransactionConfirmed) {
+    // Immediate invalidation
+    queryClient.invalidateQueries({ queryKey: ['predictor'] });
+    
+    // Delayed invalidations for webhook processing
+    const timeouts = [
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['predictor'] });
+      }, 2000),
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['predictor'] });
+      }, 5000),
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['predictor'] });
+      }, 10000),
+    ];
+    
+    // Cleanup to prevent memory leaks
+    return () => timeouts.forEach(clearTimeout);
+  }
+}, [isTransactionConfirmed, queryClient]);
+```
+
+### Why This Works
+1. **Blockchain confirmation is instant** - wagmi returns immediately after transaction mines
+2. **Webhook processing is async** - Backend may take seconds to process blockchain event
+3. **Multiple retries** - 2s, 5s, 10s delays ensure we catch the update
+4. **React Query deduplication** - Only refetches if query is active and data changed
+5. **Cleanup function** - Prevents memory leaks if component unmounts during delays
+
+### When to Use
+Use this pattern in any flow where:
+- On-chain transaction success must reflect in backend data
+- Backend syncs via webhooks (not direct API calls)
+- UI needs to show updated state immediately after transaction
+
+### ESLint Note
+This pattern triggers `react-hooks/set-state-in-effect` ESLint errors because we're calling `setStep()` in the effect body. Use the inline disable comment:
+```typescript
+// eslint-disable-next-line react-hooks/set-state-in-effect -- State transition needed for multi-step flow
+setStep('success');
+```
+
+### Files Using This Pattern
+- `src/features/predictors/hooks/useBecomePredictor.ts`
+- `src/features/signals/hooks/usePurchase.ts`
 
 ---
 

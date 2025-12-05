@@ -42,9 +42,11 @@ export function PredictorFilterPanel({
   const [localFilters, setLocalFilters] = useState<PredictorFilters>(filters);
   const [searchInput, setSearchInput] = useState(filters.search || '');
 
-  // Sync local filters with props
+  // Sync local filters with props when external filters change (e.g., URL navigation)
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional sync of external state
   useEffect(() => {
     setLocalFilters(filters);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional sync of external state
     setSearchInput(filters.search || '');
   }, [filters]);
 

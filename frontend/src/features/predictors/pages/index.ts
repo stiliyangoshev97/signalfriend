@@ -6,3 +6,4 @@
 export { PredictorDashboardPage } from './PredictorDashboardPage';
 export { PredictorsPage } from './PredictorsPage';
 export { PredictorProfilePage } from './PredictorProfilePage';
+export { default as BecomePredictorPage } from './BecomePredictorPage';

@@ -7,12 +7,13 @@
  * @module shared/config/abis
  *
  * CONTRACTS:
- * - SignalFriendMarket - buySignalNFT, fee calculations
+ * - SignalFriendMarket - buySignalNFT, joinAsPredictor, fee calculations
+ * - PredictorAccessPass - balanceOf for checking predictor status
  * - USDT (ERC20) - approve, allowance, balanceOf
  *
  * USAGE:
  * ```tsx
- * import { SIGNAL_FRIEND_MARKET_ABI, ERC20_ABI } from '@/shared/config/abis';
+ * import { SIGNAL_FRIEND_MARKET_ABI, ERC20_ABI, PREDICTOR_ACCESS_PASS_ABI } from '@/shared/config/abis';
  *
  * const { writeContract } = useWriteContract();
  * await writeContract({
@@ -26,10 +27,12 @@
 
 /**
  * SignalFriendMarket ABI
- * 
+ *
  * Functions used:
  * - buySignalNFT(address, uint256, uint256, bytes32) - Purchase a signal
+ * - joinAsPredictor(address) - Register as a predictor
  * - calculateBuyerCost(uint256) - Calculate total cost including fees
+ * - getPlatformParameters() - Get all platform fees and settings
  * - buyerAccessFee() - Get the flat access fee
  * - commissionRate() - Get current commission rate
  */
@@ -45,6 +48,26 @@ export const SIGNAL_FRIEND_MARKET_ABI = [
     ],
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'joinAsPredictor',
+    inputs: [{ name: '_referrer', type: 'address', internalType: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'getPlatformParameters',
+    inputs: [],
+    outputs: [
+      { name: '_minSignalPrice', type: 'uint256', internalType: 'uint256' },
+      { name: '_predictorJoinFee', type: 'uint256', internalType: 'uint256' },
+      { name: '_referralPayout', type: 'uint256', internalType: 'uint256' },
+      { name: '_buyerAccessFee', type: 'uint256', internalType: 'uint256' },
+      { name: '_commissionRate', type: 'uint256', internalType: 'uint256' },
+    ],
+    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -80,6 +103,33 @@ export const SIGNAL_FRIEND_MARKET_ABI = [
       { name: 'totalCost', type: 'uint256', indexed: false, internalType: 'uint256' },
     ],
     anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'PredictorJoined',
+    inputs: [
+      { name: 'predictor', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'referrer', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'nftTokenId', type: 'uint256', indexed: true, internalType: 'uint256' },
+      { name: 'referralPaid', type: 'bool', indexed: false, internalType: 'bool' },
+    ],
+    anonymous: false,
+  },
+] as const;
+
+/**
+ * PredictorAccessPass ABI (ERC-721)
+ *
+ * Functions used:
+ * - balanceOf(address) - Check if address owns a predictor NFT
+ */
+export const PREDICTOR_ACCESS_PASS_ABI = [
+  {
+    type: 'function',
+    name: 'balanceOf',
+    inputs: [{ name: 'owner', type: 'address', internalType: 'address' }],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
   },
 ] as const;
 
