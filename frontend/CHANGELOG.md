@@ -17,6 +17,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.2] - 2025-12-05 📏 SIGNAL CONTENT LIMIT FIX
+
+### Fixed
+- **Request Entity Too Large Error**: Reduced signal content character limit from 10,000 to 1,000
+  - **Root Cause**: Large signal content caused "request entity too large" error when creating signals
+  - **Solution**: Reduced max content length to 1,000 characters (same as description)
+  - This is sufficient for signal content and prevents oversized requests
+
+### Changed
+- Updated `createSignalSchema` content max length from 10,000 to 1,000 characters
+- Updated `CreateSignalModal` character counter to show `/1000` instead of `/10000`
+
+---
+
 ## [0.2.1] - 2025-12-05 🔧 PREDICTOR SYNC & AUTH ERROR FIX
 
 ### Fixed

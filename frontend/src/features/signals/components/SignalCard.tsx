@@ -160,7 +160,7 @@ export function SignalCard({ signal, isPurchased = false }: SignalCardProps): Re
       </div>
 
       {/* Title - fixed height for 2 lines */}
-      <h3 className="text-lg font-semibold text-fur-cream mb-3 line-clamp-2 min-h-[3.5rem] group-hover:text-fur-light transition-colors">
+      <h3 className="text-lg font-semibold text-fur-cream mb-3 line-clamp-2 min-h-[3.5rem] group-hover:text-fur-light transition-colors break-words">
         {signal.title || 'Untitled Signal'}
       </h3>
 
