@@ -82,7 +82,8 @@ export function PredictorInfoCard({
 }: PredictorInfoCardProps): React.ReactElement {
   const displayName = predictor.displayName || formatAddress(walletAddress);
   const initial = predictor.displayName?.charAt(0).toUpperCase() || 'P';
-  const isVerified = predictor.verificationStatus === 'verified';
+  // Check both isVerified boolean and verificationStatus enum for compatibility
+  const isVerified = predictor.isVerified || predictor.verificationStatus === 'verified';
   const rating = predictor.averageRating || 0;
   const fullStars = Math.floor(rating);
 
@@ -144,7 +145,7 @@ export function PredictorInfoCard({
         {/* Total Sales */}
         <div className="text-center">
           <p className="text-lg font-bold text-fur-cream">
-            {predictor.totalSalesCount ?? 0}
+            {predictor.totalSales ?? predictor.totalSalesCount ?? 0}
           </p>
           <p className="text-xs text-fur-cream/50">Sales</p>
         </div>

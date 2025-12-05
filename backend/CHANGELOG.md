@@ -15,6 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.16.4] - 2025-12-05 🔧 SIGNAL DETAIL PREDICTOR DATA FIX
+
+### Fixed
+- **Signal Detail Endpoint** (`src/features/signals/signal.service.ts`):
+  - Fixed incomplete predictor data in `getByContentId()` method
+  - **Before**: Only returned `displayName`, `avatarUrl`, `averageRating`, `walletAddress`
+  - **After**: Now also returns `totalSales`, `totalReviews`, `bio`, `isVerified`, `verificationStatus`
+  - **Impact**: PredictorInfoCard on signal detail page now shows correct sales count, reviews, bio, and verified badge
+
+---
+
 ## [0.16.3] - 2025-12-05 🖼️ AVATAR URL POLICY CHANGE
 
 ### Changed
