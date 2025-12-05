@@ -162,7 +162,10 @@ src/
 | GET | `/api/receipts/signal/:contentId` | Yes | Get signal sales (predictor) |
 | GET | `/api/receipts/:tokenId` | Yes | Get receipt by token ID |
 
-### Reviews (Ratings)
+### Reviews (Ratings) - PERMANENT
+
+> ⚠️ **Ratings are permanent** - Once submitted, they cannot be updated or deleted.
+> This ensures rating integrity and prevents manipulation.
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
@@ -171,9 +174,7 @@ src/
 | GET | `/api/reviews/predictor/:address` | No | Get predictor ratings |
 | GET | `/api/reviews/check/:tokenId` | No | Check if rating exists |
 | GET | `/api/reviews/:tokenId` | No | Get rating by token ID |
-| POST | `/api/reviews` | Yes | Create rating (purchaser only, 1-5 stars) |
-| PUT | `/api/reviews/:tokenId` | Yes | Update own rating |
-| DELETE | `/api/reviews/:tokenId` | Yes | Delete own rating |
+| POST | `/api/reviews` | Yes | Create rating (purchaser only, 1-5 stars, **PERMANENT**) |
 
 ### Reports (Scam/False Signal)
 

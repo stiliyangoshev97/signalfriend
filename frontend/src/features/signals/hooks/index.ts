@@ -5,3 +5,4 @@
 
 export * from './useSignals';
 export * from './usePurchase';
+export * from './useReviews';

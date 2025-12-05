@@ -35,6 +35,7 @@ import { PredictorInfoCard } from '../components/PredictorInfoCard';
 import { PurchaseCard } from '../components/PurchaseCard';
 import { SignalContent } from '../components/SignalContent';
 import { PurchaseModal } from '../components/PurchaseModal';
+import { RatingSection } from '../components/RatingSection';
 import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
 
 /**
@@ -373,6 +374,14 @@ export function SignalDetailPage(): React.ReactElement {
             reasoning={undefined}
             priceUSDT={signal.priceUsdt}
           />
+
+          {/* Rating Section - only show for purchased signals (not for predictors viewing their own or admins) */}
+          {isOwned && purchaseData?.receipt?.tokenId && (
+            <RatingSection
+              tokenId={purchaseData.receipt.tokenId}
+              signalTitle={signal.title}
+            />
+          )}
         </div>
 
         {/* Sidebar (1/3 width on large screens) */}
