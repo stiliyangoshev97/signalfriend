@@ -9,11 +9,11 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { useAccount } from 'wagmi';
 import { Avatar, Badge, Button } from '@/shared/components/ui';
 import { formatAddress } from '@/shared/utils/format';
 import { FilterPanel, SignalGrid, Pagination } from '@/features/signals/components';
 import { useCategories, useMyPurchasedContentIds } from '@/features/signals/hooks';
+import { useAuthStore } from '@/features/auth';
 import {
   usePublicPredictorProfile,
   usePublicPredictorSignals,
@@ -153,8 +153,9 @@ export function PredictorProfilePage(): React.ReactElement {
   );
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
-  // Get connected wallet to check purchased signals
-  const { address: connectedWallet } = useAccount();
+  // Check if user is authenticated (signed in with SIWE)
+  // Used to conditionally fetch purchased content IDs
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   // Fetch predictor profile
   const { data: predictor, isLoading: profileLoading, error: profileError } = usePublicPredictorProfile(address);
@@ -174,8 +175,9 @@ export function PredictorProfilePage(): React.ReactElement {
     queryFilters
   );
 
-  // Fetch user's purchased content IDs (only when authenticated)
-  const { data: purchasedContentIds } = useMyPurchasedContentIds(!!connectedWallet);
+  // Fetch user's purchased content IDs (only when authenticated with SIWE)
+  // Note: This requires authentication, not just wallet connection
+  const { data: purchasedContentIds } = useMyPurchasedContentIds(isAuthenticated);
 
   // Fetch categories for filter dropdown
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();

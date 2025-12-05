@@ -17,6 +17,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.3] - 2025-12-05 🐛 AUTH API FIX
+
+### Changed
+- **useSessionSync Hook** (`src/features/auth/api/authHooks.ts`):
+  - Now only tracks wallet addresses when user is authenticated
+  - Added `hasHandledWalletChangeRef` to prevent duplicate redirects
+  - Clears `previousAddressRef` when user logs out
+  - More robust wallet change detection logic
+
+- **PredictorProfilePage** (`src/features/predictors/pages/PredictorProfilePage.tsx`):
+  - Changed `useMyPurchasedContentIds` to check `isAuthenticated` instead of wallet connection
+  - Removed unused `useAccount` import
+  - Added `useAuthStore` import for authentication state
+
+### Fixed
+- **Bug**: Backend returned 401 "No token provided" when visiting predictor profile with connected wallet but not signed in
+- **Root Cause**: `useMyPurchasedContentIds` hook was enabled when wallet was connected, but API requires SIWE authentication
+- **Solution**: Only fetch purchased content IDs when user is authenticated (signed in), not just when wallet is connected
+
+---
+
+## [0.1.2] - 2025-12-05 🔄 WALLET CHANGE REDIRECT FIX
+
+### Changed
+- **useSessionSync Hook** (`src/features/auth/api/authHooks.ts`):
+  - Now redirects to home page (`/`) when user switches wallets
+  - Prevents stale data from previous wallet showing on current page
+  - Uses router.navigate() for immediate navigation after logout
+
+### Fixed
+- **Bug**: Pages showed stale data after wallet switch (e.g., "Purchased" badges for wrong wallet)
+- **Root Cause**: Wallet change triggered logout but user stayed on current page with cached data
+- **Solution**: Redirect to home page on wallet change to force fresh data load
+
+---
+
 ## [0.1.1] - 2025-12-05 🛒 PURCHASED SIGNALS DISPLAY FIX
 
 ### Added
