@@ -17,6 +17,10 @@ interface RatingSectionProps {
   tokenId: number;
   /** Signal title for display */
   signalTitle: string;
+  /** Signal's content ID (for cache invalidation) */
+  contentId?: string;
+  /** Predictor's wallet address (for cache invalidation) */
+  predictorAddress?: string;
 }
 
 /**
@@ -26,13 +30,16 @@ interface RatingSectionProps {
  * - Interactive rating form (if not yet rated)
  * - Read-only display of existing rating (if already rated)
  */
-export function RatingSection({ tokenId, signalTitle }: RatingSectionProps): React.ReactElement {
+export function RatingSection({ tokenId, signalTitle, contentId, predictorAddress }: RatingSectionProps): React.ReactElement {
   const [selectedRating, setSelectedRating] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
   
   const { data: checkData, isLoading: isCheckingReview } = useCheckReview(tokenId);
   const { data: existingReview } = useGetReview(tokenId);
-  const { mutate: submitRating, isPending: isSubmitting, isSuccess, error } = useCreateReview();
+  const { mutate: submitRating, isPending: isSubmitting, isSuccess, error } = useCreateReview({
+    contentId,
+    predictorAddress,
+  });
 
   const hasReview = checkData?.hasReview || isSuccess;
 

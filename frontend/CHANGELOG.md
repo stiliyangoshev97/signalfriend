@@ -17,6 +17,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.4] - 2025-12-05 🔄 RATING & PURCHASE CACHE FIX
+
+### Changed
+- **useCreateReview Hook** (`src/features/signals/hooks/useReviews.ts`):
+  - Now accepts `contentId` and `predictorAddress` options for cache invalidation
+  - Invalidates signal detail query after rating submission
+  - Invalidates predictor profile query to update average rating
+  - Invalidates signal lists to refresh ratings in marketplace
+
+- **RatingSection Component** (`src/features/signals/components/RatingSection.tsx`):
+  - Added `contentId` and `predictorAddress` props
+  - Passes these to `useCreateReview` for proper cache invalidation
+
+- **SignalDetailPage** (`src/features/signals/pages/SignalDetailPage.tsx`):
+  - Updated to pass `contentId` and `predictorAddress` to RatingSection
+
+- **usePurchaseFlow Hook** (`src/features/signals/hooks/usePurchase.ts`):
+  - Added aggressive cache invalidation after purchase confirmation
+  - Invalidates purchase check, signal detail, receipts, and content queries
+  - Multiple delayed invalidations (2s, 5s, 10s) to handle webhook processing delays
+  - Handles cases where API might be temporarily rate-limited
+
+### Fixed
+- **Bug 1**: Rating submission didn't update predictor profile or signal detail without page refresh
+  - **Root Cause**: Only review-specific queries were invalidated, not signal/predictor queries
+  - **Solution**: Added cache invalidation for signal detail, predictor profile, and signal lists
+
+- **Bug 2**: Purchase transaction succeeded on-chain but wasn't reflected in UI
+  - **Root Cause**: If backend webhook was rate-limited, purchase status wasn't updated
+  - **Solution**: Added multiple delayed cache invalidations to let webhook process
+
+---
+
 ## [0.1.3] - 2025-12-05 🐛 AUTH API FIX
 
 ### Changed
