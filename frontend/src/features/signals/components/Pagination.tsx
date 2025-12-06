@@ -42,6 +42,15 @@ export function Pagination({
   // Don't render if only one page
   if (totalPages <= 1) return null;
 
+  // Handle page change - trigger page change, then scroll to top after React updates
+  const handlePageClick = (newPage: number) => {
+    onPageChange(newPage);
+    // Use setTimeout to scroll after React has finished re-rendering
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }, 0);
+  };
+
   // Generate page numbers to display
   const getPageNumbers = (): (number | 'ellipsis')[] => {
     const pages: (number | 'ellipsis')[] = [];
@@ -107,7 +116,7 @@ export function Pagination({
       <div className="flex items-center gap-1">
         {/* Previous button */}
         <button
-          onClick={() => onPageChange(page - 1)}
+          onClick={() => handlePageClick(page - 1)}
           disabled={page === 1}
           className="px-3 py-2 text-sm rounded-lg border border-dark-600 text-fur-cream/60 hover:border-dark-500 hover:text-fur-cream disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
@@ -139,7 +148,7 @@ export function Pagination({
           ) : (
             <button
               key={pageNum}
-              onClick={() => onPageChange(pageNum)}
+              onClick={() => handlePageClick(pageNum)}
               className={`px-3 py-2 text-sm rounded-lg border transition-all ${
                 pageNum === page
                   ? 'bg-fur-light border-fur-light text-dark-900 font-medium'
@@ -153,7 +162,7 @@ export function Pagination({
 
         {/* Next button */}
         <button
-          onClick={() => onPageChange(page + 1)}
+          onClick={() => handlePageClick(page + 1)}
           disabled={page === totalPages}
           className="px-3 py-2 text-sm rounded-lg border border-dark-600 text-fur-cream/60 hover:border-dark-500 hover:text-fur-cream disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >

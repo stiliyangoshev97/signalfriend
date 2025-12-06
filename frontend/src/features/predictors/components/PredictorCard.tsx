@@ -8,7 +8,7 @@
 
 import { Link } from 'react-router-dom';
 import type { Predictor } from '@/shared/types';
-import { Avatar } from '@/shared/components/ui';
+import { Avatar, CopyableAddress } from '@/shared/components/ui';
 import { formatAddress } from '@/shared/utils/format';
 
 /** Props for PredictorCard component */
@@ -110,9 +110,9 @@ export function PredictorCard({ predictor, rank }: PredictorCardProps): React.Re
               </span>
             )}
           </div>
-          <p className="text-sm text-gray-main truncate">
-            {formatAddress(predictor.walletAddress)}
-          </p>
+          <div onClick={(e) => e.preventDefault()}>
+            <CopyableAddress address={predictor.walletAddress} size="sm" />
+          </div>
         </div>
       </div>
 
