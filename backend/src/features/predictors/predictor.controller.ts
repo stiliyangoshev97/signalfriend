@@ -16,6 +16,7 @@ import type {
   ListPredictorsQuery,
   GetPredictorByAddressParams,
   UpdatePredictorProfileInput,
+  CheckFieldUniquenessQuery,
 } from "./predictor.schemas.js";
 
 /**
@@ -174,5 +175,26 @@ export const applyForVerification = asyncHandler(async (req: Request, res: Respo
     success: true,
     message: "Verification application submitted. An admin will review your profile.",
     data: predictor,
+  });
+});
+
+/**
+ * GET /api/predictors/check-unique
+ * Checks if a field value (displayName, telegram, discord) is available.
+ * Used for real-time validation in the edit profile form.
+ *
+ * @query {string} field - Field to check (displayName, telegram, discord)
+ * @query {string} value - Value to check for uniqueness
+ * @query {string} [excludeAddress] - Address to exclude (current user)
+ * @returns {Object} JSON response with { available: boolean }
+ */
+export const checkFieldUniqueness = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const query = req.query as unknown as CheckFieldUniquenessQuery;
+
+  const result = await PredictorService.checkFieldUniqueness(query);
+
+  res.json({
+    success: true,
+    data: result,
   });
 });

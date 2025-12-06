@@ -15,6 +15,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import {
   fetchMySignals,
@@ -26,6 +27,7 @@ import {
   updateSignal,
   deactivateSignal,
   reactivateSignal,
+  checkFieldUniqueness,
 } from '../api';
 import type { CreateSignalData } from '@/shared/types';
 
@@ -121,21 +123,37 @@ export function usePredictorProfile(address?: string) {
  * 
  * @example
  * const { mutate: updateProfile } = useUpdateProfile();
- * updateProfile({ displayName: 'NewName' });
+ * updateProfile({
+ *   displayName: 'NewName',
+ *   bio: 'Trading expert',
+ *   avatarUrl: 'https://...',
+ *   socialLinks: { twitter: 'myhandle' }
+ * });
  */
 export function useUpdateProfile() {
   const { address } = useAccount();
   const queryClient = useQueryClient();
+  const setPredictor = useAuthStore((state) => state.setPredictor);
 
   return useMutation({
     mutationFn: (data: Parameters<typeof updatePredictorProfile>[1]) =>
       updatePredictorProfile(address!, data),
-    onSuccess: () => {
-      // Invalidate profile query
+    onSuccess: (updatedPredictor) => {
+      // Update auth store with new predictor data
+      setPredictor(updatedPredictor);
+      
+      // Invalidate profile queries
       queryClient.invalidateQueries({
         queryKey: predictorKeys.profile(address!),
       });
-      // Note: Auth store predictor data should be updated by the component
+      // Also invalidate public predictor profile
+      queryClient.invalidateQueries({
+        queryKey: ['predictors', 'profile', address!],
+      });
+      // Invalidate predictor list (in case name changed)
+      queryClient.invalidateQueries({
+        queryKey: ['predictors', 'list'],
+      });
     },
   });
 }
@@ -262,7 +280,7 @@ export function useReactivateSignal() {
       });
       // Also invalidate marketplace signals list so reactivated signal appears
       queryClient.invalidateQueries({
-        queryKey: ['signals', 'list'],
+              queryKey: ['signals', 'list'],
       });
       // Invalidate signal detail page cache
       queryClient.invalidateQueries({
@@ -270,4 +288,81 @@ export function useReactivateSignal() {
       });
     },
   });
+}
+
+/**
+ * Hook for real-time field uniqueness checking with debounce
+ * 
+ * @param field - Field to check: displayName, telegram, or discord
+ * @param value - Value to check
+ * @param debounceMs - Debounce delay in milliseconds (default: 500)
+ * @returns Object with isAvailable, isChecking, and error states
+ * 
+ * @example
+ * const { isAvailable, isChecking } = useCheckFieldUniqueness('displayName', formValue);
+ * if (!isAvailable) {
+ *   setError('Display name is already taken');
+ * }
+ */
+export function useCheckFieldUniqueness(
+  field: 'displayName' | 'telegram' | 'discord',
+  value: string,
+  debounceMs = 500
+) {
+  const { address } = useAccount();
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+  const [isChecking, setIsChecking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Debounce the value
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, debounceMs);
+
+    return () => clearTimeout(timer);
+  }, [value, debounceMs]);
+
+  // Check uniqueness when debounced value changes
+  const checkUniqueness = useCallback(async () => {
+    // Don't check empty values
+    if (!debouncedValue || debouncedValue.trim().length === 0) {
+      setIsAvailable(null);
+      setError(null);
+      return;
+    }
+
+    // Minimum length check
+    if (field === 'displayName' && debouncedValue.length < 3) {
+      setIsAvailable(null);
+      setError(null);
+      return;
+    }
+
+    setIsChecking(true);
+    setError(null);
+
+    try {
+      const result = await checkFieldUniqueness(field, debouncedValue, address);
+      setIsAvailable(result.available);
+      if (!result.available) {
+        const fieldLabel = field === 'displayName' ? 'Display name' : 
+                          field === 'telegram' ? 'Telegram handle' : 'Discord handle';
+        setError(`${fieldLabel} is already taken`);
+      }
+    } catch (err) {
+      console.error('Error checking field uniqueness:', err);
+      setError('Failed to check availability');
+      setIsAvailable(null);
+    } finally {
+      setIsChecking(false);
+    }
+  }, [debouncedValue, field, address]);
+
+  useEffect(() => {
+    checkUniqueness();
+  }, [checkUniqueness]);
+
+  return { isAvailable, isChecking, error };
 }

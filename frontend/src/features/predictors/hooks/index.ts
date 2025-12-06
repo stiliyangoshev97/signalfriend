@@ -14,6 +14,7 @@ export {
   useUpdateSignal,
   useDeactivateSignal,
   useReactivateSignal,
+  useCheckFieldUniqueness,
 } from './usePredictorDashboard';
 
 // Predictor listings

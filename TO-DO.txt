@@ -2,4 +2,63 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-...
+Last Updated: December 6, 2025
+
+================================================================================
+COMPLETED FEATURES ✅
+================================================================================
+
+[x] Smart contracts deployed on BNB Testnet
+[x] Backend API with all core features
+[x] Frontend with marketplace, dashboard, profiles
+[x] SIWE authentication
+[x] Signal purchase flow
+[x] Rating system (permanent, 1-5 stars)
+[x] Predictor profiles with edit capability
+[x] Real-time uniqueness validation for profile fields
+[x] Avatar URL security (SVG blocked, only JPG/PNG/GIF allowed)
+
+================================================================================
+NEXT PRIORITY: ADMIN SYSTEM
+================================================================================
+
+See detailed tasks in:
+- /frontend/TO-DO-FRONTEND.txt (Phase 7: Admin Dashboard & Moderation)
+- /backend/TO-DO-BACKEND.txt (Phase 12: Admin Dashboard & Moderation System)
+
+Key Features Needed:
+1. Admin Dashboard (accessible only by 3 admin wallets)
+2. Verification approval/rejection for predictors with 100+ sales
+3. Report system (buyers can report predictors)
+4. Blacklist/Unblacklist via smart contract
+5. Dispute system for blacklisted predictors
+
+================================================================================
+KNOWN BUGS
+================================================================================
+
+1. Mobile Responsive Issues (Frontend)
+   - Connect wallet button too large on mobile
+   - Nav items hidden when wallet connected
+   - Address overlaps navigation
+
+2. Predictors Page Search Filter (Frontend)
+   - Cannot reset/clear the name search filter
+   - Text re-enters automatically after deletion
+
+3. Wallet Address Copy (Frontend)
+   - Need "copy to clipboard" button for truncated addresses
+   - Affects predictor profile, predictors page, signal details
+
+================================================================================
+DEPLOYMENT CHECKLIST
+================================================================================
+
+[ ] Finalize admin system
+[ ] Full mobile responsive testing
+[ ] Security audit
+[ ] Performance testing
+[ ] Docker configuration
+[ ] Production environment setup
+[ ] MongoDB Atlas migration
+[ ] Domain and SSL setup

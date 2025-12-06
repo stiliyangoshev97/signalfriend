@@ -6,11 +6,13 @@
  * - View their stats (signals, sales, earnings, rating)
  * - Manage their signals (view, deactivate, reactivate)
  * - Create new signals
+ * - Edit their profile
  * 
  * Protected by PredictorRoute guard.
  */
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { Card, Button, Badge, Modal } from '@/shared/components/ui';
 import { useAuthStore } from '@/features/auth/store';
@@ -21,7 +23,7 @@ import {
   useDeactivateSignal,
   useReactivateSignal,
 } from '../hooks';
-import { DashboardStats, MySignalCard, CreateSignalModal } from '../components';
+import { DashboardStats, MySignalCard, CreateSignalModal, EditProfileModal } from '../components';
 
 /**
  * Empty state component for no signals
@@ -99,6 +101,7 @@ export function PredictorDashboardPage(): React.ReactElement {
   
   // State
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [signalFilter, setSignalFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [deactivateModalOpen, setDeactivateModalOpen] = useState(false);
   const [signalToDeactivate, setSignalToDeactivate] = useState<{ contentId: string; title: string } | null>(null);
@@ -191,13 +194,69 @@ export function PredictorDashboardPage(): React.ReactElement {
           </p>
         </div>
         
-        <Button onClick={() => setShowCreateModal(true)} size="lg">
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Create Signal
-        </Button>
+        <div className="flex gap-3">
+          <Link to={`/predictors/${predictor?.walletAddress}`}>
+            <Button variant="ghost">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              View Profile
+            </Button>
+          </Link>
+          <Button 
+            variant="secondary" 
+            onClick={() => setShowEditProfileModal(true)}
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Edit Profile
+          </Button>
+          <Button onClick={() => setShowCreateModal(true)} size="lg">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Create Signal
+          </Button>
+        </div>
       </div>
+
+      {/* Profile Incomplete Banner */}
+      {predictor && (
+        !predictor.displayName || 
+        !predictor.bio || 
+        !predictor.avatarUrl || 
+        !predictor.socialLinks?.twitter ||
+        !predictor.socialLinks?.telegram || 
+        !predictor.socialLinks?.discord
+      ) && (
+        <div className="mb-6 p-4 bg-gradient-to-r from-brand-200/10 to-golden-500/10 border border-brand-200/30 rounded-xl">
+          <div className="flex items-center gap-4">
+            <div className="flex-shrink-0 w-12 h-12 bg-brand-200/20 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-brand-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-semibold text-fur-cream">Complete Your Profile</h3>
+              <p className="mt-0.5 text-sm text-fur-cream/60">
+                Fill in all profile fields (name, bio, avatar, X/Twitter, Telegram, Discord) to build trust with buyers.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => setShowEditProfileModal(true)}
+              className="flex-shrink-0"
+            >
+              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+              Complete Profile
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="mb-8">
@@ -334,6 +393,13 @@ export function PredictorDashboardPage(): React.ReactElement {
           </div>
         </div>
       </Modal>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={showEditProfileModal}
+        onClose={() => setShowEditProfileModal(false)}
+        predictor={predictor}
+      />
     </div>
   );
 }

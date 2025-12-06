@@ -17,6 +17,95 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.2] - 2025-12-06 🖼️ AVATAR SECURITY & UX IMPROVEMENTS
+
+### Added
+- **"View Profile" Button** on Predictor Dashboard:
+  - Quick access to view own public profile
+  - Located alongside Edit Profile and Create Signal buttons
+  - Uses eye icon for clear visual indication
+
+- **Image Hosting Tip** for Avatar URL:
+  - Added recommendation for postimages.org (free, no signup required)
+  - Clickable link opens in new tab
+
+### Changed
+- **Avatar URL Validation** (Security Fix):
+  - Only JPG, PNG, and GIF images are now allowed
+  - **SVG files are blocked** for security reasons (can contain malicious JavaScript/XSS)
+  - Validation on both frontend and backend (defense in depth)
+  - Clear error message: "Only JPG, PNG, and GIF images are allowed (no SVG for security reasons)"
+
+- **Profile Completeness Check**:
+  - Now requires **all 6 fields**: Display Name, Bio, Avatar URL, Twitter/X, Telegram, Discord
+  - Updated banner message to mention all required fields
+
+### Security
+- SVG files can contain embedded JavaScript and XSS attacks
+- GIF files are safe (raster format, no executable code)
+- Backend validates image extensions before saving to database
+
+---
+
+## [0.3.1] - 2025-12-06 🔄 REAL-TIME UNIQUENESS VALIDATION
+
+### Added
+- **Real-time Field Uniqueness Checking** in Edit Profile Modal:
+  - Live validation for Display Name, Telegram, and Discord handles
+  - Visual indicators: spinner while checking, green check for available, red X for taken
+  - Debounced API calls (500ms) to prevent excessive requests
+  - Submit button disabled until uniqueness checks pass
+  - `useCheckFieldUniqueness` hook with debounce
+  - `checkFieldUniqueness` API function
+
+### Changed
+- **Profile Completeness Banner**:
+  - Now requires ALL fields: Display Name, Bio, Avatar URL, Telegram, and Discord
+  - Updated messaging to reflect full profile requirements
+  
+- **Avatar URL Validation**:
+  - Better error message: "Please enter a valid image URL (must start with http:// or https://)"
+  
+- **Bio Validation**:
+  - Added URL/link detection to prevent links in bio
+  - Shows "No links allowed" helper text
+
+### Note
+- **Twitter/X is NOT unique** - This is intentional to prevent scammers from blocking legitimate users by claiming their Twitter handles
+
+---
+
+## [0.3.0] - 2025-12-05 ✏️ EDIT PREDICTOR PROFILE
+
+### Added
+- **EditProfileModal** (`src/features/predictors/components/EditProfileModal.tsx`):
+  - Full profile editing for predictors
+  - Fields: Display Name, Avatar URL, Bio, Twitter, Telegram, Discord, Preferred Contact
+  - Form validation with Zod schema
+  - Character counters for name and bio
+  - Privacy indicators (Telegram/Discord marked as private)
+  - Pre-fills form with current predictor data
+  - Updates auth store on successful save
+
+- **Profile Incomplete Banner**:
+  - Shows on dashboard when predictor has no display name or bio
+  - Encourages profile completion for better sales
+  - Links directly to Edit Profile modal
+
+- **Edit Profile Button** on Predictor Dashboard:
+  - Located next to "Create Signal" button
+  - Opens EditProfileModal
+
+### Changed
+- **useUpdateProfile hook**: Now updates auth store with new predictor data on success
+- **updatePredictorProfile API**: Added `avatarUrl` support, uses `socialLinks` object format
+
+### Privacy Notes
+- **Public fields**: Display Name, Avatar URL, Bio, Twitter/X handle
+- **Private fields** (visible only to admin and predictor): Telegram, Discord, Preferred Contact
+
+---
+
 ## [0.2.2] - 2025-12-05 📏 SIGNAL CONTENT LIMIT FIX
 
 ### Fixed

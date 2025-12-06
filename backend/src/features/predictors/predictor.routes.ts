@@ -19,6 +19,7 @@ import {
   checkPredictorStatus,
   getPredictorEarnings,
   applyForVerification,
+  checkFieldUniqueness,
 } from "./predictor.controller.js";
 import { validate } from "../../shared/middleware/validation.js";
 import { authenticate } from "../../shared/middleware/auth.js";
@@ -26,6 +27,7 @@ import {
   listPredictorsSchema,
   getPredictorByAddressSchema,
   updatePredictorProfileSchema,
+  checkFieldUniquenessSchema,
 } from "./predictor.schemas.js";
 
 /** Express router instance for predictor routes */
@@ -48,6 +50,18 @@ router.get("/", validate(listPredictorsSchema, "query"), listPredictors);
  * Query params: metric (totalSales|averageRating|totalSignals), limit (max 50)
  */
 router.get("/top", getTopPredictors);
+
+/**
+ * GET /api/predictors/check-unique
+ * Check if a field value (displayName, telegram, discord) is available.
+ * Query params: field (displayName|telegram|discord), value, excludeAddress (optional)
+ * Returns { available: boolean }
+ */
+router.get(
+  "/check-unique",
+  validate(checkFieldUniquenessSchema, "query"),
+  checkFieldUniqueness
+);
 
 /**
  * GET /api/predictors/:address

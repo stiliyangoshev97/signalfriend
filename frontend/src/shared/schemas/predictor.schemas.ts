@@ -48,6 +48,9 @@ export const predictorSchema = z.object({
 // Update Profile Schema (for forms)
 // ===========================================
 
+/** Regex pattern to detect URLs/links in text */
+const urlPattern = /(https?:\/\/|www\.|\.com|\.org|\.net|\.io|\.xyz|\.gg|t\.me|discord\.gg)/i;
+
 export const updateProfileSchema = z.object({
   displayName: z
     .string()
@@ -58,6 +61,7 @@ export const updateProfileSchema = z.object({
   bio: z
     .string()
     .max(500, 'Bio must be at most 500 characters')
+    .refine((val) => !val || !urlPattern.test(val), 'Bio cannot contain links or URLs')
     .optional(),
   avatarUrl: z
     .string()
@@ -65,11 +69,12 @@ export const updateProfileSchema = z.object({
     .optional(),
   telegram: z
     .string()
-    .max(100)
+    .max(32, 'Telegram handle must be at most 32 characters')
+    .regex(/^[a-zA-Z0-9_]*$/, 'Telegram handle can only contain letters, numbers, and underscores')
     .optional(),
   discord: z
     .string()
-    .max(100)
+    .max(32, 'Discord handle must be at most 32 characters')
     .optional(),
   preferredContact: z.enum(['telegram', 'discord']).optional(),
 });
