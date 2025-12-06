@@ -14,8 +14,11 @@ export {
   fetchPredictorEarnings,
   updatePredictorProfile,
   applyForVerification,
+  checkFieldUniqueness,
   type PredictorStats,
   type PredictorEarnings,
+  type UpdateProfileInput,
+  type CheckFieldUniquenessResponse,
 } from './predictors.api';
 
 // Signal management

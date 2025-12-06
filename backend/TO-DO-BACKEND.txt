@@ -240,6 +240,51 @@
 [ ] MongoDB Atlas setup guide
 
 ================================================================================
+## PHASE 12: Admin Dashboard & Moderation System
+================================================================================
+
+### Admin Dashboard API
+[ ] GET /api/admin/stats - Platform statistics (total users, signals, sales, revenue)
+[ ] GET /api/admin/earnings - Query total earnings per wallet address
+[ ] GET /api/admin/earnings/:address - Earnings breakdown for specific wallet
+
+### Verification System (after 100 sales)
+[x] POST /api/predictors/:address/apply-verification - Already implemented
+[x] GET /api/admin/verification-requests - Already implemented
+[x] POST /api/admin/predictors/:address/verify - Already implemented
+[x] POST /api/admin/predictors/:address/reject - Already implemented
+[ ] Admin notification system for new verification requests
+
+### Report Predictor System
+[ ] POST /api/reports - Create report against predictor
+    - Requires buyer to have purchased at least 1 signal from predictor
+    - Buyer can only report a predictor ONCE (prevent spam)
+    - Report includes reason/description
+[ ] GET /api/admin/reports - List all reports for admin review
+[ ] PUT /api/admin/reports/:id - Mark report as reviewed/dismissed
+[ ] Report model fields: reporterId, predictorId, reason, status, createdAt
+
+### Blacklist/Unblacklist System
+[ ] POST /api/admin/predictors/:address/blacklist - Trigger smart contract blacklist
+    - Only for admin wallets
+    - Calls smart contract function
+    - Webhook updates DB when confirmed
+[ ] POST /api/admin/predictors/:address/unblacklist - Remove from blacklist
+[ ] Blacklisted predictor behavior:
+    - Excluded from GET /api/predictors list
+    - Cannot create new signals (validation in signal creation)
+    - Dashboard API returns blacklist status
+
+### Dispute System for Blacklisted Predictors
+[ ] POST /api/predictors/:address/dispute - Submit dispute (once only)
+    - Requires blacklisted status
+    - Includes explanation text
+    - Can only be submitted ONCE
+[ ] GET /api/admin/disputes - List pending disputes for review
+[ ] PUT /api/admin/disputes/:id - Resolve dispute (accept → unblacklist, or reject)
+[ ] Dispute model fields: predictorId, explanation, status, createdAt, resolvedAt
+
+================================================================================
 ## NOTES
 ================================================================================
 - Contract Addresses (BNB Testnet - Chain ID 97):

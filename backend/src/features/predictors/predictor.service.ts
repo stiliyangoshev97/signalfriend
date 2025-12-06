@@ -19,6 +19,7 @@ import type {
   ListPredictorsQuery,
   UpdatePredictorProfileInput,
   CreatePredictorFromEventInput,
+  CheckFieldUniquenessQuery,
 } from "./predictor.schemas.js";
 
 /** Predictor list response with pagination metadata */
@@ -275,8 +276,37 @@ export class PredictorService {
     }
 
     // Update other allowed fields
-    if (data.bio !== undefined) predictor.bio = data.bio;
+    if (data.bio !== undefined) {
+      // Validate bio doesn't contain links
+      const urlPattern = /(https?:\/\/|www\.|\.com|\.org|\.net|\.io|\.xyz|\.gg|t\.me|discord\.gg)/i;
+      if (urlPattern.test(data.bio)) {
+        throw ApiError.badRequest("Bio cannot contain links or URLs");
+      }
+      predictor.bio = data.bio;
+    }
     if (data.socialLinks !== undefined) {
+      // Check telegram uniqueness if provided
+      if (data.socialLinks.telegram && data.socialLinks.telegram !== predictor.socialLinks?.telegram) {
+        const existingTelegram = await Predictor.findOne({
+          "socialLinks.telegram": { $regex: new RegExp(`^${data.socialLinks.telegram}$`, "i") },
+          _id: { $ne: predictor._id },
+        });
+        if (existingTelegram) {
+          throw ApiError.conflict(`Telegram handle '${data.socialLinks.telegram}' is already in use`);
+        }
+      }
+      
+      // Check discord uniqueness if provided
+      if (data.socialLinks.discord && data.socialLinks.discord !== predictor.socialLinks?.discord) {
+        const existingDiscord = await Predictor.findOne({
+          "socialLinks.discord": { $regex: new RegExp(`^${data.socialLinks.discord}$`, "i") },
+          _id: { $ne: predictor._id },
+        });
+        if (existingDiscord) {
+          throw ApiError.conflict(`Discord handle '${data.socialLinks.discord}' is already in use`);
+        }
+      }
+      
       predictor.socialLinks = {
         ...predictor.socialLinks,
         ...data.socialLinks,
@@ -748,5 +778,44 @@ export class PredictorService {
     
     await predictor.save();
     return predictor;
+  }
+
+  /**
+   * Checks if a field value is unique among predictors.
+   * Used for real-time validation in the edit profile form.
+   *
+   * @param query - The field, value, and optional excludeAddress
+   * @returns Promise resolving to { available: boolean }
+   */
+  static async checkFieldUniqueness(
+    query: CheckFieldUniquenessQuery
+  ): Promise<{ available: boolean }> {
+    const { field, value, excludeAddress } = query;
+
+    // Build the filter based on field type
+    let filter: Record<string, unknown>;
+
+    if (field === "displayName") {
+      filter = {
+        displayName: { $regex: new RegExp(`^${value}$`, "i") },
+      };
+    } else if (field === "telegram") {
+      filter = {
+        "socialLinks.telegram": { $regex: new RegExp(`^${value}$`, "i") },
+      };
+    } else {
+      // discord
+      filter = {
+        "socialLinks.discord": { $regex: new RegExp(`^${value}$`, "i") },
+      };
+    }
+
+    // Exclude the current user's address if provided
+    if (excludeAddress) {
+      filter.walletAddress = { $ne: excludeAddress.toLowerCase() };
+    }
+
+    const existing = await Predictor.findOne(filter);
+    return { available: !existing };
   }
 }

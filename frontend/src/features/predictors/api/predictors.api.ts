@@ -145,6 +145,21 @@ export async function fetchPredictorEarnings(address: string): Promise<Predictor
 }
 
 /**
+ * Profile update input type
+ */
+export interface UpdateProfileInput {
+  displayName?: string;
+  bio?: string;
+  avatarUrl?: string;
+  socialLinks?: {
+    twitter?: string;
+    telegram?: string;
+    discord?: string;
+  };
+  preferredContact?: 'telegram' | 'discord';
+}
+
+/**
  * Update predictor profile
  * 
  * @param address - Predictor's wallet address (must match authenticated user)
@@ -154,18 +169,14 @@ export async function fetchPredictorEarnings(address: string): Promise<Predictor
  * @example
  * const updated = await updatePredictorProfile('0x123...', {
  *   displayName: 'NewName',
- *   bio: 'Trading expert since 2020'
+ *   bio: 'Trading expert since 2020',
+ *   avatarUrl: 'https://example.com/avatar.png',
+ *   socialLinks: { twitter: 'myhandle' }
  * });
  */
 export async function updatePredictorProfile(
   address: string,
-  data: {
-    displayName?: string;
-    bio?: string;
-    telegram?: string;
-    discord?: string;
-    preferredContact?: 'telegram' | 'discord';
-  }
+  data: UpdateProfileInput
 ): Promise<Predictor> {
   const response = await apiClient.put<ApiResponse<Predictor>>(
     API_CONFIG.ENDPOINTS.PREDICTOR_BY_ADDRESS(address),
@@ -188,6 +199,44 @@ export async function updatePredictorProfile(
 export async function applyForVerification(address: string): Promise<Predictor> {
   const response = await apiClient.post<ApiResponse<Predictor>>(
     `${API_CONFIG.ENDPOINTS.PREDICTOR_BY_ADDRESS(address)}/apply-verification`
+  );
+  return response.data.data;
+}
+
+/**
+ * Field uniqueness check response
+ */
+export interface CheckFieldUniquenessResponse {
+  available: boolean;
+}
+
+/**
+ * Check if a field value is unique (available)
+ * Used for real-time validation in the edit profile form.
+ * 
+ * @param field - Field to check: displayName, telegram, or discord
+ * @param value - Value to check for uniqueness
+ * @param excludeAddress - Optional address to exclude (current user)
+ * @returns Whether the value is available
+ * 
+ * @example
+ * const result = await checkFieldUniqueness('displayName', 'CryptoKing', '0x123...');
+ * if (!result.available) {
+ *   console.log('Display name is already taken');
+ * }
+ */
+export async function checkFieldUniqueness(
+  field: 'displayName' | 'telegram' | 'discord',
+  value: string,
+  excludeAddress?: string
+): Promise<CheckFieldUniquenessResponse> {
+  const params = new URLSearchParams({ field, value });
+  if (excludeAddress) {
+    params.append('excludeAddress', excludeAddress);
+  }
+  
+  const response = await apiClient.get<ApiResponse<CheckFieldUniquenessResponse>>(
+    `${API_CONFIG.ENDPOINTS.PREDICTORS}/check-unique?${params.toString()}`
   );
   return response.data.data;
 }

@@ -7,6 +7,7 @@
 export { DashboardStats } from './DashboardStats';
 export { MySignalCard } from './MySignalCard';
 export { CreateSignalModal } from './CreateSignalModal';
+export { EditProfileModal } from './EditProfileModal';
 
 // Predictor list components
 export { PredictorCard } from './PredictorCard';

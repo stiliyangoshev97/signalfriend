@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 5 December 2025 (v0.2.1 - Predictor Sync & Auth Error Fix)
+> Last Updated: 6 December 2025 (v0.3.2 - Avatar Security & Edit Profile)
 
 ---
 
@@ -28,12 +28,13 @@
 | **Purchase Flow** | ✅ 100% | Multi-step modal with USDT approval + purchase |
 | **Become a Predictor** | ✅ 100% | Full registration flow with auth prompt |
 | **My Purchased Signals** | ✅ 100% | View/access purchased signals with receipts |
-| **Predictor Dashboard** | ✅ 100% | Stats, signal management, create signal modal |
+| **Predictor Dashboard** | ✅ 100% | Stats, signal management, edit profile, view profile |
 | **Predictor List Page** | ✅ 100% | Public leaderboard with filters, pagination |
 | **Predictor Profile** | ✅ 100% | Full profile with signals grid, filters |
+| **Edit Profile Modal** | ✅ 100% | Full profile editing with uniqueness validation |
 | **Admin Panel** | ⏳ 0% | Not started |
 
-**Overall Progress: ~85%** (Infrastructure + Auth + Landing + Marketplace + Purchase Flow + Dashboard + Predictor Pages complete)
+**Overall Progress: ~88%** (Infrastructure + Auth + Landing + Marketplace + Purchase Flow + Dashboard + Profile Editing complete)
 
 ---
 

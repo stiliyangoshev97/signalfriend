@@ -15,6 +15,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.16.8] - 2025-12-06 🖼️ AVATAR URL SECURITY
+
+### Changed
+- **Avatar URL Validation** (Security Fix):
+  - Only JPG, PNG, and GIF images are now allowed
+  - **SVG files are blocked** for security reasons (can contain malicious JavaScript/XSS)
+  - Added regex validation: `/\.(jpg|jpeg|png|gif)(\?.*)?$/i`
+  - Returns clear error: "Only JPG, PNG, and GIF images are allowed"
+
+### Security
+- SVG files can contain embedded `<script>` tags and XSS payloads
+- SVG can exploit XML parser vulnerabilities
+- GIF files are safe (raster format, pixel data only, no scripting)
+- Defense in depth: validated on both frontend and backend
+
+---
+
+## [0.16.7] - 2025-12-06 🔄 REAL-TIME UNIQUENESS VALIDATION
+
+### Added
+- **Real-time Field Uniqueness Check Endpoint** (`GET /api/predictors/check-unique`)
+  - Query params: `field` (displayName|telegram|discord), `value`, `excludeAddress` (optional)
+  - Returns `{ available: boolean }` for real-time form validation
+  - Case-insensitive matching for all fields
+  - `predictor.routes.ts`: Added `/check-unique` route
+  - `predictor.controller.ts`: Added `checkFieldUniqueness` handler
+  - `predictor.service.ts`: Added `checkFieldUniqueness` method
+  - `predictor.schemas.ts`: Added `checkFieldUniquenessSchema` and `CheckFieldUniquenessQuery` type
+
+### Changed
+- **Profile Update Validation** (`predictor.service.ts`)
+  - Added Telegram handle uniqueness check (case-insensitive)
+  - Added Discord handle uniqueness check (case-insensitive)
+  - Added bio URL/link validation (prevents links in bio)
+  - Twitter/X is intentionally NOT unique (scam prevention - don't let scammers block legit users)
+
+---
+
 ## [0.16.6] - 2025-12-05 📏 SIGNAL CONTENT LIMIT FIX
 
 ### Fixed

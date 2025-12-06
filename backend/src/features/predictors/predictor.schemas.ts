@@ -57,13 +57,26 @@ export const getPredictorByAddressSchema = z.object({
  * All fields optional for partial profile updates.
  * Only the predictor themselves can update their profile.
  */
+
+/** Allowed image extensions regex (security: no SVG!) */
+const allowedImageExtensions = /\.(jpg|jpeg|png|gif)(\?.*)?$/i;
+
 export const updatePredictorProfileSchema = z.object({
   /** Display name (1-50 characters) */
   displayName: z.string().min(1).max(50).optional(),
   /** Bio/description (max 500 characters) */
   bio: z.string().max(500).optional(),
-  /** Avatar URL */
-  avatarUrl: z.string().url().max(500).optional().or(z.literal("")),
+  /** Avatar URL - only JPG, PNG, GIF allowed (no SVG for security) */
+  avatarUrl: z
+    .string()
+    .url("Invalid URL format")
+    .max(500)
+    .refine(
+      (val) => allowedImageExtensions.test(val),
+      "Only JPG, PNG, and GIF images are allowed"
+    )
+    .optional()
+    .or(z.literal("")),
   /** Social media links */
   socialLinks: z
     .object({
@@ -99,5 +112,24 @@ export type ListPredictorsQuery = z.infer<typeof listPredictorsSchema>;
 export type GetPredictorByAddressParams = z.infer<typeof getPredictorByAddressSchema>;
 /** Type for update predictor profile request body */
 export type UpdatePredictorProfileInput = z.infer<typeof updatePredictorProfileSchema>;
-/** Type for internal predictor creation */
+/** Type for create predictor from event input */
 export type CreatePredictorFromEventInput = z.infer<typeof createPredictorFromEventSchema>;
+
+/**
+ * Schema for GET /api/predictors/check-unique query parameters.
+ * Used for real-time field uniqueness validation.
+ */
+export const checkFieldUniquenessSchema = z.object({
+  /** Field to check: displayName, telegram, or discord */
+  field: z.enum(["displayName", "telegram", "discord"]),
+  /** Value to check for uniqueness */
+  value: z.string().min(1).max(100),
+  /** Address to exclude from check (current user's address) */
+  excludeAddress: z
+    .string()
+    .regex(/^0x[a-fA-F0-9]{40}$/, "Invalid Ethereum address")
+    .optional(),
+});
+
+/** Type for check field uniqueness query parameters */
+export type CheckFieldUniquenessQuery = z.infer<typeof checkFieldUniquenessSchema>;
