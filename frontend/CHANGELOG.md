@@ -11,8 +11,94 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Admin Dashboard & Moderation System
 - Signal outcome tracking
+- Buyer report signal feature
+
+---
+
+## [0.5.0] - 2025-12-07 🛡️ ADMIN DASHBOARD & MODERATION SYSTEM
+
+### Added
+
+- **Admin Dashboard Page** (`/features/admin/pages/AdminDashboardPage.tsx`):
+  - Tab-based navigation (Earnings, Verifications, Reports, Disputes)
+  - Real-time badge counts for pending items
+  - Only accessible to admin wallets via AdminRoute guard
+  - Dark theme consistent with app design
+
+- **Platform Earnings Tab**:
+  - `AdminStatsCard` component with earnings breakdown
+  - Revenue from predictor joins ($15 per join after referral)
+  - Revenue from buyer access fees ($0.50 per purchase)
+  - Revenue from commissions (5% of signal volume)
+  - Total earnings with details (predictors, purchases, volume)
+  - Quick stats panel for pending verifications and disputes
+
+- **Verifications Management**:
+  - `VerificationRequestCard` component
+  - List pending verification requests
+  - Predictor info (name, wallet, bio, contact method, social links)
+  - Approve/Reject buttons with loading states
+  - Direct contact links (Telegram, Discord icons)
+
+- **Reports Management**:
+  - `ReportCard` component with expandable details
+  - Reports list with status filtering (pending/reviewed/resolved/dismissed)
+  - Signal info (title, price, link to detail page)
+  - Reporter and predictor addresses with copy functionality
+  - Admin notes (editable textarea)
+  - Status workflow: pending → reviewed → resolved/dismissed
+  - Pagination support
+
+- **Disputes Management**:
+  - `DisputeCard` component with expandable details
+  - Disputes list with status filtering (pending/contacted/resolved/rejected)
+  - Predictor info with sales/signals stats
+  - Contact links (Telegram, Discord)
+  - Admin notes for tracking communication
+  - "Resolve & Unblacklist" action (clears blacklist in DB)
+  - Pagination support
+
+- **Predictor Blacklist Banner** (`/features/predictors/components/BlacklistBanner.tsx`):
+  - Banner shown to blacklisted predictors on their dashboard
+  - Explains blacklist status and dispute option
+  - "File Dispute" button to request admin review
+  - Shows dispute status after filing (pending/contacted/resolved/rejected)
+  - Integrated with PredictorDashboardPage
+
+- **Predictor Disputes API** (`/features/predictors/api/disputes.api.ts`):
+  - `createDispute()` - File a dispute (blacklisted predictors only)
+  - `getMyDispute()` - Check own dispute status
+  - `useMyDispute` and `useCreateDispute` React Query hooks
+
+- **Admin Header Link**:
+  - "Admin" navigation link in Header
+  - Only visible to admin wallets (3 MultiSig signers)
+  - Visible on both desktop and mobile navigation
+
+- **Admin Feature Module**:
+  - `types/admin.types.ts` - TypeScript interfaces
+  - `api/admin.api.ts` - API functions for all admin endpoints
+  - `hooks/useAdmin.ts` - React Query hooks with proper cache invalidation
+  - Component barrel exports for clean imports
+  - Page barrel exports
+
+- **API Endpoints** added to `api.config.ts`:
+  - `ADMIN_STATS` - Platform earnings
+  - `ADMIN_REPORTS` - Reports listing
+  - `ADMIN_REPORT_BY_ID` - Single report
+  - `ADMIN_DISPUTES` - Disputes listing
+  - `ADMIN_DISPUTE_COUNTS` - Counts by status
+  - `ADMIN_DISPUTE_BY_ID` - Single dispute
+  - `ADMIN_DISPUTE_RESOLVE` - Resolve dispute
+  - `DISPUTES` - Predictor create dispute
+  - `DISPUTE_ME` - Predictor's own dispute
+
+### Changed
+- Router now uses real `AdminDashboardPage` instead of placeholder
+
+### Fixed
+- Duplicate `Receipt` interface export in signals/api (renamed to `ReceiptWithSignalInfo`)
 
 ---
 

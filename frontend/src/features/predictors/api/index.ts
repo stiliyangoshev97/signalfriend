@@ -29,6 +29,14 @@ export {
   reactivateSignal,
 } from './signals.api';
 
+// Dispute management (for blacklisted predictors)
+export {
+  createDispute,
+  getMyDispute,
+  type DisputeStatus,
+  type PredictorDispute,
+} from './disputes.api';
+
 // Predictor listings
 export {
   fetchPredictors,

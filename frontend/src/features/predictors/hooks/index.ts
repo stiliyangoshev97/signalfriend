@@ -41,3 +41,10 @@ export {
   useJoinAsPredictor,
   useBecomePredictor,
 } from './useBecomePredictor';
+
+// Dispute management (for blacklisted predictors)
+export {
+  disputeKeys,
+  useMyDispute,
+  useCreateDispute,
+} from './useDispute';

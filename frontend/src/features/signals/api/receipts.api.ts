@@ -8,8 +8,8 @@
 import { apiClient } from '@/shared/api/apiClient';
 import { API_CONFIG } from '@/shared/config/api.config';
 
-/** Receipt from the API */
-export interface Receipt {
+/** Receipt from the API with full signal info (for My Signals page) */
+export interface ReceiptWithSignalInfo {
   _id: string;
   tokenId: number;
   contentId: string;
@@ -42,7 +42,7 @@ export interface PaginationMeta {
 
 /** Response from getMyReceipts */
 export interface MyReceiptsResponse {
-  receipts: Receipt[];
+  receipts: ReceiptWithSignalInfo[];
   pagination: PaginationMeta;
 }
 
@@ -62,7 +62,7 @@ export interface GetMyReceiptsParams {
  * @returns User's purchase receipts with pagination
  */
 export async function getMyReceipts(params?: GetMyReceiptsParams): Promise<MyReceiptsResponse> {
-  const response = await apiClient.get<{ success: boolean; data: Receipt[]; pagination: PaginationMeta }>(
+  const response = await apiClient.get<{ success: boolean; data: ReceiptWithSignalInfo[]; pagination: PaginationMeta }>(
     API_CONFIG.ENDPOINTS.RECEIPTS_MINE,
     { params }
   );
@@ -86,7 +86,7 @@ export async function getMyPurchasedContentIds(): Promise<string[]> {
   let hasMore = true;
   
   while (hasMore) {
-    const response = await apiClient.get<{ success: boolean; data: Receipt[]; pagination: PaginationMeta }>(
+    const response = await apiClient.get<{ success: boolean; data: ReceiptWithSignalInfo[]; pagination: PaginationMeta }>(
       API_CONFIG.ENDPOINTS.RECEIPTS_MINE,
       { params: { limit, page } }
     );
