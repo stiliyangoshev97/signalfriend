@@ -11,9 +11,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
+- Admin Dashboard & Moderation System
 - Signal outcome tracking
-- Predictor leaderboards
-- Advanced filtering
+
+---
+
+## [0.4.0] - 2025-12-06 🐛 UI BUG FIXES & MOBILE IMPROVEMENTS
+
+### Added
+- **CopyableAddress Component** (`/shared/components/ui/CopyableAddress.tsx`):
+  - Reusable component for displaying wallet addresses with copy-to-clipboard
+  - Truncated display (0x1234...5678) with full address on copy
+  - Visual feedback: checkmark icon appears for 2 seconds after copying
+  - Size variants: `sm` and `md`
+  - Used in: Predictor Profile, Predictor Cards, Signal Detail (PredictorInfoCard)
+
+- **Mobile Hamburger Menu** in Header:
+  - New hamburger icon button for mobile navigation
+  - Collapsible navigation menu on mobile devices
+  - Menu closes automatically when a link is clicked
+  - Proper accessibility with aria-label and aria-expanded
+
+### Changed
+- **Header Mobile Responsiveness**:
+  - Reduced header height on mobile (h-16 vs h-20 on desktop)
+  - Smaller logo on mobile (h-10/w-10 vs h-14/w-14)
+  - Scaled down AuthButton on mobile (scale-90)
+  - Navigation now accessible via hamburger menu on mobile
+
+- **Predictors Page Search Filter** (Bug Fix):
+  - Fixed issue where search filter couldn't be cleared/reset
+  - Added clear button (✕) inside the search input
+  - Search can now be cleared via: X button, Reset button, or deleting text + Enter
+  - Parent component now properly removes filter keys instead of keeping undefined values
+
+- **Quick Filters Highlight Logic** (Bug Fix):
+  - Quick filters now only highlight when BOTH sortBy AND sortOrder match
+  - "Oldest" no longer incorrectly highlights "New Predictors"
+  - "Lowest Rated" no longer incorrectly highlights "Best Rated"
+  - "Least Sales" no longer incorrectly highlights "Top Sellers"
+
+- **Pagination Scroll Behavior** (Bug Fix):
+  - All pagination controls (arrows AND page numbers) now scroll to top consistently
+  - Uses setTimeout to ensure scroll happens after React re-render
+  - Unified behavior across all pagination buttons
+
+### Fixed
+- Mobile navigation hidden when wallet connected
+- Wallet address overlapping navigation on mobile
+- Connect wallet button too large on mobile
+- Search filter text re-appearing after deletion
+- Inconsistent scroll behavior between pagination arrows and page numbers
 
 ---
 

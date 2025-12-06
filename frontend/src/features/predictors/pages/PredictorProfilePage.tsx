@@ -9,7 +9,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { Avatar, Badge, Button } from '@/shared/components/ui';
+import { Avatar, Badge, Button, CopyableAddress } from '@/shared/components/ui';
 import { formatAddress } from '@/shared/utils/format';
 import { FilterPanel, SignalGrid, Pagination } from '@/features/signals/components';
 import { useCategories, useMyPurchasedContentIds } from '@/features/signals/hooks';
@@ -261,9 +261,9 @@ export function PredictorProfilePage(): React.ReactElement {
                 )}
               </div>
 
-              <p className="text-fur-cream/50 text-sm mb-3">
-                {formatAddress(predictor.walletAddress)}
-              </p>
+              <div className="mb-3">
+                <CopyableAddress address={predictor.walletAddress} />
+              </div>
 
               {predictor.bio && (
                 <p className="text-fur-cream/70 max-w-2xl mb-4">

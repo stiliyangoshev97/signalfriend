@@ -37,18 +37,12 @@ Key Features Needed:
 KNOWN BUGS
 ================================================================================
 
-1. Mobile Responsive Issues (Frontend)
-   - Connect wallet button too large on mobile
-   - Nav items hidden when wallet connected
-   - Address overlaps navigation
+(No known bugs at this time - all previously reported issues have been fixed)
 
-2. Predictors Page Search Filter (Frontend)
-   - Cannot reset/clear the name search filter
-   - Text re-enters automatically after deletion
-
-3. Wallet Address Copy (Frontend)
-   - Need "copy to clipboard" button for truncated addresses
-   - Affects predictor profile, predictors page, signal details
+Previous bugs fixed in v1.1.0:
+- ✅ Mobile Responsive Issues - Header now has hamburger menu, proper scaling
+- ✅ Predictors Page Search Filter - Can now clear/reset search properly
+- ✅ Wallet Address Copy - CopyableAddress component added throughout app
 
 ================================================================================
 DEPLOYMENT CHECKLIST

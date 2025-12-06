@@ -6,7 +6,7 @@
  * Matches the style of the signals FilterPanel.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { PredictorFilters } from '../api';
 
 /** Props for PredictorFilterPanel component */
@@ -41,13 +41,19 @@ export function PredictorFilterPanel({
 }: PredictorFilterPanelProps): React.ReactElement | null {
   const [localFilters, setLocalFilters] = useState<PredictorFilters>(filters);
   const [searchInput, setSearchInput] = useState(filters.search || '');
+  
+  // Use a ref to track user-initiated changes without triggering re-renders
+  // This prevents the useEffect from overwriting user's cleared input
+  const isUserEditingRef = useRef(false);
 
   // Sync local filters with props when external filters change (e.g., URL navigation)
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional sync of external state
+  // Skip syncing if user is actively editing
   useEffect(() => {
-    setLocalFilters(filters);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional sync of external state
-    setSearchInput(filters.search || '');
+    // Only sync if this is an external change (not from user editing)
+    if (!isUserEditingRef.current) {
+      setLocalFilters(filters);
+      setSearchInput(filters.search || '');
+    }
   }, [filters]);
 
   // Update filter helper
@@ -62,13 +68,35 @@ export function PredictorFilterPanel({
     }
     setLocalFilters(newFilters);
     onFiltersChange(newFilters);
+    
+    // Reset the editing flag after a delay to allow all updates to complete
+    setTimeout(() => {
+      isUserEditingRef.current = false;
+    }, 300);
   };
 
   // Handle search submit (on Enter or blur)
   const handleSearchSubmit = () => {
-    if (searchInput !== localFilters.search) {
-      updateFilter('search', searchInput || undefined);
-    }
+    isUserEditingRef.current = true;
+    // Always update the filter with current input value
+    // The updateFilter function will handle empty strings by removing the key
+    updateFilter('search', searchInput || undefined);
+  };
+  
+  // Handle clearing the search
+  const handleClearSearch = () => {
+    isUserEditingRef.current = true;
+    setSearchInput('');
+    // Create new filters without search
+    const newFilters = { ...localFilters, page: 1 };
+    delete newFilters.search;
+    setLocalFilters(newFilters);
+    onFiltersChange(newFilters);
+    
+    // Reset the editing flag after a delay
+    setTimeout(() => {
+      isUserEditingRef.current = false;
+    }, 300);
   };
 
   // Reset all filters
@@ -77,9 +105,15 @@ export function PredictorFilterPanel({
       sortBy: 'totalSales',
       sortOrder: 'desc',
     };
+    isUserEditingRef.current = true;
     setLocalFilters(defaultFilters);
     setSearchInput('');
     onFiltersChange(defaultFilters);
+    
+    // Reset the editing flag after a delay
+    setTimeout(() => {
+      isUserEditingRef.current = false;
+    }, 300);
   };
 
   // Check if any filters are active (beyond default sort)
@@ -123,16 +157,29 @@ export function PredictorFilterPanel({
         <label className="block text-sm font-medium text-fur-cream/80 mb-2">
           Search by Name
         </label>
-        <input
-          type="text"
-          placeholder="Search predictors..."
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
-          onBlur={handleSearchSubmit}
-          className="w-full bg-dark-900 border border-dark-600 rounded-lg px-3 py-2.5 text-fur-cream text-sm placeholder:text-fur-cream/40 focus:outline-none focus:ring-2 focus:ring-fur-light/50 focus:border-fur-light transition-all"
-          style={{ colorScheme: 'dark' }}
-        />
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search predictors..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
+            onBlur={handleSearchSubmit}
+            className="w-full bg-dark-900 border border-dark-600 rounded-lg px-3 py-2.5 pr-8 text-fur-cream text-sm placeholder:text-fur-cream/40 focus:outline-none focus:ring-2 focus:ring-fur-light/50 focus:border-fur-light transition-all"
+            style={{ colorScheme: 'dark' }}
+          />
+          {/* Clear button */}
+          {searchInput && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-fur-cream/40 hover:text-fur-cream transition-colors"
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Quick Filters */}
@@ -143,6 +190,7 @@ export function PredictorFilterPanel({
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => {
+              isUserEditingRef.current = true;
               const newFilters: PredictorFilters = {
                 ...localFilters,
                 sortBy: 'totalSales',
@@ -151,9 +199,10 @@ export function PredictorFilterPanel({
               };
               setLocalFilters(newFilters);
               onFiltersChange(newFilters);
+              setTimeout(() => { isUserEditingRef.current = false; }, 300);
             }}
             className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
-              localFilters.sortBy === 'totalSales' || !localFilters.sortBy
+              (localFilters.sortBy === 'totalSales' || !localFilters.sortBy) && localFilters.sortOrder === 'desc'
                 ? 'bg-fur-light/20 border-fur-light text-fur-light'
                 : 'bg-dark-900 border-dark-600 text-fur-cream/70 hover:border-dark-500 hover:text-fur-cream'
             }`}
@@ -162,6 +211,7 @@ export function PredictorFilterPanel({
           </button>
           <button
             onClick={() => {
+              isUserEditingRef.current = true;
               const newFilters: PredictorFilters = {
                 ...localFilters,
                 sortBy: 'averageRating',
@@ -170,9 +220,10 @@ export function PredictorFilterPanel({
               };
               setLocalFilters(newFilters);
               onFiltersChange(newFilters);
+              setTimeout(() => { isUserEditingRef.current = false; }, 300);
             }}
             className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
-              localFilters.sortBy === 'averageRating'
+              localFilters.sortBy === 'averageRating' && localFilters.sortOrder === 'desc'
                 ? 'bg-fur-light/20 border-fur-light text-fur-light'
                 : 'bg-dark-900 border-dark-600 text-fur-cream/70 hover:border-dark-500 hover:text-fur-cream'
             }`}
@@ -181,6 +232,7 @@ export function PredictorFilterPanel({
           </button>
           <button
             onClick={() => {
+              isUserEditingRef.current = true;
               const newFilters: PredictorFilters = {
                 ...localFilters,
                 sortBy: 'joinedAt',
@@ -189,9 +241,10 @@ export function PredictorFilterPanel({
               };
               setLocalFilters(newFilters);
               onFiltersChange(newFilters);
+              setTimeout(() => { isUserEditingRef.current = false; }, 300);
             }}
             className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
-              localFilters.sortBy === 'joinedAt'
+              localFilters.sortBy === 'joinedAt' && localFilters.sortOrder === 'desc'
                 ? 'bg-fur-light/20 border-fur-light text-fur-light'
                 : 'bg-dark-900 border-dark-600 text-fur-cream/70 hover:border-dark-500 hover:text-fur-cream'
             }`}

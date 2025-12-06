@@ -91,18 +91,34 @@ export function PredictorsPage(): React.ReactElement {
   }, [filters, searchParams, setSearchParams]);
 
   // Handle filter changes
+  // When newFilters is passed, it represents the COMPLETE desired filter state
+  // (except for limit which we always keep)
   const handleFiltersChange = useCallback((newFilters: PredictorFilters) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...newFilters,
-    }));
+    setFilters((prev) => {
+      // Start with the new filters as the base (not merging with prev)
+      // This ensures that if a key is missing from newFilters, it's removed
+      const result: PredictorFilters = {
+        // Keep the limit from previous state
+        limit: prev.limit,
+        // Apply all new filters
+        ...newFilters,
+      };
+      
+      // Remove keys that are undefined or empty string
+      Object.keys(result).forEach((key) => {
+        const value = result[key as keyof PredictorFilters];
+        if (value === undefined || value === '') {
+          delete result[key as keyof PredictorFilters];
+        }
+      });
+      
+      return result;
+    });
   }, []);
 
-  // Handle page change
+  // Handle page change (scroll is handled by Pagination component)
   const handlePageChange = useCallback((page: number) => {
     setFilters((prev) => ({ ...prev, page }));
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   // Toggle mobile filters

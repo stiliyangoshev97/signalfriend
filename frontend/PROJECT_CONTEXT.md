@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 6 December 2025 (v0.3.2 - Avatar Security & Edit Profile)
+> Last Updated: 6 December 2025 (v0.4.0 - UI Bug Fixes & Mobile Improvements)
 
 ---
 
@@ -13,7 +13,7 @@
 | Logo-Inspired Theme | ✅ 100% | Warm greens + golden tones |
 | Web3 Integration | ✅ 100% | wagmi + RainbowKit + BNB Chain |
 | Providers Setup | ✅ 100% | Query, Web3, Sentry |
-| Base UI Components | ✅ 100% | Button, Input, Card, Modal, etc. |
+| Base UI Components | ✅ 100% | Button, Input, Card, Modal, CopyableAddress, etc. |
 | Router Setup | ✅ 100% | Routes defined, placeholder pages |
 | Auth Store | ✅ 100% | Zustand with persistence |
 | API Client | ✅ 100% | Axios with JWT interceptors |
@@ -32,9 +32,10 @@
 | **Predictor List Page** | ✅ 100% | Public leaderboard with filters, pagination |
 | **Predictor Profile** | ✅ 100% | Full profile with signals grid, filters |
 | **Edit Profile Modal** | ✅ 100% | Full profile editing with uniqueness validation |
+| **Mobile Responsive** | ✅ 100% | Hamburger menu, proper scaling, copy addresses |
 | **Admin Panel** | ⏳ 0% | Not started |
 
-**Overall Progress: ~88%** (Infrastructure + Auth + Landing + Marketplace + Purchase Flow + Dashboard + Profile Editing complete)
+**Overall Progress: ~90%** (All core features complete, Admin Panel remaining)
 
 ---
 
@@ -55,7 +56,7 @@ src/features/{feature}/
 ```
 src/shared/
 ├── api/          # Axios client
-├── components/ui/# Reusable UI components
+├── components/ui/# Reusable UI components (Button, Input, CopyableAddress, etc.)
 ├── config/       # Environment, wagmi, contracts
 ├── hooks/        # Shared hooks (useAuth)
 ├── schemas/      # Shared Zod schemas

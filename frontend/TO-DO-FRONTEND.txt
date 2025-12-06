@@ -2,8 +2,8 @@
                         SIGNALFRIEND FRONTEND TO-DO LIST
 ================================================================================
 
-Last Updated: 2025-12-05
-Branch: feature/become-predictor (v0.2.0)
+Last Updated: 2025-12-06
+Current Version: v0.4.0 (UI Bug Fixes & Mobile Improvements)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -30,6 +30,7 @@ PHASE 1: CORE SCAFFOLD ✅ COMPLETE
     - Badge (status indicators)
     - Spinner / PageLoader
     - Avatar with fallback
+    - CopyableAddress (copy-to-clipboard with visual feedback)
 
 [✅] Providers Setup
     - Web3Provider (wagmi + RainbowKit)
@@ -39,7 +40,7 @@ PHASE 1: CORE SCAFFOLD ✅ COMPLETE
 [✅] Router Setup
     - React Router v7 with placeholder pages
     - RootLayout with Header/Footer
-    - Header with logo from branding assets
+    - Header with logo + mobile hamburger menu
     - Routes: /, /signals, /predictors, /dashboard, /profile
 
 [✅] API Layer

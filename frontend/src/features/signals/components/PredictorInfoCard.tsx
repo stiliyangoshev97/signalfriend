@@ -8,6 +8,7 @@
 
 import { Link } from 'react-router-dom';
 import type { Predictor } from '@/shared/types';
+import { CopyableAddress } from '@/shared/components/ui';
 
 /** Props for PredictorInfoCard component */
 interface PredictorInfoCardProps {
@@ -119,9 +120,9 @@ export function PredictorInfoCard({
             </span>
             {isVerified && <VerifiedBadge />}
           </div>
-          <p className="text-sm text-fur-cream/50 truncate">
-            {formatAddress(walletAddress)}
-          </p>
+          <div onClick={(e) => e.preventDefault()}>
+            <CopyableAddress address={walletAddress} size="sm" />
+          </div>
         </div>
 
         {/* Arrow */}
