@@ -2,8 +2,8 @@
                         SIGNALFRIEND FRONTEND TO-DO LIST
 ================================================================================
 
-Last Updated: 2025-12-06
-Current Version: v0.4.0 (UI Bug Fixes & Mobile Improvements)
+Last Updated: 2025-12-07
+Current Version: v0.5.0 (Admin Dashboard & Moderation System)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -310,23 +310,54 @@ This avoids moderation issues (spam links, inappropriate content).
     - Rating breakdown chart (optional - shows distribution of 1-5 star votes)
 
 ================================================================================
-PHASE 6: ADMIN FEATURES (PRIORITY: LOW)
+PHASE 6: ADMIN FEATURES ✅ COMPLETE (v0.5.0)
 ================================================================================
 
-[ ] Admin Dashboard (/admin - admin only)
-    - Platform statistics
-    - User management
-    - Signal moderation
-    - Category management
+[✅] Admin Dashboard (/admin - admin only) - Added in v0.5.0
+    - AdminDashboardPage with tabbed interface (Earnings, Verifications, Reports, Disputes)
+    - Platform earnings breakdown (from predictor joins, buyer fees, commissions)
+    - AdminStatsCard component with earnings visualization
+    - Quick Stats panel showing pending verifications and disputes
+    - Admin-only route protection via AdminRoute guard
+    - Admin link in Header (only visible to admin wallets)
 
-[ ] Verification Management
-    - Pending verifications list
-    - Approve/reject predictor
-    - Blacklist functionality
+[✅] Verification Management - Added in v0.5.0
+    - Pending verifications list tab
+    - VerificationRequestCard with predictor details
+    - Approve/Reject verification actions
+    - Shows total sales, bio, social links, preferred contact
 
-[ ] Reports Management
-    - View reported content
-    - Take action on reports
+[✅] Reports Management - Added in v0.5.0
+    - Reports tab with status filtering (pending/reviewed/resolved/dismissed)
+    - ReportCard with expandable details
+    - Update report status functionality
+    - Add admin notes capability
+    - Pagination for large report lists
+
+[✅] Disputes Management - Added in v0.5.0
+    - Disputes tab with status filtering (pending/contacted/resolved/rejected)
+    - DisputeCard with predictor contact info
+    - Status workflow: pending → contacted → resolved/rejected
+    - Resolve dispute auto-unblacklists predictor
+    - Dispute counts badge in tab header
+
+[✅] Predictor Dispute Flow - Added in v0.5.0
+    - BlacklistBanner component for blacklisted predictors
+    - File Dispute button triggers simple dispute creation
+    - No explanation needed - admin contacts via preferred method
+    - Disputes API + hooks for predictors (createDispute, getMyDispute)
+    - One dispute per predictor enforced
+
+[ ] Blacklist/Unblacklist from Admin Dashboard
+    - Admin ability to blacklist predictor from reports view
+    - Admin ability to manually unblacklist predictor
+    - Sync with on-chain blacklist status
+
+[ ] Buyer Report Signal Feature
+    - Report button on purchased signal detail page
+    - Report modal with reason selection and description
+    - Submit report to backend
+    - Success confirmation
 
 ================================================================================
 PHASE 7: POLISH & OPTIMIZATION (PRIORITY: LOW)
@@ -433,42 +464,72 @@ TECHNICAL DEBT
 [ ] Add rate limiting feedback to users
 
 ================================================================================
-PHASE 7: ADMIN DASHBOARD & MODERATION
+PHASE 7: ADMIN DASHBOARD & MODERATION ✅ COMPLETE
 ================================================================================
 
-[ ] Admin Dashboard Page
-    - Only accessible by admin wallets (3 addresses currently)
-    - View total platform income/earnings per wallet
-    - View pending verification requests
-    - View reported predictors with details
-    - View blacklisted predictors with dispute requests
-    - Statistics overview (users, signals, sales, revenue)
+[✅] Admin Dashboard Page - Added in v0.5.0
+    - Only accessible by admin wallets (3 MultiSig signers)
+    - Tab-based navigation (Earnings, Verifications, Reports, Disputes)
+    - Real-time counts on tabs for pending items
+    - Dark theme consistent with app design
 
-[ ] Verification System (after 100 sales)
-    - "Apply for Verification" button appears after 100 sales on dashboard
-    - Admin receives notification of new verification request
-    - Admin can approve or reject verification
-    - Approved: Show "Verified" badge on dashboard and predictor profile
-    - Rejected: Predictor can re-apply after 100 more sales
+[✅] Platform Earnings Tab - Added in v0.5.0
+    - AdminStatsCard component showing earnings breakdown
+    - Revenue from predictor joins ($15 per join after referral bonus)
+    - Revenue from buyer access fees ($0.50 per purchase)
+    - Revenue from commissions (5% of signal volume)
+    - Total earnings calculation
+    - Quick stats panel (pending verifications, disputes)
 
-[ ] Report Predictor Feature
-    - "Report" button on predictor profile page
-    - Buyer can only report if they purchased at least 1 signal from predictor
-    - Buyer can only report a predictor ONCE (no spam)
-    - Report form with reason/description
-    - Admin sees reports in admin dashboard
-    - Admin can review and decide to blacklist or dismiss
+[✅] Verification Management - Added in v0.5.0
+    - VerificationRequestCard component
+    - List of pending verification requests
+    - Predictor info (name, wallet, bio, contact, social links)
+    - Approve/Reject buttons with loading states
+    - Direct contact links (Telegram, Discord)
 
-[ ] Blacklist/Unblacklist System
-    - Blacklist/Unblacklist buttons on predictor profile (only for admin wallets)
-    - Blacklist calls smart contract (webhook updates DB)
-    - Blacklisted predictors:
-      - Don't appear on Predictors page
-      - See "Blacklisted" banner on their dashboard
-      - Cannot create new signals
-      - Can "Dispute" blacklist ONCE with explanation
-    - Disputes show in admin dashboard for review
-    - Admin can unblacklist if dispute is valid
+[✅] Reports Management - Added in v0.5.0
+    - ReportCard component with expandable details
+    - Reports list with status filtering (pending, reviewed, resolved, dismissed)
+    - Signal and predictor info for context
+    - Admin notes (editable)
+    - Status update workflow (pending → reviewed → resolved/dismissed)
+    - Pagination support
+    - Links to signal detail and predictor profile
+
+[✅] Disputes Management - Added in v0.5.0
+    - DisputeCard component with expandable details
+    - Disputes list with status filtering (pending, contacted, resolved, rejected)
+    - Predictor info and contact details
+    - Admin notes for tracking communication
+    - Status workflow: pending → contacted → resolved/rejected
+    - "Resolve & Unblacklist" action (unblacklists predictor in DB)
+    - Pagination support
+    - Links to predictor profile
+
+[✅] Admin Feature Module Structure
+    - types/admin.types.ts - TypeScript types for admin data
+    - api/admin.api.ts - API functions for all admin endpoints
+    - hooks/useAdmin.ts - React Query hooks with caching
+    - components/ - AdminStatsCard, VerificationRequestCard, ReportCard, DisputeCard
+    - pages/AdminDashboardPage.tsx - Main dashboard with tabs
+    - Barrel exports (index.ts files at each level)
+
+[✅] API Endpoints Integrated
+    - GET /api/admin/stats - Platform earnings breakdown
+    - GET /api/admin/reports - List reports with pagination
+    - GET /api/admin/reports/:id - Get single report
+    - PUT /api/admin/reports/:id - Update report status
+    - GET /api/admin/disputes - List disputes with pagination
+    - GET /api/admin/disputes/counts - Dispute counts by status
+    - PUT /api/admin/disputes/:id - Update dispute status
+    - POST /api/admin/disputes/:id/resolve - Resolve and unblacklist
+
+[ ] Predictor Dispute Button
+    - "Dispute" button on blacklisted predictor's dashboard
+    - POST /api/disputes - Create dispute (authenticated blacklisted predictor)
+    - GET /api/disputes/me - Get own dispute status
+    - Simple one-click action (no explanation field needed)
 
 ================================================================================
 KNOWN BUGS TO FIX

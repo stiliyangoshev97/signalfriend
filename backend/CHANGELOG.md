@@ -15,6 +15,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.17.0] - 2025-12-06 🛡️ ADMIN DASHBOARD & MODERATION SYSTEM
+
+### Added
+
+**Admin Service** (`src/features/admin/admin.service.ts`)
+- New service file for admin business logic
+- `getPlatformEarnings()` - Calculates platform revenue breakdown:
+  - fromPredictorJoins: $15 × predictors (assumes all had referrals)
+  - fromBuyerAccessFees: $0.50 × purchases
+  - fromCommissions: 5% × total signal volume
+  - Includes details: totalPredictors, totalPurchases, totalSignalVolume
+- `listReports()` - Lists all reports with full signal/predictor details
+- `getReportById()` - Gets single report with populated data
+- `updateReportStatus()` - Updates report status and admin notes
+
+**Admin Endpoints** (`src/features/admin/admin.controller.ts`, `admin.routes.ts`)
+- `GET /api/admin/stats` - Platform earnings breakdown
+- `GET /api/admin/reports` - List all reports (pagination, status filter)
+- `GET /api/admin/reports/:id` - Get single report by ID
+- `PUT /api/admin/reports/:id` - Update report status
+
+**Disputes Feature** (`src/features/disputes/`)
+- New feature module for blacklist dispute handling
+- `dispute.model.ts` - Mongoose model (predictorAddress unique, status, adminNotes)
+- `dispute.schemas.ts` - Zod validation schemas
+- `dispute.service.ts` - Business logic:
+  - `create()` - Creates dispute (blacklisted predictor only)
+  - `getByPredictor()` - Get predictor's dispute
+  - `hasActiveDispute()` - Check for pending/contacted dispute
+  - `listForAdmin()` - List disputes with predictor info
+  - `updateStatus()` - Update dispute status
+  - `resolve()` - Resolve dispute and unblacklist predictor
+  - `getCounts()` - Get counts by status for dashboard
+- `dispute.controller.ts` - Route handlers
+- `dispute.routes.ts` - Route definitions:
+  - `POST /api/disputes` - Create dispute (authenticated predictor)
+  - `GET /api/disputes/me` - Get own dispute status
+  - `GET /api/admin/disputes` - List all disputes (admin)
+  - `GET /api/admin/disputes/counts` - Get counts by status (admin)
+  - `PUT /api/admin/disputes/:id` - Update dispute status (admin)
+  - `POST /api/admin/disputes/:id/resolve` - Resolve and unblacklist (admin)
+
+**Routes Mounted** (`src/index.ts`)
+- Added `/api/disputes` route mounting
+- Added `/api/admin/disputes` route mounting
+
+### Design Decisions
+- **Disputes have no explanation field** - Admin contacts predictor via preferred method (Telegram/Discord)
+- **One dispute per predictor** - Enforced by unique index on predictorAddress
+- **Earnings calculation conservative** - Assumes all predictor joins had valid referrals ($15 kept vs $20)
+
+---
+
 ## [0.16.8] - 2025-12-06 🖼️ AVATAR URL SECURITY
 
 ### Changed

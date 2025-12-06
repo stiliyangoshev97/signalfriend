@@ -79,11 +79,22 @@ export const API_CONFIG = {
     REVIEW_BY_TOKEN: (tokenId: string) => `/api/reviews/${tokenId}`,
     
     // Admin
+    ADMIN_STATS: '/api/admin/stats',
     ADMIN_PREDICTOR: (address: string) => `/api/admin/predictors/${address}`,
     ADMIN_BLACKLIST: (address: string) => `/api/admin/predictors/${address}/blacklist`,
     ADMIN_SIGNAL_DELETE: (id: string) => `/api/admin/signals/${id}`,
-    ADMIN_PENDING_VERIFICATIONS: '/api/admin/verifications/pending',
+    ADMIN_PENDING_VERIFICATIONS: '/api/admin/verification-requests',
     ADMIN_VERIFY: (address: string) => `/api/admin/predictors/${address}/verify`,
+    ADMIN_REPORTS: '/api/admin/reports',
+    ADMIN_REPORT_BY_ID: (id: string) => `/api/admin/reports/${id}`,
+    ADMIN_DISPUTES: '/api/admin/disputes',
+    ADMIN_DISPUTE_COUNTS: '/api/admin/disputes/counts',
+    ADMIN_DISPUTE_BY_ID: (id: string) => `/api/admin/disputes/${id}`,
+    ADMIN_DISPUTE_RESOLVE: (id: string) => `/api/admin/disputes/${id}/resolve`,
+    
+    // Disputes (for predictors)
+    DISPUTES: '/api/disputes',
+    DISPUTE_ME: '/api/disputes/me',
     
     // Health
     HEALTH: '/health',

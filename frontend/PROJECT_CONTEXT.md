@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 6 December 2025 (v0.4.0 - UI Bug Fixes & Mobile Improvements)
+> Last Updated: 7 December 2025 (v0.5.0 - Admin Dashboard & Moderation System)
 
 ---
 
@@ -33,9 +33,9 @@
 | **Predictor Profile** | ✅ 100% | Full profile with signals grid, filters |
 | **Edit Profile Modal** | ✅ 100% | Full profile editing with uniqueness validation |
 | **Mobile Responsive** | ✅ 100% | Hamburger menu, proper scaling, copy addresses |
-| **Admin Panel** | ⏳ 0% | Not started |
+| **Admin Dashboard** | ✅ 100% | Earnings, verifications, reports, disputes tabs |
 
-**Overall Progress: ~90%** (All core features complete, Admin Panel remaining)
+**Overall Progress: ~95%** (All core features complete, some polish remaining)
 
 ---
 

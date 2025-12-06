@@ -58,6 +58,7 @@ import { ProtectedRoute, AdminRoute, PredictorRoute } from './guards';
 import { HomePage } from '@/features/home';
 import { SignalsPage, SignalDetailPage, MyPurchasedSignalsPage } from '@/features/signals';
 import { PredictorDashboardPage, PredictorsPage, PredictorProfilePage, BecomePredictorPage } from '@/features/predictors';
+import { AdminDashboardPage } from '@/features/admin';
 
 // Lazy load pages for code splitting (example for future pages)
 // import { lazy } from 'react';
@@ -145,7 +146,7 @@ export const router = createBrowserRouter([
         path: 'admin',
         element: (
           <AdminRoute>
-            <PlaceholderPage title="Admin Panel" />
+            <AdminDashboardPage />
           </AdminRoute>
         ),
       },

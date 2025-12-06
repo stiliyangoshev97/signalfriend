@@ -51,11 +51,13 @@ import { Link, NavLink } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { useAuthStore } from '@/features/auth/store';
 import { AuthButton } from '@/features/auth';
+import { useIsAdmin } from '@/shared/hooks';
 import { cn } from '../shared/utils/cn';
 
 export function Header() {
   const { isConnected } = useAccount();
   const { isAuthenticated } = useAuthStore();
+  const isAdmin = useIsAdmin();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -110,6 +112,13 @@ export function Header() {
                 </NavLink>
               </>
             )}
+            
+            {/* Admin link - only visible to admin wallets */}
+            {isAdmin && (
+              <NavLink to="/admin" className={navLinkClass}>
+                Admin
+              </NavLink>
+            )}
           </nav>
 
           {/* Right side: Auth Button + Mobile Menu Toggle */}
@@ -161,6 +170,13 @@ export function Header() {
                   Dashboard
                 </NavLink>
               </>
+            )}
+            
+            {/* Admin link - only visible to admin wallets */}
+            {isAdmin && (
+              <NavLink to="/admin" className={mobileNavLinkClass} onClick={closeMobileMenu}>
+                Admin
+              </NavLink>
             )}
           </nav>
         )}

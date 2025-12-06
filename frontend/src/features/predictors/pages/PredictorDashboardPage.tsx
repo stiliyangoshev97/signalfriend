@@ -23,7 +23,7 @@ import {
   useDeactivateSignal,
   useReactivateSignal,
 } from '../hooks';
-import { DashboardStats, MySignalCard, CreateSignalModal, EditProfileModal } from '../components';
+import { DashboardStats, MySignalCard, CreateSignalModal, EditProfileModal, BlacklistBanner } from '../components';
 
 /**
  * Empty state component for no signals
@@ -221,6 +221,11 @@ export function PredictorDashboardPage(): React.ReactElement {
           </Button>
         </div>
       </div>
+
+      {/* Blacklist Banner */}
+      {predictor?.isBlacklisted && (
+        <BlacklistBanner preferredContact={predictor.preferredContact} />
+      )}
 
       {/* Profile Incomplete Banner */}
       {predictor && (

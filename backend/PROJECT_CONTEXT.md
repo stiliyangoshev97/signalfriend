@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
 > **Last Updated:** December 6, 2025  
-> **Current Phase:** Edit Profile + Uniqueness Validation Complete  
-> **Project Status:** 🟢 **Ready for Frontend (100/100)** - All Features Complete & Tested  
-> **Branch:** `feature/edit-predictor-profile`
+> **Current Phase:** Admin Dashboard & Moderation System Complete  
+> **Project Status:** 🟢 **Ready for Frontend (100/100)** - All Features Complete  
+> **Branch:** `feature/admin-dashboard`
 
 ---
 
@@ -48,7 +48,8 @@ backend/
 │   │   ├── receipts/            # Purchase receipts ✅
 │   │   ├── reviews/             # Ratings (1-5 score, off-chain) ✅
 │   │   ├── reports/             # Scam/false signal reports ✅
-│   │   └── admin/               # Admin endpoints (MultiSig only) ✅ (NEW)
+│   │   ├── disputes/            # Blacklist dispute appeals ✅ (NEW)
+│   │   └── admin/               # Admin endpoints (MultiSig only) ✅
 │   ├── scripts/
 │   │   ├── seedCategories.ts    # Database seeding
 │   │   ├── seedTestSignal.ts    # Test signal for webhook testing
@@ -191,7 +192,7 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
 }
 ```
 
-### Report Model (NEW)
+### Report Model
 ```typescript
 {
   tokenId: number,            // Unique - one report per purchase
@@ -202,6 +203,18 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
   reason: enum,               // false_signal, misleading_info, scam, duplicate_content, other
   description: string,        // Optional (required if reason is "other")
   status: enum,               // pending, reviewed, resolved, dismissed
+  adminNotes: string,         // Internal admin notes
+}
+```
+
+### Dispute Model (NEW)
+```typescript
+{
+  predictorAddress: string,   // Unique - one dispute per predictor
+  status: enum,               // pending, contacted, resolved, rejected
+  adminNotes: string,         // Internal tracking (e.g., "Contacted on TG 12/6")
+  createdAt: Date,
+  resolvedAt?: Date,
 }
 ```
 
@@ -399,13 +412,14 @@ npm test
 | 1. Project Setup | ✅ Complete | Folder structure, package.json, configs |
 | 2. Shared Infrastructure | ✅ Complete | Config, middleware, utils |
 | 3. Contract Integration | ✅ Complete | ABIs, addresses, Viem client |
-| 4. MongoDB Models | ✅ Complete | All 5 models defined |
+| 4. MongoDB Models | ✅ Complete | All 6 models defined (including Dispute) |
 | 5. Auth Feature | ✅ Complete | SIWE + JWT flow |
-| 6. Webhook Feature | ✅ **Complete** | GraphQL + Address Activity webhooks, all 3 events tested |
+| 6. Webhook Feature | ✅ Complete | GraphQL + Address Activity webhooks |
 | 7. All CRUD Features | ✅ Complete | Categories, Predictors, Signals, Receipts, Reviews |
-| 8. ContentId Bridge | ✅ Complete | UUID ↔ bytes32 conversion for on-chain compatibility |
-| 9. Testing | ⏳ Pending | Unit & integration tests |
-| 10. Deployment | ⏳ Pending | Docker, MongoDB Atlas |
+| 8. ContentId Bridge | ✅ Complete | UUID ↔ bytes32 conversion for on-chain |
+| 9. Admin Dashboard | ✅ Complete | Stats, Reports, Disputes management |
+| 10. Testing | ⏳ Pending | Unit & integration tests |
+| 11. Deployment | ⏳ Pending | Docker, MongoDB Atlas |
 
 ---
 

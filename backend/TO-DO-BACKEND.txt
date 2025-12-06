@@ -240,49 +240,52 @@
 [ ] MongoDB Atlas setup guide
 
 ================================================================================
-## PHASE 12: Admin Dashboard & Moderation System
+## PHASE 12: Admin Dashboard & Moderation System ✅
 ================================================================================
 
-### Admin Dashboard API
-[ ] GET /api/admin/stats - Platform statistics (total users, signals, sales, revenue)
-[ ] GET /api/admin/earnings - Query total earnings per wallet address
-[ ] GET /api/admin/earnings/:address - Earnings breakdown for specific wallet
+### Admin Dashboard API ✅
+[x] GET /api/admin/stats - Platform earnings breakdown
+    - fromPredictorJoins: $15 × predictors (assumes referrals)
+    - fromBuyerAccessFees: $0.50 × purchases
+    - fromCommissions: 5% × signal volume
+    - total: Sum of all above
+    - details: totalPredictors, totalPurchases, totalSignalVolume
 
-### Verification System (after 100 sales)
+### Verification System (after 100 sales) ✅
 [x] POST /api/predictors/:address/apply-verification - Already implemented
 [x] GET /api/admin/verification-requests - Already implemented
 [x] POST /api/admin/predictors/:address/verify - Already implemented
 [x] POST /api/admin/predictors/:address/reject - Already implemented
-[ ] Admin notification system for new verification requests
+[x] POST /api/admin/predictors/:address/unverify - Already implemented
 
-### Report Predictor System
-[ ] POST /api/reports - Create report against predictor
-    - Requires buyer to have purchased at least 1 signal from predictor
-    - Buyer can only report a predictor ONCE (prevent spam)
-    - Report includes reason/description
-[ ] GET /api/admin/reports - List all reports for admin review
-[ ] PUT /api/admin/reports/:id - Mark report as reviewed/dismissed
-[ ] Report model fields: reporterId, predictorId, reason, status, createdAt
+### Report Management (Admin) ✅
+[x] GET /api/admin/reports - List all reports with full details
+    - Includes signal info (title, price)
+    - Includes predictor info (name, contacts)
+    - Pagination and status filter
+[x] GET /api/admin/reports/:id - Get single report by ID
+[x] PUT /api/admin/reports/:id - Update report status
+    - status: pending, reviewed, resolved, dismissed
+    - adminNotes: internal notes
 
-### Blacklist/Unblacklist System
-[ ] POST /api/admin/predictors/:address/blacklist - Trigger smart contract blacklist
-    - Only for admin wallets
-    - Calls smart contract function
-    - Webhook updates DB when confirmed
-[ ] POST /api/admin/predictors/:address/unblacklist - Remove from blacklist
-[ ] Blacklisted predictor behavior:
-    - Excluded from GET /api/predictors list
-    - Cannot create new signals (validation in signal creation)
-    - Dashboard API returns blacklist status
+### Dispute System ✅
+[x] POST /api/disputes - Create dispute (blacklisted predictor only)
+    - No explanation needed (admin contacts via preferred method)
+    - One dispute per predictor (unique constraint)
+[x] GET /api/disputes/me - Get own dispute status (predictor)
+[x] GET /api/admin/disputes - List all disputes for admin
+    - Includes predictor contact info
+    - Pagination and status filter
+[x] GET /api/admin/disputes/counts - Get counts by status
+[x] PUT /api/admin/disputes/:id - Update dispute status
+    - status: pending, contacted, resolved, rejected
+    - adminNotes: internal tracking
+[x] POST /api/admin/disputes/:id/resolve - Resolve and unblacklist predictor
 
-### Dispute System for Blacklisted Predictors
-[ ] POST /api/predictors/:address/dispute - Submit dispute (once only)
-    - Requires blacklisted status
-    - Includes explanation text
-    - Can only be submitted ONCE
-[ ] GET /api/admin/disputes - List pending disputes for review
-[ ] PUT /api/admin/disputes/:id - Resolve dispute (accept → unblacklist, or reject)
-[ ] Dispute model fields: predictorId, explanation, status, createdAt, resolvedAt
+### Blacklist/Unblacklist System ✅ (Already existed)
+[x] POST /api/admin/predictors/:address/blacklist - Blacklist in DB
+[x] POST /api/admin/predictors/:address/unblacklist - Unblacklist in DB
+    - Note: On-chain blacklist requires MultiSig on BscScan
 
 ================================================================================
 ## NOTES
