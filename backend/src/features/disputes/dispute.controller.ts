@@ -94,8 +94,10 @@ export const listDisputes = asyncHandler(
 
     res.json({
       success: true,
-      data: result.disputes,
-      pagination: result.pagination,
+      data: {
+        disputes: result.disputes,
+        pagination: result.pagination,
+      },
     });
   }
 );

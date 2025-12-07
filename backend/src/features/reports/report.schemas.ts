@@ -20,6 +20,17 @@ const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
 const contentIdRegex =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+/** Regex pattern to detect URLs (http/https/www) */
+const urlPattern = /(?:https?:\/\/|www\.)[^\s]+/gi;
+
+/**
+ * Sanitizes text by removing URLs for security.
+ * Prevents phishing/scam links in user-submitted content.
+ */
+function stripUrls(text: string): string {
+  return text.replace(urlPattern, "[link removed]").trim();
+}
+
 /**
  * Schema for POST /api/reports request body.
  * Creates a new report for a purchased signal.
@@ -30,8 +41,13 @@ export const createReportSchema = z
     tokenId: z.number().int().min(0),
     /** Reason for the report */
     reason: z.enum(REPORT_REASONS),
-    /** Optional description (required if reason is "other") */
-    description: z.string().max(1000).optional().default(""),
+    /** Optional description (required if reason is "other") - URLs are stripped for security */
+    description: z
+      .string()
+      .max(1000)
+      .optional()
+      .default("")
+      .transform((val) => stripUrls(val)),
   })
   .refine(
     (data) => {

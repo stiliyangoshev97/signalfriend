@@ -2,7 +2,7 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 6, 2025
+Last Updated: December 7, 2025
 
 ================================================================================
 COMPLETED FEATURES ✅
@@ -17,21 +17,25 @@ COMPLETED FEATURES ✅
 [x] Predictor profiles with edit capability
 [x] Real-time uniqueness validation for profile fields
 [x] Avatar URL security (SVG blocked, only JPG/PNG/GIF allowed)
+[x] Admin Dashboard (earnings, verifications, reports, disputes, blacklisted)
+[x] Verification approval/rejection for predictors with 100+ sales
+[x] Report system (buyers can report purchased signals)
+[x] Blacklist/Unblacklist predictors (from admin dashboard + predictor profile)
+[x] Dispute system for blacklisted predictors
 
 ================================================================================
-NEXT PRIORITY: ADMIN SYSTEM
+NEXT PRIORITY: TESTING & OPTIMIZATION
 ================================================================================
 
 See detailed tasks in:
-- /frontend/TO-DO-FRONTEND.txt (Phase 7: Admin Dashboard & Moderation)
-- /backend/TO-DO-BACKEND.txt (Phase 12: Admin Dashboard & Moderation System)
+- /frontend/TO-DO-FRONTEND.txt (Phase 7: Polish & Optimization)
+- /backend/TO-DO-BACKEND.txt (Phase 9: Testing)
 
-Key Features Needed:
-1. Admin Dashboard (accessible only by 3 admin wallets)
-2. Verification approval/rejection for predictors with 100+ sales
-3. Report system (buyers can report predictors)
-4. Blacklist/Unblacklist via smart contract
-5. Dispute system for blacklisted predictors
+Key Tasks:
+1. Unit & integration tests for backend
+2. Performance optimization (lazy loading, caching)
+3. Mobile responsiveness improvements
+4. SEO & meta tags
 
 ================================================================================
 KNOWN BUGS
@@ -39,16 +43,17 @@ KNOWN BUGS
 
 (No known bugs at this time - all previously reported issues have been fixed)
 
-Previous bugs fixed in v1.1.0:
+Previous bugs fixed:
 - ✅ Mobile Responsive Issues - Header now has hamburger menu, proper scaling
 - ✅ Predictors Page Search Filter - Can now clear/reset search properly
 - ✅ Wallet Address Copy - CopyableAddress component added throughout app
+- ✅ Admin Reports API - Response structure fixed
 
 ================================================================================
 DEPLOYMENT CHECKLIST
 ================================================================================
 
-[ ] Finalize admin system
+[x] Admin system complete
 [ ] Full mobile responsive testing
 [ ] Security audit
 [ ] Performance testing

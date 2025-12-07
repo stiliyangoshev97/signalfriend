@@ -12,7 +12,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 - Signal outcome tracking
-- Buyer report signal feature
+
+---
+
+## [0.6.0] - 2025-12-07 📝 BUYER REPORTS & ADMIN BLACKLIST MANAGEMENT
+
+### Added
+
+- **Buyer Report Signal Feature**:
+  - `ReportSignalModal` component with reason dropdown and description
+  - Report reasons: False Signal, Misleading Info, Scam, Duplicate Content, Other
+  - One report per purchase (tokenId-based)
+  - Description field (required for "Other" reason)
+  - Warning notice about false reports
+  - `reports.api.ts` with `createReport()` and `checkReportExists()` functions
+  - `useReports.ts` hooks (`useCheckReport`, `useCreateReport`)
+  - Report section on SignalDetailPage for purchased signals
+  - Shows "Already Reported" state after submitting
+
+- **Admin Blacklist Button on Predictor Profiles**:
+  - Blacklist/Unblacklist button on PredictorProfilePage (admin only)
+  - Red "Blacklist Predictor" button for non-blacklisted predictors
+  - "Unblacklist Predictor" button with confirmation for blacklisted ones
+  - Warning indicator when predictor is currently blacklisted
+  - Separate API functions: `blacklistPredictor()`, `unblacklistPredictor()`
+  - Separate hooks: `useBlacklistPredictor()`, `useUnblacklistPredictor()`
+
+- **Blacklisted Predictors Tab in Admin Dashboard**:
+  - New "Blacklisted" tab showing all blacklisted predictors
+  - `BlacklistedPredictorCard` component with predictor stats
+  - Unblacklist action with confirmation prompt
+  - Link to view predictor profile
+  - Reminder about on-chain MultiSig action
+  - Badge count in tab header
+  - Auto-refresh after blacklist/unblacklist actions
+
+- **API Endpoints** added to `api.config.ts`:
+  - `REPORTS` - Create report
+  - `REPORT_CHECK` - Check if report exists for tokenId
+  - `ADMIN_BLACKLISTED_PREDICTORS` - List blacklisted predictors
+  - `ADMIN_UNBLACKLIST` - Unblacklist predictor
+
+- **Types** added to `admin.types.ts`:
+  - `BlacklistedPredictor` interface
+
+### Changed
+- Admin dashboard now has 5 tabs (Earnings, Verifications, Reports, Disputes, Blacklisted)
+- `useBlacklistPredictor` and `useUnblacklistPredictor` now invalidate blacklisted list
+
+### Fixed
+- Admin reports API response structure (was `data: reports[]`, now `data: { reports, pagination }`)
 
 ---
 

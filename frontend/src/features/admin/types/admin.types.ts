@@ -180,3 +180,18 @@ export interface PendingVerification {
   totalSales: number;
   totalSignals: number;
 }
+
+// ============================================
+// Blacklisted Predictor Types
+// ============================================
+
+export interface BlacklistedPredictor {
+  _id: string;
+  walletAddress: string;
+  displayName: string;
+  totalSignals: number;
+  totalSales: number;
+  averageRating: number;
+  createdAt: string;
+  updatedAt: string;
+}

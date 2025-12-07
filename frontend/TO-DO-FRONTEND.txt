@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-07
-Current Version: v0.5.0 (Admin Dashboard & Moderation System)
+Current Version: v0.6.0 (Buyer Reports & Admin Blacklist Management)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -348,16 +348,25 @@ PHASE 6: ADMIN FEATURES ✅ COMPLETE (v0.5.0)
     - Disputes API + hooks for predictors (createDispute, getMyDispute)
     - One dispute per predictor enforced
 
-[ ] Blacklist/Unblacklist from Admin Dashboard
-    - Admin ability to blacklist predictor from reports view
-    - Admin ability to manually unblacklist predictor
-    - Sync with on-chain blacklist status
+[✅] Blacklist/Unblacklist from Admin Dashboard (Added in v0.6.0)
+    - Blacklisted Predictors tab in admin dashboard
+    - View all blacklisted predictors with stats
+    - Unblacklist button with confirmation
+    - Auto-refresh after actions
+    - Reminder about on-chain MultiSig action
 
-[ ] Buyer Report Signal Feature
+[✅] Admin Blacklist Button on Predictor Profiles (Added in v0.6.0)
+    - Blacklist/Unblacklist button visible only to admins
+    - Red danger button for blacklist action
+    - Secondary button for unblacklist action
+    - Warning indicator for blacklisted predictors
+
+[✅] Buyer Report Signal Feature (Added in v0.6.0)
     - Report button on purchased signal detail page
-    - Report modal with reason selection and description
-    - Submit report to backend
-    - Success confirmation
+    - ReportSignalModal with reason selection and description
+    - Submit report to backend (one per purchase)
+    - "Already Reported" state shown after submission
+    - URL stripping on backend for security
 
 ================================================================================
 PHASE 7: POLISH & OPTIMIZATION (PRIORITY: LOW)

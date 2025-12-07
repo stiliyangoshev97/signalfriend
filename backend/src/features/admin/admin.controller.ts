@@ -46,6 +46,24 @@ export const getAdminPredictorByAddress = asyncHandler(
 );
 
 /**
+ * GET /api/admin/predictors/blacklisted
+ * Gets all blacklisted predictors for admin review.
+ * Admin only - requires MultiSig wallet.
+ *
+ * @returns {Object} JSON response with array of blacklisted predictors
+ */
+export const getBlacklistedPredictors = asyncHandler(
+  async (_req: Request, res: Response): Promise<void> => {
+    const predictors = await PredictorService.getBlacklistedPredictors();
+
+    res.json({
+      success: true,
+      data: predictors,
+    });
+  }
+);
+
+/**
  * POST /api/admin/predictors/:address/blacklist
  * Blacklists a predictor in the database.
  * Admin only - requires MultiSig wallet.
@@ -275,8 +293,10 @@ export const getReports = asyncHandler(
 
     res.json({
       success: true,
-      data: result.reports,
-      pagination: result.pagination,
+      data: {
+        reports: result.reports,
+        pagination: result.pagination,
+      },
     });
   }
 );

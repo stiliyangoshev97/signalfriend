@@ -21,6 +21,7 @@ import type {
   ListDisputesQuery,
   UpdateDisputeRequest,
   PendingVerification,
+  BlacklistedPredictor,
 } from '../types';
 
 // ============================================
@@ -191,13 +192,28 @@ export async function updateVerification(
 // ============================================
 
 /**
- * Toggle a predictor's blacklist status
- * @param address - Predictor wallet address
- * @param isBlacklisted - New blacklist status
+ * Fetch all blacklisted predictors
+ * @returns Array of blacklisted predictors
  */
-export async function updateBlacklist(
-  address: string,
-  isBlacklisted: boolean
-): Promise<void> {
-  await apiClient.put(API_CONFIG.ENDPOINTS.ADMIN_BLACKLIST(address), { isBlacklisted });
+export async function fetchBlacklistedPredictors(): Promise<BlacklistedPredictor[]> {
+  const response = await apiClient.get<ApiResponse<BlacklistedPredictor[]>>(
+    API_CONFIG.ENDPOINTS.ADMIN_BLACKLISTED_PREDICTORS
+  );
+  return response.data.data;
+}
+
+/**
+ * Blacklist a predictor (admin only)
+ * @param address - Predictor wallet address
+ */
+export async function blacklistPredictor(address: string): Promise<void> {
+  await apiClient.post(API_CONFIG.ENDPOINTS.ADMIN_BLACKLIST(address));
+}
+
+/**
+ * Unblacklist a predictor (admin only)
+ * @param address - Predictor wallet address
+ */
+export async function unblacklistPredictor(address: string): Promise<void> {
+  await apiClient.post(API_CONFIG.ENDPOINTS.ADMIN_UNBLACKLIST(address));
 }

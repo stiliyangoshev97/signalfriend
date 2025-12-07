@@ -16,6 +16,7 @@ export { PurchaseCard } from './PurchaseCard';
 export { SignalContent } from './SignalContent';
 export { PurchaseModal } from './PurchaseModal';
 export { RatingSection } from './RatingSection';
+export { ReportSignalModal } from './ReportSignalModal';
 
 // Purchased signals components
 export { PurchasedSignalCard } from './PurchasedSignalCard';

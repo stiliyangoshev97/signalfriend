@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 7 December 2025 (v0.5.0 - Admin Dashboard & Moderation System)
+> Last Updated: 7 December 2025 (v0.6.0 - Buyer Reports & Blacklist Management)
 
 ---
 
@@ -33,9 +33,11 @@
 | **Predictor Profile** | ✅ 100% | Full profile with signals grid, filters |
 | **Edit Profile Modal** | ✅ 100% | Full profile editing with uniqueness validation |
 | **Mobile Responsive** | ✅ 100% | Hamburger menu, proper scaling, copy addresses |
-| **Admin Dashboard** | ✅ 100% | Earnings, verifications, reports, disputes tabs |
+| **Admin Dashboard** | ✅ 100% | Earnings, verifications, reports, disputes, blacklisted tabs |
+| **Buyer Report Signal** | ✅ 100% | Report purchased signals with reason dropdown |
+| **Admin Blacklist/Unblacklist** | ✅ 100% | Toggle blacklist from predictor profiles |
 
-**Overall Progress: ~95%** (All core features complete, some polish remaining)
+**Overall Progress: ~98%** (All core features complete)
 
 ---
 

@@ -14,23 +14,26 @@ import {
   useReports,
   useDisputes,
   useDisputeCounts,
+  useBlacklistedPredictors,
   useUpdateReport,
   useUpdateDispute,
   useResolveDispute,
   useUpdateVerification,
+  useUnblacklistPredictor,
 } from '../hooks';
 import {
   AdminStatsCard,
   VerificationRequestCard,
   ReportCard,
   DisputeCard,
+  BlacklistedPredictorCard,
 } from '../components';
 import type { ReportStatus, DisputeStatus, ListReportsQuery, ListDisputesQuery } from '../types';
 
 /**
  * Tab definition for admin dashboard
  */
-type TabId = 'earnings' | 'verifications' | 'reports' | 'disputes';
+type TabId = 'earnings' | 'verifications' | 'reports' | 'disputes' | 'blacklisted';
 
 interface Tab {
   id: TabId;
@@ -60,12 +63,14 @@ export function AdminDashboardPage() {
   const { data: reportsData, isLoading: reportsLoading } = useReports(reportQuery);
   const { data: disputesData, isLoading: disputesLoading } = useDisputes(disputeQuery);
   const { data: disputeCounts } = useDisputeCounts();
+  const { data: blacklistedPredictors, isLoading: blacklistedLoading } = useBlacklistedPredictors();
 
   // Mutation hooks
   const updateReport = useUpdateReport();
   const updateDispute = useUpdateDispute();
   const resolveDispute = useResolveDispute();
   const updateVerification = useUpdateVerification();
+  const unblacklistPredictor = useUnblacklistPredictor();
 
   // Tab configuration with counts
   const tabs: Tab[] = [
@@ -73,6 +78,7 @@ export function AdminDashboardPage() {
     { id: 'verifications', label: 'Verifications', count: verifications?.length },
     { id: 'reports', label: 'Reports', count: reportsData?.pagination?.total },
     { id: 'disputes', label: 'Disputes', count: disputeCounts?.pending },
+    { id: 'blacklisted', label: 'Blacklisted', count: blacklistedPredictors?.length },
   ];
 
   // Handlers
@@ -109,6 +115,13 @@ export function AdminDashboardPage() {
       await updateVerification.mutateAsync({ address, approved: false });
     },
     [updateVerification]
+  );
+
+  const handleUnblacklist = useCallback(
+    async (address: string) => {
+      await unblacklistPredictor.mutateAsync(address);
+    },
+    [unblacklistPredictor]
   );
 
   return (
@@ -367,6 +380,36 @@ export function AdminDashboardPage() {
                   </div>
                 )}
               </div>
+            )}
+          </div>
+        )}
+
+        {/* Blacklisted Tab */}
+        {activeTab === 'blacklisted' && (
+          <div className="space-y-4">
+            {blacklistedLoading ? (
+              <div className="flex justify-center py-12">
+                <Spinner size="lg" />
+              </div>
+            ) : !blacklistedPredictors?.length ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 mx-auto mb-4 text-green-500/50">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-full h-full">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-gray-main">No blacklisted predictors.</p>
+                <p className="text-sm text-gray-main/70 mt-1">All predictors are in good standing.</p>
+              </div>
+            ) : (
+              blacklistedPredictors.map((predictor) => (
+                <BlacklistedPredictorCard
+                  key={predictor._id}
+                  predictor={predictor}
+                  onUnblacklist={handleUnblacklist}
+                  isProcessing={unblacklistPredictor.isPending}
+                />
+              ))
             )}
           </div>
         )}

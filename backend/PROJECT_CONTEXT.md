@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** December 6, 2025  
-> **Current Phase:** Admin Dashboard & Moderation System Complete  
-> **Project Status:** 🟢 **Ready for Frontend (100/100)** - All Features Complete  
-> **Branch:** `feature/admin-dashboard`
+> **Last Updated:** December 8, 2025  
+> **Current Phase:** Admin Dashboard & Moderation System v2 Complete  
+> **Project Status:** 🟢 **Backend v0.6.0** - All Features Complete  
+> **Branch:** `feature/buyer-reports-blacklist`
 
 ---
 
@@ -315,8 +315,13 @@ MAIN_GROUPS = {
 | GET | `/api/reports/predictor/:address/stats` | No | Get report statistics |
 | GET | `/api/reports/check/:tokenId` | No | Check if report exists |
 | GET | `/api/admin/predictors/:address` | Admin | Get full predictor info (includes contacts) |
+| GET | `/api/admin/predictors/blacklisted` | Admin | Get all blacklisted predictors |
 | POST | `/api/admin/predictors/:address/blacklist` | Admin | Blacklist predictor in DB |
 | POST | `/api/admin/predictors/:address/unblacklist` | Admin | Remove blacklist in DB |
+| GET | `/api/admin/reports` | Admin | Get all reports (paginated) |
+| PUT | `/api/admin/reports/:tokenId` | Admin | Update report status/notes |
+| GET | `/api/admin/disputes` | Admin | Get all disputes (paginated) |
+| PUT | `/api/admin/disputes/:predictorAddress` | Admin | Update dispute status/notes |
 | DELETE | `/api/admin/signals/:contentId` | Admin | Deactivate signal (soft delete) |
 
 > **Admin Endpoints:** Require authentication from one of 3 MultiSig wallet addresses configured in `ADMIN_ADDRESSES`.
@@ -427,10 +432,12 @@ npm test
 
 1. **Ratings are entirely off-chain** - Removed from smart contracts in v0.6.1, stored in MongoDB
 2. **One review per purchase** - Enforced by unique `tokenId` constraint in Review model
-3. **Feature-based folder structure** - Each feature has its own schemas, service, controller, routes
-4. **SIWE for auth** - Wallet signature proves ownership, JWT for session management
-5. **Alchemy GraphQL webhooks for indexing** - Real-time blockchain event processing with rich data
-6. **Pino for logging** - Fast, JSON-based logging with pretty printing in dev
-7. **Zod for validation** - Runtime type checking with TypeScript inference
-8. **UUID ↔ bytes32 bridge** - Seamless conversion between backend and on-chain content identifiers
-9. **USDT 18 decimals** - BNB Chain USDT uses 18 decimals, unlike Ethereum's 6
+3. **One report per purchase** - Enforced by unique `tokenId` constraint in Report model
+4. **URL stripping in reports** - Report descriptions have URLs replaced with `[link removed]` for security
+5. **Feature-based folder structure** - Each feature has its own schemas, service, controller, routes
+6. **SIWE for auth** - Wallet signature proves ownership, JWT for session management
+7. **Alchemy GraphQL webhooks for indexing** - Real-time blockchain event processing with rich data
+8. **Pino for logging** - Fast, JSON-based logging with pretty printing in dev
+9. **Zod for validation** - Runtime type checking with TypeScript inference
+10. **UUID ↔ bytes32 bridge** - Seamless conversion between backend and on-chain content identifiers
+11. **USDT 18 decimals** - BNB Chain USDT uses 18 decimals, unlike Ethereum's 6
