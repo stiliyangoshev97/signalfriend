@@ -29,13 +29,14 @@ import { useParams, Link } from 'react-router-dom';
 import { format, isValid, parseISO } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
-import { useSignal, useCheckPurchase, useSignalContent, signalKeys, purchaseKeys } from '../hooks';
+import { useSignal, useCheckPurchase, useSignalContent, useCheckReport, signalKeys, purchaseKeys } from '../hooks';
 import { SignalDetailSkeleton } from '../components/SignalDetailSkeleton';
 import { PredictorInfoCard } from '../components/PredictorInfoCard';
 import { PurchaseCard } from '../components/PurchaseCard';
 import { SignalContent } from '../components/SignalContent';
 import { PurchaseModal } from '../components/PurchaseModal';
 import { RatingSection } from '../components/RatingSection';
+import { ReportSignalModal } from '../components/ReportSignalModal';
 import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
 
 /**
@@ -152,8 +153,16 @@ export function SignalDetailPage(): React.ReactElement {
   const canAccessContent = isOwned || isOwnSignal || isAdmin;
   const { data: contentData } = useSignalContent(contentId || '', canAccessContent);
   
+  // Check if user has already reported this signal
+  const tokenId = purchaseData?.receipt?.tokenId;
+  const { data: reportData } = useCheckReport(tokenId);
+  const hasReported = reportData?.exists ?? false;
+  
   // Purchase modal state
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  
+  // Report modal state
+  const [showReportModal, setShowReportModal] = useState(false);
 
   /**
    * Handle successful purchase - refetch data
@@ -384,6 +393,44 @@ export function SignalDetailPage(): React.ReactElement {
               predictorAddress={signal.predictor?.walletAddress}
             />
           )}
+
+          {/* Report Section - only show for purchased signals (not for predictors viewing their own) */}
+          {isOwned && purchaseData?.receipt?.tokenId && !isOwnSignal && (
+            <div className="bg-dark-800 border border-dark-600 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-fur-cream mb-3">
+                Report Signal
+              </h3>
+              {hasReported ? (
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-yellow-400">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span className="font-medium">You have already reported this signal</span>
+                  </div>
+                  <p className="text-sm text-yellow-400/70 mt-2">
+                    Your report is being reviewed by our team.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-fur-cream/60 text-sm mb-4">
+                    If you believe this signal is misleading, fraudulent, or violates our guidelines, 
+                    you can report it for review by our team.
+                  </p>
+                  <button
+                    onClick={() => setShowReportModal(true)}
+                    className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/30 px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                    </svg>
+                    Report Signal
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Sidebar (1/3 width on large screens) */}
@@ -469,6 +516,16 @@ export function SignalDetailPage(): React.ReactElement {
         predictorAddress={signal.predictorAddress}
         onSuccess={handlePurchaseSuccess}
       />
+
+      {/* Report Modal - only if user owns the signal */}
+      {isOwned && purchaseData?.receipt?.tokenId && (
+        <ReportSignalModal
+          isOpen={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          tokenId={purchaseData.receipt.tokenId}
+          signalTitle={signal.title}
+        />
+      )}
     </div>
   );
 }

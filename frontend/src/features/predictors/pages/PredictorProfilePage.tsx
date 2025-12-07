@@ -9,14 +9,18 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { Avatar, Badge, Button, CopyableAddress } from '@/shared/components/ui';
 import { formatAddress } from '@/shared/utils/format';
 import { FilterPanel, SignalGrid, Pagination } from '@/features/signals/components';
 import { useCategories, useMyPurchasedContentIds } from '@/features/signals/hooks';
 import { useAuthStore } from '@/features/auth';
+import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
+import { useBlacklistPredictor, useUnblacklistPredictor } from '@/features/admin/hooks';
 import {
   usePublicPredictorProfile,
   usePublicPredictorSignals,
+  publicPredictorKeys,
 } from '../hooks/usePredictorProfilePage';
 import type { SignalFilters } from '@/shared/types';
 
@@ -147,6 +151,7 @@ function StatCard({ label, value, icon }: { label: string; value: string | numbe
  */
 export function PredictorProfilePage(): React.ReactElement {
   const { address } = useParams<{ address: string }>();
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState<SignalFilters>(() =>
     parseFiltersFromParams(searchParams)
@@ -157,8 +162,31 @@ export function PredictorProfilePage(): React.ReactElement {
   // Used to conditionally fetch purchased content IDs
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
+  // Admin check
+  const isAdmin = useIsAdmin();
+  const blacklistMutation = useBlacklistPredictor();
+  const unblacklistMutation = useUnblacklistPredictor();
+  const isBlacklistLoading = blacklistMutation.isPending || unblacklistMutation.isPending;
+
   // Fetch predictor profile
   const { data: predictor, isLoading: profileLoading, error: profileError } = usePublicPredictorProfile(address);
+
+  // Admin blacklist/unblacklist handler
+  const handleToggleBlacklist = useCallback(async () => {
+    if (!address || !predictor) return;
+    
+    try {
+      if (predictor.isBlacklisted) {
+        await unblacklistMutation.mutateAsync(address);
+      } else {
+        await blacklistMutation.mutateAsync(address);
+      }
+      // Invalidate predictor profile query to refresh blacklist status
+      queryClient.invalidateQueries({ queryKey: publicPredictorKeys.profile(address) });
+    } catch (error) {
+      console.error('Failed to update blacklist status:', error);
+    }
+  }, [address, predictor, blacklistMutation, unblacklistMutation, queryClient]);
 
   // Build query filters - DON'T exclude purchased signals on profile page
   // We want to show all signals with a "Purchased" badge for owned ones
@@ -284,6 +312,40 @@ export function PredictorProfilePage(): React.ReactElement {
                   </svg>
                   @{predictor.socialLinks.twitter.replace('@', '')}
                 </a>
+              )}
+
+              {/* Admin Blacklist/Unblacklist Button */}
+              {isAdmin && (
+                <div className="mt-4">
+                  <Button
+                    variant={predictor.isBlacklisted ? 'secondary' : 'danger'}
+                    size="sm"
+                    onClick={handleToggleBlacklist}
+                    isLoading={isBlacklistLoading}
+                    disabled={isBlacklistLoading}
+                  >
+                    {predictor.isBlacklisted ? (
+                      <>
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Unblacklist Predictor
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                        Blacklist Predictor
+                      </>
+                    )}
+                  </Button>
+                  {predictor.isBlacklisted && (
+                    <p className="text-xs text-yellow-500 mt-2">
+                      ⚠️ This predictor is currently blacklisted
+                    </p>
+                  )}
+                </div>
               )}
             </div>
 

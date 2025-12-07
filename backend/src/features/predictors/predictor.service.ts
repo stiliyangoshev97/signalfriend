@@ -559,6 +559,19 @@ export class PredictorService {
   }
 
   /**
+   * Retrieves all blacklisted predictors for admin review.
+   * Admin-only method.
+   *
+   * @returns Promise resolving to array of blacklisted predictors
+   */
+  static async getBlacklistedPredictors() {
+    return Predictor.find({ isBlacklisted: true })
+      .select("walletAddress displayName totalSignals totalSales averageRating createdAt updatedAt")
+      .sort({ updatedAt: -1 })
+      .lean();
+  }
+
+  /**
    * Blacklists a predictor in the database.
    * Admin-only method. Note: This is a backend-only blacklist.
    * For full effect, also blacklist on-chain via MultiSig.

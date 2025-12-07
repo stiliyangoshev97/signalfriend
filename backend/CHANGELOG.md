@@ -15,6 +15,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.18.0] - 2025-12-07 📝 BUYER REPORTS & ADMIN BLACKLIST MANAGEMENT
+
+### Added
+
+**Buyer Reports Endpoints** (`src/features/reports/`)
+- `POST /api/reports` - Create report (requires tokenId ownership)
+- `GET /api/reports/check/:tokenId` - Check if report exists for purchase
+- URL stripping in report descriptions for security (replaces URLs with `[link removed]`)
+
+**Admin Blacklist Management**
+- `GET /api/admin/predictors/blacklisted` - List all blacklisted predictors
+- Added `getBlacklistedPredictors()` to PredictorService
+- Added `getBlacklistedPredictors` controller handler
+
+### Changed
+- Split blacklist API into separate endpoints:
+  - `POST /api/admin/predictors/:address/blacklist` (was PUT with toggle)
+  - `POST /api/admin/predictors/:address/unblacklist` (new)
+- Admin reports API response now wraps data correctly:
+  - `{ success: true, data: { reports: [...], pagination: {...} } }`
+- Admin disputes API response now wraps data correctly:
+  - `{ success: true, data: { disputes: [...], pagination: {...} } }`
+
+### Security
+- Report descriptions now have URLs automatically stripped
+- Prevents phishing/scam links in user-submitted content
+
+---
+
 ## [0.17.0] - 2025-12-06 🛡️ ADMIN DASHBOARD & MODERATION SYSTEM
 
 ### Added

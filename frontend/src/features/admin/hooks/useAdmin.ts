@@ -18,7 +18,9 @@ import {
   resolveDispute,
   fetchPendingVerifications,
   updateVerification,
-  updateBlacklist,
+  fetchBlacklistedPredictors,
+  blacklistPredictor,
+  unblacklistPredictor,
 } from '../api';
 import type {
   ListReportsQuery,
@@ -48,6 +50,10 @@ export const adminKeys = {
   // Verifications
   verifications: () => [...adminKeys.all, 'verifications'] as const,
   pendingVerifications: () => [...adminKeys.verifications(), 'pending'] as const,
+  
+  // Blacklist
+  blacklist: () => [...adminKeys.all, 'blacklist'] as const,
+  blacklistedPredictors: () => [...adminKeys.blacklist(), 'predictors'] as const,
 };
 
 // ============================================
@@ -209,17 +215,44 @@ export function useUpdateVerification() {
 // ============================================
 
 /**
- * Hook to update a predictor's blacklist status
+ * Hook to fetch all blacklisted predictors
  */
-export function useUpdateBlacklist() {
+export function useBlacklistedPredictors() {
+  return useQuery({
+    queryKey: adminKeys.blacklistedPredictors(),
+    queryFn: fetchBlacklistedPredictors,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+/**
+ * Hook to blacklist a predictor (admin only)
+ */
+export function useBlacklistPredictor() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ address, isBlacklisted }: { address: string; isBlacklisted: boolean }) =>
-      updateBlacklist(address, isBlacklisted),
+    mutationFn: (address: string) => blacklistPredictor(address),
     onSuccess: () => {
-      // Invalidate disputes since blacklist status affects them
+      // Invalidate disputes and blacklist list
       queryClient.invalidateQueries({ queryKey: adminKeys.disputes() });
+      queryClient.invalidateQueries({ queryKey: adminKeys.blacklistedPredictors() });
+    },
+  });
+}
+
+/**
+ * Hook to unblacklist a predictor (admin only)
+ */
+export function useUnblacklistPredictor() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (address: string) => unblacklistPredictor(address),
+    onSuccess: () => {
+      // Invalidate disputes and blacklist list
+      queryClient.invalidateQueries({ queryKey: adminKeys.disputes() });
+      queryClient.invalidateQueries({ queryKey: adminKeys.blacklistedPredictors() });
     },
   });
 }

@@ -24,6 +24,7 @@
 import { Router } from "express";
 import {
   getAdminPredictorByAddress,
+  getBlacklistedPredictors,
   blacklistPredictor,
   unblacklistPredictor,
   deleteSignal,
@@ -53,6 +54,13 @@ router.use(requireAdmin);
 // ============================================================================
 // Predictor Management
 // ============================================================================
+
+/**
+ * GET /api/admin/predictors/blacklisted
+ * Get all blacklisted predictors for admin review.
+ * Note: This route must be defined BEFORE the :address route to avoid conflicts.
+ */
+router.get("/predictors/blacklisted", getBlacklistedPredictors);
 
 /**
  * GET /api/admin/predictors/:address

@@ -78,10 +78,16 @@ export const API_CONFIG = {
     REVIEWS: '/api/reviews',
     REVIEW_BY_TOKEN: (tokenId: string) => `/api/reviews/${tokenId}`,
     
+    // Reports (for buyers)
+    REPORTS: '/api/reports',
+    REPORT_CHECK: (tokenId: number) => `/api/reports/check/${tokenId}`,
+    
     // Admin
     ADMIN_STATS: '/api/admin/stats',
     ADMIN_PREDICTOR: (address: string) => `/api/admin/predictors/${address}`,
+    ADMIN_BLACKLISTED_PREDICTORS: '/api/admin/predictors/blacklisted',
     ADMIN_BLACKLIST: (address: string) => `/api/admin/predictors/${address}/blacklist`,
+    ADMIN_UNBLACKLIST: (address: string) => `/api/admin/predictors/${address}/unblacklist`,
     ADMIN_SIGNAL_DELETE: (id: string) => `/api/admin/signals/${id}`,
     ADMIN_PENDING_VERIFICATIONS: '/api/admin/verification-requests',
     ADMIN_VERIFY: (address: string) => `/api/admin/predictors/${address}/verify`,

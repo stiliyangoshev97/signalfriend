@@ -7,3 +7,4 @@ export { AdminStatsCard } from './AdminStatsCard';
 export { VerificationRequestCard } from './VerificationRequestCard';
 export { ReportCard } from './ReportCard';
 export { DisputeCard } from './DisputeCard';
+export { BlacklistedPredictorCard } from './BlacklistedPredictorCard';
