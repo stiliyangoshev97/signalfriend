@@ -15,6 +15,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.20.0] - 2025-12-08 🔒 COMPLETE BLACKLIST SYSTEM OVERHAUL
+
+### Changed
+
+**Signal Listing with Blacklist Check**
+- `getAll()` now properly handles `predictorAddress` filter with blacklist check
+- When requesting a specific predictor's signals, checks if they're blacklisted first
+- Returns empty results for blacklisted predictor signal queries
+- Prevents signals from appearing on blacklisted predictor's profile page
+
+**Signal Populate Fields**
+- `getByContentId()` now includes `isBlacklisted` in predictor population
+- `getAll()` now includes `isBlacklisted` in predictor population
+- Ensures frontend can display blacklist status correctly
+
+**Unblacklist Auto-Resolve Disputes**
+- `adminUnblacklist()` now auto-resolves any pending/contacted disputes
+- Sets dispute status to 'resolved' with `resolvedAt` timestamp
+- Keeps system consistent - no orphan disputes after unblacklist
+
+### Fixed
+- Blacklisted predictor signals no longer visible on their profile page
+- Signal detail page correctly shows blacklist status from populated predictor
+- Disputes don't remain open after predictor is unblacklisted
+
+---
+
+## [0.19.0] - 2025-12-08 🐛 BLACKLIST SYSTEM & VALIDATION FIXES
+
+### Added
+
+**URL Validation Utility** (`src/shared/utils/textValidation.ts`)
+- `containsUrl()` - Check if text contains URLs
+- `stripUrls()` - Remove URLs from text
+- `validateNoUrls()` - Throws ApiError if URLs found
+
+**Admin Predictor Profile Hook**
+- Frontend can now fetch full predictor profile with contact info via admin endpoint
+- Added `useAdminPredictorProfile()` hook and `fetchAdminPredictorProfile()` API
+
+### Changed
+
+**Blacklist System Improvements**
+- `getAll()` in SignalService now filters out signals from blacklisted predictors
+- `getContentIdentifier()` blocks retrieval for blacklisted predictor signals
+- `createSignal()` returns better error message when predictor is blacklisted
+- `blacklistPredictor()` now resets any existing dispute to pending status
+- `blacklistPredictor()` prevents blacklisting admin wallet addresses
+
+**Input Validation**
+- Signal creation now validates title, description, and content for URLs
+- Report creation now strips URLs from description on input (not just display)
+
+### Fixed
+- Blacklisted predictor signals no longer visible in marketplace
+- Cannot purchase signals from blacklisted predictors
+- Disputes are properly reset when predictor is re-blacklisted
+- Admins cannot be blacklisted
+- Better error message for blacklisted predictor creating signals
+
+---
+
 ## [0.18.0] - 2025-12-07 📝 BUYER REPORTS & ADMIN BLACKLIST MANAGEMENT
 
 ### Added

@@ -90,8 +90,8 @@ export function BlacklistBanner({ preferredContact }: BlacklistBannerProps) {
           <div className="flex-1 min-w-0">
             <h3 className="text-lg font-semibold text-red-400">Account Blacklisted</h3>
             <p className="mt-1 text-sm text-fur-cream/70">
-              Your account has been blacklisted by platform administrators. You cannot create new signals 
-              or receive new purchases while blacklisted.
+              Your account has been blacklisted by platform administrators. While blacklisted, you cannot 
+              create new signals, edit your profile, or receive new purchases.
             </p>
             
             {/* Show dispute status or button */}

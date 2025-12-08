@@ -18,6 +18,7 @@ import { Predictor } from "../predictors/predictor.model.js";
 import { Receipt } from "../receipts/receipt.model.js";
 import { ApiError } from "../../shared/utils/ApiError.js";
 import { uuidToBytes32 } from "../../shared/utils/contentId.js";
+import { containsUrl } from "../../shared/utils/textValidation.js";
 import { isAdmin } from "../../shared/middleware/admin.js";
 import type {
   ListSignalsQuery,
@@ -119,6 +120,38 @@ export class SignalService {
       filter.expiresAt = { $gt: new Date() }; // Only non-expired signals
     }
 
+    // Handle predictor filtering with blacklist check
+    if (predictorAddress) {
+      // If requesting a specific predictor's signals, check if they're blacklisted
+      const predictor = await Predictor.findOne({ 
+        walletAddress: predictorAddress.toLowerCase() 
+      }).lean();
+      
+      if (predictor?.isBlacklisted) {
+        // Blacklisted predictor - return empty results
+        return {
+          signals: [],
+          pagination: {
+            total: 0,
+            page: page || 1,
+            limit: limit || 12,
+            totalPages: 0,
+          },
+        };
+      }
+      filter.predictorAddress = predictorAddress.toLowerCase();
+    } else {
+      // General listing - exclude all blacklisted predictors
+      const blacklistedPredictors = await Predictor.find(
+        { isBlacklisted: true },
+        { walletAddress: 1 }
+      ).lean();
+      if (blacklistedPredictors.length > 0) {
+        const blacklistedAddresses = blacklistedPredictors.map((p) => p.walletAddress);
+        filter.predictorAddress = { $nin: blacklistedAddresses };
+      }
+    }
+
     // Filter by category
     if (categoryId) {
       filter.categoryId = categoryId;
@@ -127,11 +160,6 @@ export class SignalService {
     // Filter by main category group (when no specific subcategory is selected)
     if (mainGroup && !categoryId) {
       filter.mainGroup = mainGroup;
-    }
-
-    // Filter by predictor address
-    if (predictorAddress) {
-      filter.predictorAddress = predictorAddress.toLowerCase();
     }
 
     // Exclude signals already purchased by this buyer
@@ -192,7 +220,7 @@ export class SignalService {
         .skip(skip)
         .limit(limit)
         .populate("categoryId", "name slug icon mainGroup")
-        .populate("predictorId", "displayName avatarUrl averageRating")
+        .populate("predictorId", "displayName avatarUrl averageRating isBlacklisted")
         .lean(),
       Signal.countDocuments(filter),
     ]);
@@ -231,7 +259,7 @@ export class SignalService {
     const rawSignal = await Signal.findOne({ contentId })
       .select(SignalService.PUBLIC_FIELDS)
       .populate("categoryId", "name slug icon mainGroup")
-      .populate("predictorId", "displayName avatarUrl averageRating totalSales totalReviews bio isVerified verificationStatus walletAddress")
+      .populate("predictorId", "displayName avatarUrl averageRating totalSales totalReviews bio isVerified verificationStatus walletAddress isBlacklisted")
       .lean();
 
     if (!rawSignal) {
@@ -339,6 +367,12 @@ export class SignalService {
       throw ApiError.badRequest("You cannot purchase your own signal");
     }
 
+    // Block purchase from blacklisted predictors
+    const predictor = await Predictor.findOne({ walletAddress: signal.predictorAddress });
+    if (predictor?.isBlacklisted) {
+      throw ApiError.badRequest("This signal cannot be purchased because the predictor has been blacklisted");
+    }
+
     // Convert UUID to bytes32 for on-chain use
     const contentIdentifier = uuidToBytes32(contentId);
 
@@ -361,16 +395,33 @@ export class SignalService {
   ): Promise<PublicSignal> {
     const normalizedAddress = predictorAddress.toLowerCase();
 
-    // Verify caller is an active predictor
+    // First check if predictor exists
     const predictor = await Predictor.findOne({
       walletAddress: normalizedAddress,
-      isBlacklisted: false,
     });
 
     if (!predictor) {
       throw ApiError.forbidden(
         "Only active predictors can create signals. You must hold a PredictorAccessPass NFT."
       );
+    }
+
+    // Check blacklist status separately for better error message
+    if (predictor.isBlacklisted) {
+      throw ApiError.forbidden(
+        "Your account has been blacklisted. You cannot create new signals. If you believe this is an error, please submit a dispute from your dashboard."
+      );
+    }
+
+    // Validate no URLs in signal content (security measure)
+    if (containsUrl(data.title)) {
+      throw ApiError.badRequest("Signal title cannot contain links or URLs");
+    }
+    if (containsUrl(data.description)) {
+      throw ApiError.badRequest("Signal description cannot contain links or URLs");
+    }
+    if (containsUrl(data.content)) {
+      throw ApiError.badRequest("Signal content cannot contain links or URLs");
     }
 
     // Validate category exists and is active

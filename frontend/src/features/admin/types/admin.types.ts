@@ -182,6 +182,36 @@ export interface PendingVerification {
 }
 
 // ============================================
+// Admin Predictor Profile Types (with contact info)
+// ============================================
+
+export interface AdminPredictorProfile {
+  _id: string;
+  walletAddress: string;
+  tokenId: number;
+  displayName: string;
+  displayNameChanged: boolean;
+  bio: string;
+  avatarUrl: string;
+  socialLinks: {
+    twitter?: string;
+    telegram?: string;
+    discord?: string;
+  };
+  preferredContact?: 'telegram' | 'discord';
+  categoryIds: Array<{ _id: string; name: string; slug: string; icon: string }>;
+  totalSignals: number;
+  totalSales: number;
+  averageRating: number;
+  totalReviews: number;
+  isBlacklisted: boolean;
+  isVerified: boolean;
+  joinedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================
 // Blacklisted Predictor Types
 // ============================================
 

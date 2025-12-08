@@ -22,6 +22,8 @@ interface PurchaseCardProps {
   isOwned?: boolean;
   /** Whether the current user is the signal's predictor (seller) */
   isOwnSignal?: boolean;
+  /** Whether the predictor is blacklisted */
+  isPredictorBlacklisted?: boolean;
   /** Signal contentId for purchase */
   contentId: string;
   /** Callback when purchase is initiated */
@@ -62,6 +64,7 @@ export function PurchaseCard({
   isActive,
   isOwned = false,
   isOwnSignal = false,
+  isPredictorBlacklisted = false,
   contentId: _contentId, // Will be used for purchase flow
   onPurchase,
 }: PurchaseCardProps): React.ReactElement {
@@ -84,6 +87,15 @@ export function PurchaseCard({
     if (!isActive) {
       return {
         text: 'Signal Unavailable',
+        disabled: true,
+        variant: 'secondary' as const,
+      };
+    }
+
+    // Check if predictor is blacklisted
+    if (isPredictorBlacklisted) {
+      return {
+        text: 'Predictor Blacklisted',
         disabled: true,
         variant: 'secondary' as const,
       };
@@ -187,13 +199,19 @@ export function PurchaseCard({
           </p>
         )}
 
+        {isPredictorBlacklisted && !isExpired && isActive && (
+          <p className="text-sm text-accent-red text-center">
+            This signal cannot be purchased because the predictor has been blacklisted.
+          </p>
+        )}
+
         {isOwnSignal && !isExpired && (
           <p className="text-sm text-fur-light text-center">
             You cannot purchase your own signal. View it from your dashboard.
           </p>
         )}
 
-        {!isExpired && isActive && !isOwned && !isOwnSignal && (
+        {!isExpired && isActive && !isOwned && !isOwnSignal && !isPredictorBlacklisted && (
           <div className="text-xs text-fur-cream/50 space-y-1">
             <div className="flex items-center gap-2">
               <svg className="w-4 h-4 text-success-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

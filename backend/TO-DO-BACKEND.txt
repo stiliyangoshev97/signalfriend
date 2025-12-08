@@ -288,6 +288,28 @@
     - Note: On-chain blacklist requires MultiSig on BscScan
 
 ================================================================================
+## BUGS FIXED (December 8, 2025) ✅
+================================================================================
+
+BLACKLIST SYSTEM - ALL FIXED:
+[x] GET /api/signals filters out signals from blacklisted predictors
+[x] GET /api/signals with predictorAddress returns empty if predictor blacklisted
+[x] GET /api/signals/:contentId/content-identifier rejects blacklisted predictors
+[x] Prevent blacklisting admin wallet addresses
+[x] Reset dispute status when predictor is re-blacklisted after resolution
+[x] Auto-resolve disputes when predictor is unblacklisted
+[x] Correct error message for blacklisted predictor creating signal
+[x] Signal populate includes isBlacklisted in predictor data
+
+ADMIN FEATURES - ALL FIXED:
+[x] Admin endpoint includes contact info (telegram/discord/preferred)
+[x] Admin notes editable via PATCH endpoints
+
+INPUT VALIDATION - ALL FIXED:
+[x] Signal creation blocks URLs in title, description, content
+[x] Report description strips URLs on input
+
+================================================================================
 ## NOTES
 ================================================================================
 - Contract Addresses (BNB Testnet - Chain ID 97):

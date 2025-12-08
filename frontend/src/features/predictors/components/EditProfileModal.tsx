@@ -35,9 +35,7 @@ const editProfileSchema = z.object({
     .string()
     .min(3, 'Display name must be at least 3 characters')
     .max(30, 'Display name must be at most 30 characters')
-    .regex(/^[a-zA-Z0-9_]+$/, 'Only letters, numbers, and underscores allowed')
-    .optional()
-    .or(z.literal('')),
+    .regex(/^[a-zA-Z0-9_]+$/, 'Only letters, numbers, and underscores allowed'),
   bio: z
     .string()
     .max(500, 'Bio must be at most 500 characters')
@@ -61,16 +59,14 @@ const editProfileSchema = z.object({
     .or(z.literal('')),
   telegram: z
     .string()
+    .min(1, 'Telegram handle is required')
     .max(32, 'Telegram handle too long')
-    .regex(/^[a-zA-Z0-9_]*$/, 'Only letters, numbers, and underscores allowed')
-    .optional()
-    .or(z.literal('')),
+    .regex(/^[a-zA-Z0-9_]+$/, 'Only letters, numbers, and underscores allowed'),
   discord: z
     .string()
-    .max(32, 'Discord handle too long')
-    .optional()
-    .or(z.literal('')),
-  preferredContact: z.enum(['telegram', 'discord']).optional(),
+    .min(1, 'Discord handle is required')
+    .max(32, 'Discord handle too long'),
+  preferredContact: z.enum(['telegram', 'discord']),
 });
 
 type EditProfileFormData = z.infer<typeof editProfileSchema>;
@@ -122,9 +118,10 @@ export function EditProfileModal({
     handleSubmit,
     reset,
     watch,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isValid },
   } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
+    mode: 'onChange', // Validate on change for real-time feedback
     defaultValues: {
       displayName: '',
       bio: '',
@@ -132,7 +129,7 @@ export function EditProfileModal({
       twitter: '',
       telegram: '',
       discord: '',
-      preferredContact: undefined,
+      preferredContact: 'discord',
     },
   });
 
@@ -194,6 +191,12 @@ export function EditProfileModal({
   // Pre-fill form when predictor data changes
   useEffect(() => {
     if (predictor && isOpen) {
+      // Default to 'discord' if preferredContact is not set or is an invalid value
+      const validPreferredContact = 
+        predictor.preferredContact === 'telegram' || predictor.preferredContact === 'discord'
+          ? predictor.preferredContact
+          : 'discord';
+      
       reset({
         displayName: predictor.displayName || '',
         bio: predictor.bio || '',
@@ -201,7 +204,7 @@ export function EditProfileModal({
         twitter: predictor.socialLinks?.twitter || '',
         telegram: predictor.socialLinks?.telegram || '',
         discord: predictor.socialLinks?.discord || '',
-        preferredContact: predictor.preferredContact as 'telegram' | 'discord' | undefined,
+        preferredContact: validPreferredContact,
       });
     }
   }, [predictor, isOpen, reset]);
@@ -293,11 +296,19 @@ export function EditProfileModal({
           </div>
         )}
 
+        {/* Required Fields Notice */}
+        <div className="flex items-center gap-2 p-2 bg-dark-700/50 rounded-md border border-dark-600 text-xs text-fur-cream/60">
+          <span className="text-accent-red">*</span>
+          <span>Required fields must be filled to save changes</span>
+        </div>
+
         {/* Display Name Section */}
         <div className="space-y-2">
           <div className="relative">
+            <label className="block text-sm font-medium text-fur-cream mb-1.5">
+              Display Name <span className="text-accent-red">*</span>
+            </label>
             <Input
-              label="Display Name"
               placeholder="e.g., CryptoKing"
               {...register('displayName')}
               error={errors.displayName?.message || displayNameError || undefined}
@@ -419,8 +430,10 @@ export function EditProfileModal({
 
           {/* Telegram - Private */}
           <div className="relative">
+            <label className="block text-sm font-medium text-fur-cream mb-1.5">
+              Telegram <span className="text-accent-red">*</span>
+            </label>
             <Input
-              label="Telegram"
               placeholder="username (without @)"
               {...register('telegram')}
               error={errors.telegram?.message || telegramError || undefined}
@@ -449,8 +462,10 @@ export function EditProfileModal({
 
           {/* Discord - Private */}
           <div className="relative">
+            <label className="block text-sm font-medium text-fur-cream mb-1.5">
+              Discord <span className="text-accent-red">*</span>
+            </label>
             <Input
-              label="Discord"
               placeholder="username"
               {...register('discord')}
               error={errors.discord?.message || discordError || undefined}
@@ -481,9 +496,10 @@ export function EditProfileModal({
           <div>
             <label className="block text-sm font-medium text-fur-cream mb-2">
               Preferred Contact Method
+              <span className="text-accent-red font-normal ml-1">*</span>
             </label>
             <p className="text-xs text-fur-cream/40 mb-3">
-              How should admins contact you if needed?
+              How should admins contact you if needed? This is required.
             </p>
             <div className="flex gap-3">
               <label className="flex-1 cursor-pointer">
@@ -531,7 +547,7 @@ export function EditProfileModal({
           <Button
             type="submit"
             isLoading={isPending || isCheckingUniqueness}
-            disabled={!isDirty || isPending || hasUniquenessError || isCheckingUniqueness}
+            disabled={!isDirty || !isValid || isPending || hasUniquenessError || isCheckingUniqueness}
           >
             {isCheckingUniqueness ? 'Checking...' : 'Save Changes'}
           </Button>

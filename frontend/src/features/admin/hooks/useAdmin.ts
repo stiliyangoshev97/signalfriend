@@ -21,6 +21,7 @@ import {
   fetchBlacklistedPredictors,
   blacklistPredictor,
   unblacklistPredictor,
+  fetchAdminPredictorProfile,
 } from '../api';
 import type {
   ListReportsQuery,
@@ -54,6 +55,9 @@ export const adminKeys = {
   // Blacklist
   blacklist: () => [...adminKeys.all, 'blacklist'] as const,
   blacklistedPredictors: () => [...adminKeys.blacklist(), 'predictors'] as const,
+  
+  // Admin predictor profile (with contact info)
+  predictorProfile: (address: string) => [...adminKeys.all, 'predictor', address.toLowerCase()] as const,
 };
 
 // ============================================
@@ -211,6 +215,25 @@ export function useUpdateVerification() {
 }
 
 // ============================================
+// Admin Predictor Profile Hook
+// ============================================
+
+/**
+ * Hook to fetch a predictor's full profile including contact info (admin only)
+ * @param address - Predictor wallet address
+ * @param enabled - Whether to enable the query (default: true)
+ * @returns Query result with full predictor profile including telegram/discord
+ */
+export function useAdminPredictorProfile(address: string | undefined, enabled = true) {
+  return useQuery({
+    queryKey: adminKeys.predictorProfile(address ?? ''),
+    queryFn: () => fetchAdminPredictorProfile(address!),
+    enabled: enabled && !!address,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+// ============================================
 // Blacklist Hooks
 // ============================================
 
@@ -233,10 +256,16 @@ export function useBlacklistPredictor() {
   
   return useMutation({
     mutationFn: (address: string) => blacklistPredictor(address),
-    onSuccess: () => {
+    onSuccess: (_data, address) => {
       // Invalidate disputes and blacklist list
       queryClient.invalidateQueries({ queryKey: adminKeys.disputes() });
       queryClient.invalidateQueries({ queryKey: adminKeys.blacklistedPredictors() });
+      // Invalidate predictor profile queries (all variations)
+      queryClient.invalidateQueries({ queryKey: ['predictor'] });
+      // Invalidate signals queries
+      queryClient.invalidateQueries({ queryKey: ['signals'] });
+      // Invalidate admin predictor profile
+      queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address) });
     },
   });
 }
@@ -249,10 +278,16 @@ export function useUnblacklistPredictor() {
   
   return useMutation({
     mutationFn: (address: string) => unblacklistPredictor(address),
-    onSuccess: () => {
+    onSuccess: (_data, address) => {
       // Invalidate disputes and blacklist list
       queryClient.invalidateQueries({ queryKey: adminKeys.disputes() });
       queryClient.invalidateQueries({ queryKey: adminKeys.blacklistedPredictors() });
+      // Invalidate predictor profile queries (all variations)
+      queryClient.invalidateQueries({ queryKey: ['predictor'] });
+      // Invalidate signals queries
+      queryClient.invalidateQueries({ queryKey: ['signals'] });
+      // Invalidate admin predictor profile
+      queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address) });
     },
   });
 }

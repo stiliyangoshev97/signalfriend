@@ -60,6 +60,13 @@ export const signalSchema = z.object({
 });
 
 // ===========================================
+// URL Detection Pattern
+// ===========================================
+
+/** Pattern to detect URLs/links in text */
+const urlPattern = /(https?:\/\/|www\.)[^\s]+|(?:[a-zA-Z0-9-]+\.)+(?:com|net|org|io|co|gg|xyz|me|info|biz|dev|app|ai|tv|fm|ly|to|cc|link|click|site|online|store|shop|tech|cloud|digital|world|live|news|blog|page|space|zone|network|social|trade|finance|crypto|money|exchange|market|trading|invest|wallet|token|coin|nft|defi|dao|eth|btc|bnb|sol)[^\s]*/i;
+
+// ===========================================
 // Create Signal Schema (for forms)
 // ===========================================
 
@@ -67,15 +74,27 @@ export const createSignalSchema = z.object({
   title: z
     .string()
     .min(10, 'Title must be at least 10 characters')
-    .max(100, 'Title must be at most 100 characters'),
+    .max(100, 'Title must be at most 100 characters')
+    .refine(
+      (val) => !urlPattern.test(val),
+      'Title cannot contain links or URLs'
+    ),
   description: z
     .string()
     .min(20, 'Description must be at least 20 characters')
-    .max(1000, 'Description must be at most 1000 characters'),
+    .max(1000, 'Description must be at most 1000 characters')
+    .refine(
+      (val) => !urlPattern.test(val),
+      'Description cannot contain links or URLs'
+    ),
   content: z
     .string()
     .min(50, 'Signal content must be at least 50 characters')
-    .max(1000, 'Signal content must be at most 1000 characters'),
+    .max(1000, 'Signal content must be at most 1000 characters')
+    .refine(
+      (val) => !urlPattern.test(val),
+      'Signal content cannot contain links or URLs'
+    ),
   categoryId: z.string().min(1, 'Please select a category'),
   priceUsdt: z
     .number()

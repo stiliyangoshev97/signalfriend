@@ -1,4 +1,3 @@
-<!-- filepath: /Users/stiliyangoshev/Desktop/Coding/Full Projects/SignalFriend/frontend/CHANGELOG.md -->
 # Changelog
 
 All notable changes to the SignalFriend frontend will be documented in this file.
@@ -12,6 +11,102 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 - Signal outcome tracking
+
+---
+
+## [0.8.0] - 2025-12-08 🔒 COMPLETE BLACKLIST SYSTEM OVERHAUL
+
+### Added
+
+**Blacklisted Predictor Restrictions**
+- "Edit Profile" button disabled when blacklisted (with tooltip)
+- "Create Signal" button disabled when blacklisted (with tooltip)
+- Blacklist banner message updated to mention profile editing restriction
+
+**Required Profile Fields**
+- Red asterisks (*) on Display Name, Telegram, and Discord fields
+- Notice banner explaining required fields
+- Form validation prevents saving without required fields
+
+**Report URL Validation**
+- Real-time URL detection in report descriptions
+- Red border and warning when URL is detected
+- Submit button disabled when URL is present
+- Blocks: http://, https://, www., and common TLDs
+
+**Auto-Refresh Improvements**
+- Reports list auto-refreshes in admin dashboard when new report is created
+- All predictor queries invalidated on blacklist/unblacklist actions
+
+### Changed
+
+**Blacklist/Unblacklist Hooks**
+- Now invalidate ALL predictor-related queries (dashboard, public profile, signals)
+- Invalidate admin predictor profile query
+- Ensures UI stays in sync across all views
+
+**Predictor Profile Bio**
+- Added `break-words whitespace-pre-wrap overflow-hidden` to prevent long text overflow
+
+**Preferred Contact Default**
+- Explicitly validates and defaults to 'discord' if not set
+- More robust handling of invalid/missing values
+
+### Fixed
+- Blacklisted predictor signals now hidden on their profile page (backend fix)
+- Specific predictor signal queries now check blacklist status
+- UI properly refreshes after unblacklist from admin dashboard
+- Predictor dashboard reflects blacklist status immediately
+- Disputes auto-resolve when predictor is unblacklisted
+
+---
+
+## [0.7.0] - 2025-12-08 🐛 BLACKLIST SYSTEM & ADMIN IMPROVEMENTS
+
+### Added
+
+**Admin Contact Info Display**
+- Admins can now see predictor's telegram, discord, and preferred contact on profile
+- New purple "Admin Only - Contact Info" section on predictor profiles
+- `useAdminPredictorProfile()` hook fetches full predictor data for admins
+- "Preferred" badge shows which contact method the predictor prefers
+
+**Blacklist Warning Banner**
+- Blacklisted predictor profiles now show a prominent red warning banner
+- Informs users that signals from this predictor cannot be purchased
+
+**Save Notes Feature**
+- Admin notes in Reports and Disputes can now be saved independently
+- "Save Notes" button appears when notes are modified
+- No longer requires changing status to save notes
+
+### Changed
+
+**PurchaseCard Component**
+- Added `isPredictorBlacklisted` prop
+- Button shows "Predictor Blacklisted" and is disabled for blacklisted predictors
+
+**SignalDetailPage**
+- Shows warning banner when predictor is blacklisted
+- Passes blacklist status to PurchaseCard
+- Double-checks blacklist before opening purchase modal
+
+**PredictorProfilePage**
+- Fetches admin profile with contact info when admin is viewing
+- Invalidates signals queries after blacklist/unblacklist for UI refresh
+
+**EditProfileModal**
+- `displayName`, `telegram`, and `discord` are now required fields
+- `preferredContact` defaults to 'discord' and is required
+- Save button is disabled until all required fields are valid
+- Real-time validation (`mode: 'onChange'`) for immediate feedback
+
+### Fixed
+- Signals from blacklisted predictors no longer appear in marketplace
+- Cannot purchase signals from blacklisted predictors
+- UI refreshes properly after blacklist/unblacklist without page reload
+- Admin notes can now be edited after initial save
+- Signal creation now validates URLs in real-time for title, description, and content fields
 
 ---
 
