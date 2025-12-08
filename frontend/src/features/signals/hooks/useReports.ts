@@ -52,6 +52,10 @@ export function useCreateReport() {
       queryClient.invalidateQueries({ 
         queryKey: reportKeys.check(variables.tokenId) 
       });
+      // Invalidate admin reports list so it refreshes
+      queryClient.invalidateQueries({ 
+        queryKey: ['admin', 'reports'] 
+      });
     },
   });
 }

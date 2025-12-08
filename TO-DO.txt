@@ -2,7 +2,7 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 7, 2025
+Last Updated: December 8, 2025
 
 ================================================================================
 COMPLETED FEATURES ✅
@@ -22,6 +22,7 @@ COMPLETED FEATURES ✅
 [x] Report system (buyers can report purchased signals)
 [x] Blacklist/Unblacklist predictors (from admin dashboard + predictor profile)
 [x] Dispute system for blacklisted predictors
+[x] Complete blacklist system overhaul (December 8, 2025)
 
 ================================================================================
 NEXT PRIORITY: TESTING & OPTIMIZATION
@@ -38,10 +39,32 @@ Key Tasks:
 4. SEO & meta tags
 
 ================================================================================
-KNOWN BUGS
+BUGS FIXED (December 8, 2025) ✅
 ================================================================================
 
-(No known bugs at this time - all previously reported issues have been fixed)
+BLACKLIST SYSTEM BUGS - ALL FIXED:
+[x] #1 Blacklisted predictor signals filtered from marketplace
+[x] #2 Signal detail page blocks purchase from blacklisted predictors
+[x] #3 Purchase button disabled for blacklisted predictors
+[x] #4 Blacklisted predictor profile shows warning banner
+[x] #5 Dispute status resets when predictor is re-blacklisted
+[x] #6 Correct error message for blacklisted predictor creating signal
+[x] #14 Blacklisted predictor's signals hidden on their profile page
+[x] #15 Edit Profile & Create Signal buttons disabled when blacklisted
+[x] #16 Disputes auto-resolve when predictor is unblacklisted
+
+ADMIN/SECURITY BUGS - ALL FIXED:
+[x] #7 Admin contact info visible on predictor profiles
+[x] #8 Admins cannot be blacklisted (prevented)
+[x] #9 UI auto-refreshes after blacklist/unblacklist actions
+[x] #10 Admin notes editable with "Save Notes" button
+
+INPUT VALIDATION BUGS - ALL FIXED:
+[x] #11 Signal name/description/content blocks URLs (real-time validation)
+[x] #12 Report description blocks URLs (real-time validation)
+[x] #13 Profile required fields clearly marked with asterisks
+[x] #17 Reports auto-refresh in admin dashboard when created
+[x] #18 Bio text properly wraps on predictor profile page
 
 Previous bugs fixed:
 - ✅ Mobile Responsive Issues - Header now has hamburger menu, proper scaling
@@ -54,6 +77,7 @@ DEPLOYMENT CHECKLIST
 ================================================================================
 
 [x] Admin system complete
+[x] Blacklist system complete
 [ ] Full mobile responsive testing
 [ ] Security audit
 [ ] Performance testing

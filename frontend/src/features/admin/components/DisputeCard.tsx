@@ -219,6 +219,18 @@ export function DisputeCard({
               className="w-full bg-dark-900 border border-dark-600 rounded-lg px-3 py-2 text-sm text-fur-cream placeholder-gray-dim focus:outline-none focus:border-brand-500 resize-none"
               rows={2}
             />
+            {adminNotes !== dispute.adminNotes && (
+              <div className="mt-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => handleStatusUpdate(dispute.status)}
+                  isLoading={isUpdating}
+                >
+                  Save Notes
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Actions */}

@@ -22,6 +22,7 @@ import type {
   UpdateDisputeRequest,
   PendingVerification,
   BlacklistedPredictor,
+  AdminPredictorProfile,
 } from '../types';
 
 // ============================================
@@ -190,6 +191,18 @@ export async function updateVerification(
 // ============================================
 // Predictor Blacklist API
 // ============================================
+
+/**
+ * Fetch a predictor's full profile including contact info (admin only)
+ * @param address - Predictor wallet address
+ * @returns Full predictor profile with telegram/discord/preferredContact
+ */
+export async function fetchAdminPredictorProfile(address: string): Promise<AdminPredictorProfile> {
+  const response = await apiClient.get<ApiResponse<AdminPredictorProfile>>(
+    API_CONFIG.ENDPOINTS.ADMIN_PREDICTOR(address)
+  );
+  return response.data.data;
+}
 
 /**
  * Fetch all blacklisted predictors

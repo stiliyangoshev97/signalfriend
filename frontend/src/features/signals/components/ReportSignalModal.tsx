@@ -6,11 +6,14 @@
  * Requires reason selection and optional description.
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Modal, Button } from '@/shared/components/ui';
 import { useCreateReport } from '../hooks/useReports';
 import { REPORT_REASONS, getReportReasonLabel } from '../api/reports.api';
 import type { ReportReason } from '../api/reports.api';
+
+/** URL pattern to detect links in text */
+const urlPattern = /(https?:\/\/|www\.)[^\s]+|(?:[a-zA-Z0-9-]+\.)+(?:com|net|org|io|xyz|gg|me|co|info|biz|tv|cc|ru|uk|de|fr|es|it|nl|be|ch|at|au|ca|us|in|jp|cn|br|mx|ar|cl|co\.uk|com\.au|co\.jp|co\.in)[^\s]*/i;
 
 interface ReportSignalModalProps {
   isOpen: boolean;
@@ -38,6 +41,9 @@ export function ReportSignalModal({
   
   const createReport = useCreateReport();
   
+  // Check for URLs in description
+  const descriptionHasUrl = useMemo(() => urlPattern.test(description), [description]);
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -49,6 +55,12 @@ export function ReportSignalModal({
     
     if (reason === 'other' && !description.trim()) {
       setError('Please provide a description when selecting "Other"');
+      return;
+    }
+    
+    // Block submission if description contains URLs
+    if (descriptionHasUrl) {
+      setError('Description cannot contain links or URLs');
       return;
     }
     
@@ -130,12 +142,21 @@ export function ReportSignalModal({
             placeholder="Provide additional details about your report..."
             rows={4}
             maxLength={1000}
-            className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2 text-fur-cream placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent resize-none"
+            className={`w-full bg-dark-700 border rounded-lg px-3 py-2 text-fur-cream placeholder-gray-500 focus:outline-none focus:ring-2 focus:border-transparent resize-none ${
+              descriptionHasUrl 
+                ? 'border-red-500 focus:ring-red-500' 
+                : 'border-dark-600 focus:ring-brand-400'
+            }`}
             disabled={createReport.isPending}
           />
-          <p className="text-xs text-gray-main mt-1 text-right">
-            {description.length}/1000
-          </p>
+          <div className="flex justify-between mt-1">
+            <p className={`text-xs ${descriptionHasUrl ? 'text-red-400' : 'text-gray-main'}`}>
+              {descriptionHasUrl ? '⚠️ Links are not allowed in the description' : 'No links allowed'}
+            </p>
+            <p className="text-xs text-gray-main">
+              {description.length}/1000
+            </p>
+          </div>
         </div>
         
         {/* Error Message */}
@@ -159,7 +180,7 @@ export function ReportSignalModal({
           <Button
             type="submit"
             variant="danger"
-            disabled={createReport.isPending || !reason}
+            disabled={createReport.isPending || !reason || descriptionHasUrl}
             className="flex-1"
           >
             {createReport.isPending ? 'Submitting...' : 'Submit Report'}

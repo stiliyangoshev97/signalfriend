@@ -541,23 +541,35 @@ PHASE 7: ADMIN DASHBOARD & MODERATION ✅ COMPLETE
     - Simple one-click action (no explanation field needed)
 
 ================================================================================
-KNOWN BUGS TO FIX
+BUGS FIXED (December 8, 2025) ✅
 ================================================================================
 
-[ ] Predictors page search filter cannot be reset
-    - When filtering by name, deleting the input re-enters text automatically
-    - Cannot clear the search filter
+BLACKLIST SYSTEM - ALL FIXED:
+[x] Blacklisted predictor signals filtered from SignalsPage
+[x] SignalDetailPage blocks purchasing from blacklisted predictors
+[x] PurchaseCard shows "Predictor Blacklisted" and disables button
+[x] Blacklisted predictor profile shows warning banner
+[x] UI auto-refreshes after blacklist/unblacklist (query invalidation)
+[x] Blacklisted predictor's signals hidden on their profile page
+[x] Edit Profile button disabled when blacklisted
+[x] Create Signal button disabled when blacklisted
 
-[ ] Mobile responsive issues
-    - Connect wallet button too large (covers "D" in SignalFriend)
-    - "Signals" and "Predictors" nav items not visible on mobile
-    - Connected wallet address overlaps entire nav
-    - NOTE: Can test mobile on desktop using browser DevTools (F12 → toggle device toolbar)
+ADMIN FEATURES - ALL FIXED:
+[x] Admin can see predictor's telegram/discord/preferred contact on profile
+[x] Admin notes in reports/disputes editable with "Save Notes" button
+[x] Reports auto-refresh when new report is created
 
-[ ] Wallet address display on predictor profile
-    - Currently shown in truncated form (0x123...abc)
-    - Should be able to copy full address without seeing it fully
-    - Affects: predictor profile, predictors page, signal details page
+INPUT VALIDATION - ALL FIXED:
+[x] Signal creation blocks links in name/description/content (real-time)
+[x] Report description blocks links on input (real-time validation)
+[x] Profile required fields clearly marked with red asterisks
+[x] Preferred contact defaults to 'discord'
+[x] Bio text wraps properly on predictor profile page
+
+PREVIOUS BUGS (FIXED):
+[✅] Predictors page search filter cannot be reset
+[✅] Mobile responsive issues
+[✅] Wallet address copy with CopyableAddress component
 
 ================================================================================
 DEPENDENCIES TO WATCH

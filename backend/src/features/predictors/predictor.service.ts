@@ -14,7 +14,9 @@ import mongoose from "mongoose";
 import { Predictor, IPredictor } from "./predictor.model.js";
 import { Category } from "../categories/category.model.js";
 import { Receipt } from "../receipts/receipt.model.js";
+import { Dispute } from "../disputes/dispute.model.js";
 import { ApiError } from "../../shared/utils/ApiError.js";
+import { isAdmin } from "../../shared/middleware/admin.js";
 import type {
   ListPredictorsQuery,
   UpdatePredictorProfileInput,
@@ -576,12 +578,21 @@ export class PredictorService {
    * Admin-only method. Note: This is a backend-only blacklist.
    * For full effect, also blacklist on-chain via MultiSig.
    *
+   * Cannot blacklist admin wallet addresses.
+   * Resets any resolved/rejected disputes to pending status.
+   *
    * @param address - The predictor's wallet address
    * @returns Promise resolving to the updated predictor
    * @throws {ApiError} 404 if predictor not found
+   * @throws {ApiError} 400 if trying to blacklist an admin
    */
   static async adminBlacklist(address: string): Promise<IPredictor> {
     const normalizedAddress = address.toLowerCase();
+
+    // Prevent blacklisting admin wallets
+    if (isAdmin(normalizedAddress)) {
+      throw ApiError.badRequest("Cannot blacklist admin wallet addresses");
+    }
 
     const predictor = await Predictor.findOneAndUpdate(
       { walletAddress: normalizedAddress },
@@ -593,6 +604,18 @@ export class PredictorService {
       throw ApiError.notFound(`Predictor with address '${address}' not found`);
     }
 
+    // Reset any existing dispute to allow re-disputing
+    // If predictor was previously unblacklisted and is now blacklisted again,
+    // they should be able to dispute again
+    await Dispute.findOneAndUpdate(
+      { predictorAddress: normalizedAddress },
+      { 
+        status: "pending",
+        adminNotes: "",
+        resolvedAt: undefined
+      }
+    );
+
     return predictor;
   }
 
@@ -600,6 +623,8 @@ export class PredictorService {
    * Removes blacklist status from a predictor in the database.
    * Admin-only method. Note: This is a backend-only unblacklist.
    * For full effect, also unblacklist on-chain via MultiSig.
+   * 
+   * Also automatically resolves any open dispute from this predictor.
    *
    * @param address - The predictor's wallet address
    * @returns Promise resolving to the updated predictor
@@ -617,6 +642,18 @@ export class PredictorService {
     if (!predictor) {
       throw ApiError.notFound(`Predictor with address '${address}' not found`);
     }
+
+    // Automatically resolve any open dispute (pending or contacted)
+    await Dispute.findOneAndUpdate(
+      { 
+        predictorAddress: normalizedAddress,
+        status: { $in: ['pending', 'contacted'] }
+      },
+      { 
+        status: 'resolved',
+        resolvedAt: new Date()
+      }
+    );
 
     return predictor;
   }

@@ -197,13 +197,25 @@ export function ReportCard({
             </button>
             
             {showNotes && (
-              <textarea
-                value={adminNotes}
-                onChange={(e) => setAdminNotes(e.target.value)}
-                placeholder="Add internal notes..."
-                className="w-full bg-dark-900 border border-dark-600 rounded-lg px-3 py-2 text-sm text-fur-cream placeholder-gray-dim focus:outline-none focus:border-brand-500 resize-none"
-                rows={2}
-              />
+              <div className="space-y-2">
+                <textarea
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  placeholder="Add internal notes..."
+                  className="w-full bg-dark-900 border border-dark-600 rounded-lg px-3 py-2 text-sm text-fur-cream placeholder-gray-dim focus:outline-none focus:border-brand-500 resize-none"
+                  rows={2}
+                />
+                {adminNotes !== report.adminNotes && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => handleStatusUpdate(report.status)}
+                    isLoading={isUpdating}
+                  >
+                    Save Notes
+                  </Button>
+                )}
+              </div>
             )}
           </div>
 

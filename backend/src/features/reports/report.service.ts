@@ -17,6 +17,7 @@ import { Report, IReport } from "./report.model.js";
 import { Receipt } from "../receipts/receipt.model.js";
 import { Signal } from "../signals/signal.model.js";
 import { ApiError } from "../../shared/utils/ApiError.js";
+import { stripUrls } from "../../shared/utils/textValidation.js";
 import type {
   CreateReportInput,
   ListSignalReportsQuery,
@@ -94,7 +95,7 @@ export class ReportService {
       throw ApiError.notFound("Signal associated with this receipt not found");
     }
 
-    // Create report
+    // Create report (strip URLs from description for security)
     const report = new Report({
       tokenId: data.tokenId,
       signalId: signal._id,
@@ -102,7 +103,7 @@ export class ReportService {
       reporterAddress: normalizedReporter,
       predictorAddress: receipt.predictorAddress,
       reason: data.reason,
-      description: data.description || "",
+      description: data.description ? stripUrls(data.description) : "",
       status: "pending",
     });
 

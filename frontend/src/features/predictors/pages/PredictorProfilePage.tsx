@@ -16,7 +16,7 @@ import { FilterPanel, SignalGrid, Pagination } from '@/features/signals/componen
 import { useCategories, useMyPurchasedContentIds } from '@/features/signals/hooks';
 import { useAuthStore } from '@/features/auth';
 import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
-import { useBlacklistPredictor, useUnblacklistPredictor } from '@/features/admin/hooks';
+import { useBlacklistPredictor, useUnblacklistPredictor, useAdminPredictorProfile, adminKeys } from '@/features/admin/hooks';
 import {
   usePublicPredictorProfile,
   usePublicPredictorSignals,
@@ -168,8 +168,14 @@ export function PredictorProfilePage(): React.ReactElement {
   const unblacklistMutation = useUnblacklistPredictor();
   const isBlacklistLoading = blacklistMutation.isPending || unblacklistMutation.isPending;
 
-  // Fetch predictor profile
-  const { data: predictor, isLoading: profileLoading, error: profileError } = usePublicPredictorProfile(address);
+  // Fetch predictor profile - use admin endpoint for admins (includes contact info)
+  const { data: publicPredictor, isLoading: publicProfileLoading, error: publicProfileError } = usePublicPredictorProfile(address);
+  const { data: adminPredictor, isLoading: adminProfileLoading, error: adminProfileError } = useAdminPredictorProfile(address, isAdmin && isAuthenticated);
+  
+  // Use admin profile if admin, otherwise public profile
+  const predictor = isAdmin && adminPredictor ? adminPredictor : publicPredictor;
+  const profileLoading = isAdmin && isAuthenticated ? adminProfileLoading : publicProfileLoading;
+  const profileError = isAdmin && isAuthenticated ? adminProfileError : publicProfileError;
 
   // Admin blacklist/unblacklist handler
   const handleToggleBlacklist = useCallback(async () => {
@@ -181,12 +187,20 @@ export function PredictorProfilePage(): React.ReactElement {
       } else {
         await blacklistMutation.mutateAsync(address);
       }
-      // Invalidate predictor profile query to refresh blacklist status
+      // Invalidate predictor profile queries to refresh blacklist status
       queryClient.invalidateQueries({ queryKey: publicPredictorKeys.profile(address) });
+      // Also invalidate admin profile query if admin
+      if (isAdmin) {
+        queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address) });
+      }
+      // Invalidate signals queries to refresh marketplace
+      queryClient.invalidateQueries({ queryKey: publicPredictorKeys.signals(address) });
+      // Invalidate general signals queries (marketplace)
+      queryClient.invalidateQueries({ queryKey: ['signals'] });
     } catch (error) {
       console.error('Failed to update blacklist status:', error);
     }
-  }, [address, predictor, blacklistMutation, unblacklistMutation, queryClient]);
+  }, [address, predictor, blacklistMutation, unblacklistMutation, queryClient, isAdmin]);
 
   // Build query filters - DON'T exclude purchased signals on profile page
   // We want to show all signals with a "Purchased" badge for owned ones
@@ -250,6 +264,25 @@ export function PredictorProfilePage(): React.ReactElement {
 
   return (
     <div className="min-h-screen bg-dark-950">
+      {/* Blacklisted Predictor Warning Banner */}
+      {predictor.isBlacklisted && (
+        <div className="bg-red-500/10 border-b border-red-500/30">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center gap-3">
+              <svg className="w-6 h-6 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <h3 className="font-semibold text-red-400">Predictor Blacklisted</h3>
+                <p className="text-sm text-red-300/80">
+                  This predictor has been blacklisted. Their signals cannot be purchased.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Profile Header */}
       <header className="bg-gradient-to-b from-dark-800 to-dark-950 border-b border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -294,7 +327,7 @@ export function PredictorProfilePage(): React.ReactElement {
               </div>
 
               {predictor.bio && (
-                <p className="text-fur-cream/70 max-w-2xl mb-4">
+                <p className="text-fur-cream/70 max-w-2xl mb-4 break-words whitespace-pre-wrap overflow-hidden">
                   {predictor.bio}
                 </p>
               )}
@@ -312,6 +345,44 @@ export function PredictorProfilePage(): React.ReactElement {
                   </svg>
                   @{predictor.socialLinks.twitter.replace('@', '')}
                 </a>
+              )}
+
+              {/* Admin-only Contact Info */}
+              {isAdmin && (predictor.socialLinks?.telegram || predictor.socialLinks?.discord || predictor.preferredContact) && (
+                <div className="mt-4 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                  <p className="text-xs text-purple-400 font-medium mb-2 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    Admin Only - Contact Info
+                  </p>
+                  <div className="space-y-1 text-sm">
+                    {predictor.socialLinks?.telegram && (
+                      <div className="flex items-center gap-2 text-fur-cream/80">
+                        <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                        </svg>
+                        <span className="font-medium">Telegram:</span>
+                        <span>@{predictor.socialLinks.telegram.replace('@', '')}</span>
+                        {predictor.preferredContact === 'telegram' && (
+                          <Badge variant="success" className="text-xs">Preferred</Badge>
+                        )}
+                      </div>
+                    )}
+                    {predictor.socialLinks?.discord && (
+                      <div className="flex items-center gap-2 text-fur-cream/80">
+                        <svg className="w-4 h-4 text-indigo-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9460 2.4189-2.1568 2.4189Z"/>
+                        </svg>
+                        <span className="font-medium">Discord:</span>
+                        <span>{predictor.socialLinks.discord}</span>
+                        {predictor.preferredContact === 'discord' && (
+                          <Badge variant="success" className="text-xs">Preferred</Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
 
               {/* Admin Blacklist/Unblacklist Button */}
