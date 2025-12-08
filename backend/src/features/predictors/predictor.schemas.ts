@@ -104,6 +104,10 @@ export const createPredictorFromEventSchema = z.object({
   tokenId: z.number().int().min(0),
   /** Timestamp when they joined (from blockchain) */
   joinedAt: z.date(),
+  /** Optional referrer address (if joined via referral) */
+  referredBy: z.string().regex(ethereumAddressRegex).optional(),
+  /** Whether referral bonus was paid */
+  referralPaid: z.boolean().optional(),
 });
 
 /** Type for list predictors query parameters */

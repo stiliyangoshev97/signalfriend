@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 7 December 2025 (v0.6.0 - Buyer Reports & Blacklist Management)
+> Last Updated: 8 December 2025 (v0.9.0 - Phase 3 Misc Fixes Complete)
 
 ---
 
@@ -26,18 +26,20 @@
 | **Signal Marketplace** | ✅ 100% | Full marketplace with filters, cards, pagination |
 | **Signal Detail Page** | ✅ 100% | Full detail view with purchase UI |
 | **Purchase Flow** | ✅ 100% | Multi-step modal with USDT approval + purchase |
-| **Become a Predictor** | ✅ 100% | Full registration flow with auth prompt |
+| **Become a Predictor** | ✅ 100% | Full registration flow with referral validation |
 | **My Purchased Signals** | ✅ 100% | View/access purchased signals with receipts |
-| **Predictor Dashboard** | ✅ 100% | Stats, signal management, edit profile, view profile |
-| **Predictor List Page** | ✅ 100% | Public leaderboard with filters, pagination |
-| **Predictor Profile** | ✅ 100% | Full profile with signals grid, filters |
+| **Predictor Dashboard** | ✅ 100% | Stats, signal management, edit profile, referral earnings |
+| **Predictor List Page** | ✅ 100% | Public leaderboard with filters, verified badges |
+| **Predictor Profile** | ✅ 100% | Full profile with signals grid, admin sections |
 | **Edit Profile Modal** | ✅ 100% | Full profile editing with uniqueness validation |
 | **Mobile Responsive** | ✅ 100% | Hamburger menu, proper scaling, copy addresses |
 | **Admin Dashboard** | ✅ 100% | Earnings, verifications, reports, disputes, blacklisted tabs |
+| **Admin Manual Verify** | ✅ 100% | Verify/unverify any predictor from profile |
+| **Admin Earnings View** | ✅ 100% | View predictor's total earnings on their profile |
 | **Buyer Report Signal** | ✅ 100% | Report purchased signals with reason dropdown |
 | **Admin Blacklist/Unblacklist** | ✅ 100% | Toggle blacklist from predictor profiles |
 
-**Overall Progress: ~98%** (All core features complete)
+**Overall Progress: ~100%** (All core features complete)
 
 ---
 

@@ -2,8 +2,8 @@
                         SIGNALFRIEND FRONTEND TO-DO LIST
 ================================================================================
 
-Last Updated: 2025-12-07
-Current Version: v0.6.0 (Buyer Reports & Admin Blacklist Management)
+Last Updated: 2025-12-08
+Current Version: v0.9.0 (Phase 3 Misc Fixes Complete)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -539,6 +539,47 @@ PHASE 7: ADMIN DASHBOARD & MODERATION ✅ COMPLETE
     - POST /api/disputes - Create dispute (authenticated blacklisted predictor)
     - GET /api/disputes/me - Get own dispute status
     - Simple one-click action (no explanation field needed)
+
+================================================================================
+PHASE 8: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)
+================================================================================
+
+[x] #1 Fix "You have already reported" → "You have reported" message
+[x] #2 Show "Login rejected" instead of verbose viem error on sign-in rejection
+    - Updated AuthButton to use parsedError.title instead of raw error message
+    - Updated walletErrors to show "Request Cancelled" for better UX
+[x] #3 Display updated verification requirements (100 sales + $1000 earnings)
+    - Added verification progress card to dashboard
+    - Shows progress bars for both sales (100) and earnings ($1000)
+[x] #4 Admin ability to manually verify any predictor regardless of sales
+    - Added useManualVerifyPredictor() and useUnverifyPredictor() hooks
+    - "Admin Actions" section on predictor profile pages
+    - Verify/Unverify button alongside Blacklist button
+[x] #5 Frontend validation for referral address (must be existing predictor)
+    - Added checkPredictorStatus API call
+    - Debounced validation on BecomePredictorPage
+    - Shows clear error if address is not a registered predictor
+    - Improved error message: "Invalid address format. Please enter a valid wallet address (0x...)"
+[x] #6 Fix purchase modal staying open after rate limit during purchase
+    - Added 'error' step type to usePurchase hook
+    - PurchaseModal shows API errors with Retry button
+[x] #7 Add referral earnings display to predictor dashboard
+    - New referral earnings card showing paid referrals and earnings
+    - Updated PredictorEarnings type to include referral data
+    - Card now always visible (with explanation if no referrals)
+    - Updated to green theme consistent with site design
+[x] #8 Admin can view predictor's total earnings on their profile
+    - "Admin Only - Earnings" card on predictor profiles
+    - Shows: Total Earnings, From Sales, From Referrals, Platform Fee
+    - Uses green theme consistent with site design
+[x] #9 Set up Sentry for error tracking (frontend)
+    - SentryProvider already implemented with @sentry/react
+    - Configured with error filtering and privacy settings
+[x] #10 UI/UX improvements (green theme consistency, verified badge on Predictors page)
+    - "Admin Only - Contact Info" and "Admin Only - Earnings" use green theme (was purple/pink)
+    - Referral Earnings card uses green theme (was purple/pink)
+    - Verified badge on Predictors page matches profile page style (Badge with checkmark icon)
+    - Admin action buttons properly spaced in flex container
 
 ================================================================================
 BUGS FIXED (December 8, 2025) ✅

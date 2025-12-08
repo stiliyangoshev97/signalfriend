@@ -152,11 +152,19 @@ export const getPredictorEarnings = asyncHandler(async (req: Request, res: Respo
     return;
   }
 
-  const earnings = await PredictorService.getEarnings(address);
+  // Get both signal earnings and referral earnings
+  const [earnings, referralEarnings] = await Promise.all([
+    PredictorService.getEarnings(address),
+    PredictorService.getReferralEarnings(address),
+  ]);
 
   res.json({
     success: true,
-    data: earnings,
+    data: {
+      ...earnings,
+      ...referralEarnings,
+      totalEarnings: earnings.predictorEarnings + referralEarnings.referralEarnings,
+    },
   });
 });
 

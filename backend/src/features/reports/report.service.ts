@@ -85,7 +85,7 @@ export class ReportService {
     const existing = await Report.findOne({ tokenId: data.tokenId });
     if (existing) {
       throw ApiError.conflict(
-        "You have already reported this purchase"
+        "You have reported this purchase"
       );
     }
 

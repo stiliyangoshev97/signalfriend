@@ -22,6 +22,7 @@ import {
   useMyEarnings,
   useDeactivateSignal,
   useReactivateSignal,
+  useApplyForVerification,
 } from '../hooks';
 import { DashboardStats, MySignalCard, CreateSignalModal, EditProfileModal, BlacklistBanner } from '../components';
 
@@ -125,6 +126,7 @@ export function PredictorDashboardPage(): React.ReactElement {
   // Mutations
   const { mutate: deactivateSignal, isPending: isDeactivating } = useDeactivateSignal();
   const { mutate: reactivateSignal, isPending: isReactivating } = useReactivateSignal();
+  const { mutate: applyForVerification, isPending: isApplyingForVerification } = useApplyForVerification();
   
   const isActionPending = isDeactivating || isReactivating;
   
@@ -146,6 +148,17 @@ export function PredictorDashboardPage(): React.ReactElement {
   const totalEarnings = earnings?.totalEarnings || signals.reduce((sum, s) => sum + (s.priceUsdt * 0.95 * s.totalSales), 0);
   const averageRating = predictor?.averageRating || 0;
   const totalReviews = predictor?.totalReviews || signals.reduce((sum, s) => sum + s.totalReviews, 0);
+  
+  // Referral earnings
+  const referralEarnings = earnings?.referralEarnings || 0;
+  const paidReferrals = earnings?.paidReferrals || 0;
+  const hasReferralEarnings = paidReferrals > 0;
+  
+  // Verification requirements
+  const MIN_SALES_FOR_VERIFICATION = 100;
+  const MIN_EARNINGS_FOR_VERIFICATION = 1000;
+  const canApplyForVerification = totalSales >= MIN_SALES_FOR_VERIFICATION && totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION;
+  const showVerificationButton = !isVerified && predictor?.verificationStatus !== 'pending' && !predictor?.isBlacklisted;
   
   // Handlers
   const handleDeactivate = (contentId: string, title?: string) => {
@@ -187,6 +200,23 @@ export function PredictorDashboardPage(): React.ReactElement {
               </Badge>
             ) : predictor?.verificationStatus === 'pending' ? (
               <Badge variant="warning">Verification Pending</Badge>
+            ) : showVerificationButton ? (
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => applyForVerification()}
+                disabled={!canApplyForVerification || isApplyingForVerification}
+                title={!canApplyForVerification 
+                  ? `Requires ${MIN_SALES_FOR_VERIFICATION} sales (you have ${totalSales}) and $${MIN_EARNINGS_FOR_VERIFICATION} earnings (you have $${totalEarnings.toFixed(2)})`
+                  : 'Apply for verification badge'
+                }
+                className="flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                {isApplyingForVerification ? 'Applying...' : 'Get Verified'}
+              </Button>
             ) : null}
           </div>
           <p className="text-fur-cream/60">
@@ -282,6 +312,135 @@ export function PredictorDashboardPage(): React.ReactElement {
           isLoading={signalsLoading || earningsLoading}
         />
       </div>
+
+      {/* Referral Earnings Card - Always show */}
+      <div className="mb-8">
+        <Card className="bg-gradient-to-r from-brand-200/10 to-success-500/10 border-brand-200/30">
+          <div className="p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-brand-200/20 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-brand-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-fur-cream">Referral Earnings</h3>
+                <p className="text-sm text-fur-cream/60">Your earnings from inviting new predictors</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-dark-900/50 rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-brand-200">{paidReferrals}</p>
+                <p className="text-sm text-fur-cream/60">Successful Referrals</p>
+              </div>
+              <div className="bg-dark-900/50 rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-success-500">${referralEarnings.toFixed(2)}</p>
+                <p className="text-sm text-fur-cream/60">Referral Earnings</p>
+              </div>
+            </div>
+            
+            {hasReferralEarnings ? (
+              <p className="mt-3 text-xs text-fur-cream/50">
+                Earn $5 for each new predictor who joins using your address as referrer.
+              </p>
+            ) : (
+              <div className="mt-3 p-3 bg-dark-900/30 rounded-lg">
+                <p className="text-sm text-fur-cream/70">
+                  <span className="font-medium text-brand-200">💡 Earn $5 per referral!</span> Share your wallet address with friends who want to become predictors. 
+                  When they register as a new predictor using your address as their referrer, you'll earn $5 per successful referral.
+                </p>
+              </div>
+            )}
+          </div>
+        </Card>
+      </div>
+
+      {/* Verification Progress Card - Show only if not verified and not pending */}
+      {showVerificationButton && (
+        <div className="mb-8">
+          <Card className="bg-gradient-to-r from-dark-800 to-dark-700 border-dark-600">
+            <div className="p-5">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-accent-gold/20 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-accent-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-fur-cream">Verification Progress</h3>
+                  <p className="text-sm text-fur-cream/60">Complete these requirements to get verified</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Sales Progress */}
+                <div className="bg-dark-900/50 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-fur-cream/70">Total Sales</span>
+                    <span className={`text-sm font-medium ${totalSales >= MIN_SALES_FOR_VERIFICATION ? 'text-success-500' : 'text-fur-cream'}`}>
+                      {totalSales} / {MIN_SALES_FOR_VERIFICATION}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all ${totalSales >= MIN_SALES_FOR_VERIFICATION ? 'bg-success-500' : 'bg-accent-gold'}`}
+                      style={{ width: `${Math.min((totalSales / MIN_SALES_FOR_VERIFICATION) * 100, 100)}%` }}
+                    />
+                  </div>
+                  {totalSales >= MIN_SALES_FOR_VERIFICATION && (
+                    <p className="text-xs text-success-500 mt-1 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Requirement met!
+                    </p>
+                  )}
+                </div>
+
+                {/* Earnings Progress */}
+                <div className="bg-dark-900/50 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-fur-cream/70">Total Earnings</span>
+                    <span className={`text-sm font-medium ${totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION ? 'text-success-500' : 'text-fur-cream'}`}>
+                      ${totalEarnings.toFixed(2)} / ${MIN_EARNINGS_FOR_VERIFICATION}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all ${totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION ? 'bg-success-500' : 'bg-accent-gold'}`}
+                      style={{ width: `${Math.min((totalEarnings / MIN_EARNINGS_FOR_VERIFICATION) * 100, 100)}%` }}
+                    />
+                  </div>
+                  {totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION && (
+                    <p className="text-xs text-success-500 mt-1 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Requirement met!
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {canApplyForVerification && (
+                <div className="mt-4 pt-4 border-t border-dark-600">
+                  <p className="text-sm text-success-500 mb-3">
+                    🎉 Congratulations! You've met all requirements. Apply for verification now!
+                  </p>
+                  <Button 
+                    onClick={() => applyForVerification()}
+                    disabled={isApplyingForVerification}
+                    className="w-full sm:w-auto"
+                  >
+                    {isApplyingForVerification ? 'Applying...' : 'Apply for Verification'}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Published Signals Section */}
       <div>

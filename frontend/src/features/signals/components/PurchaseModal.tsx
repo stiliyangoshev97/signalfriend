@@ -122,6 +122,7 @@ export function PurchaseModal({
     isPurchasing,
     isPurchaseConfirmed,
     error,
+    retry,
   } = usePurchaseFlow({
     contentId,
     priceUsdt,
@@ -129,8 +130,30 @@ export function PurchaseModal({
   });
 
   // Parse error into user-friendly message
+  // Handle both API errors (rate limit, etc.) and wallet errors
   const parsedError = useMemo(() => {
     if (!error) return null;
+    
+    // Check if it's an API error (has status property)
+    const apiError = error as { message?: string; status?: number };
+    if (apiError.status) {
+      // Handle rate limit error specifically
+      if (apiError.status === 429) {
+        return {
+          title: 'Too Many Requests',
+          message: 'Please wait a moment and try again.',
+          isUserAction: false,
+        };
+      }
+      // Generic API error
+      return {
+        title: 'Request Failed',
+        message: apiError.message || 'Something went wrong. Please try again.',
+        isUserAction: false,
+      };
+    }
+    
+    // Otherwise, parse as wallet error
     return parseWalletError(error);
   }, [error]);
 
@@ -155,6 +178,12 @@ export function PurchaseModal({
     setHasStarted(true);
 
     try {
+      // If there's an API error, retry fetching the content identifier
+      if (step === 'error') {
+        await retry();
+        return;
+      }
+      
       if (needsApproval && !isApprovalConfirmed) {
         await handleApprove();
       } else {
@@ -170,6 +199,7 @@ export function PurchaseModal({
    */
   const getButtonText = () => {
     if (step === 'loading') return 'Loading...';
+    if (step === 'error') return 'Retry';
     if (step === 'insufficient-balance') return 'Insufficient USDT Balance';
     if (step === 'approve') return 'Approve USDT';
     if (step === 'approving') return 'Approving...';
@@ -368,7 +398,7 @@ export function PurchaseModal({
                 variant="ghost"
                 className="flex-1"
                 onClick={onClose}
-                disabled={isApproving || isPurchasing}
+                disabled={!error && (isApproving || isPurchasing)}
               >
                 Cancel
               </Button>

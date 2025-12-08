@@ -230,3 +230,19 @@ export async function blacklistPredictor(address: string): Promise<void> {
 export async function unblacklistPredictor(address: string): Promise<void> {
   await apiClient.post(API_CONFIG.ENDPOINTS.ADMIN_UNBLACKLIST(address));
 }
+
+/**
+ * Manually verify a predictor regardless of sales/earnings requirements (admin only)
+ * @param address - Predictor wallet address
+ */
+export async function manualVerifyPredictor(address: string): Promise<void> {
+  await apiClient.post(API_CONFIG.ENDPOINTS.ADMIN_MANUAL_VERIFY(address));
+}
+
+/**
+ * Remove verification from a predictor (admin only)
+ * @param address - Predictor wallet address
+ */
+export async function unverifyPredictor(address: string): Promise<void> {
+  await apiClient.post(API_CONFIG.ENDPOINTS.ADMIN_UNVERIFY(address));
+}

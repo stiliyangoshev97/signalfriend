@@ -15,6 +15,7 @@
  * - POST /api/admin/predictors/:address/verify - Approve verification
  * - POST /api/admin/predictors/:address/reject - Reject verification
  * - POST /api/admin/predictors/:address/unverify - Remove verification
+ * - POST /api/admin/predictors/:address/manual-verify - Manually verify any predictor
  * - GET /api/admin/reports - List all reports for admin review
  * - GET /api/admin/reports/:id - Get single report by ID
  * - PUT /api/admin/reports/:id - Update report status
@@ -32,6 +33,7 @@ import {
   verifyPredictor,
   rejectVerification,
   unverifyPredictor,
+  manualVerifyPredictor,
   getPlatformStats,
   getReports,
   getReportById,
@@ -112,6 +114,13 @@ router.post("/predictors/:address/reject", rejectVerification);
  * Their avatar will also be removed.
  */
 router.post("/predictors/:address/unverify", unverifyPredictor);
+
+/**
+ * POST /api/admin/predictors/:address/manual-verify
+ * Manually verify a predictor regardless of sales count or pending application.
+ * Use for special cases where normal requirements should be bypassed.
+ */
+router.post("/predictors/:address/manual-verify", manualVerifyPredictor);
 
 // ============================================================================
 // Signal Management

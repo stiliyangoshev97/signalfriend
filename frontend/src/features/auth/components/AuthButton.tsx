@@ -90,7 +90,8 @@ export function AuthButton() {
     isLoading, 
     login, 
     logout,
-    error,
+    parsedError,
+    isUserRejection,
   } = useAuth();
   const isAdmin = useIsAdmin();
 
@@ -117,13 +118,15 @@ export function AuthButton() {
   if (!isAuthenticated) {
     return (
       <div className="flex items-center gap-3">
-        {/* Show error if any */}
-        {error && (
+        {/* Show error if any - user rejection shown as yellow, other errors as red */}
+        {parsedError && (
           <span
-            className="text-sm text-error-500 max-w-[200px] truncate"
-            title={error.message}
+            className={`text-sm max-w-[200px] truncate ${
+              isUserRejection ? 'text-yellow-500' : 'text-error-500'
+            }`}
+            title={parsedError.message}
           >
-            {error.message}
+            {parsedError.title}
           </span>
         )}
         

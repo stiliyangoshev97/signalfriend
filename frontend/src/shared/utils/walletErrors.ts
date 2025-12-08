@@ -171,8 +171,8 @@ export function parseWalletError(error: unknown): ParsedWalletError {
   // User rejection - not really an error, user intentionally cancelled
   if (matchesPattern(rawMessage, ERROR_PATTERNS.userRejection)) {
     return {
-      title: 'Transaction Cancelled',
-      message: 'You declined the transaction in your wallet.',
+      title: 'Request Cancelled',
+      message: 'You declined the request in your wallet.',
       isUserAction: true,
       originalError: error,
     };

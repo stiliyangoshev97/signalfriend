@@ -350,6 +350,12 @@ export class PredictorService {
       throw ApiError.conflict(`Predictor already exists for address '${data.walletAddress}'`);
     }
 
+    // Normalize referrer address if provided (and not zero address)
+    const zeroAddress = "0x0000000000000000000000000000000000000000";
+    const referredBy = data.referredBy && data.referredBy.toLowerCase() !== zeroAddress
+      ? data.referredBy.toLowerCase()
+      : undefined;
+
     // Create with default values
     const predictor = new Predictor({
       walletAddress: normalizedAddress,
@@ -365,6 +371,8 @@ export class PredictorService {
       totalReviews: 0,
       isBlacklisted: false,
       joinedAt: data.joinedAt,
+      referredBy,
+      referralPaid: data.referralPaid ?? false,
     });
 
     await predictor.save();
@@ -536,6 +544,40 @@ export class PredictorService {
     };
   }
 
+  /**
+   * Calculates referral earnings for a predictor.
+   * Returns the count and total bonus from successful referrals.
+   * Referral bonus is $5 per referred predictor (where referralPaid = true).
+   *
+   * @param address - The predictor's wallet address
+   * @returns Promise resolving to referral earnings summary
+   */
+  static async getReferralEarnings(address: string): Promise<{
+    totalReferrals: number;
+    paidReferrals: number;
+    referralEarnings: number;
+  }> {
+    const normalizedAddress = address.toLowerCase();
+
+    // Count predictors referred by this address
+    const [totalResult, paidResult] = await Promise.all([
+      // Total referrals (regardless of payment)
+      Predictor.countDocuments({ referredBy: normalizedAddress }),
+      // Paid referrals (where referralPaid = true)
+      Predictor.countDocuments({ referredBy: normalizedAddress, referralPaid: true }),
+    ]);
+
+    // $5 per paid referral
+    const REFERRAL_BONUS = 5;
+    const referralEarnings = paidResult * REFERRAL_BONUS;
+
+    return {
+      totalReferrals: totalResult,
+      paidReferrals: paidResult,
+      referralEarnings,
+    };
+  }
+
   // ============================================================================
   // ADMIN METHODS
   // ============================================================================
@@ -664,6 +706,7 @@ export class PredictorService {
 
   /** Minimum sales required to apply for verification */
   private static readonly MIN_SALES_FOR_VERIFICATION = 100;
+  private static readonly MIN_EARNINGS_FOR_VERIFICATION = 1000; // $1000 USDT
 
   /**
    * Applies for profile verification.
@@ -706,10 +749,20 @@ export class PredictorService {
       throw ApiError.badRequest("Verification application is already pending");
     }
 
+    // Get predictor's earnings for verification check
+    const earnings = await PredictorService.getEarnings(address);
+
     // Check minimum sales requirement
     if (predictor.totalSales < PredictorService.MIN_SALES_FOR_VERIFICATION) {
       throw ApiError.badRequest(
         `You need at least ${PredictorService.MIN_SALES_FOR_VERIFICATION} sales to apply for verification. Current: ${predictor.totalSales}`
+      );
+    }
+
+    // Check minimum earnings requirement
+    if (earnings.totalSalesRevenue < PredictorService.MIN_EARNINGS_FOR_VERIFICATION) {
+      throw ApiError.badRequest(
+        `You need at least $${PredictorService.MIN_EARNINGS_FOR_VERIFICATION} USDT in total sales to apply for verification. Current: $${earnings.totalSalesRevenue.toFixed(2)}`
       );
     }
 
@@ -768,6 +821,34 @@ export class PredictorService {
 
     predictor.isVerified = true;
     predictor.verificationStatus = "none"; // Reset status
+    
+    await predictor.save();
+    return predictor;
+  }
+
+  /**
+   * Manually verifies a predictor regardless of sales count or pending status.
+   * Admin-only method for special cases.
+   *
+   * @param address - The predictor's wallet address
+   * @returns Promise resolving to the updated predictor
+   * @throws {ApiError} 404 if predictor not found
+   * @throws {ApiError} 400 if predictor is already verified
+   */
+  static async adminManualVerify(address: string): Promise<IPredictor> {
+    const normalizedAddress = address.toLowerCase();
+
+    const predictor = await Predictor.findOne({ walletAddress: normalizedAddress });
+    if (!predictor) {
+      throw ApiError.notFound(`Predictor with address '${address}' not found`);
+    }
+
+    if (predictor.isVerified) {
+      throw ApiError.badRequest("Predictor is already verified");
+    }
+
+    predictor.isVerified = true;
+    predictor.verificationStatus = "none"; // Reset any pending status
     
     await predictor.save();
     return predictor;

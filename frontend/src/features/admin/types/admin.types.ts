@@ -179,6 +179,7 @@ export interface PendingVerification {
   joinedAt: string;
   totalSales: number;
   totalSignals: number;
+  totalEarnings: number;
 }
 
 // ============================================
@@ -206,9 +207,21 @@ export interface AdminPredictorProfile {
   totalReviews: number;
   isBlacklisted: boolean;
   isVerified: boolean;
+  verificationStatus?: 'none' | 'pending' | 'rejected';
   joinedAt: string;
   createdAt: string;
   updatedAt: string;
+  /** Earnings data (admin only) */
+  earnings?: {
+    totalSalesRevenue: number;
+    predictorEarnings: number;
+    platformCommission: number;
+    totalSalesCount: number;
+    totalReferrals: number;
+    paidReferrals: number;
+    referralEarnings: number;
+    totalEarnings: number;
+  };
 }
 
 // ============================================
