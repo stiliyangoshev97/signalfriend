@@ -218,11 +218,13 @@ export class WebhookService {
         txHash,
       }, "Processing PredictorJoined event");
 
-      // Create predictor record
+      // Create predictor record with referral info
       await PredictorService.createFromEvent({
         walletAddress: args.predictor,
         tokenId: Number(args.nftTokenId),
         joinedAt: new Date(), // Could fetch block timestamp if needed
+        referredBy: args.referrer,
+        referralPaid: args.referralPaid,
       });
 
       logger.info({

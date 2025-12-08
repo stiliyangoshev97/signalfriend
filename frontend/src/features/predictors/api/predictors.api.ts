@@ -30,14 +30,22 @@ export interface PredictorStats {
  * Predictor earnings breakdown
  */
 export interface PredictorEarnings {
+  /** Total revenue from signal sales */
+  totalSalesRevenue: number;
+  /** Predictor's earnings from sales (95% of revenue) */
+  predictorEarnings: number;
+  /** Platform commission (5% of revenue) */
+  platformCommission: number;
+  /** Total number of sales */
+  totalSalesCount: number;
+  /** Total referrals (regardless of payment) */
+  totalReferrals: number;
+  /** Paid referrals (where referral bonus was paid) */
+  paidReferrals: number;
+  /** Earnings from referrals ($5 per paid referral) */
+  referralEarnings: number;
+  /** Total combined earnings (signal sales + referrals) */
   totalEarnings: number;
-  signalCount: number;
-  breakdown: {
-    contentId: string;
-    title: string;
-    sales: number;
-    earnings: number;
-  }[];
 }
 
 /**
@@ -69,6 +77,30 @@ export async function fetchMyProfile(): Promise<Predictor> {
 export async function fetchPredictorByAddress(address: string): Promise<Predictor> {
   const response = await apiClient.get<ApiResponse<Predictor>>(
     API_CONFIG.ENDPOINTS.PREDICTOR_BY_ADDRESS(address)
+  );
+  return response.data.data;
+}
+
+/**
+ * Response from predictor check endpoint
+ */
+export interface PredictorCheckResponse {
+  address: string;
+  isPredictor: boolean;
+}
+
+/**
+ * Check if an address is an active predictor
+ * 
+ * @param address - Wallet address to check
+ * @returns Object with isPredictor boolean
+ * 
+ * @example
+ * const { isPredictor } = await checkPredictorStatus('0x123...');
+ */
+export async function checkPredictorStatus(address: string): Promise<PredictorCheckResponse> {
+  const response = await apiClient.get<ApiResponse<PredictorCheckResponse>>(
+    API_CONFIG.ENDPOINTS.PREDICTOR_CHECK(address)
   );
   return response.data.data;
 }

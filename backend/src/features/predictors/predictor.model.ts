@@ -32,6 +32,10 @@ export interface IPredictor extends Document {
   salesAtLastApplication: number;
   /** Timestamp when verification was applied for */
   verificationAppliedAt?: Date;
+  /** Referrer who referred this predictor (if any) */
+  referredBy?: string;
+  /** Whether referral bonus was paid to the referrer */
+  referralPaid: boolean;
   joinedAt: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -130,6 +134,13 @@ const predictorSchema = new Schema<IPredictor>(
       type: Date,
       required: true,
     },
+    referredBy: {
+      type: String,
+    },
+    referralPaid: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -143,5 +154,7 @@ predictorSchema.index(
   { displayName: 1 },
   { unique: true, collation: { locale: "en", strength: 2 } }
 );
+// Index for referral queries
+predictorSchema.index({ referredBy: 1, referralPaid: 1 });
 
 export const Predictor = mongoose.model<IPredictor>("Predictor", predictorSchema);

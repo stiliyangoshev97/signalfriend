@@ -389,7 +389,7 @@ export function usePurchaseFlow(params: {
   const totalCost = priceUsdt + ACCESS_FEE;
 
   // Get content identifier for on-chain call
-  const { data: contentIdData, isLoading: isLoadingContentId } = useContentIdentifier(contentId);
+  const { data: contentIdData, isLoading: isLoadingContentId, error: contentIdError, refetch: refetchContentId } = useContentIdentifier(contentId);
 
   // Check balance and allowance
   const { balanceNumber, isLoading: isLoadingBalance } = useUSDTBalance(chainId);
@@ -465,11 +465,14 @@ export function usePurchaseFlow(params: {
   const canPurchase = hasEnoughBalance && !needsApproval && !!contentIdData?.contentIdentifier;
 
   // Determine current step
-  type PurchaseStep = 'loading' | 'insufficient-balance' | 'approve' | 'approving' | 'ready' | 'purchasing' | 'success';
+  type PurchaseStep = 'loading' | 'error' | 'insufficient-balance' | 'approve' | 'approving' | 'ready' | 'purchasing' | 'success';
   let step: PurchaseStep = 'loading';
 
   if (isLoadingBalance || isLoadingAllowance || isLoadingContentId) {
     step = 'loading';
+  } else if (contentIdError) {
+    // API error (e.g., rate limit) - show error state
+    step = 'error';
   } else if (!hasEnoughBalance) {
     step = 'insufficient-balance';
   } else if (needsApproval) {
@@ -531,6 +534,9 @@ export function usePurchaseFlow(params: {
 
     // Combined
     isProcessing: isApproving || isConfirmingApproval || isPurchasing || isConfirmingPurchase,
-    error: approvalError || purchaseError,
+    error: contentIdError || approvalError || purchaseError,
+    
+    // Retry function for API errors
+    retry: refetchContentId,
   };
 }

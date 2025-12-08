@@ -15,16 +15,43 @@
  * This page is publicly accessible - handles auth state internally.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { isAddress } from 'viem';
+import { isAddress, getAddress } from 'viem';
 import { Card, Button, Spinner, Badge } from '@/shared/components/ui';
 import { useAuth } from '@/features/auth/api/authHooks';
 import { useAuthStore } from '@/features/auth/store';
 import { useBecomePredictor } from '../hooks';
 import { parseWalletError } from '@/shared/utils/walletErrors';
+import { checkPredictorStatus } from '../api/predictors.api';
+
+/**
+ * Check if a string is a valid Ethereum address format.
+ * More lenient than viem's isAddress - accepts any valid hex address
+ * regardless of EIP-55 checksum casing.
+ */
+function isValidAddressFormat(address: string): boolean {
+  // Check basic format: starts with 0x and has 40 hex characters
+  if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+    return false;
+  }
+  // Double-check with viem using lowercase (bypasses checksum validation)
+  return isAddress(address.toLowerCase());
+}
+
+/**
+ * Normalize an address to proper checksum format.
+ * Returns null if the address is invalid.
+ */
+function normalizeAddress(address: string): string | null {
+  try {
+    return getAddress(address);
+  } catch {
+    return null;
+  }
+}
 
 /** Step in the registration flow */
 type RegistrationStep = 'info' | 'approve' | 'join' | 'success';
@@ -125,6 +152,7 @@ function InfoStepContent({
   referrerAddress,
   setReferrerAddress,
   referrerError,
+  isValidatingReferrer,
 }: {
   joinFeeFormatted?: string;
   referralPayoutFormatted?: string;
@@ -136,6 +164,7 @@ function InfoStepContent({
   referrerAddress: string;
   setReferrerAddress: (value: string) => void;
   referrerError: string | null;
+  isValidatingReferrer: boolean;
 }) {
   return (
     <div className="space-y-6">
@@ -242,15 +271,22 @@ function InfoStepContent({
 
         {hasReferrer && (
           <div className="space-y-2">
-            <input
-              type="text"
-              value={referrerAddress}
-              onChange={(e) => setReferrerAddress(e.target.value)}
-              placeholder="Enter referrer wallet address (0x...)"
-              className={`w-full px-4 py-3 bg-dark-700 border rounded-lg text-fur-cream placeholder-fur-cream/40 focus:outline-none focus:ring-2 focus:ring-accent-gold focus:border-transparent font-mono text-sm ${
-                referrerError ? 'border-status-error' : 'border-dark-600'
-              }`}
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={referrerAddress}
+                onChange={(e) => setReferrerAddress(e.target.value)}
+                placeholder="Enter referrer wallet address (0x...)"
+                className={`w-full px-4 py-3 bg-dark-700 border rounded-lg text-fur-cream placeholder-fur-cream/40 focus:outline-none focus:ring-2 focus:ring-accent-gold focus:border-transparent font-mono text-sm ${
+                  referrerError ? 'border-status-error' : 'border-dark-600'
+                }`}
+              />
+              {isValidatingReferrer && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <Spinner size="sm" />
+                </div>
+              )}
+            </div>
             {referrerError && (
               <p className="text-sm text-status-error">{referrerError}</p>
             )}
@@ -264,7 +300,7 @@ function InfoStepContent({
       {/* Continue button */}
       <Button
         onClick={onContinue}
-        disabled={!hasEnoughBalance}
+        disabled={!hasEnoughBalance || isValidatingReferrer || !!referrerError}
         size="lg"
         className="w-full"
       >
@@ -544,14 +580,63 @@ export default function BecomePredictorPage() {
   // Referral state - initialize from URL param if present
   const [hasReferrer, setHasReferrer] = useState(!!urlReferrer);
   const [referrerAddress, setReferrerAddress] = useState(urlReferrer || '');
+  const [isValidatingReferrer, setIsValidatingReferrer] = useState(false);
+  const [referrerValidationError, setReferrerValidationError] = useState<string | null>(null);
 
-  // Derive referrer error from current state (no useEffect needed)
-  const referrerError = useMemo(() => {
-    if (hasReferrer && referrerAddress.trim() && !isAddress(referrerAddress)) {
-      return 'Please enter a valid wallet address';
+  // Validate referrer address when it changes (debounced)
+  useEffect(() => {
+    // Clear error when referrer is disabled or empty
+    if (!hasReferrer || !referrerAddress.trim()) {
+      setReferrerValidationError(null);
+      setIsValidatingReferrer(false);
+      return;
     }
-    return null;
+
+    // First check if it's a valid address format (lenient - ignores checksum)
+    if (!isValidAddressFormat(referrerAddress)) {
+      setReferrerValidationError('Invalid address format. Please enter a valid wallet address (0x...)');
+      setIsValidatingReferrer(false);
+      return;
+    }
+
+    // Normalize the address to proper checksum format for API call
+    const normalizedAddress = normalizeAddress(referrerAddress);
+    if (!normalizedAddress) {
+      setReferrerValidationError('Invalid address format. Please enter a valid wallet address (0x...)');
+      setIsValidatingReferrer(false);
+      return;
+    }
+
+    // Address format is valid - clear any format errors and show loading state
+    // while we check if this address is actually a registered predictor
+    setReferrerValidationError(null);
+    setIsValidatingReferrer(true);
+
+    // Debounce the API call to check if address is a registered predictor
+    const timeoutId = setTimeout(async () => {
+      try {
+        const { isPredictor } = await checkPredictorStatus(normalizedAddress);
+        if (!isPredictor) {
+          setReferrerValidationError('This address is not a registered predictor. Only existing predictors can be used as referrers.');
+        } else {
+          setReferrerValidationError(null);
+        }
+      } catch {
+        // If API fails, don't block - just clear the error
+        setReferrerValidationError(null);
+      } finally {
+        setIsValidatingReferrer(false);
+      }
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(timeoutId);
+      setIsValidatingReferrer(false);
+    };
   }, [hasReferrer, referrerAddress]);
+
+  // Combined referrer error (format error or validation error)
+  const referrerError = referrerValidationError;
 
   // Auth state - check if user is connected and authenticated
   const { isConnected } = useAccount();
@@ -612,7 +697,12 @@ export default function BecomePredictorPage() {
 
   // Handle continue from info step
   const handleContinue = () => {
-    // Validate referrer if provided (error is derived, just check before proceeding)
+    // Don't proceed if there's a referrer error or still validating
+    if (referrerError || isValidatingReferrer) {
+      return;
+    }
+    
+    // Validate referrer address format if provided
     if (hasReferrer && referrerAddress.trim() && !isAddress(referrerAddress)) {
       return;
     }
@@ -728,6 +818,7 @@ export default function BecomePredictorPage() {
                 referrerAddress={referrerAddress}
                 setReferrerAddress={setReferrerAddress}
                 referrerError={referrerError}
+                isValidatingReferrer={isValidatingReferrer}
               />
             )}
 

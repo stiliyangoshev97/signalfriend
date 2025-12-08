@@ -11,6 +11,7 @@
  * - POST /api/admin/predictors/:address/verify - Approve verification
  * - POST /api/admin/predictors/:address/reject - Reject verification
  * - POST /api/admin/predictors/:address/unverify - Remove verification
+ * - POST /api/admin/predictors/:address/manual-verify - Manually verify any predictor
  * - GET /api/admin/reports - List all reports for admin review
  * - GET /api/admin/reports/:id - Get single report by ID
  * - PUT /api/admin/reports/:id - Update report status
@@ -25,22 +26,34 @@ import { asyncHandler } from "../../shared/utils/asyncHandler.js";
 
 /**
  * GET /api/admin/predictors/:address
- * Retrieves a predictor's full profile including contact info.
+ * Retrieves a predictor's full profile including contact info and earnings.
  * Admin only - requires MultiSig wallet.
  *
  * @param {string} address - Ethereum wallet address
- * @returns {Object} JSON response with full predictor data including contacts
+ * @returns {Object} JSON response with full predictor data including contacts and earnings
  * @throws {404} If predictor not found
  */
 export const getAdminPredictorByAddress = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const address = req.params.address as string;
 
-    const predictor = await PredictorService.getByAddressAdmin(address);
+    // Get predictor profile and earnings in parallel
+    const [predictor, earnings, referralEarnings] = await Promise.all([
+      PredictorService.getByAddressAdmin(address),
+      PredictorService.getEarnings(address),
+      PredictorService.getReferralEarnings(address),
+    ]);
 
     res.json({
       success: true,
-      data: predictor,
+      data: {
+        ...predictor.toObject(),
+        earnings: {
+          ...earnings,
+          ...referralEarnings,
+          totalEarnings: earnings.predictorEarnings + referralEarnings.referralEarnings,
+        },
+      },
     });
   }
 );
@@ -141,19 +154,30 @@ export const deleteSignal = asyncHandler(
 
 /**
  * GET /api/admin/verification-requests
- * Lists all pending verification requests.
+ * Lists all pending verification requests with earnings data.
  * Admin only - requires MultiSig wallet.
  *
- * @returns {Object} JSON response with array of pending predictors
+ * @returns {Object} JSON response with array of pending predictors including earnings
  */
 export const getVerificationRequests = asyncHandler(
   async (_req: Request, res: Response): Promise<void> => {
     const predictors = await PredictorService.getPendingVerifications();
 
+    // Fetch earnings for each predictor
+    const predictorsWithEarnings = await Promise.all(
+      predictors.map(async (predictor) => {
+        const earnings = await PredictorService.getEarnings(predictor.walletAddress);
+        return {
+          ...predictor.toObject(),
+          totalEarnings: earnings.totalSalesRevenue,
+        };
+      })
+    );
+
     res.json({
       success: true,
-      data: predictors,
-      count: predictors.length,
+      data: predictorsWithEarnings,
+      count: predictorsWithEarnings.length,
     });
   }
 );
@@ -225,6 +249,31 @@ export const unverifyPredictor = asyncHandler(
     res.json({
       success: true,
       message: "Predictor unverified. Their avatar has been removed.",
+      data: predictor,
+    });
+  }
+);
+
+/**
+ * POST /api/admin/predictors/:address/manual-verify
+ * Manually verifies a predictor regardless of sales count or pending application.
+ * Admin only - requires MultiSig wallet.
+ * Use for special cases where a predictor should be verified outside normal requirements.
+ *
+ * @param {string} address - Ethereum wallet address
+ * @returns {Object} JSON response with updated predictor
+ * @throws {404} If predictor not found
+ * @throws {400} If predictor is already verified
+ */
+export const manualVerifyPredictor = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const address = req.params.address as string;
+
+    const predictor = await PredictorService.adminManualVerify(address);
+
+    res.json({
+      success: true,
+      message: "Predictor manually verified. They can now upload an avatar.",
       data: predictor,
     });
   }

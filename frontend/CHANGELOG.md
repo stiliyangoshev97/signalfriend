@@ -14,6 +14,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.0] - 2025-12-08 ✅ PHASE 3 MISC FIXES COMPLETE
+
+### Added
+
+**Admin Manual Verification System**
+- Admin can manually verify/unverify any predictor from their profile page
+- New "Admin Actions" section on predictor profiles with Verify and Blacklist buttons
+- `useManualVerifyPredictor()` and `useUnverifyPredictor()` React Query hooks
+- API endpoints: `POST /api/admin/predictors/:address/manual-verify` and `/unverify`
+
+**Admin Earnings Display**
+- "Admin Only - Earnings" card on predictor profile pages (visible to admins only)
+- Shows: Total Earnings, From Sales, From Referrals, Platform Fee (5%)
+- Shows total sales revenue and count at bottom
+- Uses green theme consistent with site design
+
+**Predictor Dashboard Referral Card**
+- Referral Earnings card now always visible (not just when has referrals)
+- Shows referral count and earnings
+- When no referrals: shows explanation about earning $5 per referral
+- Updated to green theme (was pink/purple)
+
+**Verified Badge on Predictors Page**
+- PredictorCard now shows green "Verified" badge with checkmark icon
+- Matches the verified badge style on predictor profile pages
+- Uses Badge component with `variant="success"`
+
+**Referral Address Validation**
+- Lenient address format validation (accepts any valid hex address regardless of EIP-55 checksum casing)
+- Added `isValidAddressFormat()` helper that validates format without strict checksum
+- Added `normalizeAddress()` helper to convert addresses to proper checksum format
+- Improved error messages:
+  - Invalid format: "Invalid address format. Please enter a valid wallet address (0x...)"
+  - Valid address, not a predictor: "This address is not a registered predictor. Only existing predictors can be used as referrers."
+- Immediate loading state when format is valid while checking predictor status
+
+### Changed
+
+**Admin Section UI Improvements**
+- "Admin Only - Contact Info" card now uses green theme (was purple/pink)
+- "Admin Only - Earnings" card uses green theme
+- Admin action buttons now in "Admin Actions" container with proper spacing
+- Verify button uses `primary` variant (orange/gold)
+- Blacklist button uses `danger` variant (red)
+- Buttons displayed side-by-side with flex gap
+
+**AdminPredictorProfile Type**
+- Added `earnings` object with all earnings fields (totalSalesRevenue, predictorEarnings, referralEarnings, totalEarnings, platformCommission, etc.)
+- Added `verificationStatus` field
+
+### Fixed
+- Verification Progress card no longer shows for already verified predictors
+- Admin buttons properly spaced (were attached before)
+- Referral card color scheme matches site design
+
+---
+
 ## [0.8.0] - 2025-12-08 🔒 COMPLETE BLACKLIST SYSTEM OVERHAUL
 
 ### Added

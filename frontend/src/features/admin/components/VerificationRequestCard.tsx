@@ -125,6 +125,7 @@ export function VerificationRequestCard({
       <div className="flex items-center gap-4 text-xs text-gray-dim mb-4">
         <span>{verification.totalSignals} signals</span>
         <span>{verification.totalSales} sales</span>
+        <span className="text-accent-gold">${verification.totalEarnings?.toFixed(2) || '0.00'} earned</span>
         <span>
           Requested {formatDistanceToNow(new Date(verification.verificationRequestedAt), { addSuffix: true })}
         </span>

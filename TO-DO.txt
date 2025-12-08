@@ -25,6 +25,21 @@ COMPLETED FEATURES ✅
 [x] Complete blacklist system overhaul (December 8, 2025)
 
 ================================================================================
+PHASE 3: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)
+================================================================================
+
+[x] #1 Fix "You have already reported" → "You have reported" message
+[x] #2 Show "Login rejected" instead of verbose viem error on sign-in rejection
+[x] #3 Verification: Require 100 sales AND $1000 USDT total earnings (not just sales)
+[x] #4 Admin ability to manually verify any predictor regardless of sales
+[x] #5 Frontend validation for referral address (must be existing predictor)
+[x] #6 Fix purchase modal staying open after rate limit during purchase
+[x] #7 Add referral earnings display to predictor dashboard
+[x] #8 Admin can view predictor's total earnings on their profile
+[x] #9 Set up Sentry for error tracking (frontend only - backend uses Pino logger)
+[x] #10 UI/UX improvements (green theme consistency, verified badge on Predictors page)
+
+================================================================================
 NEXT PRIORITY: TESTING & OPTIMIZATION
 ================================================================================
 
@@ -37,6 +52,54 @@ Key Tasks:
 2. Performance optimization (lazy loading, caching)
 3. Mobile responsiveness improvements
 4. SEO & meta tags
+
+================================================================================
+MANUAL TESTING CHECKLIST (Phase 3 Changes)
+================================================================================
+
+### Admin Manual Verification System
+[ ] Go to any predictor's profile as admin
+[ ] Click "Verify Predictor" button → predictor should become verified
+[ ] Verify "Verified" badge appears on profile and in Predictors list
+[ ] Click "Remove Verification" → predictor should become unverified
+[ ] Confirm verification button is orange/gold (primary variant)
+[ ] Confirm blacklist button is red (danger variant)
+[ ] Buttons should be side-by-side with proper spacing
+
+### Admin Earnings Display
+[ ] View any predictor's profile as admin
+[ ] See "Admin Only - Earnings" card with green border
+[ ] Shows: Total Earnings, From Sales, From Referrals, Platform Fee
+[ ] Shows total sales revenue and count at bottom
+
+### Admin Contact Info Display
+[ ] View predictor's profile as admin
+[ ] See "Admin Only - Contact Info" card with green border
+[ ] Shows Telegram and Discord with "Preferred" badge
+
+### Predictor Dashboard Referral Card
+[ ] Log in as a predictor
+[ ] See "Referral Earnings" card (always visible)
+[ ] Card has green border theme (not pink/purple)
+[ ] If no referrals: shows explanation message about earning $5 per referral
+[ ] If has referrals: shows count and earnings
+
+### Verification Progress Hidden for Verified
+[ ] Log in as a verified predictor
+[ ] Dashboard should NOT show "Verification Progress" card
+[ ] Log in as unverified predictor
+[ ] Dashboard SHOULD show "Verification Progress" card
+
+### Referral Address Validation (Become Predictor Page)
+[ ] Toggle "I have a referral code"
+[ ] Enter invalid address format → "Invalid address format. Please enter a valid wallet address (0x...)"
+[ ] Enter valid address that's not a predictor → "This address is not a registered predictor"
+[ ] Enter valid predictor address → No error, can proceed
+
+### Verified Badge on Predictors Page
+[ ] Go to /predictors page
+[ ] Verified predictors show green "Verified" badge with checkmark icon
+[ ] Badge matches the style on predictor profile pages
 
 ================================================================================
 BUGS FIXED (December 8, 2025) ✅
@@ -78,6 +141,7 @@ DEPLOYMENT CHECKLIST
 
 [x] Admin system complete
 [x] Blacklist system complete
+[x] Phase 3 misc fixes complete
 [ ] Full mobile responsive testing
 [ ] Security audit
 [ ] Performance testing
@@ -85,3 +149,4 @@ DEPLOYMENT CHECKLIST
 [ ] Production environment setup
 [ ] MongoDB Atlas migration
 [ ] Domain and SSL setup
+[ ] Enable Sentry error tracking (set VITE_SENTRY_DSN in frontend .env)

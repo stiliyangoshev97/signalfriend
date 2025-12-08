@@ -310,6 +310,29 @@ INPUT VALIDATION - ALL FIXED:
 [x] Report description strips URLs on input
 
 ================================================================================
+## PHASE 13: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)
+================================================================================
+
+[x] #2 Fix verbose viem error on sign-in rejection - return clean "Login rejected" message
+[x] #3 Verification: Require 100 sales AND $1000 USDT total earnings (not just sales count)
+    - Updated applyForVerification() to check both conditions
+    - Updated admin verification requests to show earnings alongside sales
+[x] #4 Admin ability to manually verify any predictor regardless of sales/earnings
+    - New endpoint: POST /api/admin/predictors/:address/manual-verify
+    - New endpoint: POST /api/admin/predictors/:address/unverify
+    - Added adminManualVerify() to PredictorService
+    - Sets isVerified=true, verificationStatus='none', manuallyVerified=true
+[x] #7 Track and expose referral earnings in predictor data
+    - Added referredBy and referralPaid fields to Predictor model
+    - Added getReferralEarnings() to PredictorService
+    - Updated getPredictorEarnings endpoint to include referral earnings
+[x] #8 Admin can view predictor's total earnings on their profile
+    - Updated /api/admin/predictors/:address to return earnings object
+    - Returns: totalSalesRevenue, predictorEarnings, platformCommission, 
+      totalSalesCount, totalReferrals, paidReferrals, referralEarnings, totalEarnings
+[N/A] #9 Sentry - Not needed for backend (using Pino logger instead)
+
+================================================================================
 ## NOTES
 ================================================================================
 - Contract Addresses (BNB Testnet - Chain ID 97):

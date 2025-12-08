@@ -68,6 +68,7 @@ export const API_CONFIG = {
     // Predictors
     PREDICTORS: '/api/predictors',
     PREDICTOR_BY_ADDRESS: (address: string) => `/api/predictors/${address}`,
+    PREDICTOR_CHECK: (address: string) => `/api/predictors/${address}/check`,
     PREDICTOR_PROFILE: '/api/predictors/me',
     PREDICTOR_SIGNALS: (address: string) => `/api/signals/predictor/${address}`,
     
@@ -91,6 +92,8 @@ export const API_CONFIG = {
     ADMIN_SIGNAL_DELETE: (id: string) => `/api/admin/signals/${id}`,
     ADMIN_PENDING_VERIFICATIONS: '/api/admin/verification-requests',
     ADMIN_VERIFY: (address: string) => `/api/admin/predictors/${address}/verify`,
+    ADMIN_MANUAL_VERIFY: (address: string) => `/api/admin/predictors/${address}/manual-verify`,
+    ADMIN_UNVERIFY: (address: string) => `/api/admin/predictors/${address}/unverify`,
     ADMIN_REPORTS: '/api/admin/reports',
     ADMIN_REPORT_BY_ID: (id: string) => `/api/admin/reports/${id}`,
     ADMIN_DISPUTES: '/api/admin/disputes',

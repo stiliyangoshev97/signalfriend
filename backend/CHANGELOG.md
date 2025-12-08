@@ -15,6 +15,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.21.0] - 2025-12-08 ✅ PHASE 3 MISC FIXES COMPLETE
+
+### Added
+
+**Admin Manual Verification Endpoints**
+- `POST /api/admin/predictors/:address/manual-verify` - Admin can verify any predictor regardless of sales
+- `POST /api/admin/predictors/:address/unverify` - Admin can remove verification from any predictor
+- `adminManualVerify()` method in PredictorService
+- Updates predictor's `isVerified`, `verificationStatus`, and `manuallyVerified` fields
+
+**Admin Predictor Profile Earnings**
+- `getAdminPredictorByAddress()` now returns full earnings breakdown
+- Returns: totalSalesRevenue, predictorEarnings, platformCommission, referralEarnings, totalEarnings, etc.
+- `getReferralEarnings()` helper method for calculating referral bonuses
+
+**Verification Requirements Update**
+- Verification now requires 100 sales AND $1000 USDT total earnings (not just sales)
+- Updated `applyForVerification()` to check both conditions
+- Added earnings check using `getPredictorEarnings()` helper
+
+### Changed
+
+**AdminPredictorProfile Response**
+- Now includes `earnings` object with all financial metrics
+- Now includes `verificationStatus` field
+
+---
+
 ## [0.20.0] - 2025-12-08 🔒 COMPLETE BLACKLIST SYSTEM OVERHAUL
 
 ### Changed

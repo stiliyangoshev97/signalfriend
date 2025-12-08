@@ -44,6 +44,7 @@ cors                ^2.8.5             # CORS middleware
 helmet              ^8.0.0             # Security headers
 express-rate-limit  ^7.4.1             # Rate limiting
 cookie-parser       ^1.4.7             # Cookie parsing
+@sentry/node        ^9.2.0             # Backend error tracking
 
 # --- Dev Dependencies ---
 typescript          ^5.6.3             # TypeScript compiler
@@ -97,7 +98,7 @@ postcss             ^8.4.38            # CSS processing
 autoprefixer        ^10.4.17           # CSS vendor prefixes
 
 # --- Monitoring ---
-@sentry/react       ^10.28.0           # Error tracking
+@sentry/react       ^10.28.0           # Frontend error tracking (client-side only)
 
 # --- Dev Dependencies ---
 typescript          ~5.9.3             # TypeScript compiler
@@ -125,7 +126,7 @@ MongoDB             >= 6.0             # Database (local or Atlas)
 
 Alchemy             -                  # RPC + Webhooks (API Key required)
 WalletConnect       -                  # Wallet connection (Project ID required)
-Sentry              -                  # Error monitoring (DSN required)
+Sentry              -                  # Frontend error monitoring (DSN required)
 
 # ============================================================================
 # BLOCKCHAIN (Target Chain)

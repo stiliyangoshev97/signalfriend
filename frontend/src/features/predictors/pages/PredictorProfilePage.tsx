@@ -16,7 +16,7 @@ import { FilterPanel, SignalGrid, Pagination } from '@/features/signals/componen
 import { useCategories, useMyPurchasedContentIds } from '@/features/signals/hooks';
 import { useAuthStore } from '@/features/auth';
 import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
-import { useBlacklistPredictor, useUnblacklistPredictor, useAdminPredictorProfile, adminKeys } from '@/features/admin/hooks';
+import { useBlacklistPredictor, useUnblacklistPredictor, useAdminPredictorProfile, useManualVerifyPredictor, useUnverifyPredictor, adminKeys } from '@/features/admin/hooks';
 import {
   usePublicPredictorProfile,
   usePublicPredictorSignals,
@@ -166,7 +166,10 @@ export function PredictorProfilePage(): React.ReactElement {
   const isAdmin = useIsAdmin();
   const blacklistMutation = useBlacklistPredictor();
   const unblacklistMutation = useUnblacklistPredictor();
+  const manualVerifyMutation = useManualVerifyPredictor();
+  const unverifyMutation = useUnverifyPredictor();
   const isBlacklistLoading = blacklistMutation.isPending || unblacklistMutation.isPending;
+  const isVerifyLoading = manualVerifyMutation.isPending || unverifyMutation.isPending;
 
   // Fetch predictor profile - use admin endpoint for admins (includes contact info)
   const { data: publicPredictor, isLoading: publicProfileLoading, error: publicProfileError } = usePublicPredictorProfile(address);
@@ -201,6 +204,26 @@ export function PredictorProfilePage(): React.ReactElement {
       console.error('Failed to update blacklist status:', error);
     }
   }, [address, predictor, blacklistMutation, unblacklistMutation, queryClient, isAdmin]);
+
+  // Admin verify/unverify handler
+  const handleToggleVerify = useCallback(async () => {
+    if (!address || !predictor) return;
+    
+    try {
+      if (predictor.isVerified) {
+        await unverifyMutation.mutateAsync(address);
+      } else {
+        await manualVerifyMutation.mutateAsync(address);
+      }
+      // Invalidate predictor profile queries
+      queryClient.invalidateQueries({ queryKey: publicPredictorKeys.profile(address) });
+      if (isAdmin) {
+        queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address) });
+      }
+    } catch (error) {
+      console.error('Failed to update verification status:', error);
+    }
+  }, [address, predictor, manualVerifyMutation, unverifyMutation, queryClient, isAdmin]);
 
   // Build query filters - DON'T exclude purchased signals on profile page
   // We want to show all signals with a "Purchased" badge for owned ones
@@ -349,8 +372,8 @@ export function PredictorProfilePage(): React.ReactElement {
 
               {/* Admin-only Contact Info */}
               {isAdmin && (predictor.socialLinks?.telegram || predictor.socialLinks?.discord || predictor.preferredContact) && (
-                <div className="mt-4 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-                  <p className="text-xs text-purple-400 font-medium mb-2 flex items-center gap-1">
+                <div className="mt-4 p-3 bg-brand-200/10 border border-brand-200/30 rounded-lg">
+                  <p className="text-xs text-brand-200 font-medium mb-2 flex items-center gap-1">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                     </svg>
@@ -385,32 +408,100 @@ export function PredictorProfilePage(): React.ReactElement {
                 </div>
               )}
 
-              {/* Admin Blacklist/Unblacklist Button */}
+              {/* Admin-only Earnings Info */}
+              {isAdmin && adminPredictor?.earnings && (
+                <div className="mt-4 p-3 bg-brand-200/10 border border-brand-200/30 rounded-lg">
+                  <p className="text-xs text-brand-200 font-medium mb-2 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Admin Only - Earnings
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="bg-dark-900/50 rounded-lg p-2 text-center">
+                      <p className="text-lg font-bold text-success-500">${adminPredictor.earnings.totalEarnings.toFixed(2)}</p>
+                      <p className="text-xs text-fur-cream/60">Total Earnings</p>
+                    </div>
+                    <div className="bg-dark-900/50 rounded-lg p-2 text-center">
+                      <p className="text-lg font-bold text-fur-cream">${adminPredictor.earnings.predictorEarnings.toFixed(2)}</p>
+                      <p className="text-xs text-fur-cream/60">From Sales</p>
+                    </div>
+                    <div className="bg-dark-900/50 rounded-lg p-2 text-center">
+                      <p className="text-lg font-bold text-brand-200">${adminPredictor.earnings.referralEarnings.toFixed(2)}</p>
+                      <p className="text-xs text-fur-cream/60">From Referrals ({adminPredictor.earnings.paidReferrals})</p>
+                    </div>
+                    <div className="bg-dark-900/50 rounded-lg p-2 text-center">
+                      <p className="text-lg font-bold text-accent-gold">${adminPredictor.earnings.platformCommission.toFixed(2)}</p>
+                      <p className="text-xs text-fur-cream/60">Platform Fee (5%)</p>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-fur-cream/50">
+                    Total sales revenue: ${adminPredictor.earnings.totalSalesRevenue.toFixed(2)} from {adminPredictor.earnings.totalSalesCount} sales
+                  </div>
+                </div>
+              )}
+
+              {/* Admin Actions */}
               {isAdmin && (
-                <div className="mt-4">
-                  <Button
-                    variant={predictor.isBlacklisted ? 'secondary' : 'danger'}
-                    size="sm"
-                    onClick={handleToggleBlacklist}
-                    isLoading={isBlacklistLoading}
-                    disabled={isBlacklistLoading}
-                  >
-                    {predictor.isBlacklisted ? (
-                      <>
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Unblacklist Predictor
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                        </svg>
-                        Blacklist Predictor
-                      </>
-                    )}
-                  </Button>
+                <div className="mt-4 p-3 bg-dark-700/50 border border-dark-600 rounded-lg">
+                  <p className="text-xs text-fur-cream/70 font-medium mb-3 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Admin Actions
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {/* Verify/Unverify Button */}
+                    <Button
+                      variant={predictor.isVerified ? 'secondary' : 'primary'}
+                      size="sm"
+                      onClick={handleToggleVerify}
+                      isLoading={isVerifyLoading}
+                      disabled={isVerifyLoading}
+                    >
+                      {predictor.isVerified ? (
+                        <>
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Remove Verification
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          Verify Predictor
+                        </>
+                      )}
+                    </Button>
+                    
+                    {/* Blacklist/Unblacklist Button */}
+                    <Button
+                      variant={predictor.isBlacklisted ? 'secondary' : 'danger'}
+                      size="sm"
+                      onClick={handleToggleBlacklist}
+                      isLoading={isBlacklistLoading}
+                      disabled={isBlacklistLoading}
+                    >
+                      {predictor.isBlacklisted ? (
+                        <>
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Unblacklist Predictor
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                          </svg>
+                          Blacklist Predictor
+                        </>
+                      )}
+                    </Button>
+                  </div>
                   {predictor.isBlacklisted && (
                     <p className="text-xs text-yellow-500 mt-2">
                       ⚠️ This predictor is currently blacklisted

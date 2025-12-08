@@ -22,6 +22,8 @@ import {
   blacklistPredictor,
   unblacklistPredictor,
   fetchAdminPredictorProfile,
+  manualVerifyPredictor,
+  unverifyPredictor,
 } from '../api';
 import type {
   ListReportsQuery,
@@ -210,6 +212,39 @@ export function useUpdateVerification() {
       updateVerification(address, approved),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.pendingVerifications() });
+    },
+  });
+}
+
+/**
+ * Hook to manually verify a predictor (bypasses sales/earnings requirements)
+ */
+export function useManualVerifyPredictor() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (address: string) => manualVerifyPredictor(address),
+    onSuccess: (_data, address) => {
+      // Invalidate predictor profile queries
+      queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address) });
+      queryClient.invalidateQueries({ queryKey: ['predictor'] });
+      queryClient.invalidateQueries({ queryKey: adminKeys.pendingVerifications() });
+    },
+  });
+}
+
+/**
+ * Hook to remove verification from a predictor
+ */
+export function useUnverifyPredictor() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (address: string) => unverifyPredictor(address),
+    onSuccess: (_data, address) => {
+      // Invalidate predictor profile queries
+      queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address) });
+      queryClient.invalidateQueries({ queryKey: ['predictor'] });
     },
   });
 }
