@@ -1,6 +1,7 @@
 # SignalFriend Backend
 
-Express + MongoDB + Viem backend API for the SignalFriend platform.
+> Express + MongoDB + Viem backend API for the SignalFriend platform.  
+> **Version:** 0.22.0 | **Last Updated:** December 2025
 
 ## Tech Stack
 
@@ -55,6 +56,8 @@ JWT_SECRET=your-super-secret-jwt-key-min-32-chars
 CHAIN_ID=97
 RPC_URL=https://bsc-testnet-rpc.publicnode.com
 ALCHEMY_SIGNING_KEY=whsec_xxx  # From Alchemy webhook
+CORS_ORIGIN=http://localhost:5173
+ADMIN_ADDRESSES=0x...,0x...,0x...  # Comma-separated admin wallet addresses
 ```
 
 ### Running
@@ -94,6 +97,10 @@ src/
 │   ├── receipts/            # Purchase receipts (NFTs)
 │   ├── reviews/             # Ratings & reviews
 │   ├── categories/          # Signal categories
+│   ├── reports/             # Signal scam reports
+│   ├── disputes/            # Blacklist dispute appeals
+│   ├── admin/               # Admin endpoints
+│   ├── stats/               # Platform statistics
 │   └── webhooks/            # Alchemy event indexing (GraphQL)
 ├── scripts/                 # Utility scripts
 │   ├── seedCategories.ts

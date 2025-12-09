@@ -175,7 +175,7 @@ export function PredictorInfoCard({
       {/* Bio (if available) */}
       {predictor.bio && (
         <div className="mt-4 pt-4 border-t border-dark-600">
-          <p className="text-sm text-fur-cream/70 line-clamp-3">
+          <p className="text-sm text-fur-cream/70 line-clamp-3 break-all">
             {predictor.bio}
           </p>
         </div>

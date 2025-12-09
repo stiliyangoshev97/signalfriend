@@ -1,5 +1,10 @@
 # SignalFriend
 
+> **Web3 Transparent Signal Marketplace** — Technical Specification  
+> Last Updated: December 2025
+
+---
+
 ## Overview
 
 SignalFriend is a **Web3 Transparent Signal Marketplace** that connects verified prediction makers (Predictors) with traders via a transparent, on-chain NFT mechanism. By structuring the core transaction around an **NFT as a data ticket** within a **gated room**, the platform is legally positioned as a **Digital Information Marketplace** rather than a gambling or betting platform.
@@ -12,7 +17,7 @@ The key to avoiding the "gambling" classification is the **NFT as the purchased 
 
 | Your NFT-Based Model                                                                                                        | Why It's **NOT** Gambling                                                                                                                                                                   |
 | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **The Purchase:** A trader pays $X USDC for an NFT (the "ticket").                                                          | This is a **purchase of a digital asset** (the NFT) that contains a piece of data (the signal). The value is exchanged immediately for the data itself, not for a contingent future payout. |
+| **The Purchase:** A trader pays $X USDT for an NFT (the "ticket").                                                          | This is a **purchase of a digital asset** (the NFT) that contains a piece of data (the signal). The value is exchanged immediately for the data itself, not for a contingent future payout. |
 | **The Signal/Prediction:** The prediction is stored in the NFT's metadata (e.g., Target Price, Timeframe).                  | The prediction is the **content** of the purchased NFT, making the NFT a *content delivery mechanism*, similar to buying a digital research report or a streaming ticket.                   |
 | **No Payout:** When the prediction is correct, the platform/predictor does **not** send any additional funds to the trader. | This breaks the "Prize" element of gambling. The success of the prediction only improves the predictor's **reputation** (rank) and future sales, not their payout for that specific signal. |
 

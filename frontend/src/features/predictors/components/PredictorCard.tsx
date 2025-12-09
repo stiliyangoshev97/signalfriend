@@ -118,7 +118,7 @@ export function PredictorCard({ predictor, rank }: PredictorCardProps): React.Re
 
       {/* Bio (if available) */}
       {predictor.bio && (
-        <p className="text-sm text-fur-cream/70 mb-4 line-clamp-2">
+        <p className="text-sm text-fur-cream/70 mb-4 line-clamp-2 break-all overflow-hidden">
           {predictor.bio}
         </p>
       )}

@@ -47,13 +47,23 @@
 
 import { useAccount } from 'wagmi';
 
-// Admin addresses (MultiSig wallet holders)
-// These must match ADMIN_ADDRESSES in the backend .env
-// Signers from the deployed MultiSig Safe on BSC Testnet
+/**
+ * Admin addresses for off-chain operations.
+ * These must match ADMIN_ADDRESSES in the backend .env
+ * 
+ * Admin privileges (off-chain only):
+ * - Handle reports and disputes
+ * - View private predictor contact info
+ * - Access admin dashboard
+ * 
+ * Note: On-chain operations (blacklisting) require MultiSig wallet signatures
+ * on the smart contract - these admin addresses alone cannot blacklist.
+ */
 const ADMIN_ADDRESSES = [
-  '0x4Cca77ba15B0D85d7B733E0838a429E7bEF42DD2', // Signer 1
-  '0xC119B9152afcC5f40C019aABd78A312d37C63926', // Signer 2
-  '0x6499fe8016cE2C2d3a21d08c3016345Edf3467F1', // Signer 3
+  '0x4Cca77ba15B0D85d7B733E0838a429E7bEF42DD2', // Admin 1 (MultiSig Signer)
+  '0xC119B9152afcC5f40C019aABd78A312d37C63926', // Admin 2 (MultiSig Signer)
+  '0x6499fe8016cE2C2d3a21d08c3016345Edf3467F1', // Admin 3 (MultiSig Signer)
+  // Add new admins below (they can handle reports/disputes but NOT blacklist)
 ].map((addr) => addr.toLowerCase());
 
 export function useIsAdmin(): boolean {
