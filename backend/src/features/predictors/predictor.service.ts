@@ -23,6 +23,7 @@ import type {
   CreatePredictorFromEventInput,
   CheckFieldUniquenessQuery,
 } from "./predictor.schemas.js";
+import { isReservedDisplayName } from "./predictor.schemas.js";
 
 /** Predictor list response with pagination metadata */
 export interface PredictorListResponse {
@@ -252,6 +253,11 @@ export class PredictorService {
     if (data.displayName !== undefined) {
       if (predictor.displayNameChanged) {
         throw ApiError.forbidden("Display name can only be changed once and is now locked");
+      }
+      
+      // Check for reserved names (defense-in-depth, also validated in schema)
+      if (isReservedDisplayName(data.displayName)) {
+        throw ApiError.badRequest("This display name is reserved and cannot be used");
       }
       
       // Check if new displayName is different from current

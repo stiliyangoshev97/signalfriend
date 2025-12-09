@@ -5,6 +5,67 @@
 
 ---
 
+## 🛠️ Maintenance Mode
+
+When you need to take the site down for maintenance (deployments, database migrations, etc.), you can enable maintenance mode to show users a friendly maintenance page instead of errors.
+
+### Enabling Maintenance Mode
+
+**1. Update `frontend/.env.local`:**
+```bash
+# Enable maintenance mode
+VITE_MAINTENANCE_MODE=true
+
+# Optional: Custom message (default: "SignalFriend is currently undergoing scheduled maintenance...")
+VITE_MAINTENANCE_MESSAGE=We're upgrading our systems to serve you better!
+
+# Optional: Expected end time (displayed to users)
+VITE_MAINTENANCE_END_TIME=December 10, 2025 at 6:00 PM UTC
+```
+
+**2. Rebuild and deploy the frontend:**
+```bash
+cd frontend
+npm run build
+# Deploy the build to your hosting provider
+```
+
+### Disabling Maintenance Mode
+
+**1. Update `frontend/.env.local`:**
+```bash
+# Disable maintenance mode
+VITE_MAINTENANCE_MODE=false
+```
+Or simply remove/comment out the `VITE_MAINTENANCE_MODE` line.
+
+**2. Rebuild and deploy the frontend.**
+
+### Maintenance Page Features
+
+- Displays SignalFriend logo
+- Shows maintenance message (customizable via env var)
+- Shows expected end time (optional)
+- Links to Discord and Twitter for updates
+- Mobile-responsive design
+
+### Production Tip
+
+For production deployments, consider having a pre-built maintenance page ready:
+```bash
+# Build with maintenance mode enabled
+VITE_MAINTENANCE_MODE=true npm run build
+# Save this build as maintenance-build
+
+# Build normal version
+VITE_MAINTENANCE_MODE=false npm run build
+# Save as production-build
+```
+
+Then you can quickly swap between versions without rebuilding.
+
+---
+
 ## 🌐 Network Testing (Access from Phone/Other Devices)
 
 To test the app on your phone or other devices on the same network:

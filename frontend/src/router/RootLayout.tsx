@@ -55,7 +55,7 @@
  * @see https://reactrouter.com/en/main/components/outlet
  */
 
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import { Suspense } from 'react';
 import { Spinner } from '../shared/components/ui';
 import Header from './Header';
@@ -96,22 +96,37 @@ export function RootLayout() {
               © {new Date().getFullYear()} SignalFriend. All rights reserved.
             </p>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <Link
+                to="/terms"
+                className="text-gray-main hover:text-fur-cream transition-colors"
+              >
+                Terms
+              </Link>
+              <span className="text-gray-main/50">|</span>
               <a
-                href="https://discord.gg/signalfriend"
+                href="mailto:contact@signalfriend.com"
+                className="text-gray-main hover:text-fur-cream transition-colors"
+              >
+                Contact
+              </a>
+              <span className="text-gray-main/50">|</span>
+              <a
+                href="https://discord.gg/jSRspBYK"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-main hover:text-fur-cream transition-colors"
               >
                 Discord
               </a>
+              <span className="text-gray-main/50">|</span>
               <a
-                href="https://twitter.com/signalfriend"
+                href="https://x.com/signalfriend1"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-main hover:text-fur-cream transition-colors"
               >
-                Twitter
+                X
               </a>
             </div>
           </div>
