@@ -54,6 +54,7 @@ module.exports = {
         },
         // Accent colors from logo details
         accent: {
+          gold: '#F4C56A',     // Golden accent (from fur.light)
           red: '#C63732',
           'red-dark': '#A92E2A',
           pink: '#E46A63',      // Tongue pink

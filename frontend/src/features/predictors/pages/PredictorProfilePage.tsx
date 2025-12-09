@@ -10,13 +10,14 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Avatar, Badge, Button, CopyableAddress } from '@/shared/components/ui';
+import { useChainId } from 'wagmi';
+import { Avatar, Badge, Button, CopyableAddress, Modal } from '@/shared/components/ui';
 import { formatAddress } from '@/shared/utils/format';
 import { FilterPanel, SignalGrid, Pagination } from '@/features/signals/components';
 import { useCategories, useMyPurchasedContentIds } from '@/features/signals/hooks';
 import { useAuthStore } from '@/features/auth';
 import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
-import { useBlacklistPredictor, useUnblacklistPredictor, useAdminPredictorProfile, useManualVerifyPredictor, useUnverifyPredictor, adminKeys } from '@/features/admin/hooks';
+import { useAdminPredictorProfile, useManualVerifyPredictor, useUnverifyPredictor, adminKeys, useProposeBlacklist } from '@/features/admin/hooks';
 import {
   usePublicPredictorProfile,
   usePublicPredictorSignals,
@@ -157,18 +158,31 @@ export function PredictorProfilePage(): React.ReactElement {
     parseFiltersFromParams(searchParams)
   );
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [blacklistModalOpen, setBlacklistModalOpen] = useState(false);
+  const [blacklistProposalSuccess, setBlacklistProposalSuccess] = useState<{
+    actionId: string;
+    txHash: string;
+    isBlacklist: boolean;
+  } | null>(null);
 
   // Check if user is authenticated (signed in with SIWE)
   // Used to conditionally fetch purchased content IDs
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
+  // Get chain ID for smart contract calls
+  const chainId = useChainId();
+
   // Admin check
   const isAdmin = useIsAdmin();
-  const blacklistMutation = useBlacklistPredictor();
-  const unblacklistMutation = useUnblacklistPredictor();
+  
+  // Smart contract blacklist hook (MultiSig proposal)
+  const { proposeBlacklist, proposeUnblacklist, state: blacklistState, reset: resetBlacklist } = useProposeBlacklist(chainId);
+  
+  // API mutations for verify/unverify (blacklist now uses smart contract)
   const manualVerifyMutation = useManualVerifyPredictor();
   const unverifyMutation = useUnverifyPredictor();
-  const isBlacklistLoading = blacklistMutation.isPending || unblacklistMutation.isPending;
+  
+  const isBlacklistLoading = blacklistState.isPending || blacklistState.isConfirming;
   const isVerifyLoading = manualVerifyMutation.isPending || unverifyMutation.isPending;
 
   // Fetch predictor profile - use admin endpoint for admins (includes contact info)
@@ -180,30 +194,55 @@ export function PredictorProfilePage(): React.ReactElement {
   const profileLoading = isAdmin && isAuthenticated ? adminProfileLoading : publicProfileLoading;
   const profileError = isAdmin && isAuthenticated ? adminProfileError : publicProfileError;
 
-  // Admin blacklist/unblacklist handler
+  // Open confirmation modal for blacklist action
+  const handleBlacklistClick = useCallback(() => {
+    setBlacklistModalOpen(true);
+    setBlacklistProposalSuccess(null);
+    resetBlacklist();
+  }, [resetBlacklist]);
+
+  // Admin blacklist/unblacklist handler - NOW USES SMART CONTRACT
   const handleToggleBlacklist = useCallback(async () => {
     if (!address || !predictor) return;
     
     try {
+      let result;
       if (predictor.isBlacklisted) {
-        await unblacklistMutation.mutateAsync(address);
+        result = await proposeUnblacklist(address);
       } else {
-        await blacklistMutation.mutateAsync(address);
+        result = await proposeBlacklist(address);
       }
-      // Invalidate predictor profile queries to refresh blacklist status
-      queryClient.invalidateQueries({ queryKey: publicPredictorKeys.profile(address) });
-      // Also invalidate admin profile query if admin
-      if (isAdmin) {
-        queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address) });
-      }
-      // Invalidate signals queries to refresh marketplace
-      queryClient.invalidateQueries({ queryKey: publicPredictorKeys.signals(address) });
-      // Invalidate general signals queries (marketplace)
-      queryClient.invalidateQueries({ queryKey: ['signals'] });
+      
+      // Show success with transaction details
+      setBlacklistProposalSuccess({
+        actionId: result.actionId,
+        txHash: result.transactionHash,
+        isBlacklist: result.isBlacklist,
+      });
+      
+      // Note: The actual blacklist status update happens after MultiSig approval
+      // The webhook will sync the database when the action is executed on-chain
+      // For now, we just show success message about the proposal
+      
     } catch (error) {
-      console.error('Failed to update blacklist status:', error);
+      console.error('Failed to propose blacklist action:', error);
+      // Error is already in blacklistState.error
     }
-  }, [address, predictor, blacklistMutation, unblacklistMutation, queryClient, isAdmin]);
+  }, [address, predictor, proposeBlacklist, proposeUnblacklist]);
+
+  // Close modal and reset state
+  const handleCloseBlacklistModal = useCallback(() => {
+    setBlacklistModalOpen(false);
+    // If proposal was successful, invalidate queries to check for updates
+    if (blacklistProposalSuccess) {
+      queryClient.invalidateQueries({ queryKey: publicPredictorKeys.profile(address!) });
+      if (isAdmin) {
+        queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address!) });
+      }
+      queryClient.invalidateQueries({ queryKey: publicPredictorKeys.signals(address!) });
+      queryClient.invalidateQueries({ queryKey: ['signals'] });
+    }
+  }, [blacklistProposalSuccess, address, queryClient, isAdmin]);
 
   // Admin verify/unverify handler
   const handleToggleVerify = useCallback(async () => {
@@ -481,7 +520,7 @@ export function PredictorProfilePage(): React.ReactElement {
                     <Button
                       variant={predictor.isBlacklisted ? 'secondary' : 'danger'}
                       size="sm"
-                      onClick={handleToggleBlacklist}
+                      onClick={handleBlacklistClick}
                       isLoading={isBlacklistLoading}
                       disabled={isBlacklistLoading}
                     >
@@ -640,6 +679,148 @@ export function PredictorProfilePage(): React.ReactElement {
             </main>
           </div>
       </div>
+
+      {/* Blacklist Confirmation Modal */}
+      <Modal
+        isOpen={blacklistModalOpen}
+        onClose={handleCloseBlacklistModal}
+        title={predictor?.isBlacklisted ? '🔓 Propose Unblacklist' : '🚫 Propose Blacklist'}
+      >
+        <div className="space-y-4">
+          {/* Not yet submitted */}
+          {!blacklistProposalSuccess && !blacklistState.error && (
+            <>
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                <p className="text-yellow-300 text-sm">
+                  <strong>⚠️ MultiSig Required</strong>
+                </p>
+                <p className="text-yellow-300/80 text-sm mt-1">
+                  This will create a proposal on the smart contract. Two additional signers must approve on BscScan for the action to execute.
+                </p>
+              </div>
+              
+              <p className="text-fur-cream/80">
+                {predictor?.isBlacklisted ? (
+                  <>
+                    Are you sure you want to propose <strong className="text-success-500">unblacklisting</strong> this predictor?
+                    <br />
+                    <span className="text-sm text-fur-cream/60 mt-1 block">
+                      This will allow them to receive referral earnings again.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Are you sure you want to propose <strong className="text-red-400">blacklisting</strong> this predictor?
+                    <br />
+                    <span className="text-sm text-fur-cream/60 mt-1 block">
+                      This will block referral earnings and sync to the database via webhook.
+                    </span>
+                  </>
+                )}
+              </p>
+
+              <div className="flex gap-3 pt-2">
+                <Button
+                  variant="secondary"
+                  onClick={handleCloseBlacklistModal}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant={predictor?.isBlacklisted ? 'primary' : 'danger'}
+                  onClick={handleToggleBlacklist}
+                  isLoading={isBlacklistLoading}
+                  disabled={isBlacklistLoading}
+                  className="flex-1"
+                >
+                  {isBlacklistLoading 
+                    ? (blacklistState.isConfirming ? 'Confirming...' : 'Signing...') 
+                    : (predictor?.isBlacklisted ? 'Propose Unblacklist' : 'Propose Blacklist')
+                  }
+                </Button>
+              </div>
+            </>
+          )}
+
+          {/* Error state */}
+          {blacklistState.error && !blacklistProposalSuccess && (
+            <>
+              <div className={`rounded-lg p-4 ${blacklistState.isUserRejection ? 'bg-yellow-500/10 border border-yellow-500/30' : 'bg-red-500/10 border border-red-500/30'}`}>
+                <p className={`font-medium ${blacklistState.isUserRejection ? 'text-yellow-400' : 'text-red-400'}`}>
+                  {blacklistState.isUserRejection ? '⚠️ Transaction Cancelled' : '❌ Transaction Failed'}
+                </p>
+                <p className={`text-sm mt-1 ${blacklistState.isUserRejection ? 'text-yellow-300/80' : 'text-red-300/80'}`}>
+                  {blacklistState.error}
+                </p>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button variant="secondary" onClick={handleCloseBlacklistModal} className="flex-1">
+                  Close
+                </Button>
+                <Button variant="primary" onClick={resetBlacklist} className="flex-1">
+                  Try Again
+                </Button>
+              </div>
+            </>
+          )}
+
+          {/* Success state */}
+          {blacklistProposalSuccess && (
+            <>
+              <div className="bg-success-500/10 border border-success-500/30 rounded-lg p-4">
+                <p className="text-success-400 font-medium">
+                  ✅ Proposal Created Successfully!
+                </p>
+                <p className="text-success-300/80 text-sm mt-2">
+                  {blacklistProposalSuccess.isBlacklist 
+                    ? 'Blacklist proposal has been submitted.'
+                    : 'Unblacklist proposal has been submitted.'
+                  }
+                </p>
+              </div>
+
+              <div className="bg-dark-700 rounded-lg p-4 space-y-3">
+                <div>
+                  <p className="text-xs text-fur-cream/50 mb-1">Transaction Hash</p>
+                  <a
+                    href={`https://testnet.bscscan.com/tx/${blacklistProposalSuccess.txHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-brand-200 hover:underline break-all"
+                  >
+                    {blacklistProposalSuccess.txHash}
+                  </a>
+                </div>
+                {blacklistProposalSuccess.actionId && (
+                  <div>
+                    <p className="text-xs text-fur-cream/50 mb-1">Action ID (for approvals)</p>
+                    <p className="text-sm text-fur-cream/80 break-all font-mono">
+                      {blacklistProposalSuccess.actionId}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                <p className="text-blue-300 text-sm">
+                  <strong>Next Steps:</strong>
+                </p>
+                <ol className="text-blue-300/80 text-sm mt-2 list-decimal list-inside space-y-1">
+                  <li>Go to PredictorAccessPass on BscScan</li>
+                  <li>Connect as Signer 2 or 3</li>
+                  <li>Call <code className="bg-dark-800 px-1 rounded">approveAction(actionId)</code></li>
+                  <li>Repeat with the 3rd signer to execute</li>
+                </ol>
+              </div>
+
+              <Button variant="secondary" onClick={handleCloseBlacklistModal} className="w-full">
+                Close
+              </Button>
+            </>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }

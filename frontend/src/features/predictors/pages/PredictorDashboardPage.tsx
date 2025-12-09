@@ -144,8 +144,21 @@ export function PredictorDashboardPage(): React.ReactElement {
   
   // Calculate stats
   const totalSignals = signals.length;
-  const totalSales = signals.reduce((sum, s) => sum + s.totalSales, 0);
-  const totalEarnings = earnings?.totalEarnings || signals.reduce((sum, s) => sum + (s.priceUsdt * 0.95 * s.totalSales), 0);
+  
+  // Use earnings API as primary source (fetched fresh on this page)
+  // Fall back to predictor.totalSales (from auth store, may be stale)
+  // Then calculate from signals as last resort
+  const totalSales = earnings?.totalSalesCount 
+    ?? predictor?.totalSales 
+    ?? signals.reduce((sum, s) => sum + s.totalSales, 0);
+  
+  // Use earnings API for total earnings (most accurate, fetched fresh)
+  // Only fall back to calculation if earnings hasn't loaded yet
+  // Using explicit undefined check to allow 0 as a valid value
+  const totalEarnings = earnings?.totalEarnings !== undefined 
+    ? earnings.totalEarnings 
+    : signals.reduce((sum, s) => sum + (s.priceUsdt * 0.95 * s.totalSales), 0);
+  
   const averageRating = predictor?.averageRating || 0;
   const totalReviews = predictor?.totalReviews || signals.reduce((sum, s) => sum + s.totalReviews, 0);
   
@@ -157,6 +170,16 @@ export function PredictorDashboardPage(): React.ReactElement {
   // Verification requirements
   const MIN_SALES_FOR_VERIFICATION = 100;
   const MIN_EARNINGS_FOR_VERIFICATION = 1000;
+  
+  // Calculate progress percentages (ensure minimum visibility when there's progress)
+  // Use 5% minimum so small progress is visible
+  const salesProgress = totalSales > 0 
+    ? Math.max(5, Math.min((totalSales / MIN_SALES_FOR_VERIFICATION) * 100, 100))
+    : 0;
+  const earningsProgress = totalEarnings > 0 
+    ? Math.max(5, Math.min((totalEarnings / MIN_EARNINGS_FOR_VERIFICATION) * 100, 100))
+    : 0;
+  
   const canApplyForVerification = totalSales >= MIN_SALES_FOR_VERIFICATION && totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION;
   const showVerificationButton = !isVerified && predictor?.verificationStatus !== 'pending' && !predictor?.isBlacklisted;
   
@@ -371,6 +394,11 @@ export function PredictorDashboardPage(): React.ReactElement {
                   <h3 className="text-lg font-semibold text-fur-cream">Verification Progress</h3>
                   <p className="text-sm text-fur-cream/60">Complete these requirements to get verified</p>
                 </div>
+                {earningsLoading && (
+                  <div className="ml-auto">
+                    <div className="w-5 h-5 border-2 border-accent-gold border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -379,16 +407,17 @@ export function PredictorDashboardPage(): React.ReactElement {
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-fur-cream/70">Total Sales</span>
                     <span className={`text-sm font-medium ${totalSales >= MIN_SALES_FOR_VERIFICATION ? 'text-success-500' : 'text-fur-cream'}`}>
-                      {totalSales} / {MIN_SALES_FOR_VERIFICATION}
+                      {earningsLoading ? '...' : totalSales} / {MIN_SALES_FOR_VERIFICATION}
                     </span>
                   </div>
                   <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
+                    {/* Progress bar - uses pre-calculated salesProgress */}
                     <div 
-                      className={`h-full rounded-full transition-all ${totalSales >= MIN_SALES_FOR_VERIFICATION ? 'bg-success-500' : 'bg-accent-gold'}`}
-                      style={{ width: `${Math.min((totalSales / MIN_SALES_FOR_VERIFICATION) * 100, 100)}%` }}
+                      className={`h-full rounded-full transition-all duration-500 ${totalSales >= MIN_SALES_FOR_VERIFICATION ? 'bg-success-500' : 'bg-accent-gold'}`}
+                      style={{ width: `${earningsLoading ? 0 : salesProgress}%` }}
                     />
                   </div>
-                  {totalSales >= MIN_SALES_FOR_VERIFICATION && (
+                  {!earningsLoading && totalSales >= MIN_SALES_FOR_VERIFICATION && (
                     <p className="text-xs text-success-500 mt-1 flex items-center gap-1">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -403,16 +432,17 @@ export function PredictorDashboardPage(): React.ReactElement {
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-fur-cream/70">Total Earnings</span>
                     <span className={`text-sm font-medium ${totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION ? 'text-success-500' : 'text-fur-cream'}`}>
-                      ${totalEarnings.toFixed(2)} / ${MIN_EARNINGS_FOR_VERIFICATION}
+                      {earningsLoading ? '...' : `$${totalEarnings.toFixed(2)}`} / ${MIN_EARNINGS_FOR_VERIFICATION}
                     </span>
                   </div>
                   <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
+                    {/* Progress bar - uses pre-calculated earningsProgress */}
                     <div 
-                      className={`h-full rounded-full transition-all ${totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION ? 'bg-success-500' : 'bg-accent-gold'}`}
-                      style={{ width: `${Math.min((totalEarnings / MIN_EARNINGS_FOR_VERIFICATION) * 100, 100)}%` }}
+                      className={`h-full rounded-full transition-all duration-500 ${totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION ? 'bg-success-500' : 'bg-accent-gold'}`}
+                      style={{ width: `${earningsLoading ? 0 : earningsProgress}%` }}
                     />
                   </div>
-                  {totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION && (
+                  {!earningsLoading && totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION && (
                     <p className="text-xs text-success-500 mt-1 flex items-center gap-1">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />

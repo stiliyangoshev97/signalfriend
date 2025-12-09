@@ -3,7 +3,23 @@
 ================================================================================
 
 Last Updated: 2025-12-09
-Current Version: v0.10.0 (Phase 4 Polish & Fixes Complete)
+Current Version: v0.11.0 (Admin Blacklist via Smart Contract)
+
+================================================================================
+PHASE 5: ADMIN BLACKLIST VIA SMART CONTRACT ✅ COMPLETE
+================================================================================
+
+[✅] Smart Contract Blacklist Integration
+    - useProposeBlacklist hook for calling proposeBlacklist on-chain
+    - Extended PREDICTOR_ACCESS_PASS_ABI with proposeBlacklist function
+    - Confirmation modal with MultiSig explanation
+    - Success state with actionId and transaction hash
+    - Error handling with parseWalletError utility
+
+[✅] Verification Progress Bar Fix
+    - Use predictor.totalSales as primary source
+    - Proper earnings calculation with undefined check
+    - Progress bar now increments correctly
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
