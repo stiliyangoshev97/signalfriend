@@ -24,6 +24,10 @@
  * When a user switches wallets (without disconnecting), the auth state
  * is cleared to prevent JWT/wallet address mismatch.
  *
+ * MAINTENANCE MODE:
+ * Set VITE_MAINTENANCE_MODE=true in .env.local to show maintenance page.
+ * See RUNBOOK.md for full instructions.
+ *
  * @see main.tsx for provider configuration
  * @see router/index.tsx for route definitions
  */
@@ -31,11 +35,24 @@
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 import { useSessionSync } from './features/auth';
+import { MaintenancePage } from './features/maintenance';
+
+/**
+ * Check if maintenance mode is enabled via environment variable.
+ * Only "true" (case-insensitive) enables maintenance mode.
+ */
+const isMaintenanceMode =
+  import.meta.env.VITE_MAINTENANCE_MODE?.toLowerCase() === 'true';
 
 function App() {
   // Run session sync globally to detect wallet changes on any page
   // This prevents JWT/wallet mismatch when user switches accounts
   useSessionSync();
+
+  // Show maintenance page if maintenance mode is enabled
+  if (isMaintenanceMode) {
+    return <MaintenancePage />;
+  }
   
   return <RouterProvider router={router} />;
 }

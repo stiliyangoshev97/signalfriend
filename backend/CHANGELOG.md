@@ -12,6 +12,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned
 - Unit & integration tests
 - Docker configuration
+- Admin blacklist via smart contract integration
+
+---
+
+## [0.22.0] - 2025-12-09 🛠️ RESERVED DISPLAY NAMES
+
+### Added
+
+**Reserved Display Name Validation**
+- `RESERVED_DISPLAY_NAMES` constant array with prohibited names:
+  - admin, administrator, signalfriend, signal_friend, signal-friend
+  - moderator, mod, support, help, official
+  - team, staff, system, bot, root, owner, founder
+- `isReservedDisplayName()` function for checking reserved names
+  - Case-insensitive matching
+  - Partial match blocking (e.g., "admin123" blocked)
+  - Any name containing "signalfriend" blocked
+- Zod schema validation with `.refine()` in `updatePredictorProfileSchema`
+- Defense-in-depth check in `PredictorService.updateProfile()`
+
+### Changed
+
+**Predictor Schema Exports**
+- `RESERVED_DISPLAY_NAMES` now exported for potential frontend use
+- `isReservedDisplayName()` now exported for reuse
 
 ---
 

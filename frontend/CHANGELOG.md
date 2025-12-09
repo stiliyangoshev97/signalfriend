@@ -11,6 +11,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 - Signal outcome tracking
+- Admin blacklist via smart contract (proposeBlacklist)
+
+---
+
+## [0.10.0] - 2025-12-09 🛠️ POLISH & FIXES
+
+### Added
+
+**Terms and Conditions Page**
+- Comprehensive legal Terms and Conditions page at `/terms`
+- 12 sections covering: Introduction, Platform Nature (NFT marketplace disclaimers), User Responsibilities, Predictor Terms, Fees, NFT Ownership, Prohibited Activities, Disclaimers, Indemnification, Modifications, Governing Law, Contact Information
+- Positions platform as NFT marketplace, NOT financial advisors or gambling
+- Contact information with email, Discord, and X links
+
+**Maintenance Mode**
+- `MaintenancePage` component with customizable message and end time
+- Enable via `VITE_MAINTENANCE_MODE=true` in `.env.local`
+- Optional `VITE_MAINTENANCE_MESSAGE` for custom message
+- Optional `VITE_MAINTENANCE_END_TIME` for expected end time display
+- Documented in RUNBOOK.md
+
+**Legal Feature Module**
+- New `/features/legal` module with barrel exports
+- `TermsPage` component with full legal terms
+
+**Maintenance Feature Module**
+- New `/features/maintenance` module with barrel exports
+- `MaintenancePage` component for site downtime
+
+### Changed
+
+**Footer Updates**
+- Added "Terms" link to footer (React Router Link)
+- Added "Contact" email link (mailto:contact@signalfriend.com)
+- Changed "Twitter" to "X" with correct branding
+- Updated Discord link to `https://discord.gg/jSRspBYK`
+- Updated X link to `https://x.com/signalfriend1`
+- Footer now shows: Terms | Contact | Discord | X
+
+**Signals Page**
+- Updated subtitle from refund claims to: "Browse trading signals sorted by rating, sales, and verified status. All purchases are secured by smart contracts on BNB Chain."
+
+**App.tsx**
+- Added maintenance mode check before rendering router
+- Imports MaintenancePage from maintenance feature
+
+### Fixed
+- Removed inaccurate refund protection claims from Signals page
 
 ---
 

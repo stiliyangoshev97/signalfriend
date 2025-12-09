@@ -333,6 +333,22 @@ INPUT VALIDATION - ALL FIXED:
 [N/A] #9 Sentry - Not needed for backend (using Pino logger instead)
 
 ================================================================================
+## PHASE 14: POLISH & SECURITY (December 9, 2025) ✅
+================================================================================
+
+[x] Reserved Display Name Validation
+    - RESERVED_DISPLAY_NAMES array with prohibited names
+    - Names blocked: admin, administrator, signalfriend, moderator, mod, 
+      support, help, official, team, staff, system, bot, root, owner, founder
+    - isReservedDisplayName() function with:
+      - Case-insensitive matching
+      - Partial match blocking (e.g., "admin123")
+      - Blocks any name containing "signalfriend"
+    - Zod schema validation in updatePredictorProfileSchema
+    - Defense-in-depth check in PredictorService.updateProfile()
+    - Both function and array exported for frontend use
+
+================================================================================
 ## NOTES
 ================================================================================
 - Contract Addresses (BNB Testnet - Chain ID 97):

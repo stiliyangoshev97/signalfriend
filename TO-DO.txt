@@ -2,7 +2,7 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 8, 2025
+Last Updated: December 9, 2025
 
 ================================================================================
 COMPLETED FEATURES ✅
@@ -40,8 +40,24 @@ PHASE 3: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)
 [x] #10 UI/UX improvements (green theme consistency, verified badge on Predictors page)
 
 ================================================================================
-NEXT PRIORITY: TESTING & OPTIMIZATION
+PHASE 4: POLISH & FIXES ✅ COMPLETE (December 9, 2025)
 ================================================================================
+
+[x] #1 Signals page: Remove refund claims, mention sorting by rating/sales/verified
+[x] #2 Footer: Update Discord/Twitter links, add Contact email
+[x] #3 Terms and Conditions page (legal positioning as NFT marketplace)
+[x] #4 Blacklisting discussion (smart contract vs web app) - USE SMART CONTRACT
+[x] #5 Prohibit reserved display names (admin, moderator, signalfriend, etc.)
+[x] #6 Maintenance page with RUNBOOK documentation
+
+================================================================================
+NEXT PRIORITY: ADMIN BLACKLIST VIA SMART CONTRACT
+================================================================================
+
+[ ] Update admin blacklist button to call proposeBlacklist(address, true) on smart contract
+[ ] Update admin unblacklist button to call proposeBlacklist(address, false) on smart contract
+[ ] This creates a multisig proposal that requires 2 more signatures on BscScan
+[ ] Webhook will automatically sync the blacklist status to database when approved
 
 See detailed tasks in:
 - /frontend/TO-DO-FRONTEND.txt (Phase 7: Polish & Optimization)
@@ -54,11 +70,49 @@ Key Tasks:
 4. SEO & meta tags
 
 ================================================================================
-MANUAL TESTING CHECKLIST (Phase 3 Changes)
+MANUAL TESTING CHECKLIST (Phase 4 Changes)
 ================================================================================
 
-### Admin Manual Verification System
-[ ] Go to any predictor's profile as admin
+### Terms Page
+[ ] Navigate to /terms - should show full Terms and Conditions
+[ ] Click Terms link in footer - should navigate to /terms
+[ ] Verify all 12 sections display correctly
+[ ] Check contact links work (email, Discord, X)
+
+### Footer
+[ ] Terms link works
+[ ] Contact opens email client
+[ ] Discord opens correct invite
+[ ] X opens correct profile
+
+### Signals Page
+[ ] Subtitle shows new text about sorting and smart contracts
+
+### Reserved Display Names
+[ ] Try setting display name to "admin" - should be rejected
+[ ] Try setting display name to "signalfriend" - should be rejected
+[ ] Try setting display name to "admin123" - should be rejected
+[ ] Valid names should still work
+
+### Maintenance Mode
+[ ] Set VITE_MAINTENANCE_MODE=true in .env.local
+[ ] Rebuild and verify maintenance page shows
+[ ] Set VITE_MAINTENANCE_MODE=false and verify site works
+
+================================================================================
+NOTES
+================================================================================
+
+**Blacklisting Best Practice:**
+- Always blacklist from SMART CONTRACT, not from web UI
+- Smart contract blacklist blocks referral earnings AND syncs to database via webhook
+- Web UI blacklist only updates database, not smart contract (incomplete)
+- Use: cast send or BscScan to call proposeBlacklist(address, bool)
+
+**Maintenance Mode:**
+- Set VITE_MAINTENANCE_MODE=true in frontend/.env.local
+- Optional: VITE_MAINTENANCE_MESSAGE and VITE_MAINTENANCE_END_TIME
+- Rebuild frontend after changing env vars
 [ ] Click "Verify Predictor" button → predictor should become verified
 [ ] Verify "Verified" badge appears on profile and in Predictors list
 [ ] Click "Remove Verification" → predictor should become unverified

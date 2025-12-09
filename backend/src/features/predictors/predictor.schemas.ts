@@ -61,9 +61,57 @@ export const getPredictorByAddressSchema = z.object({
 /** Allowed image extensions regex (security: no SVG!) */
 const allowedImageExtensions = /\.(jpg|jpeg|png|gif)(\?.*)?$/i;
 
+/**
+ * Reserved display names that cannot be used by predictors.
+ * These names could be used for impersonation or confusion.
+ * Checked case-insensitively.
+ */
+export const RESERVED_DISPLAY_NAMES = [
+  "admin",
+  "administrator",
+  "signalfriend",
+  "signal_friend",
+  "signal-friend",
+  "moderator",
+  "mod",
+  "support",
+  "help",
+  "official",
+  "team",
+  "staff",
+  "system",
+  "bot",
+  "root",
+  "owner",
+  "founder",
+];
+
+/**
+ * Checks if a display name is reserved/prohibited.
+ * Performs case-insensitive check and also checks for partial matches
+ * (e.g., "admin123" or "signalfriend_official" would be blocked).
+ */
+export function isReservedDisplayName(name: string): boolean {
+  const lowerName = name.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return RESERVED_DISPLAY_NAMES.some(
+    (reserved) =>
+      lowerName === reserved.replace(/[^a-z0-9]/g, "") ||
+      lowerName.startsWith(reserved.replace(/[^a-z0-9]/g, "")) ||
+      lowerName.includes("signalfriend")
+  );
+}
+
 export const updatePredictorProfileSchema = z.object({
   /** Display name (1-50 characters) */
-  displayName: z.string().min(1).max(50).optional(),
+  displayName: z
+    .string()
+    .min(1)
+    .max(50)
+    .refine(
+      (val) => !isReservedDisplayName(val),
+      "This display name is reserved and cannot be used"
+    )
+    .optional(),
   /** Bio/description (max 500 characters) */
   bio: z.string().max(500).optional(),
   /** Avatar URL - only JPG, PNG, GIF allowed (no SVG for security) */

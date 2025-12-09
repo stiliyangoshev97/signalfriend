@@ -2,8 +2,8 @@
                         SIGNALFRIEND FRONTEND TO-DO LIST
 ================================================================================
 
-Last Updated: 2025-12-08
-Current Version: v0.9.0 (Phase 3 Misc Fixes Complete)
+Last Updated: 2025-12-09
+Current Version: v0.10.0 (Phase 4 Polish & Fixes Complete)
 
 ================================================================================
 PHASE 1: CORE SCAFFOLD ✅ COMPLETE
@@ -369,8 +369,24 @@ PHASE 6: ADMIN FEATURES ✅ COMPLETE (v0.5.0)
     - URL stripping on backend for security
 
 ================================================================================
-PHASE 7: POLISH & OPTIMIZATION (PRIORITY: LOW)
+PHASE 7: POLISH & FIXES ✅ PARTIAL (December 9, 2025)
 ================================================================================
+
+[✅] Legal & Compliance
+    - Terms and Conditions page (/terms)
+    - Legal positioning as NFT marketplace (not financial advice, not gambling)
+    - Footer links: Terms | Contact | Discord | X
+
+[✅] Maintenance Mode
+    - MaintenancePage component
+    - Environment variable toggle (VITE_MAINTENANCE_MODE)
+    - Customizable message and end time
+    - RUNBOOK documentation
+
+[✅] UI/UX Fixes
+    - Signals page subtitle updated (removed refund claims)
+    - Footer social links updated (Discord, X)
+    - Contact email added to footer
 
 [ ] Performance
     - React.lazy for route splitting
