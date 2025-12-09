@@ -14,6 +14,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.12.0] - 2025-12-09 🛡️ FRONTEND VALIDATION & POLISH
+
+### Added
+
+**Reserved Names & Handles Validation (Frontend)**
+- `RESERVED_DISPLAY_NAMES` array with 30+ prohibited display names
+- `isReservedDisplayName()` function with case-insensitive + partial match checking
+- `RESERVED_SOCIAL_HANDLES` array for Twitter, Telegram, Discord
+- `isReservedSocialHandle()` function to prevent impersonation of official accounts
+- Zod `.refine()` validation on displayName, twitter, telegram, discord fields
+
+**Avatar URL Length Limit**
+- Added `.max(500)` validation to avatarUrl field in EditProfileModal
+- Prevents excessively long URLs (like Dropbox preview links) that fail backend validation
+- User-friendly error message suggesting postimages.org
+
+**Bio Text Truncation Fix**
+- Added `break-all` CSS class to PredictorCard and PredictorInfoCard bio sections
+- Long unbroken strings (e.g., "sssssss...") now properly wrap and show ellipsis
+- Works with existing `line-clamp-2` and `line-clamp-3` utilities
+
+### Changed
+
+**Admin Badge Rename**
+- Changed "🔐 Multisig" badge to "🔐 Admin" in AuthButton
+- Updated tooltip from "Multisig signer wallet detected" to "Admin wallet detected"
+- Better reflects actual functionality (admins handle reports/disputes, not just signing)
+
+**useIsAdmin Hook Documentation**
+- Updated comments to clarify admin vs multisig distinction
+- Added note that admin privileges are off-chain only
+- Added comment for adding new admins
+
+---
+
 ## [0.11.0] - 2025-12-09 🔗 ADMIN BLACKLIST VIA SMART CONTRACT
 
 ### Added

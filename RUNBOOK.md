@@ -1,7 +1,7 @@
 # 📖 SignalFriend - General Runbook
 
 > Quick reference for common development tasks and configurations.  
-> Last Updated: 5 December 2025
+> Last Updated: 9 December 2025
 
 ---
 
@@ -184,6 +184,43 @@ forge build              # Compile contracts
 forge test               # Run tests
 forge test -vvv          # Run tests with verbose output
 ```
+
+---
+
+## 🚀 Running in Production Mode
+
+Use these commands when you need to test production builds locally (bypasses Vite HMR, more accurate behavior testing).
+
+### Frontend (Production Build)
+```bash
+cd frontend
+npm run build            # Build production bundle
+npm run preview          # Serve production build locally (usually port 4173)
+```
+
+### Backend (Production Build)
+```bash
+cd backend
+npm run build            # Compile TypeScript to JavaScript
+npm start                # Run compiled JS (production mode)
+```
+
+### One-liner Commands
+```bash
+# Frontend: Build and preview
+cd frontend && npm run build && npm run preview
+
+# Backend: Build and start
+cd backend && npm run build && npm start
+```
+
+### When to Use Production Mode
+- Testing behavior that differs between dev and production
+- Debugging issues that don't reproduce in dev mode (e.g., HMR state preservation)
+- Performance testing
+- Pre-deployment verification
+
+---
 
 ### Git Workflow
 ```bash

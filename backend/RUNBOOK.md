@@ -1,7 +1,7 @@
 # 📋 SignalFriend Backend Runbook
 
 > Complete development, testing, and operations guide.  
-> Last Updated: December 2024
+> Last Updated: December 2025
 
 ---
 
@@ -12,12 +12,62 @@
 mongod
 
 # Terminal 2: Start the backend
-cd /Users/stiliyangoshev/Desktop/Coding/Full\ Projects/SignalFriend/backend
+cd backend
 npm run dev
 
 # Terminal 3: Start ngrok (for webhook testing)
 ngrok http 3001
 ```
+
+---
+
+## 🔧 Environment Variables
+
+Key environment variables in `.env`:
+
+```bash
+# Server
+NODE_ENV=development
+PORT=3001
+
+# Database
+MONGODB_URI=mongodb://localhost:27017/signalfriend
+
+# Authentication
+JWT_SECRET=your-super-secret-jwt-key-min-32-chars
+JWT_EXPIRES_IN=7d
+
+# Blockchain
+CHAIN_ID=97
+RPC_URL=https://bsc-testnet-rpc.publicnode.com
+
+# Alchemy Webhooks
+ALCHEMY_SIGNING_KEY=whsec_xxx
+
+# CORS
+CORS_ORIGIN=http://localhost:5173
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Admin Configuration (comma-separated wallet addresses)
+ADMIN_ADDRESSES=0x...,0x...,0x...
+```
+
+---
+
+## 🛡️ Admin Configuration
+
+Admins are wallet addresses with elevated privileges (view reports, approve verifications, etc.).
+
+To add new admins, update `ADMIN_ADDRESSES` in `.env`:
+
+```bash
+ADMIN_ADDRESSES=0x4Cca77ba15B0D85d7B733E0838a429E7bEF42DD2,0xNewAdminAddress
+```
+
+**Note:** Admin privileges are off-chain only. For on-chain actions (blacklisting), MultiSig is required.
 
 ---
 
@@ -419,6 +469,38 @@ db.signals.deleteMany({})
 ### "Event not decoded properly"
 - Check event signatures match contract ABIs
 - Run `generateEventSignatures.ts` to verify hashes
+
+---
+
+## 🧪 Rate Limit Testing
+
+### Trigger Rate Limit Script
+
+Use this script to test frontend retry logic when API rate limiting kicks in.
+
+```bash
+# From project root
+cd /Users/stiliyangoshev/Desktop/Coding/Full\ Projects/SignalFriend
+
+# Run the rate limit trigger script
+./scripts/trigger-rate-limit.sh
+```
+
+**What it does:**
+- Sends 110 rapid requests to `/api/signals`
+- Rate limit kicks in after ~75 requests (limit is 100 per 15 min window)
+- Remaining requests return 429 (Too Many Requests)
+
+**Testing procedure:**
+1. Open the frontend signal purchase page
+2. Run the script
+3. Try to purchase a signal
+4. The blockchain transaction should succeed, but API calls will fail
+5. The frontend retry logic should recover after rate limit resets
+
+**Reset rate limit:**
+- Wait 15 minutes (automatic reset)
+- Or restart the backend server
 
 ---
 

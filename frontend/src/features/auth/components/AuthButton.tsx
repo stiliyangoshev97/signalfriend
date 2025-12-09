@@ -130,13 +130,13 @@ export function AuthButton() {
           </span>
         )}
         
-        {/* Multisig wallet indicator (before sign in) */}
+        {/* Admin wallet indicator (before sign in) */}
         {isAdmin && (
           <span 
             className="px-2 py-1 text-xs font-medium bg-fur-main/20 text-fur-main border border-fur-main/30 rounded-lg hidden sm:inline"
-            title="Multisig signer wallet detected"
+            title="Admin wallet detected"
           >
-            🔐 Multisig
+            🔐 Admin
           </span>
         )}
         
@@ -174,13 +174,13 @@ export function AuthButton() {
   // Fully authenticated - show user info with logout
   return (
     <div className="flex items-center gap-3">
-      {/* Multisig wallet indicator */}
+      {/* Admin wallet indicator */}
       {isAdmin && (
         <span 
           className="px-2 py-1 text-xs font-medium bg-fur-main/20 text-fur-main border border-fur-main/30 rounded-lg"
-          title="Connected with multisig signer wallet"
+          title="Connected with admin wallet"
         >
-          🔐 Multisig
+          🔐 Admin
         </span>
       )}
       

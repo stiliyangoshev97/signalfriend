@@ -30,12 +30,119 @@ const urlPattern = /(https?:\/\/|www\.|\.com|\.org|\.net|\.io|\.xyz|\.gg|t\.me|d
 /** Allowed image file extensions (security: no SVG!) */
 const allowedImageExtensions = /\.(jpg|jpeg|png|gif)(\?.*)?$/i;
 
+/**
+ * Reserved display names that cannot be used.
+ * These names could be used for impersonation or confusion.
+ * Must match backend validation in predictor.schemas.ts
+ */
+const RESERVED_DISPLAY_NAMES = [
+  'admin',
+  'administrator',
+  'signalfriend',
+  'signal_friend',
+  'signal-friend',
+  'signalfriend_admin',
+  'signalfriend_administrator',
+  'signalfriend_mod',
+  'signalfriend_moderator',
+  'signalfriend_support',
+  'signalfriend_official',
+  'signalfriend_team',
+  'moderator',
+  'mod',
+  'support',
+  'help',
+  'official',
+  'team',
+  'staff',
+  'system',
+  'bot',
+  'root',
+  'owner',
+  'founder',
+  'ceo',
+  'cto',
+  'developer',
+  'dev',
+];
+
+/**
+ * Checks if a display name is reserved/prohibited.
+ * Performs case-insensitive check and also checks for partial matches.
+ * @param name - The display name to check
+ * @returns true if the name is reserved, false otherwise
+ */
+function isReservedDisplayName(name: string): boolean {
+  const lowerName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return RESERVED_DISPLAY_NAMES.some(
+    (reserved) => {
+      const normalizedReserved = reserved.replace(/[^a-z0-9]/g, '');
+      return (
+        lowerName === normalizedReserved ||
+        lowerName.startsWith(normalizedReserved) ||
+        lowerName.includes('signalfriend')
+      );
+    }
+  );
+}
+
+/**
+ * Reserved social media handles that cannot be used.
+ * Prevents impersonation of the official SignalFriend accounts.
+ * Official accounts:
+ * - Twitter: @signalfriend1
+ * - Discord: signalfriend.com
+ * - Telegram: (platform official channels)
+ */
+const RESERVED_SOCIAL_HANDLES = [
+  'signalfriend',
+  'signalfriend1',
+  'signalfriend2',
+  'signal_friend',
+  'signal-friend',
+  'signalfriendofficial',
+  'signalfriend_official',
+  'signalfriendadmin',
+  'signalfriend_admin',
+  'signalfriendmod',
+  'signalfriend_mod',
+  'signalfriendteam',
+  'signalfriend_team',
+  'signalfriendsupport',
+  'signalfriend_support',
+  'signalfriendhelp',
+  'signalfriend_help',
+  'signalfriend.com',
+  'signalfriendcom',
+];
+
+/**
+ * Checks if a social handle is reserved/prohibited.
+ * Prevents users from impersonating official SignalFriend accounts.
+ * @param handle - The social handle to check
+ * @returns true if the handle is reserved, false otherwise
+ */
+function isReservedSocialHandle(handle: string): boolean {
+  if (!handle) return false;
+  const normalizedHandle = handle.toLowerCase().replace(/[^a-z0-9.]/g, '');
+  return (
+    RESERVED_SOCIAL_HANDLES.some(
+      (reserved) => normalizedHandle === reserved.toLowerCase().replace(/[^a-z0-9.]/g, '')
+    ) ||
+    normalizedHandle.includes('signalfriend')
+  );
+}
+
 const editProfileSchema = z.object({
   displayName: z
     .string()
     .min(3, 'Display name must be at least 3 characters')
     .max(30, 'Display name must be at most 30 characters')
-    .regex(/^[a-zA-Z0-9_]+$/, 'Only letters, numbers, and underscores allowed'),
+    .regex(/^[a-zA-Z0-9_]+$/, 'Only letters, numbers, and underscores allowed')
+    .refine(
+      (val) => !isReservedDisplayName(val),
+      'This display name is reserved and cannot be used'
+    ),
   bio: z
     .string()
     .max(500, 'Bio must be at most 500 characters')
@@ -44,6 +151,7 @@ const editProfileSchema = z.object({
     .or(z.literal('')),
   avatarUrl: z
     .string()
+    .max(500, 'URL is too long (max 500 characters). Use a direct image link from postimages.org or similar.')
     .url('Please enter a valid image URL (must start with http:// or https://)')
     .refine(
       (val) => !val || allowedImageExtensions.test(val),
@@ -55,17 +163,29 @@ const editProfileSchema = z.object({
     .string()
     .max(50, 'Twitter handle too long')
     .regex(/^[a-zA-Z0-9_]*$/, 'Only letters, numbers, and underscores allowed')
+    .refine(
+      (val) => !val || !isReservedSocialHandle(val),
+      'This Twitter handle is reserved and cannot be used'
+    )
     .optional()
     .or(z.literal('')),
   telegram: z
     .string()
     .min(1, 'Telegram handle is required')
     .max(32, 'Telegram handle too long')
-    .regex(/^[a-zA-Z0-9_]+$/, 'Only letters, numbers, and underscores allowed'),
+    .regex(/^[a-zA-Z0-9_]+$/, 'Only letters, numbers, and underscores allowed')
+    .refine(
+      (val) => !isReservedSocialHandle(val),
+      'This Telegram handle is reserved and cannot be used'
+    ),
   discord: z
     .string()
     .min(1, 'Discord handle is required')
-    .max(32, 'Discord handle too long'),
+    .max(32, 'Discord handle too long')
+    .refine(
+      (val) => !isReservedSocialHandle(val),
+      'This Discord handle is reserved and cannot be used'
+    ),
   preferredContact: z.enum(['telegram', 'discord']),
 });
 

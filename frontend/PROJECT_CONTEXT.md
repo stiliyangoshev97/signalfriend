@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 9 December 2025 (v0.11.0 - Admin Blacklist via Smart Contract)
+> Last Updated: 9 December 2025 (v0.12.0 - Frontend Validation & Polish)
 
 ---
 
@@ -31,13 +31,15 @@
 | **Predictor Dashboard** | ✅ 100% | Stats, signal management, edit profile, referral earnings |
 | **Predictor List Page** | ✅ 100% | Public leaderboard with filters, verified badges |
 | **Predictor Profile** | ✅ 100% | Full profile with signals grid, admin sections |
-| **Edit Profile Modal** | ✅ 100% | Full profile editing with uniqueness validation |
+| **Edit Profile Modal** | ✅ 100% | Full profile editing with uniqueness + reserved name validation |
 | **Mobile Responsive** | ✅ 100% | Hamburger menu, proper scaling, copy addresses |
 | **Admin Dashboard** | ✅ 100% | Earnings, verifications, reports, disputes, blacklisted tabs |
 | **Admin Manual Verify** | ✅ 100% | Verify/unverify any predictor from profile |
 | **Admin Earnings View** | ✅ 100% | View predictor's total earnings on their profile |
 | **Buyer Report Signal** | ✅ 100% | Report purchased signals with reason dropdown |
 | **Admin Blacklist/Unblacklist** | ✅ 100% | Via smart contract MultiSig proposal |
+| **Reserved Name Validation** | ✅ 100% | Frontend blocks reserved display names & social handles |
+| **Avatar URL Validation** | ✅ 100% | Max 500 chars, blocks excessively long URLs |
 
 **Overall Progress: ~100%** (All core features complete)
 
