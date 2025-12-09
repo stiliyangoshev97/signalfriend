@@ -11,7 +11,7 @@
  * 2. Browse Signals - Find signals that match your strategy
  * 3. Purchase Signal - Pay with USDT, receive SignalKey NFT
  * 4. View Content - Access the full signal details
- * 5. Auto-Refund - Get refunded if prediction misses
+ * 5. Rate Signal - Help the community with feedback
  */
 
 interface Step {
@@ -29,7 +29,7 @@ const buyerSteps: Step[] = [
   {
     number: 2,
     title: 'Browse Signals',
-    description: 'Explore signals from verified predictors. Filter by category, risk level, price, and more.',
+    description: 'Explore signals from predictors. Filter by category, risk level, price, and ratings.',
   },
   {
     number: 3,
@@ -43,16 +43,16 @@ const buyerSteps: Step[] = [
   },
   {
     number: 5,
-    title: 'Auto-Refund',
-    description: "If the prediction doesn't hit the target, claim your refund automatically through the smart contract.",
+    title: 'Rate Signal',
+    description: 'After using the signal, rate it to help others and build predictor reputation.',
   },
 ];
 
 const predictorSteps: Step[] = [
   {
     number: 1,
-    title: 'Register & Verify',
-    description: 'Mint your PredictorAccessPass NFT and complete verification to start publishing signals.',
+    title: 'Register',
+    description: 'Pay a one-time registration fee and receive your PredictorAccessPass NFT to start publishing.',
   },
   {
     number: 2,
@@ -62,12 +62,12 @@ const predictorSteps: Step[] = [
   {
     number: 3,
     title: 'Earn Revenue',
-    description: 'Earn USDT for every signal purchase. Build your reputation with accurate predictions.',
+    description: 'Receive USDT directly to your wallet for every signal purchase. 95% goes to you.',
   },
   {
     number: 4,
     title: 'Build Reputation',
-    description: 'Your stats are tracked on-chain. Higher accuracy means more subscribers and earnings.',
+    description: 'Earn ratings from buyers. High performers can achieve verified status.',
   },
 ];
 

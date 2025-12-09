@@ -3,6 +3,7 @@
  *
  * Final call-to-action section at the bottom of the landing page.
  * Encourages users to get started with a prominent CTA.
+ * Displays real platform statistics fetched from the backend.
  *
  * @module features/home/components/CTASection
  *
@@ -10,13 +11,23 @@
  * - Full-width gradient background
  * - Centered text with strong headline
  * - Prominent CTA button
- * - Trust badge/stats below
+ * - Real stats from API below
  */
 
 import { Link } from 'react-router-dom';
-import { Button } from '@/shared/components/ui';
+import { Button, Spinner } from '@/shared/components/ui';
+import { usePublicStats } from '../api/stats';
+
+/**
+ * Formats a number as currency (e.g., 1234.56 → "$1,234")
+ */
+function formatCurrency(amount: number): string {
+  return `$${Math.floor(amount).toLocaleString()}`;
+}
 
 export function CTASection() {
+  const { data: stats, isLoading } = usePublicStats();
+
   return (
     <section className="py-16 md:py-24 relative overflow-hidden">
       {/* Background gradient */}
@@ -36,8 +47,8 @@ export function CTASection() {
 
           {/* Description */}
           <p className="text-lg md:text-xl text-gray-main mb-8">
-            Join the marketplace where predictors put their money where their mouth is, 
-            and buyers are protected by smart contracts.
+            Join the marketplace where predictors build reputation through results, 
+            and buyers get transparent access to trading signals.
           </p>
 
           {/* CTA Buttons */}
@@ -57,16 +68,34 @@ export function CTASection() {
           {/* Stats/Trust indicators */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 pt-8 border-t border-dark-600">
             <div>
-              <div className="text-2xl md:text-3xl font-bold text-fur-cream">100+</div>
-              <div className="text-sm text-gray-main">Active Signals</div>
+              {isLoading ? (
+                <div className="flex justify-center"><Spinner size="sm" /></div>
+              ) : (
+                <div className="text-2xl md:text-3xl font-bold text-fur-cream">
+                  {stats?.totalSignals ?? 0}
+                </div>
+              )}
+              <div className="text-sm text-gray-main">Total Signals</div>
             </div>
             <div>
-              <div className="text-2xl md:text-3xl font-bold text-fur-cream">50+</div>
-              <div className="text-sm text-gray-main">Verified Predictors</div>
+              {isLoading ? (
+                <div className="flex justify-center"><Spinner size="sm" /></div>
+              ) : (
+                <div className="text-2xl md:text-3xl font-bold text-fur-cream">
+                  {stats?.totalPredictors ?? 0}
+                </div>
+              )}
+              <div className="text-sm text-gray-main">Total Predictors</div>
             </div>
             <div>
-              <div className="text-2xl md:text-3xl font-bold text-fur-cream">$10K+</div>
-              <div className="text-sm text-gray-main">Refunds Processed</div>
+              {isLoading ? (
+                <div className="flex justify-center"><Spinner size="sm" /></div>
+              ) : (
+                <div className="text-2xl md:text-3xl font-bold text-fur-cream">
+                  {formatCurrency(stats?.totalPredictorEarnings ?? 0)}
+                </div>
+              )}
+              <div className="text-sm text-gray-main">Predictor Earnings</div>
             </div>
             <div>
               <div className="text-2xl md:text-3xl font-bold text-fur-cream">BNB</div>
