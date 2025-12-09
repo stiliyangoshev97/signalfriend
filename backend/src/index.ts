@@ -31,6 +31,7 @@ import { reviewRoutes } from "./features/reviews/review.routes.js";
 import reportRoutes from "./features/reports/report.routes.js";
 import { adminRoutes } from "./features/admin/admin.routes.js";
 import { disputeRoutes, adminDisputeRoutes } from "./features/disputes/dispute.routes.js";
+import { statsRoutes } from "./features/stats/stats.routes.js";
 
 /** Express application instance */
 const app = express();
@@ -77,6 +78,7 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/disputes", disputeRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/disputes", adminDisputeRoutes);
+app.use("/api/stats", statsRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

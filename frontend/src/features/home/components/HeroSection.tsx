@@ -67,8 +67,8 @@ export function HeroSection() {
 
             {/* Description */}
             <p className="text-lg md:text-xl text-gray-main mb-8 max-w-2xl mx-auto lg:mx-0">
-              Connect with top crypto predictors, purchase trading signals, and get 
-              automatic refunds if predictions don't hit. All secured by smart contracts 
+              Connect with crypto predictors, purchase trading signals as NFTs, 
+              and access premium market insights. All payments secured by smart contracts 
               on BNB Chain.
             </p>
 
@@ -92,13 +92,13 @@ export function HeroSection() {
                 <svg className="w-5 h-5 text-success-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span>On-chain Refunds</span>
+                <span>NFT Receipts</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-main">
                 <svg className="w-5 h-5 text-success-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span>Verified Predictors</span>
+                <span>USDT Payments</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-main">
                 <svg className="w-5 h-5 text-success-500" fill="currentColor" viewBox="0 0 20 20">
