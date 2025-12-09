@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 8 December 2025 (v0.9.0 - Phase 3 Misc Fixes Complete)
+> Last Updated: 9 December 2025 (v0.11.0 - Admin Blacklist via Smart Contract)
 
 ---
 
@@ -37,7 +37,7 @@
 | **Admin Manual Verify** | ✅ 100% | Verify/unverify any predictor from profile |
 | **Admin Earnings View** | ✅ 100% | View predictor's total earnings on their profile |
 | **Buyer Report Signal** | ✅ 100% | Report purchased signals with reason dropdown |
-| **Admin Blacklist/Unblacklist** | ✅ 100% | Toggle blacklist from predictor profiles |
+| **Admin Blacklist/Unblacklist** | ✅ 100% | Via smart contract MultiSig proposal |
 
 **Overall Progress: ~100%** (All core features complete)
 

@@ -122,6 +122,7 @@ export const SIGNAL_FRIEND_MARKET_ABI = [
  *
  * Functions used:
  * - balanceOf(address) - Check if address owns a predictor NFT
+ * - proposeBlacklist(address, bool) - Propose to blacklist/unblacklist (MultiSig)
  */
 export const PREDICTOR_ACCESS_PASS_ABI = [
   {
@@ -130,6 +131,44 @@ export const PREDICTOR_ACCESS_PASS_ABI = [
     inputs: [{ name: 'owner', type: 'address', internalType: 'address' }],
     outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'proposeBlacklist',
+    inputs: [
+      { name: '_predictor', type: 'address', internalType: 'address' },
+      { name: '_status', type: 'bool', internalType: 'bool' },
+    ],
+    outputs: [{ name: '', type: 'bytes32', internalType: 'bytes32' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'isBlacklisted',
+    inputs: [{ name: '_predictor', type: 'address', internalType: 'address' }],
+    outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+    stateMutability: 'view',
+  },
+  // Events
+  {
+    type: 'event',
+    name: 'ActionProposed',
+    inputs: [
+      { name: 'actionId', type: 'bytes32', indexed: true, internalType: 'bytes32' },
+      { name: 'actionType', type: 'uint8', indexed: false, internalType: 'enum PredictorAccessPass.ActionType' },
+      { name: 'proposer', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'expiryTime', type: 'uint256', indexed: false, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'PredictorBlacklisted',
+    inputs: [
+      { name: 'predictor', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'isBlacklisted', type: 'bool', indexed: false, internalType: 'bool' },
+    ],
+    anonymous: false,
   },
 ] as const;
 

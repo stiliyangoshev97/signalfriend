@@ -11,7 +11,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 - Signal outcome tracking
-- Admin blacklist via smart contract (proposeBlacklist)
+
+---
+
+## [0.11.0] - 2025-12-09 🔗 ADMIN BLACKLIST VIA SMART CONTRACT
+
+### Added
+
+**Smart Contract Blacklist Integration**
+- New `useProposeBlacklist` hook for calling `proposeBlacklist` on PredictorAccessPass contract
+- Admin blacklist/unblacklist now creates MultiSig proposals on-chain
+- Confirmation modal explaining MultiSig process (requires 2 more approvals)
+- Success state shows transaction hash and actionId for further approvals
+- Error handling with user-friendly messages for transaction rejections
+
+**Extended PredictorAccessPass ABI**
+- Added `proposeBlacklist(address, bool)` function
+- Added `isBlacklisted(address)` view function
+- Added `ActionProposed` and `PredictorBlacklisted` events
+
+### Changed
+
+**Admin Blacklist Flow**
+- Blacklist button now opens confirmation modal instead of direct API call
+- Shows warning about MultiSig requirement before proceeding
+- Displays next steps after successful proposal (go to BscScan, approve with other signers)
+- Transaction hash and actionId displayed for tracking
+
+**Verification Progress Bar Fix**
+- Now uses `predictor.totalSales` as primary source (synced from receipts)
+- Falls back to `earnings.totalSalesCount`, then signal calculation
+- Fixed earnings calculation to use explicit undefined check (allows 0 as valid value)
+- Progress bar now increments properly instead of showing 0% until target met
+
+### Technical Details
+- `useProposeBlacklist` hook manages transaction lifecycle (pending → confirming → success/error)
+- Extracts `actionId` from `ActionProposed` event logs
+- Uses `parseWalletError` for user-friendly error messages
+- Proper TypeScript typing for viem log decoding
 
 ---
 

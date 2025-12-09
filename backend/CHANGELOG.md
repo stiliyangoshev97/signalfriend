@@ -12,7 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned
 - Unit & integration tests
 - Docker configuration
-- Admin blacklist via smart contract integration
+
+### Note
+- Admin blacklist via smart contract integration is now handled entirely on the frontend (v0.11.0), calling `proposeBlacklist()` directly on the PredictorAccessPass smart contract
 
 ---
 

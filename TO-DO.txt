@@ -51,13 +51,18 @@ PHASE 4: POLISH & FIXES ✅ COMPLETE (December 9, 2025)
 [x] #6 Maintenance page with RUNBOOK documentation
 
 ================================================================================
-NEXT PRIORITY: ADMIN BLACKLIST VIA SMART CONTRACT
+PHASE 5: ADMIN BLACKLIST VIA SMART CONTRACT ✅ COMPLETE (December 9, 2025)
 ================================================================================
 
-[ ] Update admin blacklist button to call proposeBlacklist(address, true) on smart contract
-[ ] Update admin unblacklist button to call proposeBlacklist(address, false) on smart contract
-[ ] This creates a multisig proposal that requires 2 more signatures on BscScan
-[ ] Webhook will automatically sync the blacklist status to database when approved
+[x] Update admin blacklist button to call proposeBlacklist(address, true) on smart contract
+[x] Update admin unblacklist button to call proposeBlacklist(address, false) on smart contract
+[x] This creates a multisig proposal that requires 2 more signatures on BscScan
+[x] Webhook will automatically sync the blacklist status to database when approved
+[x] Fixed verification progress bar not showing incremental progress
+
+================================================================================
+NEXT PRIORITY: TESTING & POLISH
+================================================================================
 
 See detailed tasks in:
 - /frontend/TO-DO-FRONTEND.txt (Phase 7: Polish & Optimization)
