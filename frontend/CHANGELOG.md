@@ -14,6 +14,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.13.0] - 2025-12-10 🔧 FILTERS & SORTING IMPROVEMENTS
+
+### Added
+
+**Verified Predictors Filter**
+- New "✓ Verified Only" toggle button in PredictorFilterPanel Quick Filters
+- Filters predictors list to show only verified predictors when active
+- Toggle on/off behavior (click again to show all)
+
+**Best Quality Sort Option for Signals**
+- New "⭐ Best Quality" option in Signals FilterPanel sort dropdown
+- Default sort option showing highest-rated signals with most sales first
+- Quality-first sorting: rating → sales → reviews → date
+
+### Changed
+
+**Signal Sort Dropdown**
+- Added "⭐ Best Quality" as first/default option
+- Reordered options: Best Quality, Newest, Price Low→High, Price High→Low, Most Popular
+- Explicit sort selection now properly respected (fixes price sorting issues)
+
+**PredictorFilters Type**
+- Added `verified?: boolean` to `PredictorFilters` interface
+- API now passes `verified` param when filter is active
+
+**Signals API**
+- `fetchSignals()` no longer sends `sortBy` when using quality-first default
+- Explicit sort selections properly mapped to backend params
+
+---
+
 ## [0.12.0] - 2025-12-09 🛡️ FRONTEND VALIDATION & POLISH
 
 ### Added

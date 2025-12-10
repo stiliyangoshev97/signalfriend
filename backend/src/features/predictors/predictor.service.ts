@@ -104,6 +104,7 @@ export class PredictorService {
     const {
       categoryId,
       active,
+      verified,
       sortBy,
       sortOrder,
       page,
@@ -119,6 +120,11 @@ export class PredictorService {
       filter.isBlacklisted = false;
     }
 
+    // Filter by verified status (true = only verified, false = only unverified)
+    if (verified !== undefined) {
+      filter.isVerified = verified;
+    }
+
     // Filter by category
     if (categoryId) {
       filter.categoryIds = categoryId;
@@ -129,10 +135,46 @@ export class PredictorService {
       filter.displayName = { $regex: search, $options: "i" };
     }
 
-    // Build sort
-    const sort: Record<string, 1 | -1> = {
-      [sortBy]: sortOrder === "asc" ? 1 : -1,
-    };
+    // Build compound sort with intelligent tiebreakers
+    // This ensures fair ordering when primary sort values are equal
+    const sortDirection = sortOrder === "asc" ? 1 : -1;
+    const sort: Record<string, 1 | -1> = {};
+
+    // Primary sort field (user-selected)
+    sort[sortBy] = sortDirection;
+
+    // Add tiebreakers based on primary sort field
+    // When values are equal, use secondary metrics to determine order
+    switch (sortBy) {
+      case "averageRating":
+        // Same rating? More reviews = more credible rating
+        sort.totalReviews = -1;
+        sort.totalSales = -1;
+        sort.joinedAt = 1; // Older accounts first (more established)
+        break;
+      case "totalSales":
+        // Same sales? Higher rated = better quality
+        sort.averageRating = -1;
+        sort.totalReviews = -1;
+        sort.joinedAt = 1;
+        break;
+      case "totalSignals":
+        // Same signals? More sales = more successful
+        sort.totalSales = -1;
+        sort.averageRating = -1;
+        sort.joinedAt = 1;
+        break;
+      case "joinedAt":
+        // Same join date? More sales = more active
+        sort.totalSales = -1;
+        sort.averageRating = -1;
+        break;
+      default:
+        // Fallback tiebreakers
+        sort.totalSales = -1;
+        sort.averageRating = -1;
+        sort.joinedAt = 1;
+    }
 
     // Calculate skip for pagination
     const skip = (page - 1) * limit;
@@ -495,9 +537,30 @@ export class PredictorService {
     metric: "totalSales" | "averageRating" | "totalSignals" = "totalSales",
     limit: number = 10
   ): Promise<Partial<IPredictor>[]> {
+    // Build compound sort with tiebreakers (same logic as getAll)
+    const sort: Record<string, 1 | -1> = { [metric]: -1 };
+
+    switch (metric) {
+      case "averageRating":
+        sort.totalReviews = -1;
+        sort.totalSales = -1;
+        sort.joinedAt = 1;
+        break;
+      case "totalSales":
+        sort.averageRating = -1;
+        sort.totalReviews = -1;
+        sort.joinedAt = 1;
+        break;
+      case "totalSignals":
+        sort.totalSales = -1;
+        sort.averageRating = -1;
+        sort.joinedAt = 1;
+        break;
+    }
+
     return Predictor.find({ isBlacklisted: false })
       .select(PredictorService.HIDDEN_FIELDS)
-      .sort({ [metric]: -1 })
+      .sort(sort)
       .limit(limit)
       .populate("categoryIds", "name slug icon");
   }

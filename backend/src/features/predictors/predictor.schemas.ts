@@ -26,6 +26,11 @@ export const listPredictorsSchema = z.object({
     .optional()
     .default("true")
     .transform((val) => val === "true"),
+  /** Filter by verified status (true = only verified, false = only unverified, undefined = all) */
+  verified: z
+    .string()
+    .optional()
+    .transform((val) => (val === undefined ? undefined : val === "true")),
   /** Sort field (totalSales, averageRating, joinedAt) */
   sortBy: z
     .enum(["totalSales", "averageRating", "joinedAt", "totalSignals"])

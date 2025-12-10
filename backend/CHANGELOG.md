@@ -18,6 +18,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.23.0] - 2025-12-10 🔧 FILTERS & SORTING IMPROVEMENTS
+
+### Added
+
+**Predictor Verified Filter**
+- New `verified` query parameter for `/api/predictors` endpoint
+- `verified=true` returns only verified predictors
+- `verified=false` returns only unverified predictors
+- `undefined` (default) returns all predictors
+
+**Compound Sorting for Predictors**
+- Intelligent tiebreakers when primary sort values are equal
+- Sort by `averageRating`: tiebreaks by `totalReviews` → `totalSales` → `joinedAt`
+- Sort by `totalSales`: tiebreaks by `averageRating` → `totalReviews` → `joinedAt`
+- Sort by `totalSignals`: tiebreaks by `totalSales` → `averageRating` → `joinedAt`
+- Sort by `joinedAt`: tiebreaks by `totalSales` → `averageRating`
+- Applied to both `getAll()` and `getTopPredictors()` methods
+
+**Smart Signal Sorting**
+- Quality-first default sort when no `sortBy` is specified (rating → sales → reviews → date)
+- User's explicit sort selection is respected as primary sort
+- Tiebreakers applied when primary values are equal
+- Fixes misleading behavior where "Price Low→High" showed expensive signals first
+
+### Changed
+
+**Signal Schema**
+- Removed default value from `sortBy` in `listSignalsSchema`
+- `sortBy=undefined` now triggers quality-first sorting
+- Explicit sort selection overrides quality-first behavior
+
+---
+
 ## [0.22.0] - 2025-12-09 🛠️ RESERVED DISPLAY NAMES
 
 ### Added

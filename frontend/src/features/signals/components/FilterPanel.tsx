@@ -328,20 +328,20 @@ export function FilterPanel({
           Sort By
         </label>
         <select
-          value={localFilters.sortBy || 'newest'}
-          onChange={(e) =>
-            updateFilter(
-              'sortBy',
-              e.target.value as SignalFilters['sortBy']
-            )
-          }
+          value={localFilters.sortBy || ''}
+          onChange={(e) => {
+            const value = e.target.value as SignalFilters['sortBy'] | '';
+            // Empty string means "Best Quality" (no sortBy sent to API)
+            updateFilter('sortBy', value || undefined);
+          }}
           className="w-full bg-dark-900 border border-dark-600 rounded-lg px-3 py-2.5 text-fur-cream text-sm focus:outline-none focus:ring-2 focus:ring-fur-light/50 focus:border-fur-light transition-all appearance-none cursor-pointer"
           style={{ colorScheme: 'dark' }}
         >
-          <option value="newest">Newest First</option>
-          <option value="price-low">Price: Low to High</option>
-          <option value="price-high">Price: High to Low</option>
-          <option value="popular">Most Popular</option>
+          <option value="">⭐ Best Quality</option>
+          <option value="newest">🆕 Newest First</option>
+          <option value="price-low">💰 Price: Low to High</option>
+          <option value="price-high">💎 Price: High to Low</option>
+          <option value="popular">🔥 Most Popular</option>
         </select>
       </div>
     </aside>

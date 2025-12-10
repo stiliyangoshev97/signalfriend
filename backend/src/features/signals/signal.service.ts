@@ -200,14 +200,46 @@ export class SignalService {
       filter.potentialReward = potentialReward;
     }
 
-    // Build sort - always prioritize by rating and sales first (best signals on top)
-    // Then apply user's sort preference as secondary sort
-    // This ensures highly-rated signals with good sales always appear first
-    const sort: Record<string, 1 | -1> = {
-      averageRating: -1, // Best rated first
-      totalSales: -1, // Most sales second
-      [sortBy]: sortOrder === "asc" ? 1 : -1, // User's preference third
-    };
+    // Build sort based on whether user explicitly selected a sort option
+    const sort: Record<string, 1 | -1> = {};
+    const sortDirection = sortOrder === "asc" ? 1 : -1;
+
+    if (sortBy === undefined) {
+      // No explicit sort selected - use quality-first default
+      // This ensures the best signals appear first on initial page load
+      sort.averageRating = -1;  // Best rated first
+      sort.totalSales = -1;     // Most sales second
+      sort.totalReviews = -1;   // More reviews = more credible
+      sort.createdAt = -1;      // Newest as final tiebreaker
+    } else {
+      // User explicitly selected a sort - respect their choice as primary
+      // Add intelligent tiebreakers when primary values are equal
+      sort[sortBy] = sortDirection;
+
+      switch (sortBy) {
+        case "averageRating":
+          sort.totalReviews = -1;  // More reviews = more credible rating
+          sort.totalSales = -1;
+          sort.createdAt = -1;
+          break;
+        case "totalSales":
+          sort.averageRating = -1;
+          sort.totalReviews = -1;
+          sort.createdAt = -1;
+          break;
+        case "priceUsdt":
+          // Same price? Show better rated first
+          sort.averageRating = -1;
+          sort.totalSales = -1;
+          sort.createdAt = -1;
+          break;
+        case "createdAt":
+          // Same date? Show better rated first
+          sort.averageRating = -1;
+          sort.totalSales = -1;
+          break;
+      }
+    }
 
     // Calculate skip for pagination
     const skip = (page - 1) * limit;

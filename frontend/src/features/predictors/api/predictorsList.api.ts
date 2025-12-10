@@ -22,6 +22,8 @@ export interface PredictorFilters {
   categoryId?: string;
   /** Exclude blacklisted predictors (default: true) */
   active?: boolean;
+  /** Filter by verified status (true = only verified, false = only unverified, undefined = all) */
+  verified?: boolean;
   /** Sort field */
   sortBy?: 'totalSales' | 'averageRating' | 'joinedAt' | 'totalSignals';
   /** Sort direction */
@@ -82,6 +84,7 @@ export async function fetchPredictors(
 
   if (filters?.categoryId) params.append('categoryId', filters.categoryId);
   if (filters?.active !== undefined) params.append('active', String(filters.active));
+  if (filters?.verified !== undefined) params.append('verified', String(filters.verified));
   if (filters?.sortBy) params.append('sortBy', filters.sortBy);
   if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
   if (filters?.search) params.append('search', filters.search);
