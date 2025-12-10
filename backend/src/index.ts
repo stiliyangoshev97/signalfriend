@@ -3,7 +3,7 @@
  *
  * This file sets up and configures the Express application with:
  * - Security middleware (Helmet, CORS)
- * - Rate limiting (general + auth-specific)
+ * - Tiered rate limiting (auth, read, write, critical)
  * - Body parsing and cookie parsing
  * - API routes (auth, webhooks, categories)
  * - Health check endpoint
@@ -18,7 +18,12 @@ import { env } from "./shared/config/env.js";
 import { logger } from "./shared/config/logger.js";
 import { connectDatabase, disconnectDatabase } from "./shared/config/database.js";
 import { securityMiddleware, corsMiddleware } from "./shared/middleware/security.js";
-import { rateLimiter } from "./shared/middleware/rateLimiter.js";
+import { 
+  rateLimiter, 
+  readRateLimiter, 
+  writeRateLimiter,
+  criticalRateLimiter 
+} from "./shared/middleware/rateLimiter.js";
 import { maintenanceMode } from "./shared/middleware/maintenance.js";
 import { errorHandler, notFoundHandler } from "./shared/middleware/errorHandler.js";
 import { authRoutes } from "./features/auth/auth.routes.js";
@@ -48,8 +53,35 @@ app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
-// Rate limiting (skip for webhooks)
-app.use(/^(?!\/api\/webhooks).*$/, rateLimiter);
+// =============================================================================
+// TIERED RATE LIMITING
+// =============================================================================
+// Rate limits are applied per-route category for optimal protection:
+// - Webhooks: No rate limiting (internal service)
+// - Auth: Specific limiters applied in auth.routes.ts
+// - Read: High limits for browsing (200/min)
+// - Write: Moderate limits (60/15min)
+// - Critical: Very high limits for purchases (500/15min)
+// - General: Fallback safety net
+
+// Skip rate limiting entirely for webhooks (internal service)
+// Note: Webhooks are protected by signature verification, not rate limiting
+
+// Apply read rate limiter to GET endpoints (high frequency, low risk)
+app.use("/api/signals", readRateLimiter);
+app.use("/api/predictors", readRateLimiter);
+app.use("/api/categories", readRateLimiter);
+app.use("/api/stats", readRateLimiter);
+app.use("/api/reviews", readRateLimiter);
+app.use("/api/reports", readRateLimiter);
+app.use("/api/disputes", readRateLimiter);
+
+// Apply critical rate limiter to receipts (never block purchases)
+app.use("/api/receipts", criticalRateLimiter);
+
+// General fallback rate limiter for any routes not covered above
+// (except webhooks which are completely skipped)
+app.use(/^(?!\/api\/webhooks|\/api\/auth).*$/, rateLimiter);
 
 // Maintenance mode (blocks all requests except /health)
 app.use(maintenanceMode);

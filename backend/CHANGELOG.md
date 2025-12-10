@@ -12,9 +12,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned
 - Unit & integration tests
 - Docker configuration
+- Redis-based rate limiting for horizontal scaling
 
 ### Note
 - Admin blacklist via smart contract integration is now handled entirely on the frontend (v0.11.0), calling `proposeBlacklist()` directly on the PredictorAccessPass smart contract
+
+---
+
+## [0.24.0] - 2025-12-10 🛡️ PRODUCTION-READY TIERED RATE LIMITING
+
+### Added
+
+**Tiered Rate Limiting System**
+- Production-ready rate limiting with per-endpoint-type limits
+- Separate rate limiters for different operation types:
+  - **Auth Nonce**: 60 req/15min (supports wallet switching)
+  - **Auth Verify**: 20 req/15min (prevents brute force)
+  - **Auth Logout**: 30 req/15min
+  - **Read Operations**: 200 req/min (high frequency browsing)
+  - **Write Operations**: 60 req/15min (data modification)
+  - **Critical Operations**: 500 req/15min (purchases - never block revenue)
+  - **General Fallback**: Configurable via env vars
+
+**Rate Limiter Features**
+- IP-based tracking for unauthenticated requests
+- Hybrid IP/User tracking for authenticated requests (more lenient)
+- Detailed logging when rate limits are exceeded
+- Standard rate limit headers (`RateLimit-*`)
+- Skip function for critical authenticated operations
+
+**Route-Level Rate Limiting**
+- Auth routes: Specific nonce/verify limiters
+- Signal/Predictor/Category routes: Read limiter for GETs
+- Signal/Predictor/Review/Report routes: Write limiter for POST/PUT/DELETE
+- Receipt routes: Critical limiter (never block purchases)
+- Webhook routes: No rate limiting (protected by signature verification)
+
+### Changed
+
+**Rate Limiter Configuration**
+- Refactored `rateLimiter.ts` from 2 simple limiters to comprehensive tiered system
+- Auth rate limit increased from 10/15min to 60/15min for nonce, 20/15min for verify
+- Global rate limiter now serves as fallback safety net
+
+**Route Files Updated**
+- `auth.routes.ts`: Uses `authNonceRateLimiter` and `authVerifyRateLimiter`
+- `signal.routes.ts`: Write limiter on POST/PUT/DELETE
+- `predictor.routes.ts`: Write limiter on PUT/POST
+- `review.routes.ts`: Write limiter on POST
+- `report.routes.ts`: Write limiter on POST
+- `dispute.routes.ts`: Write limiter on POST
+- `category.routes.ts`: Write limiter on POST/PUT/DELETE
+- `index.ts`: Tiered rate limiters applied by route category
+
+### Design Principles
+1. **Authenticated users get higher limits** - Abuse is traceable by wallet
+2. **Reads >> Writes** - Reads are cheap, writes need protection
+3. **Never block purchases** - Lost revenue + terrible UX
+4. **IP + User hybrid** - IP for unauthenticated, userId for authenticated
 
 ---
 

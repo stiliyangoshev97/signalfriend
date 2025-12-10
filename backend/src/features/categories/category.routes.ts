@@ -21,6 +21,7 @@ import {
 } from "./category.controller.js";
 import { validate } from "../../shared/middleware/validation.js";
 import { authenticate } from "../../shared/middleware/auth.js";
+import { writeRateLimiter } from "../../shared/middleware/rateLimiter.js";
 import {
   listCategoriesSchema,
   getCategoryBySlugSchema,
@@ -46,13 +47,13 @@ router.get("/:slug", validate(getCategoryBySlugSchema, "params"), getCategoryByS
 // ============================================================================
 // TODO: Add isAdmin middleware when admin system is implemented
 
-/** POST /api/categories - Create a new category */
-router.post("/", authenticate, validate(createCategorySchema), createCategory);
+/** POST /api/categories - Create a new category (write rate limited) */
+router.post("/", authenticate, writeRateLimiter, validate(createCategorySchema), createCategory);
 
-/** PUT /api/categories/:slug - Update an existing category */
-router.put("/:slug", authenticate, validate(getCategoryBySlugSchema, "params"), validate(updateCategorySchema), updateCategory);
+/** PUT /api/categories/:slug - Update an existing category (write rate limited) */
+router.put("/:slug", authenticate, writeRateLimiter, validate(getCategoryBySlugSchema, "params"), validate(updateCategorySchema), updateCategory);
 
-/** DELETE /api/categories/:slug - Delete a category */
-router.delete("/:slug", authenticate, validate(getCategoryBySlugSchema, "params"), deleteCategory);
+/** DELETE /api/categories/:slug - Delete a category (write rate limited) */
+router.delete("/:slug", authenticate, writeRateLimiter, validate(getCategoryBySlugSchema, "params"), deleteCategory);
 
 export const categoryRoutes = router;

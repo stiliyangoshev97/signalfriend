@@ -23,6 +23,7 @@ import {
 } from "./predictor.controller.js";
 import { validate } from "../../shared/middleware/validation.js";
 import { authenticate } from "../../shared/middleware/auth.js";
+import { writeRateLimiter } from "../../shared/middleware/rateLimiter.js";
 import {
   listPredictorsSchema,
   getPredictorByAddressSchema,
@@ -104,10 +105,12 @@ router.get(
  * PUT /api/predictors/:address
  * Update predictor's own profile.
  * Only the predictor can update their own profile.
+ * Rate limited: 60 req/15min (write operations)
  */
 router.put(
   "/:address",
   authenticate,
+  writeRateLimiter,
   validate(getPredictorByAddressSchema, "params"),
   validate(updatePredictorProfileSchema),
   updatePredictorProfile
@@ -118,10 +121,12 @@ router.put(
  * Apply for profile verification.
  * Requires 100+ sales (or 100 more sales after rejection).
  * Only the predictor can apply for their own verification.
+ * Rate limited: 60 req/15min (write operations)
  */
 router.post(
   "/:address/apply-verification",
   authenticate,
+  writeRateLimiter,
   validate(getPredictorByAddressSchema, "params"),
   applyForVerification
 );

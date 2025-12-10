@@ -1,7 +1,7 @@
 # SignalFriend Backend
 
 > Express + MongoDB + Viem backend API for the SignalFriend platform.  
-> **Version:** 0.22.0 | **Last Updated:** December 2025
+> **Version:** 0.24.0 | **Last Updated:** December 2025
 
 ## Tech Stack
 
@@ -231,6 +231,46 @@ src/
 4. **Frontend** calls `POST /api/auth/verify` with message + signature
 5. **Backend** verifies signature, returns JWT
 6. **Frontend** includes JWT in `Authorization: Bearer <token>` header
+
+## Rate Limiting
+
+The API uses a **tiered rate limiting system** to balance security with user experience.
+
+### Rate Limit Tiers
+
+| Tier | Limit | Window | Endpoints |
+|------|-------|--------|-----------|
+| Auth Nonce | 60 req | 15 min | `GET /auth/nonce` |
+| Auth Verify | 20 req | 15 min | `POST /auth/verify` |
+| Read | 200 req | 1 min | All GET endpoints |
+| Write | 60 req | 15 min | POST/PUT/DELETE (signals, reviews, etc.) |
+| Critical | 500 req | 15 min | `/receipts/*` (never block purchases) |
+| General | Configurable | Configurable | Fallback safety net |
+
+### Design Principles
+
+1. **Authenticated users get higher limits** - Abuse is traceable by wallet
+2. **Reads >> Writes** - Reads are cheap, writes need protection
+3. **Never block purchases** - Critical endpoints have very high limits
+4. **IP + User hybrid** - IP for unauthenticated, userId for authenticated
+
+### Response Headers
+
+All responses include standard rate limit headers:
+```
+RateLimit-Limit: 200
+RateLimit-Remaining: 195
+RateLimit-Reset: 1702234567
+```
+
+### Rate Limit Exceeded Response
+
+```json
+{
+  "success": false,
+  "error": "Too many read requests, please try again later."
+}
+```
 
 ## Alchemy Webhook Setup
 

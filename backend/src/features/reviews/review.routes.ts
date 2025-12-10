@@ -25,6 +25,7 @@ import {
 } from "./review.controller.js";
 import { validate } from "../../shared/middleware/validation.js";
 import { authenticate } from "../../shared/middleware/auth.js";
+import { writeRateLimiter } from "../../shared/middleware/rateLimiter.js";
 import {
   listSignalReviewsSchema,
   listPredictorReviewsSchema,
@@ -104,11 +105,12 @@ router.get(
  * POST /api/reviews
  * Create a new review for a purchased signal.
  * Caller must own the SignalKeyNFT (tokenId).
+ * Rate limited: 60 req/15min (write operations)
  * 
  * NOTE: Ratings are PERMANENT. Once submitted, they cannot be updated or deleted.
  * This ensures rating integrity and prevents manipulation.
  */
-router.post("/", authenticate, validate(createReviewSchema), createReview);
+router.post("/", authenticate, writeRateLimiter, validate(createReviewSchema), createReview);
 
 // NOTE: PUT and DELETE endpoints have been intentionally removed.
 // Ratings are permanent to ensure integrity and prevent manipulation.

@@ -28,6 +28,7 @@ import {
 } from "./dispute.controller.js";
 import { authenticate } from "../../shared/middleware/auth.js";
 import { requireAdmin } from "../../shared/middleware/admin.js";
+import { writeRateLimiter } from "../../shared/middleware/rateLimiter.js";
 
 // ============================================================================
 // Predictor Routes (Authenticated)
@@ -43,8 +44,9 @@ predictorRouter.use(authenticate);
  * POST /api/disputes
  * Create a dispute (blacklisted predictor only).
  * Just a simple flag - no form data needed.
+ * Rate limited: 60 req/15min (write operations)
  */
-predictorRouter.post("/", createDispute);
+predictorRouter.post("/", writeRateLimiter, createDispute);
 
 /**
  * GET /api/disputes/me

@@ -1,8 +1,8 @@
 # SignalFriend Backend - Project Context
 
 > **Last Updated:** December 10, 2025  
-> **Current Phase:** Filters & Sorting Improvements  
-> **Project Status:** 🟢 **Backend v0.23.0** - All Features Complete  
+> **Current Phase:** Production-Ready Rate Limiting  
+> **Project Status:** 🟢 **Backend v0.24.0** - All Features Complete  
 > **Branch:** `main`
 
 ---
@@ -20,6 +20,7 @@
 | Validation | Zod | Schema validation |
 | Logging | Pino | Structured logging |
 | Testing | Vitest | Unit & integration tests |
+| Rate Limiting | express-rate-limit | Tiered API protection |
 
 ### Key Technical Details
 - **USDT Decimals:** 18 (BNB Chain, not 6 like Ethereum)
@@ -380,6 +381,57 @@ CORS_ORIGIN=http://localhost:3000
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
 ```
+
+---
+
+## 🛡️ Tiered Rate Limiting
+
+The API uses a production-ready tiered rate limiting system to balance security with user experience.
+
+### Rate Limit Tiers
+| Tier | Limit | Window | Use Case |
+|------|-------|--------|----------|
+| Auth Nonce | 60 req | 15 min | Nonce generation (supports wallet switching) |
+| Auth Verify | 20 req | 15 min | Signature verification (prevents brute force) |
+| Auth Logout | 30 req | 15 min | Logout operations |
+| Read | 200 req | 1 min | GET operations (browsing, listing) |
+| Write | 60 req | 15 min | POST/PUT/DELETE (data modification) |
+| Critical | 500 req | 15 min | Purchase operations (never block revenue) |
+| General | Configurable | Configurable | Fallback safety net |
+
+### Route Assignments
+```
+Authentication:
+├── GET /auth/nonce      → authNonceRateLimiter  (60/15min)
+├── POST /auth/verify    → authVerifyRateLimiter (20/15min)
+
+Read Operations (200/min):
+├── GET /signals/*       → readRateLimiter
+├── GET /predictors/*    → readRateLimiter
+├── GET /categories/*    → readRateLimiter
+├── GET /stats/*         → readRateLimiter
+├── GET /reviews/*       → readRateLimiter
+├── GET /reports/*       → readRateLimiter
+
+Write Operations (60/15min):
+├── POST /signals        → writeRateLimiter
+├── PUT /signals/:id     → writeRateLimiter
+├── POST /reviews        → writeRateLimiter
+├── POST /reports        → writeRateLimiter
+├── PUT /predictors/:id  → writeRateLimiter
+
+Critical (500/15min - never block):
+├── /api/receipts/*      → criticalRateLimiter
+
+Excluded:
+├── /api/webhooks/*      → No rate limiting (protected by signature)
+```
+
+### Design Principles
+1. **Authenticated users get higher limits** - Abuse is traceable by wallet address
+2. **Reads >> Writes** - Reads are cheap, writes need protection
+3. **Never block purchases** - Lost revenue + terrible UX
+4. **IP + User hybrid tracking** - IP for unauthenticated, userId for authenticated
 
 ---
 
