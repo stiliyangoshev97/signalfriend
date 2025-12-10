@@ -119,6 +119,7 @@ export function PredictorFilterPanel({
   // Check if any filters are active (beyond default sort)
   const hasActiveFilters =
     localFilters.search ||
+    localFilters.verified !== undefined ||
     (localFilters.sortBy !== 'totalSales' && localFilters.sortBy !== undefined) ||
     (localFilters.sortOrder !== 'desc' && localFilters.sortOrder !== undefined);
 
@@ -250,6 +251,26 @@ export function PredictorFilterPanel({
             }`}
           >
             🆕 New Predictors
+          </button>
+          <button
+            onClick={() => {
+              isUserEditingRef.current = true;
+              const newFilters: PredictorFilters = {
+                ...localFilters,
+                verified: localFilters.verified === true ? undefined : true,
+                page: 1,
+              };
+              setLocalFilters(newFilters);
+              onFiltersChange(newFilters);
+              setTimeout(() => { isUserEditingRef.current = false; }, 300);
+            }}
+            className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
+              localFilters.verified === true
+                ? 'bg-fur-light/20 border-fur-light text-fur-light'
+                : 'bg-dark-900 border-dark-600 text-fur-cream/70 hover:border-dark-500 hover:text-fur-cream'
+            }`}
+          >
+            ✓ Verified Only
           </button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 9 December 2025 (v0.12.0 - Frontend Validation & Polish)
+> Last Updated: 10 December 2025 (v0.13.0 - Filters & Sorting Improvements)
 
 ---
 
@@ -40,6 +40,8 @@
 | **Admin Blacklist/Unblacklist** | ✅ 100% | Via smart contract MultiSig proposal |
 | **Reserved Name Validation** | ✅ 100% | Frontend blocks reserved display names & social handles |
 | **Avatar URL Validation** | ✅ 100% | Max 500 chars, blocks excessively long URLs |
+| **Verified Predictor Filter** | ✅ 100% | Filter predictors by verified status |
+| **Smart Signal Sorting** | ✅ 100% | Quality-first default, respects explicit user selection |
 
 **Overall Progress: ~100%** (All core features complete)
 

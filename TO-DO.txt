@@ -2,7 +2,7 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 9, 2025
+Last Updated: December 10, 2025
 
 ================================================================================
 COMPLETED FEATURES ✅
@@ -23,6 +23,7 @@ COMPLETED FEATURES ✅
 [x] Blacklist/Unblacklist predictors (from admin dashboard + predictor profile)
 [x] Dispute system for blacklisted predictors
 [x] Complete blacklist system overhaul (December 8, 2025)
+[x] Filters & sorting improvements (December 10, 2025)
 
 ================================================================================
 PHASE 3: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)
@@ -71,6 +72,16 @@ PHASE 6: FRONTEND VALIDATION & POLISH ✅ COMPLETE (December 9, 2025)
 [x] Bio text truncation fix (break-all for long unbroken strings)
 [x] Documentation updates (RUNBOOK, README, changelogs)
 [x] Sentry DSN configuration documented
+
+================================================================================
+PHASE 7: FILTERS & SORTING IMPROVEMENTS ✅ COMPLETE (December 10, 2025)
+================================================================================
+
+[x] Filter predictors by verified status (Verified Only toggle)
+[x] Compound sorting for predictors (intelligent tiebreakers when values equal)
+[x] Smart signal sorting (quality-first default, respects explicit user selection)
+[x] "Best Quality" sort option for signals (rating → sales → reviews → date)
+[x] Fix price sorting showing expensive signals first when "Low to High" selected
 
 ================================================================================
 NEXT PRIORITY: TESTING & POLISH

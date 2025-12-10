@@ -42,11 +42,10 @@ export const listSignalsSchema = z.object({
     .optional()
     .default("true")
     .transform((val) => val === "true"),
-  /** Sort field */
+  /** Sort field (undefined = quality-first default sort) */
   sortBy: z
     .enum(["createdAt", "totalSales", "averageRating", "priceUsdt"])
-    .optional()
-    .default("createdAt"),
+    .optional(),
   /** Sort direction */
   sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
   /** Page number (1-based) */
