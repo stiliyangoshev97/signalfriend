@@ -84,6 +84,21 @@ PHASE 7: FILTERS & SORTING IMPROVEMENTS ✅ COMPLETE (December 10, 2025)
 [x] Fix price sorting showing expensive signals first when "Low to High" selected
 
 ================================================================================
+PHASE 8: PRODUCTION-READY RATE LIMITING ✅ COMPLETE (December 10, 2025)
+================================================================================
+
+[x] Tiered rate limiting system (auth, read, write, critical)
+[x] Auth nonce: 60 req/15min (supports wallet switching)
+[x] Auth verify: 20 req/15min (prevents brute force)
+[x] Read operations: 200 req/min (high frequency browsing)
+[x] Write operations: 60 req/15min (data modification)
+[x] Critical operations: 500 req/15min (purchases - never block revenue)
+[x] IP + User hybrid tracking for authenticated requests
+[x] Route-level rate limiting (signals, predictors, receipts, etc.)
+[x] Webhooks excluded from rate limiting (protected by signature)
+[x] Documentation updates (RUNBOOK, README, PROJECT_CONTEXT, CHANGELOG)
+
+================================================================================
 NEXT PRIORITY: TESTING & POLISH
 ================================================================================
 

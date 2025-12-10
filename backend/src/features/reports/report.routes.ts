@@ -17,6 +17,7 @@ import { Router } from "express";
 import { ReportController } from "./report.controller.js";
 import { authenticate } from "../../shared/middleware/auth.js";
 import { validate } from "../../shared/middleware/validation.js";
+import { writeRateLimiter } from "../../shared/middleware/rateLimiter.js";
 import {
   createReportSchema,
   listSignalReportsSchema,
@@ -32,10 +33,12 @@ const router = Router();
  * POST /api/reports
  * Create a new report for a purchased signal.
  * Requires authentication.
+ * Rate limited: 60 req/15min (write operations)
  */
 router.post(
   "/",
   authenticate,
+  writeRateLimiter,
   validate(createReportSchema),
   ReportController.create
 );

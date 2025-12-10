@@ -25,6 +25,7 @@ import {
 } from "./signal.controller.js";
 import { validate } from "../../shared/middleware/validation.js";
 import { authenticate } from "../../shared/middleware/auth.js";
+import { writeRateLimiter } from "../../shared/middleware/rateLimiter.js";
 import {
   listSignalsSchema,
   getSignalByContentIdSchema,
@@ -96,17 +97,20 @@ router.get(
  * POST /api/signals
  * Create a new signal for sale.
  * Only active predictors can create signals.
+ * Rate limited: 60 req/15min (write operations)
  */
-router.post("/", authenticate, validate(createSignalSchema), createSignal);
+router.post("/", authenticate, writeRateLimiter, validate(createSignalSchema), createSignal);
 
 /**
  * PUT /api/signals/:contentId
  * Update a signal's metadata.
  * Only the signal's creator can update it.
+ * Rate limited: 60 req/15min (write operations)
  */
 router.put(
   "/:contentId",
   authenticate,
+  writeRateLimiter,
   validate(getSignalByContentIdSchema, "params"),
   validate(updateSignalSchema),
   updateSignal
@@ -116,10 +120,12 @@ router.put(
  * DELETE /api/signals/:contentId
  * Deactivate a signal (soft delete).
  * Only the signal's creator can deactivate it.
+ * Rate limited: 60 req/15min (write operations)
  */
 router.delete(
   "/:contentId",
   authenticate,
+  writeRateLimiter,
   validate(getSignalByContentIdSchema, "params"),
   deactivateSignal
 );

@@ -57,7 +57,69 @@ ADMIN_ADDRESSES=0x...,0x...,0x...
 
 ---
 
-## 🛡️ Admin Configuration
+## 🛡️ Rate Limiting
+
+### Tiered Rate Limits
+
+The API uses production-ready tiered rate limiting to balance security with user experience:
+
+| Tier | Limit | Window | Use Case |
+|------|-------|--------|----------|
+| Auth Nonce | 60 req | 15 min | `GET /auth/nonce` - supports wallet switching |
+| Auth Verify | 20 req | 15 min | `POST /auth/verify` - prevents brute force |
+| Read | 200 req | 1 min | All GET endpoints (browsing, listing) |
+| Write | 60 req | 15 min | POST/PUT/DELETE (data modification) |
+| Critical | 500 req | 15 min | Receipt/purchase endpoints (never block revenue) |
+| General | Config | Config | Fallback safety net |
+
+### Testing Rate Limits
+
+```bash
+# Test read rate limit (should allow 200 requests per minute)
+for i in {1..210}; do
+  curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3001/api/signals
+done | sort | uniq -c
+
+# Test auth nonce rate limit (should allow 60 per 15 minutes)
+for i in {1..70}; do
+  curl -s -o /dev/null -w "%{http_code}\n" \
+    "http://localhost:3001/api/auth/nonce?address=0x4Cca77ba15B0D85d7B733E0838a429E7bEF42DD2"
+done | sort | uniq -c
+
+# Check rate limit headers
+curl -I http://localhost:3001/api/signals 2>&1 | grep -i ratelimit
+```
+
+**Expected response when rate limited:**
+```json
+{
+  "success": false,
+  "error": "Too many read requests, please try again later."
+}
+```
+
+### Rate Limit Response Headers
+
+All responses include standard rate limit headers:
+```
+RateLimit-Limit: 200
+RateLimit-Remaining: 195
+RateLimit-Reset: 1702234567
+```
+
+### Adjusting Rate Limits
+
+For development/testing, you can increase limits in `.env`:
+```bash
+RATE_LIMIT_WINDOW_MS=60000      # 1 minute window
+RATE_LIMIT_MAX_REQUESTS=1000    # 1000 requests (general fallback)
+```
+
+**Note:** Tier-specific limits are configured in `src/shared/middleware/rateLimiter.ts`.
+
+---
+
+## 👨‍💼 Admin Configuration
 
 Admins are wallet addresses with elevated privileges (view reports, approve verifications, etc.).
 
