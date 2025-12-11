@@ -14,6 +14,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.0] - 2025-12-11 📰 NEWS SYSTEM & ANNOUNCEMENTS
+
+### Added
+
+**Announcement Banner Component**
+- New `AnnouncementBanner` component in `/shared/components/ui/`
+- Environment variable controlled (`VITE_ANNOUNCEMENT_ENABLED`, `VITE_ANNOUNCEMENT_MESSAGE`)
+- 4 variants: `info` (blue), `warning` (amber), `success` (green), `error` (red)
+- Dismissible per session (not persisted to localStorage)
+- Auto-hides when user is on the `/news` page
+- Optional link to News page with "Learn More" CTA
+- Consistent gold/orange badge styling
+
+**News Page**
+- New `/news` route with full News page
+- 5 sample news items with dates and categories
+- Category badges: `Update`, `Feature`, `Security`, `Community`
+- Responsive grid layout
+- "View Full Article" links (ready for future expansion)
+
+**Navigation Updates**
+- "News" link added to navbar (after Dashboard)
+- Mobile hamburger menu includes News link
+
+### Changed
+
+**Environment Configuration**
+- Added `VITE_ANNOUNCEMENT_ENABLED`, `VITE_ANNOUNCEMENT_MESSAGE`, `VITE_ANNOUNCEMENT_TYPE`, `VITE_ANNOUNCEMENT_LINK`
+- Updated `.env.example` and `.env.local` with announcement variables
+
+**RUNBOOK Documentation**
+- Added Announcement Banner configuration section
+- Added News Page documentation
+- Added network configuration (`VITE_ENABLE_TESTNET`) documentation
+
+---
+
 ## [0.13.0] - 2025-12-10 🔧 FILTERS & SORTING IMPROVEMENTS
 
 ### Added
@@ -645,7 +682,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2025-12-05 🚀 BECOME A PREDICTOR FLOW
 
 ### Added
-- **BecomePredictorPage** (`src/features/predictors/pages/BecomePredictorPage.tsx`):
+- **BecomePredictorPage** (`src/features/predictors/pages/BecomePredictorPage.ts`):
   - Complete registration flow for becoming a predictor
   - Benefits overview (earn from signals, build reputation, referral rewards, NFT pass)
   - USDT balance check with clear messaging for insufficient funds

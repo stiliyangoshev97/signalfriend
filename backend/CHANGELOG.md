@@ -19,6 +19,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.25.0] - 2025-12-11 🛠️ MISCELLANEOUS IMPROVEMENTS & SECURITY
+
+### Added
+
+**Webhook Security Enhancements**
+- Timestamp validation for webhooks (rejects events >5 minutes old)
+- `ProcessedWebhookEvent` model for idempotency protection (prevents replay attacks)
+- TTL index auto-deletes processed events after 24 hours
+- `validateTimestamp()` method in webhook service
+- Comprehensive RUNBOOK documentation for webhook security
+
+**Test Signal Seeding Script**
+- New `seedTestSignals.ts` script for bulk test data generation
+- Supports `--count=100` or `--count=500` flags
+- `--dry-run` mode for previewing without database changes
+- `--clear` flag to remove existing seeded signals first
+- Realistic data generation with proper category distribution
+- npm scripts: `seed:signals`, `seed:signals:100`, `seed:signals:500`
+
+**Predictor Stats Modification Script**
+- New `modifyPredictorStats.ts` for testing verification flow
+- `--list` flag to show all predictors with their stats
+- `--address=0x...` to target specific predictor
+- `--sales=N` and `--revenue=N` to set verification-ready stats
+- `--reset` flag to clear stats back to zero
+- Creates mock receipts with `0xMOCK_VERIFICATION_TEST_` prefix
+- npm scripts: `predictor:stats`, `predictor:stats:list`, `predictor:verify-ready`
+
+**Rate Limiting Test Script**
+- New `/scripts/test-rate-limits.sh` for comprehensive rate limit testing
+- Tests all tiers: auth nonce, auth verify, read, write, critical
+- Supports custom base URL parameter
+- RUNBOOK documentation with expected results
+
+**Environment Configuration**
+- Organized `.env` file with clear sections and comments
+- Production values documented (commented out) for easy switching
+- Mainnet local testing MongoDB URI option added
+- Removed unused maintenance mode env vars (frontend-only feature)
+
+### Changed
+
+**Webhook Service**
+- Added timestamp validation before processing events
+- Added idempotency check using `ProcessedWebhookEvent` model
+- Events are now deduplicated by `eventId` (transaction hash + log index)
+
+**.gitignore Enhancements**
+- Added private key patterns (`*.pem`, `*.key`, `private*`)
+- Added backup file patterns (`*.bak`, `*.backup`)
+- Added additional sensitive file patterns
+
+### Security
+- Webhook replay attack protection via timestamp + idempotency
+- Sensitive file patterns added to .gitignore
+- Real Alchemy API key replaced with placeholder in .env
+- Sentry DSN safety comment added to frontend .env
+
+---
+
 ## [0.24.0] - 2025-12-10 🛡️ PRODUCTION-READY TIERED RATE LIMITING
 
 ### Added

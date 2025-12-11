@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 10 December 2025 (v0.13.0 - Filters & Sorting Improvements)
+> Last Updated: 11 December 2025 (v0.14.0 - News System & Announcements)
 
 ---
 
@@ -13,7 +13,7 @@
 | Logo-Inspired Theme | ✅ 100% | Warm greens + golden tones |
 | Web3 Integration | ✅ 100% | wagmi + RainbowKit + BNB Chain |
 | Providers Setup | ✅ 100% | Query, Web3, Sentry |
-| Base UI Components | ✅ 100% | Button, Input, Card, Modal, CopyableAddress, etc. |
+| Base UI Components | ✅ 100% | Button, Input, Card, Modal, CopyableAddress, AnnouncementBanner, etc. |
 | Router Setup | ✅ 100% | Routes defined, placeholder pages |
 | Auth Store | ✅ 100% | Zustand with persistence |
 | API Client | ✅ 100% | Axios with JWT interceptors |
@@ -42,6 +42,7 @@
 | **Avatar URL Validation** | ✅ 100% | Max 500 chars, blocks excessively long URLs |
 | **Verified Predictor Filter** | ✅ 100% | Filter predictors by verified status |
 | **Smart Signal Sorting** | ✅ 100% | Quality-first default, respects explicit user selection |
+| **News System** | ✅ 100% | AnnouncementBanner + News page with env var control |
 
 **Overall Progress: ~100%** (All core features complete)
 

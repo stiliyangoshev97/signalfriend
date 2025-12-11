@@ -1,8 +1,8 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** December 10, 2025  
-> **Current Phase:** Production-Ready Rate Limiting  
-> **Project Status:** 🟢 **Backend v0.24.0** - All Features Complete  
+> **Last Updated:** December 11, 2025  
+> **Current Phase:** Miscellaneous Improvements & Security  
+> **Project Status:** 🟢 **Backend v0.25.0** - All Features Complete  
 > **Branch:** `main`
 
 ---
@@ -26,6 +26,7 @@
 - **USDT Decimals:** 18 (BNB Chain, not 6 like Ethereum)
 - **ContentId Format:** UUID in MongoDB ↔ bytes32 on-chain
 - **Webhook Type:** Alchemy Custom (GraphQL) webhooks
+- **Webhook Security:** Timestamp validation (5 min max age) + idempotency protection
 
 ### Project Structure
 ```
@@ -49,15 +50,17 @@ backend/
 │   │   ├── receipts/            # Purchase receipts ✅
 │   │   ├── reviews/             # Ratings (1-5 score, off-chain) ✅
 │   │   ├── reports/             # Scam/false signal reports ✅
-│   │   ├── disputes/            # Blacklist dispute appeals ✅ (NEW)
+│   │   ├── disputes/            # Blacklist dispute appeals ✅
 │   │   └── admin/               # Admin endpoints (MultiSig only) ✅
 │   ├── scripts/
 │   │   ├── seedCategories.ts    # Database seeding
-│   │   ├── seedTestSignal.ts    # Test signal for webhook testing
+│   │   ├── seedTestSignal.ts    # Single test signal
+│   │   ├── seedTestSignals.ts   # Bulk test signals (100/500)
+│   │   ├── modifyPredictorStats.ts  # Test verification flow
 │   │   └── generateEventSignatures.ts  # Event hash generator
 │   └── shared/
 │       ├── config/              # env, database, logger
-│       ├── middleware/          # auth, validation, errors, security, admin
+│       ├── middleware/          # auth, validation, errors, security, admin, rateLimiter
 │       ├── services/            # blockchain.service.ts (viem)
 │       ├── types/               # TypeScript types
 │       └── utils/               # ApiError, asyncHandler, contentId
