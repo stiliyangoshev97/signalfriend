@@ -13,7 +13,13 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "seed:categories": "tsx src/scripts/seedCategories.ts"
+    "seed:categories": "tsx src/scripts/seedCategories.ts",
+    "seed:signals": "tsx src/scripts/seedTestSignals.ts",
+    "seed:signals:100": "tsx src/scripts/seedTestSignals.ts --count=100",
+    "seed:signals:500": "tsx src/scripts/seedTestSignals.ts --count=500",
+    "predictor:stats": "tsx src/scripts/modifyPredictorStats.ts",
+    "predictor:stats:list": "tsx src/scripts/modifyPredictorStats.ts --list",
+    "predictor:verify-ready": "tsx src/scripts/modifyPredictorStats.ts --sales=100 --revenue=1000"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",

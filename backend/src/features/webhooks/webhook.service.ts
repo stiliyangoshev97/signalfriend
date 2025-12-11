@@ -3,6 +3,8 @@
  *
  * Handles blockchain event indexing via Alchemy Custom Webhooks:
  * - Signature verification for webhook security
+ * - Timestamp validation to prevent replay attacks
+ * - Idempotency protection via processed event tracking
  * - Event decoding using viem and contract ABIs
  * - Database updates based on blockchain events
  *
@@ -25,11 +27,15 @@ import { PredictorService } from "../predictors/predictor.service.js";
 import { ReceiptService } from "../receipts/receipt.service.js";
 import { signalFriendMarketAbi } from "../../contracts/abis/SignalFriendMarket.js";
 import { predictorAccessPassAbi } from "../../contracts/abis/PredictorAccessPass.js";
+import { ProcessedWebhookEvent } from "./processedEvent.model.js";
 import type { 
   AlchemyGraphqlWebhookPayload, 
   AlchemyAddressActivityWebhookPayload 
 } from "./webhook.schemas.js";
 import { EVENT_SIGNATURES } from "./webhook.schemas.js";
+
+/** Maximum age for webhook timestamps (5 minutes) - prevents replay attacks */
+const MAX_WEBHOOK_AGE_MS = 5 * 60 * 1000;
 
 /** Normalized event log structure used internally */
 interface EventLog {
@@ -66,33 +72,146 @@ export class WebhookService {
   }
 
   /**
+   * Validates the webhook timestamp to prevent replay attacks.
+   * Rejects webhooks older than MAX_WEBHOOK_AGE_MS (5 minutes).
+   *
+   * @param createdAt - The ISO timestamp string from the webhook payload
+   * @returns Object with isValid boolean and age in milliseconds
+   */
+  static validateTimestamp(createdAt: string): { isValid: boolean; ageMs: number } {
+    const webhookTime = new Date(createdAt).getTime();
+    const now = Date.now();
+    const ageMs = now - webhookTime;
+
+    // Allow some clock skew (webhooks slightly in the future are OK)
+    const isValid = ageMs < MAX_WEBHOOK_AGE_MS && ageMs > -60000; // Allow 1 min future
+
+    if (!isValid) {
+      logger.warn({
+        createdAt,
+        ageMs,
+        maxAgeMs: MAX_WEBHOOK_AGE_MS,
+      }, "Webhook timestamp validation failed");
+    }
+
+    return { isValid, ageMs };
+  }
+
+  /**
+   * Checks if an event has already been processed (idempotency check).
+   * Uses transaction hash + topic0 as a unique event key.
+   *
+   * @param txHash - Transaction hash
+   * @param topic0 - Event signature (first topic)
+   * @returns True if event was already processed
+   */
+  static async isEventProcessed(txHash: string, topic0: string): Promise<boolean> {
+    const eventKey = `${txHash.toLowerCase()}-${topic0.toLowerCase()}`;
+    const existing = await ProcessedWebhookEvent.findOne({ eventKey });
+    return !!existing;
+  }
+
+  /**
+   * Marks an event as processed to prevent duplicate processing.
+   *
+   * @param txHash - Transaction hash
+   * @param topic0 - Event signature (first topic)
+   * @param eventType - Human-readable event type name
+   * @param webhookId - Alchemy webhook ID
+   * @param webhookCreatedAt - Webhook creation timestamp
+   */
+  static async markEventProcessed(
+    txHash: string,
+    topic0: string,
+    eventType: string,
+    webhookId: string,
+    webhookCreatedAt: Date
+  ): Promise<void> {
+    const eventKey = `${txHash.toLowerCase()}-${topic0.toLowerCase()}`;
+    
+    try {
+      await ProcessedWebhookEvent.create({
+        eventKey,
+        transactionHash: txHash.toLowerCase(),
+        eventType,
+        webhookId,
+        webhookCreatedAt,
+        processedAt: new Date(),
+      });
+    } catch (error) {
+      // Ignore duplicate key errors (race condition, already processed)
+      if (error instanceof Error && error.message.includes("duplicate key")) {
+        logger.debug({ eventKey }, "Event already marked as processed (race condition)");
+        return;
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Processes a GraphQL webhook payload.
    * This is the recommended webhook type for custom contract events.
    *
+   * Includes timestamp validation and idempotency protection.
+   *
    * @param payload - The validated GraphQL webhook payload
+   * @returns Object with processed count and skipped count
    */
-  static async processGraphqlWebhook(payload: AlchemyGraphqlWebhookPayload): Promise<void> {
+  static async processGraphqlWebhook(payload: AlchemyGraphqlWebhookPayload): Promise<{ processed: number; skipped: number }> {
+    // Validate webhook timestamp
+    const { isValid, ageMs } = this.validateTimestamp(payload.createdAt);
+    if (!isValid) {
+      logger.warn({
+        webhookId: payload.webhookId,
+        createdAt: payload.createdAt,
+        ageMs,
+      }, "Rejecting stale GraphQL webhook");
+      return { processed: 0, skipped: 0 };
+    }
+
     const logs = payload.event.data.block.logs;
+    const webhookCreatedAt = new Date(payload.createdAt);
+    let processed = 0;
+    let skipped = 0;
 
     logger.info({ 
       logsCount: logs.length, 
-      webhookId: payload.webhookId 
+      webhookId: payload.webhookId,
+      ageMs,
     }, "Processing GraphQL webhook");
 
     for (const log of logs) {
       const topic0 = log.topics[0];
       if (!topic0) continue;
 
+      const txHash = log.transaction.hash;
+
+      // Check idempotency - skip if already processed
+      if (await this.isEventProcessed(txHash, topic0)) {
+        logger.debug({
+          txHash,
+          topic0,
+        }, "Skipping already processed event (idempotent)");
+        skipped++;
+        continue;
+      }
+
       // Normalize log structure
       const normalizedLog: EventLog = {
         address: log.account.address,
         topics: log.topics,
         data: log.data,
-        transactionHash: log.transaction.hash,
+        transactionHash: txHash,
       };
 
       try {
-        await this.processEventLog(normalizedLog, topic0);
+        const eventType = await this.processEventLog(normalizedLog, topic0);
+        
+        // Mark as processed after successful handling
+        if (eventType) {
+          await this.markEventProcessed(txHash, topic0, eventType, payload.webhookId, webhookCreatedAt);
+          processed++;
+        }
       } catch (error) {
         logger.error({
           err: error,
@@ -102,6 +221,14 @@ export class WebhookService {
         // Continue processing other events
       }
     }
+
+    logger.info({
+      webhookId: payload.webhookId,
+      processed,
+      skipped,
+    }, "GraphQL webhook processing complete");
+
+    return { processed, skipped };
   }
 
   /**
@@ -109,14 +236,32 @@ export class WebhookService {
    * Note: This type only captures token transfers, not custom events.
    * Kept for backwards compatibility.
    *
+   * Includes timestamp validation and idempotency protection.
+   *
    * @param payload - The validated Address Activity webhook payload
+   * @returns Object with processed count and skipped count
    */
-  static async processAddressActivityWebhook(payload: AlchemyAddressActivityWebhookPayload): Promise<void> {
+  static async processAddressActivityWebhook(payload: AlchemyAddressActivityWebhookPayload): Promise<{ processed: number; skipped: number }> {
+    // Validate webhook timestamp
+    const { isValid, ageMs } = this.validateTimestamp(payload.createdAt);
+    if (!isValid) {
+      logger.warn({
+        webhookId: payload.webhookId,
+        createdAt: payload.createdAt,
+        ageMs,
+      }, "Rejecting stale Address Activity webhook");
+      return { processed: 0, skipped: 0 };
+    }
+
     const { activity } = payload.event;
+    const webhookCreatedAt = new Date(payload.createdAt);
+    let processed = 0;
+    let skipped = 0;
 
     logger.info({ 
       activityCount: activity.length, 
-      webhookId: payload.webhookId 
+      webhookId: payload.webhookId,
+      ageMs,
     }, "Processing Address Activity webhook");
 
     for (const event of activity) {
@@ -125,26 +270,52 @@ export class WebhookService {
       const topic0 = event.log.topics[0];
       if (!topic0) continue;
 
+      const txHash = event.hash;
+
+      // Check idempotency - skip if already processed
+      if (await this.isEventProcessed(txHash, topic0)) {
+        logger.debug({
+          txHash,
+          topic0,
+        }, "Skipping already processed event (idempotent)");
+        skipped++;
+        continue;
+      }
+
       // Normalize log structure
       const normalizedLog: EventLog = {
         address: event.log.address,
         topics: event.log.topics,
         data: event.log.data,
-        transactionHash: event.hash,
+        transactionHash: txHash,
       };
 
       try {
-        await this.processEventLog(normalizedLog, topic0);
+        const eventType = await this.processEventLog(normalizedLog, topic0);
+        
+        // Mark as processed after successful handling
+        if (eventType) {
+          await this.markEventProcessed(txHash, topic0, eventType, payload.webhookId, webhookCreatedAt);
+          processed++;
+        }
       } catch (error) {
         logger.error({
           err: error,
           topic: topic0,
-          txHash: event.hash,
+          txHash,
           blockNum: event.blockNum,
         }, "Error processing blockchain event");
         // Continue processing other events
       }
     }
+
+    logger.info({
+      webhookId: payload.webhookId,
+      processed,
+      skipped,
+    }, "Address Activity webhook processing complete");
+
+    return { processed, skipped };
   }
 
   /**
@@ -152,30 +323,32 @@ export class WebhookService {
    *
    * @param log - Normalized event log
    * @param topic0 - The first topic (event signature hash)
+   * @returns The event type name if handled, null if unhandled
    */
-  private static async processEventLog(log: EventLog, topic0: string): Promise<void> {
+  private static async processEventLog(log: EventLog, topic0: string): Promise<string | null> {
     switch (topic0.toLowerCase()) {
       case EVENT_SIGNATURES.PredictorJoined.toLowerCase():
         await this.handlePredictorJoined(log);
-        break;
+        return "PredictorJoined";
 
       case EVENT_SIGNATURES.SignalPurchased.toLowerCase():
         await this.handleSignalPurchased(log);
-        break;
+        return "SignalPurchased";
 
       case EVENT_SIGNATURES.PredictorBlacklisted.toLowerCase():
         await this.handlePredictorBlacklisted(log);
-        break;
+        return "PredictorBlacklisted";
 
       case EVENT_SIGNATURES.PredictorNFTMinted.toLowerCase():
         await this.handlePredictorNFTMinted(log);
-        break;
+        return "PredictorNFTMinted";
 
       default:
         logger.debug({
           topic: topic0,
           txHash: log.transactionHash,
         }, "Unhandled event type");
+        return null;
     }
   }
 

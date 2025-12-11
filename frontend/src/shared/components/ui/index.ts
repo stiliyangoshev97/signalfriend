@@ -28,6 +28,7 @@
  */
 
 // UI Components barrel export
+export { AnnouncementBanner } from './AnnouncementBanner';
 export { Button } from './Button';
 export { Input } from './Input';
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './Card';

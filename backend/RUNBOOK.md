@@ -74,6 +74,28 @@ The API uses production-ready tiered rate limiting to balance security with user
 
 ### Testing Rate Limits
 
+#### Comprehensive Test Script
+
+Use the test script to verify all rate limit tiers:
+
+```bash
+# From project root - test all tiers
+./scripts/test-rate-limits.sh
+
+# Test specific tier
+./scripts/test-rate-limits.sh read         # Test read tier (200 req/min)
+./scripts/test-rate-limits.sh auth-nonce   # Test auth nonce (60 req/15min)
+./scripts/test-rate-limits.sh auth-verify  # Test auth verify (20 req/15min)
+./scripts/test-rate-limits.sh write        # Test write tier (60 req/15min)
+./scripts/test-rate-limits.sh critical     # Test critical tier (500 req/15min)
+./scripts/test-rate-limits.sh headers      # Check rate limit headers only
+
+# Test with custom backend URL
+API_URL=https://api.signalfriend.com ./scripts/test-rate-limits.sh read
+```
+
+#### Manual Testing
+
 ```bash
 # Test read rate limit (should allow 200 requests per minute)
 for i in {1..210}; do
@@ -116,6 +138,17 @@ RATE_LIMIT_MAX_REQUESTS=1000    # 1000 requests (general fallback)
 ```
 
 **Note:** Tier-specific limits are configured in `src/shared/middleware/rateLimiter.ts`.
+
+### Resetting Rate Limits
+
+```bash
+# Option 1: Restart the backend (immediate reset)
+npm run dev
+
+# Option 2: Wait for window to expire
+# - Read tier: 1 minute
+# - All other tiers: 15 minutes
+```
 
 ---
 
@@ -259,6 +292,69 @@ This is extremely useful for:
 
 ---
 
+## 🔐 Webhook Security
+
+The webhook system includes multiple layers of protection against attacks and duplicate processing.
+
+### Signature Verification
+
+All incoming webhooks are verified using HMAC-SHA256 signature validation:
+
+```typescript
+// Alchemy includes x-alchemy-signature header
+// We verify: HMAC-SHA256(body, ALCHEMY_SIGNING_KEY) === signature
+```
+
+If signature verification fails, the webhook is rejected with 401 Unauthorized.
+
+### Timestamp Validation
+
+Webhooks are validated to prevent replay attacks:
+
+- **Maximum Age:** 5 minutes
+- **Clock Skew Tolerance:** 1 minute into the future
+- Stale webhooks are logged and rejected
+
+This prevents attackers from capturing and replaying old webhook payloads.
+
+### Idempotency Protection
+
+Each blockchain event is tracked in the `ProcessedWebhookEvent` collection:
+
+- **Event Key:** `{transactionHash}-{topic0}` (unique per event)
+- **TTL:** Records auto-delete after 30 days
+- Duplicate events are skipped (safe for webhook retries)
+
+This ensures:
+1. Alchemy's automatic retries don't cause duplicate processing
+2. Manual webhook replays (e.g., from ngrok inspector) are safe
+3. Database operations remain consistent
+
+### No Blockchain Polling
+
+The backend does **NOT** poll the blockchain. All blockchain data comes via Alchemy webhooks.
+
+This design:
+- Reduces RPC costs
+- Eliminates polling-related bugs
+- Ensures consistent event ordering
+- Handles chain reorgs automatically (Alchemy's responsibility)
+
+### Monitoring Webhook Health
+
+```bash
+# Check webhook endpoint health
+curl http://localhost:3001/api/webhooks/health
+
+# View processed events in MongoDB
+mongosh mongodb://localhost:27017/signalfriend --eval "db.processedwebhookevents.find().sort({processedAt: -1}).limit(10)"
+
+# Count events by type
+mongosh mongodb://localhost:27017/signalfriend --eval "db.processedwebhookevents.aggregate([{\\$group: {_id: '\\$eventType', count: {\\$sum: 1}}}])"
+```
+
+---
+
 ## 🌱 Database Seeding
 
 ### Seed Categories
@@ -276,6 +372,89 @@ npx tsx src/scripts/seedCategories.ts
 ```bash
 # Creates a test signal with known contentId for testing purchases
 npx tsx src/scripts/seedTestSignal.ts
+```
+
+### Seed Test Signals (Bulk)
+
+Create multiple test signals for development and load testing:
+
+```bash
+# Preview what would be created (dry run)
+npm run seed:signals -- --dry-run
+
+# Create 100 test signals (default)
+npm run seed:signals
+
+# Create 100 test signals explicitly
+npm run seed:signals:100
+
+# Create 500 test signals
+npm run seed:signals:500
+
+# Create custom count
+npx tsx src/scripts/seedTestSignals.ts --count=250
+
+# Clear existing test signals before creating new ones
+npx tsx src/scripts/seedTestSignals.ts --clear --count=100
+```
+
+**What it creates:**
+- Realistic signal titles based on category (crypto, tradfi, macro)
+- Varied prices ($1-$50 USDT)
+- Random risk/reward levels
+- Simulated sales counts and ratings
+- Creation dates spread over 90 days
+- Proper expiry dates (30-180 days after creation)
+
+**Requirements:**
+- At least one predictor must exist (join via blockchain or run `seedMissingPredictors`)
+- Categories must be seeded first (`npm run seed:categories`)
+
+### Modify Predictor Stats (Verification Testing)
+
+Modify predictor sales and earnings to test the verification application flow without making real purchases.
+
+**Verification Requirements:**
+- Minimum 100 sales (`totalSales >= 100`)
+- Minimum $1000 USDT in total revenue (aggregated from receipts)
+
+```bash
+# List all predictors with their current stats
+npm run predictor:stats:list
+
+# Set predictor to meet verification requirements (100 sales, $1000 revenue)
+npm run predictor:verify-ready -- --address=0x123...
+
+# Set custom sales and revenue values
+npm run predictor:stats -- --address=0x123... --sales=150 --revenue=1500
+
+# Preview changes without applying (dry run)
+npm run predictor:stats -- --address=0x123... --sales=100 --revenue=1000 --dry-run
+
+# Reset predictor stats (removes mock receipts, keeps real ones)
+npm run predictor:stats -- --address=0x123... --reset
+```
+
+**What it does:**
+- Updates `totalSales` on the predictor document
+- Creates mock receipts with `priceUsdt` to reach target revenue
+- Mock receipts use a special transaction hash prefix (`0xMOCK_VERIFICATION_TEST_`)
+- Reset removes only mock receipts, preserving real purchase data
+
+**Example workflow:**
+```bash
+# 1. List predictors to find your test address
+npm run predictor:stats:list
+
+# 2. Set stats to meet verification requirements
+npm run predictor:stats -- --address=0x4cca77ba15b0d85d7b733e0838a429e7bef42dd2 --sales=100 --revenue=1000
+
+# 3. Apply for verification in the frontend dashboard
+
+# 4. Test admin approval/rejection flow
+
+# 5. Clean up when done testing
+npm run predictor:stats -- --address=0x4cca77ba15b0d85d7b733e0838a429e7bef42dd2 --reset
 ```
 
 ---
@@ -361,6 +540,160 @@ Creates predictor records for wallets that have signals but no predictor profile
 
 ```bash
 npx tsx src/scripts/seedMissingPredictors.ts
+```
+
+---
+
+## 🗃️ Database Fork/Clone for Testing
+
+When testing migrations, schema changes, or debugging production issues, you'll want to work with a copy of production data without risking the original database. Here are three approaches:
+
+### Option 1: MongoDB Atlas Fork (Recommended for Cloud)
+
+If using MongoDB Atlas, you can create a database fork directly from the Atlas UI:
+
+1. Go to [MongoDB Atlas Dashboard](https://cloud.mongodb.com/)
+2. Select your cluster → **Actions** → **Clone to New Cluster** (or use Point-in-Time restore)
+3. Choose the point-in-time to clone from
+4. Select a new cluster tier (M0 free tier works for testing)
+5. Wait for the clone to complete (~5-10 minutes)
+6. Update your `.env` with the new cluster connection string:
+   ```bash
+   MONGODB_URI=mongodb+srv://user:pass@your-clone-cluster.mongodb.net/signalfriend
+   ```
+
+**Pros:** Zero downtime, automatic, includes all indexes  
+**Cons:** May incur additional Atlas charges, slower for large datasets
+
+### Option 2: mongodump/mongorestore (Recommended for Local Testing)
+
+Export production data and import it into a local MongoDB instance:
+
+```bash
+# Step 1: Export from production (replace connection string)
+mongodump --uri="mongodb+srv://user:pass@production-cluster.mongodb.net/signalfriend" \
+  --out=./backup-$(date +%Y%m%d)
+
+# Step 2: Start local MongoDB (if not running)
+mongod
+
+# Step 3: Restore to local database (use a different name to avoid confusion)
+mongorestore --uri="mongodb://localhost:27017" \
+  --db=signalfriend_test \
+  ./backup-$(date +%Y%m%d)/signalfriend
+
+# Step 4: Update .env to use local test database
+MONGODB_URI=mongodb://localhost:27017/signalfriend_test
+```
+
+**Selective Export (specific collections only):**
+```bash
+# Export only signals and predictors (skip receipts for privacy)
+mongodump --uri="mongodb+srv://..." \
+  --db=signalfriend \
+  --collection=signals \
+  --out=./backup-partial
+
+mongodump --uri="mongodb+srv://..." \
+  --db=signalfriend \
+  --collection=predictors \
+  --out=./backup-partial
+
+mongodump --uri="mongodb+srv://..." \
+  --db=signalfriend \
+  --collection=categories \
+  --out=./backup-partial
+```
+
+**Pros:** Fast, free, works offline, can be selective  
+**Cons:** Manual process, may need to recreate indexes
+
+### Option 3: Fresh Local Database with Seed Data
+
+For a clean testing environment without production data:
+
+```bash
+# Step 1: Ensure local MongoDB is running
+mongod
+
+# Step 2: Update .env to use a fresh local database
+MONGODB_URI=mongodb://localhost:27017/signalfriend_dev
+
+# Step 3: Seed categories
+npm run seed:categories
+
+# Step 4: Seed test signal (optional, for webhook testing)
+npx tsx src/scripts/seedTestSignal.ts
+
+# Step 5: Create any additional test data as needed
+```
+
+**Pros:** Clean slate, no production data risks, fast  
+**Cons:** No real data for realistic testing
+
+### Best Practices for Testing Migrations
+
+1. **Always test migrations on a fork/copy first:**
+   ```bash
+   # 1. Create a database copy (use any method above)
+   # 2. Point .env to the copy
+   # 3. Run migration with --dry-run first
+   npx tsx src/scripts/migrateCategories.ts --dry-run
+   # 4. If dry run looks good, run actual migration
+   npx tsx src/scripts/migrateCategories.ts
+   # 5. Verify results in MongoDB
+   mongosh mongodb://localhost:27017/signalfriend_test
+   # 6. If successful, repeat on production
+   ```
+
+2. **Document the database you're connected to:**
+   ```bash
+   # Add to your terminal prompt or check before migrations
+   echo "Current DB: $MONGODB_URI"
+   ```
+
+3. **Keep backups before destructive operations:**
+   ```bash
+   # Quick backup before migration
+   mongodump --uri="$MONGODB_URI" --out=./pre-migration-backup-$(date +%Y%m%d-%H%M)
+   ```
+
+4. **Use different database names for different purposes:**
+   | Database | Purpose |
+   |----------|---------|
+   | `signalfriend` | Production |
+   | `signalfriend_staging` | Staging/QA |
+   | `signalfriend_test` | Migration testing |
+   | `signalfriend_dev` | Local development |
+
+### Environment-Specific Configurations
+
+Store different connection strings for different environments:
+
+```bash
+# Development (.env.development)
+MONGODB_URI=mongodb://localhost:27017/signalfriend_dev
+
+# Testing (.env.test)  
+MONGODB_URI=mongodb://localhost:27017/signalfriend_test
+
+# Staging (.env.staging)
+MONGODB_URI=mongodb+srv://user:pass@staging-cluster.mongodb.net/signalfriend_staging
+
+# Production (.env.production)
+MONGODB_URI=mongodb+srv://user:pass@prod-cluster.mongodb.net/signalfriend
+```
+
+**⚠️ Never commit `.env` files with real credentials to git!**
+
+### Cleanup After Testing
+
+```bash
+# Drop test database when done
+mongosh mongodb://localhost:27017/signalfriend_test --eval "db.dropDatabase()"
+
+# Or delete backup files
+rm -rf ./backup-* ./pre-migration-backup-*
 ```
 
 ---
@@ -462,8 +795,7 @@ curl -X POST http://localhost:3001/api/auth/verify \
 
 ngrok provides a web interface to inspect all requests:
 
-```
-http://127.0.0.1:4040
+``http://127.0.0.1:4040
 ```
 
 This shows:

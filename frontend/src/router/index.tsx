@@ -60,6 +60,7 @@ import { SignalsPage, SignalDetailPage, MyPurchasedSignalsPage } from '@/feature
 import { PredictorDashboardPage, PredictorsPage, PredictorProfilePage, BecomePredictorPage } from '@/features/predictors';
 import { AdminDashboardPage } from '@/features/admin';
 import { TermsPage } from '@/features/legal';
+import { NewsPage } from '@/features/news';
 
 // Lazy load pages for code splitting (example for future pages)
 // import { lazy } from 'react';
@@ -104,6 +105,10 @@ export const router = createBrowserRouter([
       {
         path: 'terms',
         element: <TermsPage />,
+      },
+      {
+        path: 'news',
+        element: <NewsPage />,
       },
       
       // ===== AUTHENTICATED ROUTES =====
