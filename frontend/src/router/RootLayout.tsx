@@ -57,12 +57,15 @@
 
 import { Outlet, Link } from 'react-router-dom';
 import { Suspense } from 'react';
-import { Spinner } from '../shared/components/ui';
+import { Spinner, AnnouncementBanner } from '../shared/components/ui';
 import Header from './Header';
 
 export function RootLayout() {
   return (
     <div className="min-h-screen bg-dark-700 flex flex-col">
+      {/* Announcement banner (controlled via env vars) */}
+      <AnnouncementBanner />
+      
       {/* Header with navigation */}
       <Header />
       

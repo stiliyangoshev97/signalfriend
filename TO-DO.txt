@@ -99,6 +99,34 @@ PHASE 8: PRODUCTION-READY RATE LIMITING ✅ COMPLETE (December 10, 2025)
 [x] Documentation updates (RUNBOOK, README, PROJECT_CONTEXT, CHANGELOG)
 
 ================================================================================
+PHASE 9: MISC IMPROVEMENTS ✅ COMPLETE (December 11, 2025)
+================================================================================
+
+[x] #1 Document database fork process in backend RUNBOOK.md + comment production values in .env
+[x] #2 Add webhook timestamp validation + idempotency protection, verify no polling used
+[x] #3 Skip Redis implementation (for later)
+[x] #4 Verify .gitignore includes all sensitive files
+[x] #5 Create rate limiting test scripts for all tiers + document in RUNBOOK
+[x] #6 Create scripts to seed 100 and 500 test signals
+[x] #7 Create news banner component + news page + document in frontend RUNBOOK
+[x] #8 Audit both .env files for security
+[x] #9 News display system with env variable control (merged with #7)
+[x] #10 Skip Coinbase error (ad blocker blocking analytics - not our issue)
+[x] #11 Skip sessions info (JWT only - already documented)
+[x] #12 Create script to modify predictor sales/earnings for testing verification flow
+
+================================================================================
+NEXT: PRE-DEPLOYMENT TESTING CHECKLIST
+================================================================================
+
+[ ] Test rate limiting scripts (./scripts/test-rate-limits.sh)
+[ ] Use seed script to add 500 signals (npm run seed:signals:500)
+[ ] Use script to modify predictor stats for verification testing
+[ ] Update all PROJECT_CONTEXT.md files (backend, frontend)
+[ ] Update all CHANGELOG.md files (backend, frontend)
+[ ] Git commit and push all Phase 9 changes
+
+================================================================================
 NEXT PRIORITY: TESTING & POLISH
 ================================================================================
 
