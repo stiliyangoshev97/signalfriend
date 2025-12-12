@@ -207,3 +207,52 @@ See main [RUNBOOK.md](../RUNBOOK.md) for:
 - Network testing (access from phone/other devices)
 - Git workflow
 - Environment file overview
+
+---
+
+## 🚀 Vercel Deployment
+
+### Security Headers (vercel.json)
+
+The `vercel.json` file in the frontend folder configures HTTP security headers automatically when deployed to Vercel.
+
+**How it works:**
+- Vercel automatically reads `vercel.json` from your project root (frontend folder)
+- No manual configuration needed - just deploy
+- Headers are applied to ALL routes (`/(.*)`  pattern)
+
+**Headers configured:**
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `X-Content-Type-Options` | `nosniff` | Prevents MIME type sniffing |
+| `X-Frame-Options` | `DENY` | Blocks clickjacking (no iframes) |
+| `X-XSS-Protection` | `1; mode=block` | Legacy XSS filter (still useful) |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Controls referrer info sent |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` | Disables unused browser features |
+
+### Deployment Steps
+
+1. Connect your GitHub repo to Vercel
+2. Set the **Root Directory** to `frontend`
+3. Vercel auto-detects Vite and uses:
+   - Build command: `npm run build`
+   - Output directory: `dist`
+4. Add environment variables in Vercel dashboard:
+   - `VITE_API_BASE_URL` = your backend URL
+   - `VITE_WALLETCONNECT_PROJECT_ID` = your WalletConnect ID
+   - `VITE_CHAIN_ID` = `56` (mainnet)
+   - `VITE_ENABLE_TESTNET` = `false`
+   - `VITE_SENTRY_DSN` = your Sentry DSN
+5. Deploy!
+
+### Verifying Headers
+
+After deployment, check headers are applied:
+
+```bash
+curl -I https://your-app.vercel.app
+```
+
+You should see all the security headers in the response.
+

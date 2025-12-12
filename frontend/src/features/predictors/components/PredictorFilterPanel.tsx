@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import type { PredictorFilters } from '../api';
+import { useDebounce } from '@/shared/hooks';
 
 /** Props for PredictorFilterPanel component */
 interface PredictorFilterPanelProps {
@@ -42,6 +43,9 @@ export function PredictorFilterPanel({
   const [localFilters, setLocalFilters] = useState<PredictorFilters>(filters);
   const [searchInput, setSearchInput] = useState(filters.search || '');
   
+  // Debounce search input - waits 300ms after user stops typing
+  const debouncedSearch = useDebounce(searchInput, 300);
+  
   // Use a ref to track user-initiated changes without triggering re-renders
   // This prevents the useEffect from overwriting user's cleared input
   const isUserEditingRef = useRef(false);
@@ -56,32 +60,25 @@ export function PredictorFilterPanel({
     }
   }, [filters]);
 
-  // Update filter helper
-  const updateFilter = <K extends keyof PredictorFilters>(
-    key: K,
-    value: PredictorFilters[K]
-  ) => {
-    const newFilters = { ...localFilters, [key]: value, page: 1 };
-    // Remove empty values
-    if (value === '' || value === undefined) {
-      delete newFilters[key];
+  // Auto-search when debounced value changes
+  useEffect(() => {
+    // Skip if this matches the current filter (avoids loops on initial load)
+    if (debouncedSearch === (localFilters.search || '')) return;
+    
+    isUserEditingRef.current = true;
+    const newFilters = { ...localFilters, page: 1 };
+    if (debouncedSearch) {
+      newFilters.search = debouncedSearch;
+    } else {
+      delete newFilters.search;
     }
     setLocalFilters(newFilters);
     onFiltersChange(newFilters);
     
-    // Reset the editing flag after a delay to allow all updates to complete
     setTimeout(() => {
       isUserEditingRef.current = false;
-    }, 300);
-  };
-
-  // Handle search submit (on Enter or blur)
-  const handleSearchSubmit = () => {
-    isUserEditingRef.current = true;
-    // Always update the filter with current input value
-    // The updateFilter function will handle empty strings by removing the key
-    updateFilter('search', searchInput || undefined);
-  };
+    }, 100);
+  }, [debouncedSearch]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Handle clearing the search
   const handleClearSearch = () => {
@@ -164,8 +161,6 @@ export function PredictorFilterPanel({
             placeholder="Search predictors..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
-            onBlur={handleSearchSubmit}
             className="w-full bg-dark-900 border border-dark-600 rounded-lg px-3 py-2.5 pr-8 text-fur-cream text-sm placeholder:text-fur-cream/40 focus:outline-none focus:ring-2 focus:ring-fur-light/50 focus:border-fur-light transition-all"
             style={{ colorScheme: 'dark' }}
           />

@@ -279,18 +279,7 @@ export function SignalDetailPage(): React.ReactElement {
           Marketplace
         </Link>
         <ChevronRightIcon />
-        {signal.category && (
-          <>
-            <Link
-              to={`/signals?category=${signal.categoryId}`}
-              className="text-fur-cream/60 hover:text-fur-light transition-colors"
-            >
-              {signal.category.mainGroup || signal.mainGroup} &gt; {signal.category.name}
-            </Link>
-            <ChevronRightIcon />
-          </>
-        )}
-        <span className="text-fur-cream truncate max-w-[200px]">
+        <span className="text-fur-cream truncate max-w-[300px]">
           {signal.title}
         </span>
       </nav>
