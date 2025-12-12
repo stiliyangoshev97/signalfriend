@@ -22,7 +22,7 @@ import {
   checkFieldUniqueness,
 } from "./predictor.controller.js";
 import { validate } from "../../shared/middleware/validation.js";
-import { authenticate } from "../../shared/middleware/auth.js";
+import { authenticate, optionalAuth } from "../../shared/middleware/auth.js";
 import { writeRateLimiter } from "../../shared/middleware/rateLimiter.js";
 import {
   listPredictorsSchema,
@@ -67,9 +67,11 @@ router.get(
 /**
  * GET /api/predictors/:address
  * Get a single predictor's full profile by wallet address.
+ * Uses optional auth - if authenticated and viewing own profile, returns private contact info.
  */
 router.get(
   "/:address",
+  optionalAuth,
   validate(getPredictorByAddressSchema, "params"),
   getPredictorByAddress
 );

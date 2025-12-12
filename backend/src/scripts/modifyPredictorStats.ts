@@ -215,9 +215,12 @@ async function modifyPredictor(address: string, sales: number, revenue: number):
   const currentRevenue = currentResult[0]?.totalRevenue || 0;
   const currentReceiptCount = currentResult[0]?.count || 0;
 
-  // Calculate how many mock receipts we need
+  // Calculate how many mock receipts we need to reach target sales count
+  const receiptsToCreate = Math.max(0, sales - currentReceiptCount);
+  
+  // Calculate price per receipt to reach target revenue
+  // If we need to create receipts, distribute the remaining revenue across them
   const revenueNeeded = Math.max(0, revenue - currentRevenue);
-  const receiptsToCreate = revenueNeeded > 0 ? Math.ceil(revenueNeeded / 10) : 0; // $10 avg per receipt
   const pricePerReceipt = receiptsToCreate > 0 ? revenueNeeded / receiptsToCreate : 0;
 
   console.log("\n╔══════════════════════════════════════════════════════════════════════════════╗");
@@ -226,9 +229,12 @@ async function modifyPredictor(address: string, sales: number, revenue: number):
   console.log(`║ Address:            ${address}`);
   console.log(`║ Display Name:       ${predictor.displayName}`);
   console.log("╠──────────────────────────────────────────────────────────────────────────────╣");
-  console.log(`║ Current totalSales: ${predictor.totalSales} → ${sales}`);
-  console.log(`║ Current revenue:    $${currentRevenue.toFixed(2)} → $${revenue.toFixed(2)}`);
-  console.log(`║ Receipts to create: ${receiptsToCreate} (at ~$${pricePerReceipt.toFixed(2)} each)`);
+  console.log(`║ Current receipts:   ${currentReceiptCount} → ${sales} (target)`);
+  console.log(`║ Current revenue:    $${currentRevenue.toFixed(2)} → $${revenue.toFixed(2)} (target)`);
+  console.log(`║ Receipts to create: ${receiptsToCreate} mock receipts`);
+  if (receiptsToCreate > 0) {
+    console.log(`║ Price per receipt:  $${pricePerReceipt.toFixed(2)} each`);
+  }
   console.log("╠──────────────────────────────────────────────────────────────────────────────╣");
   console.log(`║ Verification Status: ${predictor.verificationStatus}`);
   console.log(`║ Is Verified:         ${predictor.isVerified}`);
@@ -290,23 +296,29 @@ async function modifyPredictor(address: string, sales: number, revenue: number):
     console.log(`📜 Created ${receiptsToCreate} mock receipts`);
   }
 
-  // Update predictor sales
-  predictor.totalSales = sales;
+  // Update predictor.totalSales to match receipt count for consistency
+  // Even though the frontend uses receipt count, keeping the model in sync prevents confusion
+  const finalReceiptCount = currentReceiptCount + receiptsToCreate;
+  predictor.totalSales = finalReceiptCount;
   await predictor.save();
-
-  console.log(`✅ Updated totalSales to ${sales}`);
+  
+  console.log(`✅ Updated totalSales to ${finalReceiptCount}`);
 
   // Verify final state
   const finalResult = await Receipt.aggregate([
     { $match: { predictorAddress: address } },
-    { $group: { _id: null, totalRevenue: { $sum: "$priceUsdt" } } },
+    { $group: { _id: null, totalRevenue: { $sum: "$priceUsdt" }, count: { $sum: 1 } } },
   ]);
 
   const finalRevenue = finalResult[0]?.totalRevenue || 0;
+  const verifiedReceiptCount = finalResult[0]?.count || 0;
+  
   console.log(`\n📊 Final state:`);
-  console.log(`   - totalSales: ${sales}`);
+  console.log(`   - Total receipts: ${verifiedReceiptCount}`);
+  console.log(`   - totalSales (Predictor model): ${finalReceiptCount}`);
   console.log(`   - Total revenue: $${finalRevenue.toFixed(2)}`);
-  console.log(`   - Can apply for verification: ${sales >= 100 && finalRevenue >= 1000 ? "YES ✅" : "NO ❌"}\n`);
+  console.log(`   - Can apply for verification: ${finalReceiptCount >= 100 && finalRevenue >= 1000 ? "YES ✅" : "NO ❌"}`);
+  console.log(`\n💡 Note: Both backend and frontend now use receipt count as the primary sales metric.\n`);
 }
 
 // =============================================================================
