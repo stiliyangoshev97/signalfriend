@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
 > **Last Updated:** December 12, 2025  
-> **Current Phase:** Verification System Bug Fixes  
-> **Project Status:** 🟢 **Backend v0.27.0** - Verification System Fixed  
-> **Branch:** `feature/fix-verification-process`
+> **Current Phase:** Comprehensive Backend Testing  
+> **Project Status:** 🟢 **Backend v0.28.0** - 290 Tests Passing  
+> **Branch:** `feature/backend-tests`
 
 ---
 
@@ -65,7 +65,14 @@ backend/
 │       ├── types/               # TypeScript types
 │       └── utils/               # ApiError, asyncHandler, contentId
 ├── tests/
-│   └── setup.ts                 # Test configuration
+│   ├── setup.ts                 # Test configuration
+│   ├── unit/                    # Unit tests (277 tests)
+│   │   ├── utils/               # contentId, textValidation, ApiError
+│   │   └── features/            # auth, predictors, signals, reviews
+│   └── integration/             # Integration tests (13 tests)
+│       ├── helpers/             # testApp.ts
+│       ├── health.test.ts
+│       └── errorHandling.test.ts
 ├── package.json
 ├── tsconfig.json
 ├── vitest.config.ts
