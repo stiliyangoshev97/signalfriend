@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** December 11, 2025  
-> **Current Phase:** Miscellaneous Improvements & Security  
-> **Project Status:** 🟢 **Backend v0.25.0** - All Features Complete  
-> **Branch:** `main`
+> **Last Updated:** December 12, 2025  
+> **Current Phase:** Pre-Deployment Testing & Bug Fixes  
+> **Project Status:** 🟢 **Backend v0.26.0** - Production-Ready  
+> **Branch:** `feature/pre-deployment-testing`
 
 ---
 
@@ -142,7 +142,8 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
   isBlacklisted: boolean,     // Synced from blockchain
   isVerified: boolean,        // Has verified badge (admin approved)
   verificationStatus: 'none' | 'pending' | 'rejected',
-  salesAtLastApplication: number,  // For re-apply logic after rejection
+  salesAtLastApplication: number,     // For re-apply logic after rejection
+  earningsAtLastApplication: number,  // Added in v0.26.0 - tracks earnings at rejection
   verificationAppliedAt?: Date,
   joinedAt: Date,             // From blockchain event
 }

@@ -2,7 +2,7 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 10, 2025
+Last Updated: December 12, 2025
 
 ================================================================================
 COMPLETED FEATURES ✅
@@ -24,6 +24,7 @@ COMPLETED FEATURES ✅
 [x] Dispute system for blacklisted predictors
 [x] Complete blacklist system overhaul (December 8, 2025)
 [x] Filters & sorting improvements (December 10, 2025)
+[x] Verification reapplication progress tracking (December 12, 2025)
 
 ================================================================================
 PHASE 3: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)
@@ -116,15 +117,48 @@ PHASE 9: MISC IMPROVEMENTS ✅ COMPLETE (December 11, 2025)
 [x] #12 Create script to modify predictor sales/earnings for testing verification flow
 
 ================================================================================
-NEXT: PRE-DEPLOYMENT TESTING CHECKLIST
+PHASE 10: PRE-DEPLOYMENT TESTING ✅ COMPLETE (December 12, 2025)
 ================================================================================
 
-[ ] Test rate limiting scripts (./scripts/test-rate-limits.sh)
-[ ] Use seed script to add 500 signals (npm run seed:signals:500)
-[ ] Use script to modify predictor stats for verification testing
-[ ] Update all PROJECT_CONTEXT.md files (backend, frontend)
-[ ] Update all CHANGELOG.md files (backend, frontend)
-[ ] Git commit and push all Phase 9 changes
+[x] Test rate limiting scripts (./scripts/test-rate-limits.sh) - PASSED ✅
+    - Headers test: RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset all present
+    - Rate limiter correctly returns 429 when limit exceeded
+[x] Use seed script to add 500 signals (npm run seed:signals:500) - PASSED ✅
+    - 500 signals created successfully
+    - Categories distributed across Crypto, Traditional Finance, Macro/Other
+    - Signal counts updated for 26 predictors
+[x] Use script to modify predictor stats for verification testing - PASSED ✅
+    - Multiple predictors tested with various sales/earnings combinations
+    - Mock receipts created successfully
+    - Verification eligibility logic validated
+[x] Test verification application flow - PASSED ✅
+    - "Get Verified" button properly changes to "Verification Pending" badge
+    - Admin sees verification requests in dashboard
+[x] Test verification approval flow - PASSED ✅
+    - Admin can approve verification requests
+    - Predictor becomes verified, badge appears on profile
+    - Verification progress card hidden after approval
+[x] Test verification rejection flow - PASSED ✅
+    - Admin can reject verification requests with reason
+    - Predictor sees "Verification Rejected" card
+    - Progress tracking shows incremental sales/earnings since rejection
+[x] Test verification reapplication flow - PASSED ✅
+    - Rejected predictors can reapply when meeting additional requirements
+    - Progress bars correctly show: (current - baseline) / 50 sales and $500 earnings
+    - "Reapply for Verification" button appears when eligible
+    - Multiple rejection → reapplication cycles tested successfully
+[x] Bug fixes during testing - ALL FIXED ✅
+    - Fixed CORS multiple origins parsing (parseOrigins utility)
+    - Fixed rate limit values to production-ready levels
+    - Fixed admin verification date display ("Invalid time value")
+    - Fixed incomplete profile handling (optional chaining for social links)
+    - Fixed rejection workflow bug (was calling verify endpoint)
+    - Fixed "Get Verified" button state after application
+[x] Documentation updates - COMPLETE ✅
+    - Updated backend/frontend PROJECT_CONTEXT.md with v0.26.0/v0.15.0
+    - Updated backend/frontend CHANGELOG.md with all bug fixes
+    - Updated backend RUNBOOK.md with rate limit testing guide
+    - Updated checkPredictorStats.ts script documentation
 
 ================================================================================
 NEXT PRIORITY: TESTING & POLISH

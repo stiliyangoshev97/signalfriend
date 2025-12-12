@@ -11,7 +11,7 @@
  * Protected by PredictorRoute guard.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { Card, Button, Badge, Modal } from '@/shared/components/ui';
@@ -24,6 +24,7 @@ import {
   useReactivateSignal,
   useApplyForVerification,
 } from '../hooks';
+import { fetchPredictorByAddress } from '../api';
 import { DashboardStats, MySignalCard, CreateSignalModal, EditProfileModal, BlacklistBanner } from '../components';
 
 /**
@@ -98,7 +99,23 @@ function SignalsLoadingSkeleton() {
 export function PredictorDashboardPage(): React.ReactElement {
   const { address: _address } = useAccount();
   const predictor = useAuthStore((state) => state.predictor);
+  const setPredictor = useAuthStore((state) => state.setPredictor);
   const isVerified = useIsVerifiedPredictor();
+  
+  // Refresh predictor data from backend on mount to ensure auth store has latest verification status
+  useEffect(() => {
+    const refreshPredictorData = async () => {
+      if (predictor?.walletAddress) {
+        try {
+          const freshData = await fetchPredictorByAddress(predictor.walletAddress);
+          setPredictor(freshData);
+        } catch (error) {
+          console.error('Failed to refresh predictor data:', error);
+        }
+      }
+    };
+    refreshPredictorData();
+  }, []); // Only run once on mount
   
   // State
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -171,17 +188,32 @@ export function PredictorDashboardPage(): React.ReactElement {
   const MIN_SALES_FOR_VERIFICATION = 100;
   const MIN_EARNINGS_FOR_VERIFICATION = 1000;
   
+  // Calculate verification progress
+  const isRejected = predictor?.verificationStatus === 'rejected';
+  
+  // For rejected predictors, calculate progress since rejection
+  const salesSinceRejection = isRejected 
+    ? totalSales - (predictor?.salesAtLastApplication || 0)
+    : totalSales;
+  const earningsSinceRejection = isRejected 
+    ? totalEarnings - (predictor?.earningsAtLastApplication || 0)
+    : totalEarnings;
+  
+  // Use appropriate values for progress bars
+  const displaySales = isRejected ? salesSinceRejection : totalSales;
+  const displayEarnings = isRejected ? earningsSinceRejection : totalEarnings;
+  
   // Calculate progress percentages (ensure minimum visibility when there's progress)
   // Use 5% minimum so small progress is visible
-  const salesProgress = totalSales > 0 
-    ? Math.max(5, Math.min((totalSales / MIN_SALES_FOR_VERIFICATION) * 100, 100))
+  const salesProgress = displaySales > 0 
+    ? Math.max(5, Math.min((displaySales / MIN_SALES_FOR_VERIFICATION) * 100, 100))
     : 0;
-  const earningsProgress = totalEarnings > 0 
-    ? Math.max(5, Math.min((totalEarnings / MIN_EARNINGS_FOR_VERIFICATION) * 100, 100))
+  const earningsProgress = displayEarnings > 0 
+    ? Math.max(5, Math.min((displayEarnings / MIN_EARNINGS_FOR_VERIFICATION) * 100, 100))
     : 0;
   
-  const canApplyForVerification = totalSales >= MIN_SALES_FOR_VERIFICATION && totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION;
-  const showVerificationButton = !isVerified && predictor?.verificationStatus !== 'pending' && !predictor?.isBlacklisted;
+  const canApplyForVerification = displaySales >= MIN_SALES_FOR_VERIFICATION && displayEarnings >= MIN_EARNINGS_FOR_VERIFICATION;
+  const showVerificationButton = !isVerified && predictor?.verificationStatus !== 'pending' && predictor?.verificationStatus !== 'rejected' && !predictor?.isBlacklisted;
   
   // Handlers
   const handleDeactivate = (contentId: string, title?: string) => {
@@ -204,6 +236,17 @@ export function PredictorDashboardPage(): React.ReactElement {
   const handleCreateSuccess = () => {
     refetchSignals();
   };
+
+  useEffect(() => {
+    const refreshPredictorData = async () => {
+      if (_address) {
+        const updatedPredictor = await fetchPredictorByAddress(_address);
+        useAuthStore.setState({ predictor: updatedPredictor });
+      }
+    };
+
+    refreshPredictorData();
+  }, [_address]);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -379,7 +422,7 @@ export function PredictorDashboardPage(): React.ReactElement {
         </Card>
       </div>
 
-      {/* Verification Progress Card - Show only if not verified and not pending */}
+      {/* Verification Progress Card - Show if not verified and not pending */}
       {showVerificationButton && (
         <div className="mb-8">
           <Card className="bg-gradient-to-r from-dark-800 to-dark-700 border-dark-600">
@@ -406,18 +449,17 @@ export function PredictorDashboardPage(): React.ReactElement {
                 <div className="bg-dark-900/50 rounded-lg p-4">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-fur-cream/70">Total Sales</span>
-                    <span className={`text-sm font-medium ${totalSales >= MIN_SALES_FOR_VERIFICATION ? 'text-success-500' : 'text-fur-cream'}`}>
-                      {earningsLoading ? '...' : totalSales} / {MIN_SALES_FOR_VERIFICATION}
+                    <span className={`text-sm font-medium ${displaySales >= MIN_SALES_FOR_VERIFICATION ? 'text-success-500' : 'text-fur-cream'}`}>
+                      {earningsLoading ? '...' : displaySales} / {MIN_SALES_FOR_VERIFICATION}
                     </span>
                   </div>
                   <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
-                    {/* Progress bar - uses pre-calculated salesProgress */}
                     <div 
-                      className={`h-full rounded-full transition-all duration-500 ${totalSales >= MIN_SALES_FOR_VERIFICATION ? 'bg-success-500' : 'bg-accent-gold'}`}
+                      className={`h-full rounded-full transition-all duration-500 ${displaySales >= MIN_SALES_FOR_VERIFICATION ? 'bg-success-500' : 'bg-accent-gold'}`}
                       style={{ width: `${earningsLoading ? 0 : salesProgress}%` }}
                     />
                   </div>
-                  {!earningsLoading && totalSales >= MIN_SALES_FOR_VERIFICATION && (
+                  {!earningsLoading && displaySales >= MIN_SALES_FOR_VERIFICATION && (
                     <p className="text-xs text-success-500 mt-1 flex items-center gap-1">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -431,18 +473,17 @@ export function PredictorDashboardPage(): React.ReactElement {
                 <div className="bg-dark-900/50 rounded-lg p-4">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-fur-cream/70">Total Earnings</span>
-                    <span className={`text-sm font-medium ${totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION ? 'text-success-500' : 'text-fur-cream'}`}>
-                      {earningsLoading ? '...' : `$${totalEarnings.toFixed(2)}`} / ${MIN_EARNINGS_FOR_VERIFICATION}
+                    <span className={`text-sm font-medium ${displayEarnings >= MIN_EARNINGS_FOR_VERIFICATION ? 'text-success-500' : 'text-fur-cream'}`}>
+                      {earningsLoading ? '...' : `$${displayEarnings.toFixed(2)}`} / ${MIN_EARNINGS_FOR_VERIFICATION}
                     </span>
                   </div>
                   <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
-                    {/* Progress bar - uses pre-calculated earningsProgress */}
                     <div 
-                      className={`h-full rounded-full transition-all duration-500 ${totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION ? 'bg-success-500' : 'bg-accent-gold'}`}
+                      className={`h-full rounded-full transition-all duration-500 ${displayEarnings >= MIN_EARNINGS_FOR_VERIFICATION ? 'bg-success-500' : 'bg-accent-gold'}`}
                       style={{ width: `${earningsLoading ? 0 : earningsProgress}%` }}
                     />
                   </div>
-                  {!earningsLoading && totalEarnings >= MIN_EARNINGS_FOR_VERIFICATION && (
+                  {!earningsLoading && displayEarnings >= MIN_EARNINGS_FOR_VERIFICATION && (
                     <p className="text-xs text-success-500 mt-1 flex items-center gap-1">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -464,6 +505,97 @@ export function PredictorDashboardPage(): React.ReactElement {
                     className="w-full sm:w-auto"
                   >
                     {isApplyingForVerification ? 'Applying...' : 'Apply for Verification'}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Rejected Verification - Reapplication Progress Card */}
+      {isRejected && (
+        <div className="mb-8">
+          <Card className="bg-gradient-to-r from-red-900/20 to-dark-800 border-red-500/30">
+            <div className="p-5">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-red-400">Verification Rejected</h3>
+                  <p className="text-sm text-fur-cream/60">Make 100 more sales and earn $1000 more to reapply</p>
+                </div>
+                {earningsLoading && (
+                  <div className="ml-auto">
+                    <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Additional Sales Needed */}
+                <div className="bg-dark-900/50 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-fur-cream/70">Additional Sales</span>
+                    <span className={`text-sm font-medium ${salesSinceRejection >= MIN_SALES_FOR_VERIFICATION ? 'text-success-500' : 'text-fur-cream'}`}>
+                      {earningsLoading ? '...' : salesSinceRejection} / {MIN_SALES_FOR_VERIFICATION}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${salesSinceRejection >= MIN_SALES_FOR_VERIFICATION ? 'bg-success-500' : 'bg-red-500'}`}
+                      style={{ width: `${earningsLoading ? 0 : salesProgress}%` }}
+                    />
+                  </div>
+                  {!earningsLoading && salesSinceRejection >= MIN_SALES_FOR_VERIFICATION && (
+                    <p className="text-xs text-success-500 mt-1 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Requirement met!
+                    </p>
+                  )}
+                </div>
+
+                {/* Additional Earnings Needed */}
+                <div className="bg-dark-900/50 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-fur-cream/70">Additional Earnings</span>
+                    <span className={`text-sm font-medium ${earningsSinceRejection >= MIN_EARNINGS_FOR_VERIFICATION ? 'text-success-500' : 'text-fur-cream'}`}>
+                      {earningsLoading ? '...' : `$${earningsSinceRejection.toFixed(2)}`} / ${MIN_EARNINGS_FOR_VERIFICATION}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${earningsSinceRejection >= MIN_EARNINGS_FOR_VERIFICATION ? 'bg-success-500' : 'bg-red-500'}`}
+                      style={{ width: `${earningsLoading ? 0 : earningsProgress}%` }}
+                    />
+                  </div>
+                  {!earningsLoading && earningsSinceRejection >= MIN_EARNINGS_FOR_VERIFICATION && (
+                    <p className="text-xs text-success-500 mt-1 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Requirement met!
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {canApplyForVerification && (
+                <div className="mt-4 pt-4 border-t border-red-500/30">
+                  <p className="text-sm text-success-500 mb-3">
+                    🎉 Great job! You've earned enough to reapply for verification!
+                  </p>
+                  <Button 
+                    onClick={() => applyForVerification()}
+                    disabled={isApplyingForVerification}
+                    className="w-full sm:w-auto"
+                  >
+                    {isApplyingForVerification ? 'Applying...' : 'Reapply for Verification'}
                   </Button>
                 </div>
               )}

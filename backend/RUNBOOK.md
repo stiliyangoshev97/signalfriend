@@ -76,43 +76,76 @@ The API uses production-ready tiered rate limiting to balance security with user
 
 #### Comprehensive Test Script
 
-Use the test script to verify all rate limit tiers:
+The rate limit test script is located at `/scripts/test-rate-limits.sh` (project root, not backend folder).
+
+**Prerequisites:**
+- Backend server must be running (`cd backend && npm run dev`)
+- Script must be executable
 
 ```bash
-# From project root - test all tiers
-./scripts/test-rate-limits.sh
+# Step 1: Navigate to PROJECT ROOT (not backend folder!)
+cd /path/to/SignalFriend
 
-# Test specific tier
+# Step 2: Make script executable (first time only)
+chmod +x scripts/test-rate-limits.sh
+
+# Step 3: Ensure backend is running (in another terminal)
+# cd backend && npm run dev
+
+# Step 4: Run tests
+./scripts/test-rate-limits.sh              # Test ALL tiers
+./scripts/test-rate-limits.sh headers      # Quick check - just verify headers
 ./scripts/test-rate-limits.sh read         # Test read tier (200 req/min)
 ./scripts/test-rate-limits.sh auth-nonce   # Test auth nonce (60 req/15min)
 ./scripts/test-rate-limits.sh auth-verify  # Test auth verify (20 req/15min)
 ./scripts/test-rate-limits.sh write        # Test write tier (60 req/15min)
 ./scripts/test-rate-limits.sh critical     # Test critical tier (500 req/15min)
-./scripts/test-rate-limits.sh headers      # Check rate limit headers only
+```
 
-# Test with custom backend URL
+**Available Tiers:**
+| Tier | Command | Limit | Notes |
+|------|---------|-------|-------|
+| `headers` | `./scripts/test-rate-limits.sh headers` | N/A | Quick check for rate limit headers |
+| `auth-nonce` | `./scripts/test-rate-limits.sh auth-nonce` | 60/15min | Tests `/api/auth/nonce` |
+| `auth-verify` | `./scripts/test-rate-limits.sh auth-verify` | 20/15min | Tests `/api/auth/verify` |
+| `read` | `./scripts/test-rate-limits.sh read` | 200/1min | Tests `/api/signals` (GET) |
+| `write` | `./scripts/test-rate-limits.sh write` | 60/15min | Tests `/api/signals` (POST) |
+| `critical` | `./scripts/test-rate-limits.sh critical` | 500/15min | Tests `/api/receipts/verify` |
+| `all` | `./scripts/test-rate-limits.sh` | All | Runs all tests sequentially |
+
+**Test with custom backend URL (production/staging):**
+```bash
 API_URL=https://api.signalfriend.com ./scripts/test-rate-limits.sh read
 ```
 
-#### Manual Testing
+**⚠️ Important Notes:**
+- Tests will exhaust your rate limit - wait 15 minutes or restart backend to reset
+- Run `headers` test first as a quick sanity check
+- The `read` test sends 220 requests and takes ~10 seconds
+
+#### Manual Testing (Alternative to Script)
+
+If you prefer manual testing without the script:
 
 ```bash
-# Test read rate limit (should allow 200 requests per minute)
+# Quick check: View rate limit headers
+curl -I http://localhost:3001/api/signals 2>&1 | grep -i ratelimit
+
+# Test read rate limit (200/min) - sends 210 requests
 for i in {1..210}; do
   curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3001/api/signals
 done | sort | uniq -c
+# Expected: ~200 responses with "200", ~10 with "429"
 
-# Test auth nonce rate limit (should allow 60 per 15 minutes)
+# Test auth nonce rate limit (60/15min) - sends 70 requests
 for i in {1..70}; do
   curl -s -o /dev/null -w "%{http_code}\n" \
     "http://localhost:3001/api/auth/nonce?address=0x4Cca77ba15B0D85d7B733E0838a429E7bEF42DD2"
 done | sort | uniq -c
-
-# Check rate limit headers
-curl -I http://localhost:3001/api/signals 2>&1 | grep -i ratelimit
+# Expected: ~60 responses with "200", ~10 with "429"
 ```
 
-**Expected response when rate limited:**
+**Expected response when rate limited (HTTP 429):**
 ```json
 {
   "success": false,

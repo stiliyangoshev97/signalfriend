@@ -210,8 +210,12 @@ export function useUpdateVerification() {
   return useMutation({
     mutationFn: ({ address, approved }: { address: string; approved: boolean }) =>
       updateVerification(address, approved),
-    onSuccess: () => {
+    onSuccess: (_data, { address }) => {
+      // Invalidate pending verifications list
       queryClient.invalidateQueries({ queryKey: adminKeys.pendingVerifications() });
+      // Invalidate predictor profile in case they're viewing it
+      queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address) });
+      queryClient.invalidateQueries({ queryKey: ['predictor', address] });
     },
   });
 }

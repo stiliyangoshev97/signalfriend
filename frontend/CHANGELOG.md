@@ -14,6 +14,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.15.0] - 2025-12-12 🧪 PRE-DEPLOYMENT TESTING & BUG FIXES
+
+### Added
+
+**Verification Reapplication Progress Tracking**
+- Added `salesAtLastApplication` and `earningsAtLastApplication` to Predictor schema
+- New "Verification Rejected" card in PredictorDashboardPage (red theme)
+- Shows incremental progress: "Additional Sales" and "Additional Earnings" since rejection
+- "Reapply for Verification" button appears when both requirements are met
+- Progress bars track towards reapplication thresholds (50 additional sales, $500 additional earnings)
+
+**Dashboard Data Refresh**
+- Added `useEffect` to PredictorDashboardPage to refresh predictor data on mount
+- Ensures fresh data after verification status changes
+
+### Changed
+
+**API Configuration**
+- Added `ADMIN_REJECT_VERIFICATION` endpoint to `api.config.ts`
+- `admin.api.ts` `updateVerification()` now calls different endpoints based on `approved` flag:
+  - `true` → calls `/admin/verify/:address`
+  - `false` → calls `/admin/reject/:address`
+
+**Admin Verification Flow**
+- `useUpdateVerification` hook now invalidates predictor queries after approval/rejection
+- Ensures predictor profiles update immediately after admin action
+
+**Verification Button State**
+- Fixed "Get Verified" button to immediately change to "Verification Pending" badge after clicking
+- `useApplyForVerification` hook now updates auth store via `setPredictor` in onSuccess callback
+
+**Verification Dashboard Logic**
+- Updated `showVerificationButton` logic to exclude `rejected` status
+- Rejected predictors see dedicated "Verification Rejected" card instead of "Get Verified" button
+
+### Fixed
+
+**Verification Rejection Workflow Bug**
+- Admin rejection was incorrectly calling verify endpoint and verifying users instead of rejecting
+- Fixed by adding proper endpoint routing in `updateVerification()` API function
+- Rejection now properly sets `verificationStatus: 'rejected'` and clears `isVerified` flag
+
+**Admin Verification Date Display**
+- Fixed "Invalid time value" error on admin verification requests page
+- Backend now properly maps `verificationAppliedAt` → `verificationRequestedAt`
+
+**Incomplete Profile Handling**
+- Fixed `VerificationRequestCard` crashes on predictors with missing social links
+- Added optional chaining (`?.`) for `socialLinks.telegram` and `socialLinks.discord`
+- Added fallback "Not specified" for missing `preferredContact`
+
+**Verification Button State After Application**
+- Button now immediately updates to "Verification Pending" badge after clicking
+- Previously required page refresh to see updated state
+- Fixed via immediate auth store update in `useApplyForVerification` hook
+
+### Technical Details
+
+**Reapplication Validation**
+- Frontend calculates `salesSinceRejection = totalSales - salesAtLastApplication`
+- Frontend calculates `earningsSinceRejection = totalEarnings - earningsAtLastApplication`
+- Reapply button enabled when BOTH conditions met:
+  - `salesSinceRejection >= 50`
+  - `earningsSinceRejection >= 500`
+
+**Query Invalidation**
+- Admin approval/rejection now invalidates:
+  - Predictor by address query
+  - All predictor queries
+  - Ensures UI updates across entire app
+
+---
+
 ## [0.14.0] - 2025-12-11 📰 NEWS SYSTEM & ANNOUNCEMENTS
 
 ### Added

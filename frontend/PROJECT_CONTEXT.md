@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 11 December 2025 (v0.14.0 - News System & Announcements)
+> Last Updated: 12 December 2025 (v0.15.0 - Pre-Deployment Testing & Bug Fixes)
 
 ---
 
@@ -28,7 +28,7 @@
 | **Purchase Flow** | ✅ 100% | Multi-step modal with USDT approval + purchase |
 | **Become a Predictor** | ✅ 100% | Full registration flow with referral validation |
 | **My Purchased Signals** | ✅ 100% | View/access purchased signals with receipts |
-| **Predictor Dashboard** | ✅ 100% | Stats, signal management, edit profile, referral earnings |
+| **Predictor Dashboard** | ✅ 100% | Stats, signal management, edit profile, referral earnings, reapplication tracking |
 | **Predictor List Page** | ✅ 100% | Public leaderboard with filters, verified badges |
 | **Predictor Profile** | ✅ 100% | Full profile with signals grid, admin sections |
 | **Edit Profile Modal** | ✅ 100% | Full profile editing with uniqueness + reserved name validation |
@@ -43,8 +43,9 @@
 | **Verified Predictor Filter** | ✅ 100% | Filter predictors by verified status |
 | **Smart Signal Sorting** | ✅ 100% | Quality-first default, respects explicit user selection |
 | **News System** | ✅ 100% | AnnouncementBanner + News page with env var control |
+| **Verification Reapplication** | ✅ 100% | Progress tracking for rejected predictors |
 
-**Overall Progress: ~100%** (All core features complete)
+**Overall Progress: ~100%** (All core features complete + production-ready)
 
 ---
 

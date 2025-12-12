@@ -166,10 +166,16 @@ export function useUpdateProfile() {
 export function useApplyForVerification() {
   const { address } = useAccount();
   const queryClient = useQueryClient();
+  const setPredictor = useAuthStore((state) => state.setPredictor);
 
   return useMutation({
     mutationFn: () => applyForVerification(address!),
-    onSuccess: () => {
+    onSuccess: (updatedPredictor) => {
+      // Update the auth store with the new predictor data (including pending status)
+      // This will immediately update the UI to show "Verification Pending" badge
+      setPredictor(updatedPredictor);
+      
+      // Invalidate queries to refetch predictor data for consistency
       queryClient.invalidateQueries({
         queryKey: predictorKeys.profile(address!),
       });

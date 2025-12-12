@@ -92,6 +92,7 @@ export const API_CONFIG = {
     ADMIN_SIGNAL_DELETE: (id: string) => `/api/admin/signals/${id}`,
     ADMIN_PENDING_VERIFICATIONS: '/api/admin/verification-requests',
     ADMIN_VERIFY: (address: string) => `/api/admin/predictors/${address}/verify`,
+    ADMIN_REJECT_VERIFICATION: (address: string) => `/api/admin/predictors/${address}/reject`,
     ADMIN_MANUAL_VERIFY: (address: string) => `/api/admin/predictors/${address}/manual-verify`,
     ADMIN_UNVERIFY: (address: string) => `/api/admin/predictors/${address}/unverify`,
     ADMIN_REPORTS: '/api/admin/reports',
