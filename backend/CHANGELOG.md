@@ -19,6 +19,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.26.0] - 2025-12-12 🧪 PRE-DEPLOYMENT TESTING & BUG FIXES
+
+### Added
+
+**Verification Reapplication Progress Tracking**
+- Added `earningsAtLastApplication` field to Predictor model
+- Predictors can now track incremental progress toward reapplication requirements after rejection
+- Dashboard shows "Additional Sales" and "Additional Earnings" since rejection
+- System validates BOTH sales AND earnings requirements for reapplication eligibility
+
+**Script Improvements**
+- `checkPredictorStats.ts` now supports CLI arguments:
+  - `--address=<wallet>` to check specific predictor
+  - `--list` to show all predictors with stats
+  - Removed hardcoded wallet addresses
+- Deleted redundant `fixPredictorStats.ts` (functionality covered by `modifyPredictorStats.ts`)
+
+### Changed
+
+**CORS Multiple Origins Support**
+- `security.ts` middleware now properly parses comma-separated `ALLOWED_ORIGINS` env var
+- Added `parseOrigins()` utility function to split origins into array
+- Supports multiple frontend domains for production deployment
+
+**Rate Limits - Production Values**
+- Updated production-ready rate limit values:
+  - `AUTH_NONCE`: 100/15min (was 60/15min)
+  - `AUTH_VERIFY`: 50/15min (was 20/15min)
+  - `READ`: 300/1min (was 200/1min)
+  - `WRITE`: 100/15min (was 60/15min)
+  - `CRITICAL`: 500/15min (unchanged)
+- Updated `.env` `RATE_LIMIT_MAX_REQUESTS` to 500
+
+**Verification Date Mapping**
+- `admin.controller.ts` now maps `verificationAppliedAt` to `verificationRequestedAt` for frontend compatibility
+- Fixes "Invalid time value" error in admin verification requests page
+
+**Verification Rejection Flow**
+- Rejection logic now records BOTH `salesAtLastApplication` AND `earningsAtLastApplication` at rejection time
+- Application logic NO LONGER updates baseline values on reapplication (only on rejection)
+- Reapplication eligibility check now validates BOTH sales AND earnings requirements
+- Prevents re-rejected predictors from seeing inflated "progress since rejection"
+
+### Fixed
+
+**Verification Date Display Bug**
+- Admin verification page was showing "Invalid time value" for verification requested dates
+- Fixed by mapping `verificationAppliedAt` → `verificationRequestedAt` in admin controller
+
+**Incomplete Profile Handling**
+- Admin verification card was crashing on predictors with missing social links
+- Backend now ensures proper optional field handling in admin endpoints
+
+### Documentation
+
+**RUNBOOK Updates**
+- Added comprehensive rate limiting test documentation
+- Documented test scripts usage (`seed:signals`, `predictor:stats`, etc.)
+- Added examples for predictor stats modification workflow
+
+---
+
 ## [0.25.0] - 2025-12-11 🛠️ MISCELLANEOUS IMPROVEMENTS & SECURITY
 
 ### Added

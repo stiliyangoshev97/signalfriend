@@ -35,6 +35,8 @@ export const predictorSchema = z.object({
   isBlacklisted: z.boolean(),
   isVerified: z.boolean(),
   verificationStatus: verificationStatusSchema.optional(),
+  salesAtLastApplication: z.number().optional(),
+  earningsAtLastApplication: z.number().optional(),
   joinedAt: z.string(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),

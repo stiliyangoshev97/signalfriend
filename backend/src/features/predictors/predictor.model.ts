@@ -30,6 +30,8 @@ export interface IPredictor extends Document {
   verificationStatus: VerificationStatus;
   /** Total sales when last applied for verification (for re-apply after rejection) */
   salesAtLastApplication: number;
+  /** Total earnings when last applied for verification (for re-apply after rejection) */
+  earningsAtLastApplication: number;
   /** Timestamp when verification was applied for */
   verificationAppliedAt?: Date;
   /** Referrer who referred this predictor (if any) */
@@ -124,6 +126,10 @@ const predictorSchema = new Schema<IPredictor>(
       index: true,
     },
     salesAtLastApplication: {
+      type: Number,
+      default: 0,
+    },
+    earningsAtLastApplication: {
       type: Number,
       default: 0,
     },

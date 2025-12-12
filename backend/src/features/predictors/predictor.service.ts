@@ -835,20 +835,28 @@ export class PredictorService {
       );
     }
 
-    // If previously rejected, check if enough new sales since last application
+    // If previously rejected, check if enough new sales and earnings since last application
     if (predictor.verificationStatus === "rejected") {
       const salesSinceLastApplication = predictor.totalSales - predictor.salesAtLastApplication;
+      const earningsSinceLastApplication = earnings.predictorEarnings - (predictor.earningsAtLastApplication || 0);
+      
       if (salesSinceLastApplication < PredictorService.MIN_SALES_FOR_VERIFICATION) {
         const salesNeeded = PredictorService.MIN_SALES_FOR_VERIFICATION - salesSinceLastApplication;
         throw ApiError.badRequest(
           `You need ${salesNeeded} more sales to re-apply after rejection. Sales since last application: ${salesSinceLastApplication}`
         );
       }
+      
+      if (earningsSinceLastApplication < PredictorService.MIN_EARNINGS_FOR_VERIFICATION) {
+        const earningsNeeded = PredictorService.MIN_EARNINGS_FOR_VERIFICATION - earningsSinceLastApplication;
+        throw ApiError.badRequest(
+          `You need $${earningsNeeded.toFixed(2)} more earnings to re-apply after rejection. Earnings since last application: $${earningsSinceLastApplication.toFixed(2)}`
+        );
+      }
     }
 
     // Apply for verification
     predictor.verificationStatus = "pending";
-    predictor.salesAtLastApplication = predictor.totalSales;
     predictor.verificationAppliedAt = new Date();
 
     await predictor.save();
@@ -944,8 +952,12 @@ export class PredictorService {
       throw ApiError.badRequest("No pending verification application for this predictor");
     }
 
+    // Record current stats at rejection time - this becomes the baseline for reapplication
+    const earnings = await this.getEarnings(normalizedAddress);
+    
     predictor.verificationStatus = "rejected";
-    predictor.salesAtLastApplication = predictor.totalSales; // Record sales at rejection
+    predictor.salesAtLastApplication = predictor.totalSales;
+    predictor.earningsAtLastApplication = earnings.predictorEarnings;
     
     await predictor.save();
     return predictor;

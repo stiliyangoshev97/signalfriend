@@ -163,13 +163,16 @@ export const getVerificationRequests = asyncHandler(
   async (_req: Request, res: Response): Promise<void> => {
     const predictors = await PredictorService.getPendingVerifications();
 
-    // Fetch earnings for each predictor
+    // Fetch earnings for each predictor and map fields for frontend
     const predictorsWithEarnings = await Promise.all(
       predictors.map(async (predictor) => {
         const earnings = await PredictorService.getEarnings(predictor.walletAddress);
+        const predictorObj = predictor.toObject();
         return {
-          ...predictor.toObject(),
+          ...predictorObj,
           totalEarnings: earnings.totalSalesRevenue,
+          // Map backend field to frontend expected field name
+          verificationRequestedAt: predictorObj.verificationAppliedAt,
         };
       })
     );

@@ -97,11 +97,11 @@ export function VerificationRequestCard({
         <div className="flex items-center gap-1.5 text-gray-main">
           <span className="text-gray-dim">Prefers:</span>
           <span className="capitalize text-fur-cream">
-            {verification.preferredContact}
+            {verification.preferredContact || 'Not specified'}
           </span>
         </div>
         
-        {verification.socialLinks.telegram && (
+        {verification.socialLinks?.telegram && (
           <a
             href={`https://t.me/${verification.socialLinks.telegram.replace('@', '')}`}
             target="_blank"
@@ -113,7 +113,7 @@ export function VerificationRequestCard({
           </a>
         )}
         
-        {verification.socialLinks.discord && (
+        {verification.socialLinks?.discord && (
           <span className="flex items-center gap-1.5 text-indigo-400">
             <ContactIcon type="discord" />
             <span>{verification.socialLinks.discord}</span>

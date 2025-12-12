@@ -31,20 +31,25 @@ const ONE_MINUTE = 60 * 1000;
 
 /**
  * Rate limit configuration per tier.
- * Easy to adjust for production scaling.
+ * Production-ready limits that balance security with user experience.
+ *
+ * Design Philosophy:
+ * - Normal users will NEVER hit these limits with regular usage
+ * - Only automated scripts/bots should trigger rate limiting
+ * - Authenticated users get tracked by wallet (more accountable = more trust)
  */
 const RATE_LIMITS = {
-  /** Auth nonce generation: 60 req/15min (handles wallet switching) */
-  AUTH_NONCE: { windowMs: FIFTEEN_MINUTES, max: 60 },
-  /** Auth verify: 20 req/15min (prevents brute force, allows retries) */
-  AUTH_VERIFY: { windowMs: FIFTEEN_MINUTES, max: 20 },
-  /** Auth logout: 30 req/15min */
-  AUTH_LOGOUT: { windowMs: FIFTEEN_MINUTES, max: 30 },
-  /** Read operations: 200 req/min (generous for normal browsing) */
-  READ: { windowMs: ONE_MINUTE, max: 200 },
-  /** Write operations: 60 req/15min (4/min average - plenty for real usage) */
-  WRITE: { windowMs: FIFTEEN_MINUTES, max: 60 },
-  /** Critical/purchase operations: 500 req/15min (sanity check, never block) */
+  /** Auth nonce generation: 100 req/15min (supports wallet switching + retries) */
+  AUTH_NONCE: { windowMs: FIFTEEN_MINUTES, max: 100 },
+  /** Auth verify: 50 req/15min (generous for retries, still prevents brute force) */
+  AUTH_VERIFY: { windowMs: FIFTEEN_MINUTES, max: 50 },
+  /** Auth logout: 50 req/15min */
+  AUTH_LOGOUT: { windowMs: FIFTEEN_MINUTES, max: 50 },
+  /** Read operations: 300 req/min (20 page loads with 15 API calls each) */
+  READ: { windowMs: ONE_MINUTE, max: 300 },
+  /** Write operations: 100 req/15min (~7/min - plenty for signal creation, ratings, etc.) */
+  WRITE: { windowMs: FIFTEEN_MINUTES, max: 100 },
+  /** Critical/purchase operations: 500 req/15min (sanity check only, never block) */
   CRITICAL: { windowMs: FIFTEEN_MINUTES, max: 500 },
   /** General fallback: uses env config */
   GENERAL: { windowMs: env.RATE_LIMIT_WINDOW_MS, max: env.RATE_LIMIT_MAX_REQUESTS },

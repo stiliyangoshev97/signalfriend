@@ -185,7 +185,13 @@ export async function updateVerification(
   address: string,
   approved: boolean
 ): Promise<void> {
-  await apiClient.post(API_CONFIG.ENDPOINTS.ADMIN_VERIFY(address), { approved });
+  if (approved) {
+    // Approve verification
+    await apiClient.post(API_CONFIG.ENDPOINTS.ADMIN_VERIFY(address));
+  } else {
+    // Reject verification
+    await apiClient.post(API_CONFIG.ENDPOINTS.ADMIN_REJECT_VERIFICATION(address));
+  }
 }
 
 // ============================================
