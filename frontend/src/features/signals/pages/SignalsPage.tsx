@@ -11,6 +11,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { useSignals, useCategories } from '../hooks';
 import { FilterPanel, SignalGrid, Pagination } from '../components';
+import { useSEO, getSEOUrl } from '@/shared/hooks';
 import type { SignalFilters } from '@/shared/types';
 
 /**
@@ -77,6 +78,14 @@ function filtersToParams(filters: SignalFilters): URLSearchParams {
  * <Route path="/signals" element={<SignalsPage />} />
  */
 export function SignalsPage(): React.ReactElement {
+  // SEO for signals marketplace page
+  useSEO({
+    title: 'Trading Signals Marketplace',
+    description:
+      'Browse premium trading signals from verified predictors. Filter by category, risk level, and price. All signals are secured on the blockchain.',
+    url: getSEOUrl('/signals'),
+  });
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState<SignalFilters>(() =>
     parseFiltersFromParams(searchParams)

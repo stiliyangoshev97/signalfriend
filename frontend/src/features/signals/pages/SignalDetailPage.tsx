@@ -38,6 +38,7 @@ import { PurchaseModal } from '../components/PurchaseModal';
 import { RatingSection } from '../components/RatingSection';
 import { ReportSignalModal } from '../components/ReportSignalModal';
 import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
+import { useSEO, getSEOUrl } from '@/shared/hooks';
 
 /**
  * Risk level badge colors and labels
@@ -137,6 +138,16 @@ export function SignalDetailPage(): React.ReactElement {
   const { address } = useAccount();
   const isAdmin = useIsAdmin();
   const { data: signal, isLoading, error } = useSignal(contentId || '');
+
+  // Dynamic SEO based on signal data
+  useSEO({
+    title: signal ? `${signal.title} - Trading Signal` : 'Signal Details',
+    description: signal
+      ? `${signal.description.slice(0, 150)}${signal.description.length > 150 ? '...' : ''} - ${signal.riskLevel} risk, ${signal.potentialReward} reward potential.`
+      : 'View trading signal details, pricing, and predictor information on SignalFriend.',
+    url: contentId ? getSEOUrl(`/signals/${contentId}`) : undefined,
+    type: 'article',
+  });
   
   // Check if user owns this signal
   const { data: purchaseData, refetch: refetchPurchase } = useCheckPurchase(contentId || '');

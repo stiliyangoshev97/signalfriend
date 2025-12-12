@@ -14,6 +14,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.16.0] - 2025-12-12 🔍 SEO & META TAGS
+
+### Added
+
+**SEO Infrastructure**
+- Created `useSEO` hook for dynamic page titles and meta tags
+- Created `getSEOUrl` utility for generating canonical URLs
+- Updated `index.html` with comprehensive meta tags
+
+**Meta Tags (index.html)**
+- Primary meta tags: title, description, keywords, author, robots
+- Open Graph tags for Facebook/LinkedIn sharing
+- Twitter Card tags for Twitter/X sharing
+- Theme color for mobile browsers
+- Canonical URL
+- Favicon updated to use SignalFriend logo
+
+**Page-Specific SEO**
+- HomePage: Uses default meta tags with canonical URL
+- SignalsPage: "Trading Signals Marketplace" with filters description
+- SignalDetailPage: Dynamic title/description based on signal data
+- PredictorsPage: "Top Predictors Leaderboard" with predictor discovery
+- PredictorProfilePage: Dynamic title/description based on predictor data
+- PredictorDashboardPage: noIndex (private page)
+- AdminDashboardPage: noIndex (private page)
+- TermsPage: Legal terms with proper SEO
+
+**Social Media Preview**
+- Signals shared on social media now display with proper title, description, and logo
+- Predictor profiles show personalized previews with stats
+
+### Technical Details
+
+- Uses native DOM manipulation (no external library needed)
+- Works with React 19
+- Automatic cleanup on component unmount
+- Supports article, website, and profile OG types
+- noIndex option for private/admin pages
+
+---
+
 ## [0.15.0] - 2025-12-12 🧪 PRE-DEPLOYMENT TESTING & BUG FIXES
 
 ### Added
