@@ -203,17 +203,29 @@ export class PredictorService {
 
   /**
    * Retrieves a single predictor by wallet address.
-   * Returns sanitized data without sensitive contact info.
+   * Returns sanitized data without sensitive contact info (telegram, discord, preferredContact).
+   * If callerAddress matches the predictor address, returns full data including private fields.
    *
    * @param address - The predictor's wallet address
-   * @returns Promise resolving to the predictor document (sanitized)
+   * @param callerAddress - Optional address of the authenticated caller
+   * @returns Promise resolving to the predictor document (sanitized or full)
    * @throws {ApiError} 404 if predictor not found
    */
-  static async getByAddress(address: string): Promise<Partial<IPredictor>> {
+  static async getByAddress(address: string, callerAddress?: string): Promise<Partial<IPredictor>> {
     const normalizedAddress = address.toLowerCase();
-    const predictor = await Predictor.findOne({ walletAddress: normalizedAddress })
-      .select(PredictorService.HIDDEN_FIELDS)
-      .populate("categoryIds", "name slug icon");
+    const normalizedCaller = callerAddress?.toLowerCase();
+    
+    // If caller is viewing their own profile, return full data (including private contact info)
+    const isOwnProfile = normalizedCaller && normalizedCaller === normalizedAddress;
+    
+    const query = Predictor.findOne({ walletAddress: normalizedAddress });
+    
+    // Only apply HIDDEN_FIELDS if viewing someone else's profile
+    if (!isOwnProfile) {
+      query.select(PredictorService.HIDDEN_FIELDS);
+    }
+    
+    const predictor = await query.populate("categoryIds", "name slug icon");
 
     if (!predictor) {
       throw ApiError.notFound(`Predictor with address '${address}' not found`);
@@ -357,10 +369,21 @@ export class PredictorService {
         }
       }
       
-      predictor.socialLinks = {
-        ...predictor.socialLinks,
-        ...data.socialLinks,
-      };
+      // Update socialLinks fields individually (Mongoose nested object update)
+      if (!predictor.socialLinks) {
+        predictor.socialLinks = {};
+      }
+      if (data.socialLinks.twitter !== undefined) {
+        predictor.socialLinks.twitter = data.socialLinks.twitter;
+      }
+      if (data.socialLinks.telegram !== undefined) {
+        predictor.socialLinks.telegram = data.socialLinks.telegram;
+      }
+      if (data.socialLinks.discord !== undefined) {
+        predictor.socialLinks.discord = data.socialLinks.discord;
+      }
+      // Mark the nested object as modified so Mongoose knows to save it
+      predictor.markModified('socialLinks');
     }
     if (data.preferredContact !== undefined) {
       predictor.preferredContact = data.preferredContact;
@@ -821,10 +844,14 @@ export class PredictorService {
     // Get predictor's earnings for verification check
     const earnings = await PredictorService.getEarnings(address);
 
+    // Use totalSalesCount from earnings API (receipt count) as the source of truth
+    // This matches what the frontend displays and ensures consistency
+    const actualSalesCount = earnings.totalSalesCount;
+
     // Check minimum sales requirement
-    if (predictor.totalSales < PredictorService.MIN_SALES_FOR_VERIFICATION) {
+    if (actualSalesCount < PredictorService.MIN_SALES_FOR_VERIFICATION) {
       throw ApiError.badRequest(
-        `You need at least ${PredictorService.MIN_SALES_FOR_VERIFICATION} sales to apply for verification. Current: ${predictor.totalSales}`
+        `You need at least ${PredictorService.MIN_SALES_FOR_VERIFICATION} sales to apply for verification. Current: ${actualSalesCount}`
       );
     }
 
@@ -837,7 +864,7 @@ export class PredictorService {
 
     // If previously rejected, check if enough new sales and earnings since last application
     if (predictor.verificationStatus === "rejected") {
-      const salesSinceLastApplication = predictor.totalSales - predictor.salesAtLastApplication;
+      const salesSinceLastApplication = actualSalesCount - predictor.salesAtLastApplication;
       const earningsSinceLastApplication = earnings.predictorEarnings - (predictor.earningsAtLastApplication || 0);
       
       if (salesSinceLastApplication < PredictorService.MIN_SALES_FOR_VERIFICATION) {
@@ -956,7 +983,8 @@ export class PredictorService {
     const earnings = await this.getEarnings(normalizedAddress);
     
     predictor.verificationStatus = "rejected";
-    predictor.salesAtLastApplication = predictor.totalSales;
+    // Use earnings.totalSalesCount (receipt count) as source of truth for consistency
+    predictor.salesAtLastApplication = earnings.totalSalesCount;
     predictor.earningsAtLastApplication = earnings.predictorEarnings;
     
     await predictor.save();

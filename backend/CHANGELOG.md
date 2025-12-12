@@ -19,6 +19,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.27.0] - 2025-12-12 🔧 VERIFICATION SYSTEM FIX
+
+### Fixed
+
+**Profile Update - Social Links Data Loss on Refetch**
+- Fixed telegram and discord fields being cleared after profile update
+- Issue: `GET /api/predictors/:address` uses `HIDDEN_FIELDS` to exclude private contact info, but Dashboard refetch after update would overwrite auth store with incomplete data
+- Solution: Added `optionalAuth` middleware to the route - when authenticated user views their own profile, backend returns full data including private fields
+- Modified files: `predictor.service.ts`, `predictor.controller.ts`, `predictor.routes.ts`
+
+**Verification Application Receipt Count Consistency**
+- Fixed verification application failing due to `predictor.totalSales` vs receipt count mismatch
+- Backend now uses `earnings.totalSalesCount` (actual receipt count) as source of truth
+- This matches frontend display logic and ensures consistency across the application
+- Updated `applyForVerification()` to use receipt count instead of `predictor.totalSales`
+- Updated `adminRejectVerification()` to record receipt count in `salesAtLastApplication`
+
+**Modified Predictor Stats Script**
+- Fixed `modifyPredictorStats.ts` to create receipts based on target sales count, not revenue
+- Script now properly syncs `predictor.totalSales` with actual receipt count
+- Prevents mismatch between displayed stats and verification eligibility
+
+### Technical Details
+
+**Root Cause:**
+- Frontend displayed sales count from earnings API (receipt count)
+- Backend verification checked `predictor.totalSales` field (stale/unsynced value)
+- Test script created receipts based on revenue calculation, not sales target
+- This caused "100 sales shown but only 2 counted" bug
+
+**Solution:**
+- All verification logic now uses `earnings.totalSalesCount` (receipt count)
+- Script creates exact number of receipts to match target sales count
+- `predictor.totalSales` synced for consistency but no longer used in verification logic
+
+---
+
 ## [0.26.0] - 2025-12-12 🧪 PRE-DEPLOYMENT TESTING & BUG FIXES
 
 ### Added

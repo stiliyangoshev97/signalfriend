@@ -67,6 +67,7 @@ export const getTopPredictors = asyncHandler(async (req: Request, res: Response)
 /**
  * GET /api/predictors/:address
  * Retrieves a single predictor by wallet address.
+ * If authenticated and viewing own profile, returns full data including private contact info.
  *
  * @param {string} address - Ethereum wallet address
  * @returns {Object} JSON response with predictor data
@@ -74,8 +75,10 @@ export const getTopPredictors = asyncHandler(async (req: Request, res: Response)
  */
 export const getPredictorByAddress = asyncHandler(async (req: Request, res: Response): Promise<void> => {
   const { address } = req.params as GetPredictorByAddressParams;
+  // Pass caller address if authenticated (req.user is set by optional auth middleware)
+  const callerAddress = req.user?.address;
 
-  const predictor = await PredictorService.getByAddress(address);
+  const predictor = await PredictorService.getByAddress(address, callerAddress);
 
   res.json({
     success: true,
