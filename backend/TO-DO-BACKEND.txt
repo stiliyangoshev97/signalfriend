@@ -310,6 +310,24 @@ INPUT VALIDATION - ALL FIXED:
 [x] Report description strips URLs on input
 
 ================================================================================
+## BUGS FIXED (December 12, 2025 - v0.27.0) ✅
+================================================================================
+
+VERIFICATION SYSTEM - ALL FIXED:
+[x] Bug #1: Verification sales count mismatch (100 shown but only 2 counted)
+    - Root cause: Backend checked predictor.totalSales (stale) vs frontend displayed receipt count
+    - Solution: Changed applyForVerification() to use earnings.totalSalesCount as source of truth
+    - Updated adminRejectVerification() to record receipt count in salesAtLastApplication
+    - Fixed modifyPredictorStats.ts to create receipts based on sales count, not revenue
+    - Files: predictor.service.ts, modifyPredictorStats.ts
+
+[x] Bug #2: Profile telegram/discord fields not saving after update
+    - Root cause: GET /api/predictors/:address uses HIDDEN_FIELDS, Dashboard refetch overwrites auth store
+    - Solution: Added optionalAuth middleware - authenticated users get full data when viewing own profile
+    - Modified getByAddress() to accept callerAddress parameter, returns private fields for own profile
+    - Files: predictor.service.ts, predictor.controller.ts, predictor.routes.ts
+
+================================================================================
 ## PHASE 13: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)
 ================================================================================
 

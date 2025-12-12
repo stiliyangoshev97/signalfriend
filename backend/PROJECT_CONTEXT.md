@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
 > **Last Updated:** December 12, 2025  
-> **Current Phase:** Pre-Deployment Testing & Bug Fixes  
-> **Project Status:** 🟢 **Backend v0.26.0** - Production-Ready  
-> **Branch:** `feature/pre-deployment-testing`
+> **Current Phase:** Verification System Bug Fixes  
+> **Project Status:** 🟢 **Backend v0.27.0** - Verification System Fixed  
+> **Branch:** `feature/fix-verification-process`
 
 ---
 
@@ -436,6 +436,30 @@ Excluded:
 2. **Reads >> Writes** - Reads are cheap, writes need protection
 3. **Never block purchases** - Lost revenue + terrible UX
 4. **IP + User hybrid tracking** - IP for unauthenticated, userId for authenticated
+
+---
+
+## 🐛 Recent Bug Fixes (v0.27.0)
+
+### Bug #1: Verification Sales Count Mismatch
+**Problem:** Frontend showed 100 sales but backend rejected verification saying "only 2 sales"
+- **Root Cause:** Backend checked `predictor.totalSales` (stale field) vs frontend displayed `earnings.totalSalesCount` (receipt count from aggregation)
+- **Solution:** Changed verification logic to use `earnings.totalSalesCount` as source of truth
+- **Files Modified:**
+  - `predictor.service.ts`: `applyForVerification()` now uses receipt count
+  - `predictor.service.ts`: `adminRejectVerification()` records receipt count in `salesAtLastApplication`
+  - `modifyPredictorStats.ts`: Fixed to create receipts based on sales count target, not revenue calculation
+
+### Bug #2: Profile Telegram/Discord Not Saving
+**Problem:** After updating profile, telegram and discord fields were cleared on page refresh
+- **Root Cause:** `GET /api/predictors/:address` uses `HIDDEN_FIELDS` to exclude private contact info for public viewing. Dashboard's `useEffect` refetched predictor data after update, calling this endpoint which returned incomplete data and overwrote the auth store.
+- **Solution:** Added `optionalAuth` middleware to the route - when authenticated user views their own profile, backend returns full data including private fields
+- **Files Modified:**
+  - `predictor.service.ts`: `getByAddress()` accepts optional `callerAddress`, returns full data for own profile
+  - `predictor.controller.ts`: Pass `req.user?.address` from optional auth middleware
+  - `predictor.routes.ts`: Added `optionalAuth` middleware to `GET /:address` route
+
+**Key Learning:** Receipt count from `Receipt.aggregate()` is the authoritative source for sales metrics, not the `predictor.totalSales` denormalized field.
 
 ---
 
