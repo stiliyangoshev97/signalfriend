@@ -30,6 +30,8 @@ const URL_REGEX = /(?:https?:\/\/|www\.)[^\s]+|(?:[a-zA-Z0-9-]+\.)+(?:com|net|or
  * containsUrl("Visit example.com") // true
  */
 export function containsUrl(text: string): boolean {
+  // Reset lastIndex to avoid issues with global regex flag
+  URL_REGEX.lastIndex = 0;
   return URL_REGEX.test(text);
 }
 

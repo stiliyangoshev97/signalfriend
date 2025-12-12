@@ -10,12 +10,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Unit & integration tests
 - Docker configuration
 - Redis-based rate limiting for horizontal scaling
 
 ### Note
 - Admin blacklist via smart contract integration is now handled entirely on the frontend (v0.11.0), calling `proposeBlacklist()` directly on the PredictorAccessPass smart contract
+
+---
+
+## [0.28.0] - 2025-12-12 🧪 COMPREHENSIVE BACKEND TESTING
+
+### Added
+
+**Unit Tests (277 tests)**
+- `contentId.test.ts` - 33 tests for UUID ↔ bytes32 conversion functions
+- `textValidation.test.ts` - 46 tests for URL detection, stripping, and validation
+- `ApiError.test.ts` - 24 tests for custom error class with factory methods
+- `auth.service.test.ts` - 11 tests for SIWE nonce generation and cleanup
+- `predictor.schemas.test.ts` - 55 tests for predictor Zod validation schemas
+- `signal.schemas.test.ts` - 64 tests for signal CRUD validation schemas
+- `review.schemas.test.ts` - 44 tests for rating/review validation schemas
+
+**Integration Tests (13 tests)**
+- `testApp.ts` - Minimal Express app factory for integration testing
+- `health.test.ts` - 5 tests for health check endpoint
+- `errorHandling.test.ts` - 8 tests for 404 handling and error response format
+
+**Dependencies**
+- Added `supertest` and `@types/supertest` for HTTP integration testing
+
+### Fixed
+
+**Global Regex State Bug in textValidation.ts**
+- Fixed inconsistent URL detection due to global regex flag (`/g`)
+- Added `URL_REGEX.lastIndex = 0` reset before each test
+- Bug caused `containsUrl()` to return alternating true/false for same input
+
+### Technical Details
+
+**Test Coverage:**
+- Utilities: `contentId.ts`, `textValidation.ts`, `ApiError.ts`
+- Schemas: `predictor.schemas.ts`, `signal.schemas.ts`, `review.schemas.ts`
+- Services: `auth.service.ts`
+- API: Health endpoint, 404 handling, error response format
+
+**Test Results:**
+- 9 test files, 290 tests passing
+- Test duration: ~1.13s
 
 ---
 
