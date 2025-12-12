@@ -11,6 +11,7 @@ import { useSearchParams } from 'react-router-dom';
 import { usePredictors } from '../hooks';
 import { PredictorGrid, PredictorFilterPanel } from '../components';
 import { Pagination } from '@/features/signals/components';
+import { useSEO, getSEOUrl } from '@/shared/hooks';
 import type { PredictorFilters } from '../api';
 
 /**
@@ -67,6 +68,14 @@ function filtersToParams(filters: PredictorFilters): URLSearchParams {
  * <Route path="/predictors" element={<PredictorsPage />} />
  */
 export function PredictorsPage(): React.ReactElement {
+  // SEO for predictors leaderboard page
+  useSEO({
+    title: 'Top Predictors Leaderboard',
+    description:
+      'Discover top-rated trading signal predictors. View rankings, ratings, and track records. Find verified predictors you can trust on SignalFriend.',
+    url: getSEOUrl('/predictors'),
+  });
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState<PredictorFilters>(() => ({
     sortBy: 'totalSales',

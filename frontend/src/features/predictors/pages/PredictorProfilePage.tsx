@@ -17,6 +17,7 @@ import { FilterPanel, SignalGrid, Pagination } from '@/features/signals/componen
 import { useCategories, useMyPurchasedContentIds } from '@/features/signals/hooks';
 import { useAuthStore } from '@/features/auth';
 import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
+import { useSEO, getSEOUrl } from '@/shared/hooks';
 import { useAdminPredictorProfile, useManualVerifyPredictor, useUnverifyPredictor, adminKeys, useProposeBlacklist } from '@/features/admin/hooks';
 import {
   usePublicPredictorProfile,
@@ -193,6 +194,18 @@ export function PredictorProfilePage(): React.ReactElement {
   const predictor = isAdmin && adminPredictor ? adminPredictor : publicPredictor;
   const profileLoading = isAdmin && isAuthenticated ? adminProfileLoading : publicProfileLoading;
   const profileError = isAdmin && isAuthenticated ? adminProfileError : publicProfileError;
+
+  // Dynamic SEO based on predictor data
+  useSEO({
+    title: predictor
+      ? `${predictor.displayName || formatAddress(predictor.walletAddress)} - Predictor Profile`
+      : 'Predictor Profile',
+    description: predictor
+      ? `${predictor.bio?.slice(0, 120) || 'Trading signal predictor'} - ${predictor.totalSignals || 0} signals, ${predictor.totalSales || 0} sales, ${predictor.averageRating?.toFixed(1) || 'N/A'} rating.`
+      : 'View predictor profile, trading signals, and performance stats on SignalFriend.',
+    url: address ? getSEOUrl(`/predictors/${address}`) : undefined,
+    type: 'profile',
+  });
 
   // Open confirmation modal for blacklist action
   const handleBlacklistClick = useCallback(() => {

@@ -18,6 +18,7 @@ import {
   HowItWorksSection,
   CTASection,
 } from '../components';
+import { useSEO, getSEOUrl } from '@/shared/hooks';
 
 /**
  * HomePage component - Main landing page for SignalFriend
@@ -46,6 +47,11 @@ import {
  * }
  */
 export function HomePage(): ReactElement {
+  // SEO for home page - uses defaults from index.html, just sets canonical URL
+  useSEO({
+    url: getSEOUrl('/'),
+  });
+
   return (
     <main className="min-h-screen">
       {/* Hero Section - Main value proposition */}

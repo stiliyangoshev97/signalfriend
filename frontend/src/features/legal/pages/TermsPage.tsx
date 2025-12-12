@@ -8,7 +8,16 @@
  * @module features/legal/pages/TermsPage
  */
 
+import { useSEO, getSEOUrl } from '@/shared/hooks';
+
 export function TermsPage() {
+  // SEO for terms page
+  useSEO({
+    title: 'Terms and Conditions',
+    description: 'SignalFriend Terms and Conditions. Read our legal terms of service for the NFT-based digital information marketplace on BNB Chain.',
+    url: getSEOUrl('/terms'),
+  });
+
   return (
     <div className="min-h-screen bg-dark-950">
       {/* Page Header */}

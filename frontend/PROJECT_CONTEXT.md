@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 12 December 2025 (v0.15.0 - Pre-Deployment Testing & Bug Fixes)
+> Last Updated: 12 December 2025 (v0.16.0 - SEO & Meta Tags)
 
 ---
 
@@ -44,6 +44,7 @@
 | **Smart Signal Sorting** | ✅ 100% | Quality-first default, respects explicit user selection |
 | **News System** | ✅ 100% | AnnouncementBanner + News page with env var control |
 | **Verification Reapplication** | ✅ 100% | Progress tracking for rejected predictors |
+| **SEO & Meta Tags** | ✅ 100% | useSEO hook, Open Graph, Twitter Cards, page-specific meta |
 
 **Overall Progress: ~100%** (All core features complete + production-ready)
 
@@ -588,6 +589,67 @@ import { parseWalletError } from '@/shared/utils';
 const { title, message, isUserAction } = parseWalletError(error);
 // isUserAction = true means user intentionally cancelled (not an error)
 ```
+
+---
+
+## 🔍 SEO & Meta Tags (v0.16.0)
+
+### Overview
+All pages have proper SEO metadata for search engines and social media sharing.
+
+### useSEO Hook
+Custom hook for managing page-specific meta tags dynamically:
+
+```typescript
+// Basic usage
+useSEO({
+  title: 'Trading Signals',
+  description: 'Browse premium signals...',
+  url: getSEOUrl('/signals'),
+});
+
+// Dynamic content
+useSEO({
+  title: signal ? `${signal.title} - Trading Signal` : 'Signal Details',
+  description: signal?.description,
+  type: 'article', // 'website' | 'article' | 'profile'
+  noIndex: true, // For private pages
+});
+```
+
+### Features
+| Feature | Description |
+|---------|-------------|
+| Document Title | Sets `<title>` tag with site name suffix |
+| Meta Description | For search engine snippets |
+| Open Graph | Facebook/LinkedIn preview cards |
+| Twitter Cards | Twitter/X preview cards |
+| Canonical URL | Prevents duplicate content issues |
+| noIndex Option | Excludes private/admin pages from search engines |
+
+### Page-Specific SEO
+| Page | Title | Type | Notes |
+|------|-------|------|-------|
+| HomePage | Default | website | Uses index.html defaults |
+| SignalsPage | "Trading Signals Marketplace" | website | Static meta |
+| SignalDetailPage | Dynamic (signal title) | article | Generated from signal data |
+| PredictorsPage | "Top Predictors Leaderboard" | website | Static meta |
+| PredictorProfilePage | Dynamic (predictor name) | profile | Generated from predictor data |
+| DashboardPage | "Predictor Dashboard" | website | noIndex=true (private) |
+| AdminDashboardPage | "Admin Dashboard" | website | noIndex=true (private) |
+| TermsPage | "Terms and Conditions" | website | Legal page |
+
+### Social Media Previews
+When users share links on Facebook, LinkedIn, or Twitter:
+- Displays SignalFriend logo
+- Shows page-specific title and description
+- Includes relevant metadata (ratings, stats, etc.)
+
+### Implementation
+- Location: `src/shared/hooks/useSEO.ts`
+- Uses native DOM manipulation (no external library)
+- Works with React 19
+- Automatic cleanup on component unmount
 
 ---
 

@@ -8,6 +8,7 @@
 
 import { useState, useCallback } from 'react';
 import { Spinner } from '@/shared/components/ui';
+import { useSEO, getSEOUrl } from '@/shared/hooks';
 import {
   usePlatformEarnings,
   usePendingVerifications,
@@ -51,6 +52,14 @@ interface Tab {
  * - Disputes management with status tracking
  */
 export function AdminDashboardPage() {
+  // SEO for admin dashboard - noIndex since it's a private page
+  useSEO({
+    title: 'Admin Dashboard',
+    description: 'SignalFriend admin dashboard for platform management.',
+    url: getSEOUrl('/admin'),
+    noIndex: true, // Don't index admin pages
+  });
+
   const [activeTab, setActiveTab] = useState<TabId>('earnings');
   const [reportQuery, setReportQuery] = useState<ListReportsQuery>({ page: 1, limit: 10 });
   const [disputeQuery, setDisputeQuery] = useState<ListDisputesQuery>({ page: 1, limit: 10 });

@@ -17,6 +17,7 @@ import { useAccount } from 'wagmi';
 import { Card, Button, Badge, Modal } from '@/shared/components/ui';
 import { useAuthStore } from '@/features/auth/store';
 import { useIsVerifiedPredictor } from '@/shared/hooks';
+import { useSEO, getSEOUrl } from '@/shared/hooks';
 import { 
   useMySignals, 
   useMyEarnings,
@@ -97,6 +98,14 @@ function SignalsLoadingSkeleton() {
  * @returns Dashboard page element
  */
 export function PredictorDashboardPage(): React.ReactElement {
+  // SEO for dashboard - noIndex since it's a private page
+  useSEO({
+    title: 'Predictor Dashboard',
+    description: 'Manage your trading signals, view earnings, and track your performance as a SignalFriend predictor.',
+    url: getSEOUrl('/dashboard'),
+    noIndex: true, // Don't index private dashboard pages
+  });
+
   const { address: _address } = useAccount();
   const predictor = useAuthStore((state) => state.predictor);
   const setPredictor = useAuthStore((state) => state.setPredictor);
