@@ -53,18 +53,25 @@
  */
 
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { lazy } from 'react';
 import RootLayout from './RootLayout';
 import { ProtectedRoute, AdminRoute, PredictorRoute } from './guards';
-import { HomePage } from '@/features/home';
-import { SignalsPage, SignalDetailPage, MyPurchasedSignalsPage } from '@/features/signals';
-import { PredictorDashboardPage, PredictorsPage, PredictorProfilePage, BecomePredictorPage } from '@/features/predictors';
-import { AdminDashboardPage } from '@/features/admin';
-import { TermsPage } from '@/features/legal';
-import { NewsPage } from '@/features/news';
 
-// Lazy load pages for code splitting (example for future pages)
-// import { lazy } from 'react';
-// const PredictorsPage = lazy(() => import('../features/predictors/pages/PredictorsPage'));
+// Lazy load pages for code splitting
+// Public pages (most visited, load immediately for SEO)
+import { HomePage } from '@/features/home';
+
+// Lazy loaded pages (load on demand)
+const SignalsPage = lazy(() => import('@/features/signals/pages/SignalsPage'));
+const SignalDetailPage = lazy(() => import('@/features/signals/pages/SignalDetailPage'));
+const MyPurchasedSignalsPage = lazy(() => import('@/features/signals/pages/MyPurchasedSignalsPage'));
+const PredictorsPage = lazy(() => import('@/features/predictors/pages/PredictorsPage'));
+const PredictorProfilePage = lazy(() => import('@/features/predictors/pages/PredictorProfilePage'));
+const PredictorDashboardPage = lazy(() => import('@/features/predictors/pages/PredictorDashboardPage'));
+const BecomePredictorPage = lazy(() => import('@/features/predictors/pages/BecomePredictorPage'));
+const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage'));
+const TermsPage = lazy(() => import('@/features/legal/pages/TermsPage'));
+const NewsPage = lazy(() => import('@/features/news/pages/NewsPage'));
 
 // Placeholder pages (to be replaced with actual pages)
 const PlaceholderPage = ({ title }: { title: string }) => (

@@ -432,11 +432,11 @@ PHASE 7: POLISH & FIXES ✅ PARTIAL (December 9, 2025)
     - Footer social links updated (Discord, X)
     - Contact email added to footer
 
-[ ] Performance
-    - React.lazy for route splitting
-    - Image optimization
-    - Query caching strategies
-    - Debounced search inputs
+[✅] Performance (v0.17.0)
+    - React.lazy for route splitting (all pages except HomePage)
+    - Debounced search inputs (useDebounce hook, 300ms delay)
+    - Query caching strategies (TanStack Query built-in)
+    [ ] Image optimization (not needed yet)
 
 [ ] UX Improvements
     - Toast notifications

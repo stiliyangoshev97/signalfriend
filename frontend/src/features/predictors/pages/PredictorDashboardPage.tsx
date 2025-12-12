@@ -745,3 +745,5 @@ export function PredictorDashboardPage(): React.ReactElement {
     </div>
   );
 }
+
+export default PredictorDashboardPage;

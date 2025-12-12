@@ -14,6 +14,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.17.1] - 2025-12-12 🔒 SECURITY & BUG FIXES
+
+### Fixed
+
+**Breadcrumb Navigation Bug**
+- Simplified breadcrumb on signal detail page: `Marketplace > Signal Title`
+- Removed category link that caused "Cast to ObjectId failed" error
+- Category is still visible in the badge below the breadcrumb
+
+### Added
+
+**Vercel Security Headers**
+- Created `vercel.json` with HTTP security headers
+- Headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy
+- Automatically applied when deployed to Vercel
+- Updated RUNBOOK.md with Vercel deployment documentation
+
+---
+
+## [0.17.0] - 2025-12-12 ⚡ PERFORMANCE OPTIMIZATION
+
+### Added
+
+**React.lazy Route Splitting**
+- All pages except HomePage now use `React.lazy()` for code splitting
+- Reduces initial bundle size - pages load on demand
+- Suspense fallback already in place in RootLayout
+
+**Debounced Search Inputs**
+- New `useDebounce` hook in `@/shared/hooks`
+- PredictorFilterPanel search now auto-triggers after 300ms delay
+- Reduces API calls while typing
+- No need to press Enter anymore - search happens automatically
+
+### Changed
+
+- Added default exports to: PredictorsPage, PredictorDashboardPage, AdminDashboardPage
+- Updated hooks barrel export to include useDebounce
+
+### Technical Details
+
+- useDebounce accepts any value type and delay (default 300ms)
+- Lazy-loaded pages: SignalsPage, SignalDetailPage, MyPurchasedSignalsPage, PredictorsPage, PredictorProfilePage, PredictorDashboardPage, BecomePredictorPage, AdminDashboardPage, TermsPage, NewsPage
+- HomePage loads immediately (most visited, good for SEO)
+
+---
+
 ## [0.16.0] - 2025-12-12 🔍 SEO & META TAGS
 
 ### Added

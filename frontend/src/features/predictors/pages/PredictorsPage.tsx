@@ -242,3 +242,5 @@ export function PredictorsPage(): React.ReactElement {
     </div>
   );
 }
+
+export default PredictorsPage;

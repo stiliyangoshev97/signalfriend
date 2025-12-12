@@ -20,7 +20,7 @@
 
 // Shared hooks exports
 export { useAuth } from './useAuth';
-// ...existing code...
 export { useIsAdmin } from './useIsAdmin';
 export { useIsPredictor, useIsVerifiedPredictor } from './useIsPredictor';
 export { useSEO, getSEOUrl, type SEOOptions } from './useSEO';
+export { useDebounce } from './useDebounce';

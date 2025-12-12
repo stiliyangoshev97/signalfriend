@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 12 December 2025 (v0.16.0 - SEO & Meta Tags)
+> Last Updated: 12 December 2025 (v0.17.1 - Security & Bug Fixes)
 
 ---
 
@@ -14,7 +14,7 @@
 | Web3 Integration | ✅ 100% | wagmi + RainbowKit + BNB Chain |
 | Providers Setup | ✅ 100% | Query, Web3, Sentry |
 | Base UI Components | ✅ 100% | Button, Input, Card, Modal, CopyableAddress, AnnouncementBanner, etc. |
-| Router Setup | ✅ 100% | Routes defined, placeholder pages |
+| Router Setup | ✅ 100% | Routes defined, React.lazy code splitting |
 | Auth Store | ✅ 100% | Zustand with persistence |
 | API Client | ✅ 100% | Axios with JWT interceptors |
 | Zod Schemas | ✅ 100% | All domain schemas defined |
@@ -45,6 +45,8 @@
 | **News System** | ✅ 100% | AnnouncementBanner + News page with env var control |
 | **Verification Reapplication** | ✅ 100% | Progress tracking for rejected predictors |
 | **SEO & Meta Tags** | ✅ 100% | useSEO hook, Open Graph, Twitter Cards, page-specific meta |
+| **Performance** | ✅ 100% | React.lazy route splitting, useDebounce for search |
+| **Security Headers** | ✅ 100% | vercel.json with HTTP security headers for production |
 
 **Overall Progress: ~100%** (All core features complete + production-ready)
 
