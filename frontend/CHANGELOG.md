@@ -14,6 +14,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.18.0] - 2025-12-13 🔧 CONFIGURABLE SOCIAL LINKS & CI/CD
+
+### Added
+
+**Environment-Based Social Links Configuration**
+- New `src/shared/config/social.ts` - centralized social links config
+- Discord, Twitter/X, and contact email now read from environment variables
+- No more hardcoded social URLs scattered across components
+- Falls back to defaults for Twitter/email, Discord requires explicit config
+
+**Environment Variables (Frontend)**
+- `VITE_DISCORD_URL` - Discord server invite URL (required, no fallback)
+- `VITE_TWITTER_URL` - Twitter/X profile URL (default: x.com/signalfriend1)
+- `VITE_CONTACT_EMAIL` - Contact email (default: contact@signalfriend.com)
+
+**CI/CD Pipeline**
+- New `.github/workflows/ci.yml` - GitHub Actions workflow
+- Runs backend tests (tsc, lint, vitest) and frontend build (tsc, lint, build) in parallel
+- Triggers on push/PR to main and develop branches
+- Node.js 20.x with npm caching for faster builds
+
+**Vercel Preview Deployments**
+- Added `Dummy.txt` for Vercel preview workflow triggers
+
+**News Page Updates**
+- Updated all dates from 2024 to 2025
+- Added referral program announcement ("Earn 5 USDT per referred predictor!")
+- Removed outdated maintenance notice
+
+**How It Works Section**
+- Added Step 5: "Refer & Earn" - earn 5 USDT for each referred predictor
+
+### Changed
+
+- `RootLayout.tsx` - Footer now uses `socialLinks` config
+- `MaintenancePage.tsx` - Uses `socialLinks` config for Discord/Twitter
+- `TermsPage.tsx` - Uses `socialLinks` config for all contact links
+- `.env.example` - Added social link environment variables
+
+### Security
+
+- Full security audit completed (AUDIT.md) - 93/100 score
+- All rate limiting verified across all endpoints
+- Production-ready security posture confirmed
+
+---
+
 ## [0.17.1] - 2025-12-12 🔒 SECURITY & BUG FIXES
 
 ### Fixed

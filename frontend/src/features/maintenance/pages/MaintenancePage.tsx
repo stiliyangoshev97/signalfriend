@@ -12,6 +12,8 @@
  * @module features/maintenance/pages/MaintenancePage
  */
 
+import { socialLinks } from '@/shared/config/social';
+
 export function MaintenancePage() {
   // Custom message from environment variable
   const customMessage = import.meta.env.VITE_MAINTENANCE_MESSAGE;
@@ -79,7 +81,7 @@ export function MaintenancePage() {
         {/* Social Links */}
         <div className="flex items-center justify-center gap-6">
           <a
-            href="https://discord.gg/jSRspBYK"
+            href={socialLinks.discord}
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-main hover:text-fur-cream transition-colors flex items-center gap-2"
@@ -94,7 +96,7 @@ export function MaintenancePage() {
             Discord
           </a>
           <a
-            href="https://x.com/signalfriend1"
+            href={socialLinks.twitter}
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-main hover:text-fur-cream transition-colors flex items-center gap-2"

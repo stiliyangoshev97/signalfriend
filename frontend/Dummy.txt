@@ -1,0 +1,40 @@
+# SignalFriend Frontend - Vercel Preview Trigger File
+# ============================================================================
+# 
+# PURPOSE:
+# This file is used to trigger Vercel preview deployments in a monorepo setup.
+# Since SignalFriend uses a monorepo (frontend + backend in same repo), Vercel
+# may not always detect changes that require a new preview deployment.
+#
+# HOW TO USE:
+# 1. When you push backend changes to Render and need a corresponding frontend
+#    preview to test the full stack together, simply update this file.
+# 2. Add a new line below with the preview version (Preview1, Preview2, etc.)
+# 3. Commit and push - Vercel will detect the change and create a new preview.
+#
+# WHEN YOU NEED THIS:
+# - Backend API changes that require frontend testing
+# - Testing full integration before merging to production
+# - When backend is deployed to Render preview but frontend hasn't changed
+#
+# PREVIEW DEPLOYMENT WORKFLOW:
+# 1. Push backend changes → Render creates preview deployment
+# 2. Get Render preview URL (e.g., https://signalfriend-backend-pr-123.onrender.com)
+# 3. Update this file with new preview version
+# 4. Push to trigger Vercel preview
+# 5. In Vercel preview settings, set VITE_API_BASE_URL to Render preview URL
+# 6. Test the full stack on both preview environments
+# 7. If everything works, merge to main for production deployment
+#
+# IMPORTANT:
+# - Each Vercel preview needs its own environment variables configured
+# - Set VITE_API_BASE_URL in Vercel preview to point to Render preview backend
+# - Production environment variables remain unchanged
+#
+# ============================================================================
+
+# Preview History (add new entries at the bottom)
+# Format: PreviewX - Date - Description
+# ============================================================================
+
+Preview1 - 2025-12-13 - Initial setup, testing preview deployment workflow

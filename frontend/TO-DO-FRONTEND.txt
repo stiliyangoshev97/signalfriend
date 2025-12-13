@@ -2,8 +2,35 @@
                         SIGNALFRIEND FRONTEND TO-DO LIST
 ================================================================================
 
-Last Updated: 2025-12-09
-Current Version: v0.12.0 (Frontend Validation & Polish)
+Last Updated: 2025-12-13
+Current Version: v0.17.0 (Configurable Social Links)
+
+================================================================================
+PHASE 7: IMPROVEMENTS & AUDITS ✅ COMPLETE (December 13, 2025)
+================================================================================
+
+[✅] Configurable Social Links
+    - Created src/shared/config/social.ts
+    - VITE_DISCORD_URL, VITE_TWITTER_URL, VITE_CONTACT_EMAIL env vars
+    - Updated RootLayout footer to use socialLinks config
+    - Updated MaintenancePage to use socialLinks config
+    - Updated TermsPage to use socialLinks config
+    - Discord fallback removed (requires explicit configuration)
+
+[✅] News Page Updates
+    - Changed all dates from 2024 to 2025
+    - Added referral program announcement at top
+    - Removed outdated maintenance notice
+
+[✅] How It Works Section
+    - Added Step 5: "Refer & Earn" (5 USDT per referred predictor)
+
+[✅] Vercel Preview Support
+    - Created Dummy.txt for preview deployment triggers
+
+[✅] Documentation
+    - Updated .env.example with social link variables
+    - Updated CHANGELOG.md
 
 ================================================================================
 PHASE 6: FRONTEND VALIDATION & POLISH ✅ COMPLETE

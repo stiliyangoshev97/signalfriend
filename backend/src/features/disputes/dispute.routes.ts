@@ -82,15 +82,17 @@ adminRouter.get("/counts", getDisputeCounts);
  * PUT /api/admin/disputes/:id
  * Update dispute status and admin notes.
  * Body: { status, adminNotes? }
+ * Rate limited: 100 req/15min (write operations)
  */
-adminRouter.put("/:id", updateDisputeStatus);
+adminRouter.put("/:id", writeRateLimiter, updateDisputeStatus);
 
 /**
  * POST /api/admin/disputes/:id/resolve
  * Resolve dispute and unblacklist predictor in DB.
  * Body: { adminNotes? }
+ * Rate limited: 100 req/15min (write operations)
  */
-adminRouter.post("/:id/resolve", resolveDispute);
+adminRouter.post("/:id/resolve", writeRateLimiter, resolveDispute);
 
 export const disputeRoutes = predictorRouter;
 export const adminDisputeRoutes = adminRouter;
