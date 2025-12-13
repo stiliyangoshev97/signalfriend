@@ -386,6 +386,87 @@ mongosh mongodb://localhost:27017/signalfriend --eval "db.processedwebhookevents
 mongosh mongodb://localhost:27017/signalfriend --eval "db.processedwebhookevents.aggregate([{\\$group: {_id: '\\$eventType', count: {\\$sum: 1}}}])"
 ```
 
+### IP Whitelisting for Alchemy Webhooks
+
+For production security, configure Alchemy's IP allowlist to only accept webhook requests from your server's IP address.
+
+#### Get Your Current Public IP
+
+```bash
+# Get both IPv4 and IPv6 addresses
+curl -4 ifconfig.me 2>/dev/null && echo "" && curl -6 ifconfig.me 2>/dev/null
+
+# Example output:
+# 212.39.89.180                          (IPv4)
+# 2a01:5a8:767:f5c2:b199:ec03:ee31:55da  (IPv6)
+```
+
+#### Local Development Setup
+
+⚠️ **Important:** Your home/ISP IP address changes periodically! You'll need to update the Alchemy IP allowlist when this happens.
+
+**When webhooks stop working:**
+1. Check if your IP changed: `curl -4 ifconfig.me`
+2. Update the IP allowlist on Alchemy Dashboard
+3. Test webhook delivery
+
+**Configure Alchemy IP Allowlist (Local Dev):**
+1. Go to [Alchemy Dashboard](https://dashboard.alchemy.com/)
+2. Navigate to: **Webhooks** → **Your Webhook** → **Settings**
+3. Under **IP Allowlist**, add your current public IPv4:
+   - **IPv4 (Recommended)**: Use the address from `curl -4 ifconfig.me`
+   - Example: `212.39.89.180`
+4. *(Optional)* Also add your IPv6 for redundancy
+   - Example: `2a01:5a8:767:f5c2:b199:ec03:ee31:55da`
+5. **Save** the webhook settings
+
+**Testing:** Use ngrok inspector (`http://127.0.0.1:4040`) to verify webhook deliveries after updating IPs.
+
+#### Production Setup (Render)
+
+For production deployments on Render:
+
+1. **Deploy your backend** to Render
+2. **Get the static outbound IP**:
+   - Render Dashboard → Your Service → **Settings** → **Outbound IPs**
+   - Copy the static IP address(es)
+3. **Update Alchemy IP Allowlist**:
+   - Go to [Alchemy Dashboard](https://dashboard.alchemy.com/)
+   - Navigate to: **Webhooks** → **Your Webhook** → **Settings**
+   - Add Render's static outbound IP(s) to the **IP Allowlist**
+   - Remove or keep your local development IP as needed
+4. **Update webhook URL** from ngrok to your production domain:
+   - Example: `https://api.signalfriend.com/api/webhooks/alchemy`
+
+**Note:** Render provides **static outbound IPs** for paid plans. Free plans may have dynamic IPs - check Render's documentation for your plan.
+
+#### Why IP Whitelisting Matters
+
+- **Prevents unauthorized webhook calls**: Only Alchemy and your approved IPs can trigger webhook endpoints
+- **Reduces attack surface**: Even if someone knows your webhook URL, they can't spoof events
+- **Complements signature verification**: Works alongside HMAC-SHA256 validation for defense-in-depth
+
+#### Troubleshooting
+
+```bash
+# Webhook not receiving events? Check these:
+
+# 1. Verify your current IP hasn't changed
+curl -4 ifconfig.me
+
+# 2. Check Alchemy webhook logs
+# Alchemy Dashboard → Webhooks → Your Webhook → Logs
+
+# 3. Test webhook endpoint is reachable
+curl -I http://localhost:3001/api/webhooks/health
+
+# 4. Check ngrok tunnel status
+curl http://127.0.0.1:4040/api/tunnels
+
+# 5. View recent webhook activity in MongoDB
+mongosh mongodb://localhost:27017/signalfriend --eval "db.processedwebhookevents.find().sort({processedAt: -1}).limit(5).pretty()"
+```
+
 ---
 
 ## 🌱 Database Seeding
