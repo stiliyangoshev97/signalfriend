@@ -41,6 +41,7 @@ import {
 } from "./admin.controller.js";
 import { authenticate } from "../../shared/middleware/auth.js";
 import { requireAdmin } from "../../shared/middleware/admin.js";
+import { writeRateLimiter } from "../../shared/middleware/rateLimiter.js";
 
 /** Express router instance for admin routes */
 const router = Router();
@@ -74,15 +75,17 @@ router.get("/predictors/:address", getAdminPredictorByAddress);
  * POST /api/admin/predictors/:address/blacklist
  * Blacklist a predictor in the database.
  * Note: Also blacklist on-chain via MultiSig for full effect.
+ * Rate limited: 100 req/15min (write operations)
  */
-router.post("/predictors/:address/blacklist", blacklistPredictor);
+router.post("/predictors/:address/blacklist", writeRateLimiter, blacklistPredictor);
 
 /**
  * POST /api/admin/predictors/:address/unblacklist
  * Remove blacklist status from a predictor.
  * Note: Also unblacklist on-chain via MultiSig for full effect.
+ * Rate limited: 100 req/15min (write operations)
  */
-router.post("/predictors/:address/unblacklist", unblacklistPredictor);
+router.post("/predictors/:address/unblacklist", writeRateLimiter, unblacklistPredictor);
 
 // ============================================================================
 // Verification Management
@@ -98,29 +101,33 @@ router.get("/verification-requests", getVerificationRequests);
  * POST /api/admin/predictors/:address/verify
  * Approve a predictor's verification request.
  * They will get a verified badge and can upload an avatar.
+ * Rate limited: 100 req/15min (write operations)
  */
-router.post("/predictors/:address/verify", verifyPredictor);
+router.post("/predictors/:address/verify", writeRateLimiter, verifyPredictor);
 
 /**
  * POST /api/admin/predictors/:address/reject
  * Reject a predictor's verification request.
  * They need 100 more sales to re-apply.
+ * Rate limited: 100 req/15min (write operations)
  */
-router.post("/predictors/:address/reject", rejectVerification);
+router.post("/predictors/:address/reject", writeRateLimiter, rejectVerification);
 
 /**
  * POST /api/admin/predictors/:address/unverify
  * Remove verification status from a predictor.
  * Their avatar will also be removed.
+ * Rate limited: 100 req/15min (write operations)
  */
-router.post("/predictors/:address/unverify", unverifyPredictor);
+router.post("/predictors/:address/unverify", writeRateLimiter, unverifyPredictor);
 
 /**
  * POST /api/admin/predictors/:address/manual-verify
  * Manually verify a predictor regardless of sales count or pending application.
  * Use for special cases where normal requirements should be bypassed.
+ * Rate limited: 100 req/15min (write operations)
  */
-router.post("/predictors/:address/manual-verify", manualVerifyPredictor);
+router.post("/predictors/:address/manual-verify", writeRateLimiter, manualVerifyPredictor);
 
 // ============================================================================
 // Signal Management
@@ -130,8 +137,9 @@ router.post("/predictors/:address/manual-verify", manualVerifyPredictor);
  * DELETE /api/admin/signals/:contentId
  * Deactivate a signal (soft delete).
  * Contact predictor via their preferred method to explain removal.
+ * Rate limited: 100 req/15min (write operations)
  */
-router.delete("/signals/:contentId", deleteSignal);
+router.delete("/signals/:contentId", writeRateLimiter, deleteSignal);
 
 // ============================================================================
 // Platform Statistics
@@ -164,7 +172,8 @@ router.get("/reports/:id", getReportById);
  * PUT /api/admin/reports/:id
  * Update report status (pending, reviewed, resolved, dismissed).
  * Body: { status, adminNotes? }
+ * Rate limited: 100 req/15min (write operations)
  */
-router.put("/reports/:id", updateReportStatus);
+router.put("/reports/:id", writeRateLimiter, updateReportStatus);
 
 export const adminRoutes = router;

@@ -57,41 +57,68 @@ The backend uses Alchemy webhooks to listen for blockchain events and sync them 
 
 ### Step 4: Configure GraphQL Query
 
-**This is the exact GraphQL query template we use:**
+**This is the exact GraphQL query we use (copy-paste ready):**
 
 ```graphql
 {
   block {
-    logs(filter: {addresses: ["0x5133397a4B9463c5270beBa05b22301e6dD184ca", "0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4"]}) {
-      transaction {
-        hash
-        from {
-          address
-        }
-        to {
-          address
-        }
-      }
-      topics
-      data
+    hash,
+    number,
+    timestamp,
+    logs(filter: {addresses: ["0x5133397a4B9463c5270beBa05b22301e6dD184ca", "0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4"]}) { 
+      data,
+      topics,
+      index,
       account {
         address
+      },
+      transaction {
+        hash,
+        nonce,
+        index,
+        from {
+          address
+        },
+        to {
+          address
+        },
+        value,
+        gasPrice,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        gas,
+        status,
+        gasUsed,
+        cumulativeGasUsed,
+        effectiveGasPrice,
+        createdContract {
+          address
+        }
       }
     }
   }
 }
 ```
 
-**What this query does:**
-- Filters logs to only our two contract addresses
-- Returns transaction hash for reference
-- Returns `topics` array (topic0 = event signature, topic1-3 = indexed params)
-- Returns `data` (non-indexed event parameters, ABI-encoded)
-- Returns emitting contract address
+**What this query captures:**
 
-**Contract Addresses:**
+| Field | Purpose |
+|-------|---------|
+| `block.hash` | Block identifier |
+| `block.number` | Block height |
+| `block.timestamp` | When the event occurred |
+| `logs.topics` | Event signature (topic0) + indexed params |
+| `logs.data` | Non-indexed event parameters (ABI-encoded) |
+| `logs.account.address` | Contract that emitted the event |
+| `transaction.hash` | Transaction reference |
+| `transaction.from.address` | Who initiated the transaction |
+| `transaction.status` | Success/failure status |
+
+**Contract Addresses (Testnet):**
 - `0x5133397a4B9463c5270beBa05b22301e6dD184ca` - SignalFriendMarket (PredictorJoined, SignalPurchased)
 - `0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4` - PredictorAccessPass (PredictorBlacklisted)
+
+> ⚠️ **For Mainnet:** Replace these addresses with your mainnet contract addresses.
 
 ### Step 5: Copy the Signing Key
 
@@ -123,19 +150,33 @@ When an event occurs, Alchemy sends this payload structure:
   "event": {
     "data": {
       "block": {
+        "hash": "0xabc123...",
+        "number": 12345678,
+        "timestamp": 1701432000,
         "logs": [
           {
-            "transaction": {
-              "hash": "0x1234...",
-              "from": { "address": "0xbuyer..." },
-              "to": { "address": "0xcontract..." }
-            },
+            "data": "0x...",
             "topics": [
               "0x2f2789d1da7b490fc20c28c5014f1fdd449737869b924042025cd634b2248cc4",
               "0x000000000000000000000000predictor-address..."
             ],
-            "data": "0x...",
-            "account": { "address": "0x5133397a4b9463c5270beba05b22301e6dd184ca" }
+            "index": 0,
+            "account": {
+              "address": "0x5133397a4b9463c5270beba05b22301e6dd184ca"
+            },
+            "transaction": {
+              "hash": "0x1234...",
+              "nonce": 42,
+              "index": 0,
+              "from": { "address": "0xbuyer..." },
+              "to": { "address": "0xcontract..." },
+              "value": "0",
+              "gasPrice": "3000000000",
+              "gas": 200000,
+              "status": 1,
+              "gasUsed": 150000,
+              "effectiveGasPrice": "3000000000"
+            }
           }
         ]
       }

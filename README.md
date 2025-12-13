@@ -142,6 +142,111 @@ SignalFriend/
 
 ---
 
+## 🎯 Technical Deep Dive (For Interviews)
+
+This section provides a comprehensive technical overview for Web3 engineering interviews.
+
+### Architecture Decisions
+
+**Why BNB Chain?**
+- Low transaction fees (~$0.05 per tx) make microtransactions viable
+- EVM-compatible, allowing use of battle-tested Solidity patterns
+- Fast block times (3 seconds) for good UX
+
+**Why Hybrid Architecture (On-chain + Off-chain)?**
+- **On-chain:** Payments, ownership (NFTs), blacklisting, referral tracking — immutable and trustless
+- **Off-chain:** Signal content, ratings, profiles — for privacy, editability, and cost efficiency
+- **Sync mechanism:** Alchemy webhooks listen for on-chain events and update MongoDB in real-time
+
+**Why SIWE (Sign-In with Ethereum)?**
+- Passwordless auth using wallet signatures
+- No centralized credentials to steal
+- User proves wallet ownership without exposing private keys
+- JWT tokens (7-day expiry) for stateless API authentication
+
+### Security Measures
+
+| Layer | Implementation |
+|-------|----------------|
+| **Smart Contracts** | OpenZeppelin standards, ReentrancyGuard, 2/3 MultiSig for admin actions |
+| **API** | Tiered rate limiting (auth: 20/15min, write: 60/15min, read: 200/min) |
+| **Authentication** | SIWE + JWT with RS256-equivalent security via 32+ char secrets |
+| **Input Validation** | Zod schemas on frontend + backend, URL blocking in user content |
+| **Webhooks** | HMAC signature verification, timestamp validation, idempotency keys |
+| **CORS** | Strict origin whitelist, credentials required |
+
+### Smart Contract Design
+
+```
+SignalFriendMarket (Orchestrator)
+├── Handles all USDT payments
+├── Splits fees: 95% predictor, 5% platform
+├── Tracks referral relationships
+└── Calls child contracts
+
+PredictorAccessPass (Soulbound NFT)
+├── Non-transferable (ERC721 with transfer disabled)
+├── One per wallet address
+├── Stores on-chain blacklist status
+└── MultiSig-controlled blacklisting (2/3 signatures)
+
+SignalKeyNFT (Receipt NFT)
+├── Transferable (can sell/gift access)
+├── Minted on purchase
+├── Proves ownership for content access
+└── ContentId links to off-chain signal data
+```
+
+### Event-Driven Architecture
+
+```
+User Action → Smart Contract → Blockchain Event
+                                    ↓
+                            Alchemy Webhook
+                                    ↓
+                            Backend API → MongoDB
+                                    ↓
+                            Frontend (TanStack Query invalidation)
+```
+
+**Events Handled:**
+- `PredictorJoined` → Create predictor profile
+- `SignalPurchased` → Create receipt, increment sales
+- `PredictorBlacklisted` → Update blacklist status, resolve disputes
+
+### Tech Stack Rationale
+
+| Choice | Why |
+|--------|-----|
+| **React + Vite** | Fast HMR, modern tooling, excellent TS support |
+| **wagmi + viem** | Type-safe Web3 hooks, better than ethers.js for React |
+| **RainbowKit** | Best-in-class wallet connection UX |
+| **Express + MongoDB** | Flexible schema for evolving product, fast iteration |
+| **Foundry** | Fastest Solidity testing, native fuzzing support |
+| **TanStack Query** | Automatic caching, background refetching, optimistic updates |
+| **Zustand** | Minimal boilerplate state management |
+| **Tailwind CSS** | Rapid UI development, consistent design system |
+
+### Testing Strategy
+
+- **Smart Contracts:** Foundry unit tests + fuzz tests (100+ test cases)
+- **Backend:** Vitest with 290 unit/integration tests
+- **Frontend:** TypeScript strict mode, Zod runtime validation
+- **CI/CD:** GitHub Actions runs all tests before merge
+
+### Performance Optimizations
+
+- Lazy-loaded routes (React.lazy + Suspense)
+- MongoDB compound indexes for common queries
+- TanStack Query caching with stale-while-revalidate
+- Optimistic UI updates for better perceived performance
+
+### Audit Results
+
+Full security audit completed with **93/100 score** — see [AUDIT.md](./AUDIT.md) for details.
+
+---
+
 ## 🔗 Links
 
 - **Website:** [signalfriend.com](https://signalfriend.com)

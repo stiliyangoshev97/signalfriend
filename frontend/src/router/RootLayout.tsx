@@ -59,6 +59,7 @@ import { Outlet, Link } from 'react-router-dom';
 import { Suspense } from 'react';
 import { Spinner, AnnouncementBanner } from '../shared/components/ui';
 import Header from './Header';
+import { socialLinks } from '../shared/config/social';
 
 export function RootLayout() {
   return (
@@ -108,14 +109,14 @@ export function RootLayout() {
               </Link>
               <span className="text-gray-main/50">|</span>
               <a
-                href="mailto:contact@signalfriend.com"
+                href={`mailto:${socialLinks.email}`}
                 className="text-gray-main hover:text-fur-cream transition-colors"
               >
                 Contact
               </a>
               <span className="text-gray-main/50">|</span>
               <a
-                href="https://discord.gg/jSRspBYK"
+                href={socialLinks.discord}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-main hover:text-fur-cream transition-colors"
@@ -124,7 +125,7 @@ export function RootLayout() {
               </a>
               <span className="text-gray-main/50">|</span>
               <a
-                href="https://x.com/signalfriend1"
+                href={socialLinks.twitter}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-main hover:text-fur-cream transition-colors"

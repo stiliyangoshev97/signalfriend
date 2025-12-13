@@ -2,7 +2,7 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 12, 2025
+Last Updated: December 13, 2025
 
 ================================================================================
 COMPLETED FEATURES ✅
@@ -25,6 +25,8 @@ COMPLETED FEATURES ✅
 [x] Complete blacklist system overhaul (December 8, 2025)
 [x] Filters & sorting improvements (December 10, 2025)
 [x] Verification reapplication progress tracking (December 12, 2025)
+[x] Security audit + CI/CD pipeline (December 13, 2025)
+[x] Configurable social links via environment variables (December 13, 2025)
 
 ================================================================================
 PHASE 3: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)
@@ -159,6 +161,25 @@ PHASE 10: PRE-DEPLOYMENT TESTING ✅ COMPLETE (December 12, 2025)
     - Updated backend/frontend CHANGELOG.md with all bug fixes
     - Updated backend RUNBOOK.md with rate limit testing guide
     - Updated checkPredictorStats.ts script documentation
+
+================================================================================
+PHASE 11: IMPROVEMENTS & AUDITS ✅ COMPLETE (December 13, 2025)
+================================================================================
+
+[x] Run seed script 5x to add 2500 signals for load testing
+[x] Full security audit of backend/frontend (AUDIT.md created - 93/100 score)
+[x] Mobile testing discussion (browser DevTools emulation confirmed valid)
+[x] Create Dummy.txt for Vercel preview deployments
+[x] Test rate limiting / DDoS protection (all endpoints verified)
+[x] CI/CD pipeline for tests before merge (.github/workflows/ci.yml)
+[x] JWT secret and 7-day expiry documentation
+[x] SetupWebhooks.md updated with exact working GraphQL query
+[x] News page updated (2024→2025, referral announcement added)
+[x] How It Works section updated (added "Refer & Earn" step)
+[x] Social links configurable via environment variables
+    - VITE_DISCORD_URL, VITE_TWITTER_URL, VITE_CONTACT_EMAIL
+    - Created frontend/src/shared/config/social.ts
+    - Updated RootLayout, MaintenancePage, TermsPage
 
 ================================================================================
 NEXT PRIORITY: TESTING & POLISH
@@ -301,8 +322,9 @@ DEPLOYMENT CHECKLIST
 [x] Admin system complete
 [x] Blacklist system complete
 [x] Phase 3 misc fixes complete
+[x] Security audit (AUDIT.md - 93/100 score, PRODUCTION READY)
+[x] CI/CD pipeline (.github/workflows/ci.yml)
 [ ] Full mobile responsive testing
-[ ] Security audit
 [ ] Performance testing
 [ ] Docker configuration
 [ ] Production environment setup

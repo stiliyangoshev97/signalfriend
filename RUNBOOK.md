@@ -256,3 +256,114 @@ For testing wallet connections on mobile:
 3. The WalletConnect Project ID is configured in frontend `.env.local`
 
 ---
+
+## 🔄 CI/CD Pipeline
+
+SignalFriend uses **GitHub Actions** to automatically run tests on every Pull Request and push to `main`. This catches bugs before they get merged.
+
+### How It Works
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Pull Request Created                         │
+└─────────────────────────┬───────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                 GitHub Actions Triggered                        │
+└─────────────────────────┬───────────────────────────────────────┘
+                          │
+            ┌─────────────┴─────────────┐
+            ▼                           ▼
+    ┌───────────────┐           ┌───────────────┐
+    │   Backend     │           │   Frontend    │
+    │   (parallel)  │           │   (parallel)  │
+    ├───────────────┤           ├───────────────┤
+    │ npm ci        │           │ npm ci        │
+    │ tsc --noEmit  │           │ tsc --noEmit  │
+    │ npm run lint  │           │ npm run lint  │
+    │ npm test      │           │ npm run build │
+    └───────┬───────┘           └───────┬───────┘
+            │                           │
+            └─────────────┬─────────────┘
+                          ▼
+              ┌───────────────────┐
+              │   All Passed?     │
+              └─────────┬─────────┘
+                        │
+           ┌────────────┴────────────┐
+           ▼                         ▼
+    ┌─────────────┐          ┌─────────────┐
+    │  ✅ Merge   │          │  ❌ Blocked │
+    │   Allowed   │          │  Fix Issues │
+    └─────────────┘          └─────────────┘
+```
+
+### What Gets Checked
+
+| Job | Checks | What It Catches |
+|-----|--------|-----------------|
+| **Backend** | TypeScript compile | Type errors |
+| | ESLint | Code style issues |
+| | Vitest | Broken tests, regressions |
+| **Frontend** | TypeScript compile | Type errors |
+| | ESLint | Code style issues |
+| | Vite build | Import errors, build failures |
+
+### Viewing CI Results
+
+1. **On Pull Request**: Look for the green ✓ or red ✗ at the bottom
+2. **Details**: Click "Details" next to any check to see logs
+3. **Actions Tab**: Go to repo → Actions to see all runs
+
+### What Happens on Failure
+
+- ❌ PR shows red "Some checks were not successful"
+- You can still merge (not blocked) but **should fix issues first**
+- Click "Details" to see which step failed and why
+
+### Branch Protection (Recommended)
+
+To **require** CI to pass before merging:
+
+1. Go to GitHub repo → Settings → Branches
+2. Add rule for `main` branch
+3. Enable "Require status checks to pass"
+4. Select "CI Success" as required check
+5. Save
+
+Now PRs **cannot** be merged unless all tests pass.
+
+### Running Checks Locally
+
+Before pushing, run the same checks locally:
+
+```bash
+# Backend
+cd backend
+npx tsc --noEmit           # Type check
+npm run lint               # Linting
+npm test                   # Run tests
+
+# Frontend
+cd frontend
+npx tsc --noEmit           # Type check
+npm run lint               # Linting  
+npm run build              # Build check
+```
+
+### CI Configuration
+
+The workflow is defined in `.github/workflows/ci.yml`.
+
+**Triggers:**
+- Every push to `main`
+- Every pull request targeting `main`
+
+**Features:**
+- Runs backend and frontend checks **in parallel** (faster)
+- Caches npm dependencies (faster subsequent runs)
+- Auto-cancels old runs when new commits are pushed
+
+---
+

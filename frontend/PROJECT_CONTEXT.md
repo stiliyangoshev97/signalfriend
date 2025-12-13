@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 12 December 2025 (v0.17.1 - Security & Bug Fixes)
+> Last Updated: 13 December 2025 (v0.18.0 - Configurable Social Links & CI/CD)
 
 ---
 
@@ -70,8 +70,8 @@ src/features/{feature}/
 src/shared/
 ├── api/          # Axios client
 ├── components/ui/# Reusable UI components (Button, Input, CopyableAddress, etc.)
-├── config/       # Environment, wagmi, contracts
-├── hooks/        # Shared hooks (useAuth)
+├── config/       # Environment, wagmi, contracts, social links
+├── hooks/        # Shared hooks (useAuth, useDebounce, useSEO)
 ├── schemas/      # Shared Zod schemas
 ├── types/        # Shared TypeScript types
 └── utils/        # Utility functions
@@ -137,6 +137,30 @@ accent: {
 - `GET /api/receipts/check/:contentId` - Check if user owns signal
 - `GET /api/predictors` - List predictors
 - `GET /api/categories` - List categories
+
+---
+
+## 🌐 Social Links Configuration
+
+Social links are configured via environment variables in `src/shared/config/social.ts`:
+
+```typescript
+import { socialLinks } from '@/shared/config/social';
+
+// Usage in components
+<a href={socialLinks.discord}>Discord</a>
+<a href={socialLinks.twitter}>Twitter</a>
+<a href={`mailto:${socialLinks.email}`}>Contact</a>
+```
+
+### Environment Variables
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `VITE_DISCORD_URL` | ✅ Yes | `''` (empty) | Discord invite URL |
+| `VITE_TWITTER_URL` | No | `https://x.com/signalfriend1` | Twitter/X profile |
+| `VITE_CONTACT_EMAIL` | No | `contact@signalfriend.com` | Contact email |
+
+**Note:** Discord URL has no fallback to prevent showing invalid invite links.
 
 ---
 

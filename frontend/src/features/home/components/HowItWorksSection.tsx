@@ -69,6 +69,11 @@ const predictorSteps: Step[] = [
     title: 'Build Reputation',
     description: 'Earn ratings from buyers. High performers can achieve verified status.',
   },
+  {
+    number: 5,
+    title: 'Refer & Earn',
+    description: 'Invite friends to become predictors. Earn 5 USDT for each new predictor who registers with your wallet address.',
+  },
 ];
 
 function StepCard({ step, isLast }: { step: Step; isLast: boolean }) {
