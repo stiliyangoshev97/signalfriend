@@ -46,8 +46,17 @@ const envSchema = z.object({
   RPC_URL: z.string().url(),
 
   // Alchemy Configuration
-  /** Alchemy webhook signing key (optional for development) */
+  /** Alchemy webhook signing key (required in production, recommended in development) */
   ALCHEMY_SIGNING_KEY: z.string().optional(),
+  /** 
+   * Skip webhook signature verification (DEVELOPMENT ONLY)
+   * Set to "true" to bypass signature checks for local testing without Alchemy
+   * This flag is IGNORED in production - signature verification is always enforced
+   */
+  SKIP_WEBHOOK_SIGNATURE: z
+    .string()
+    .default("false")
+    .transform((val) => val === "true"),
 
   // CORS Configuration
   /** Allowed CORS origin for frontend */
@@ -91,6 +100,15 @@ const parsed = envSchema.safeParse(process.env);
 if (!parsed.success) {
   console.error("❌ Invalid environment variables:");
   console.error(parsed.error.flatten().fieldErrors);
+  process.exit(1);
+}
+
+// Security check: ALCHEMY_SIGNING_KEY is REQUIRED in production
+// Without it, webhook signature verification is skipped, allowing spoofed events
+if (parsed.data.NODE_ENV === "production" && !parsed.data.ALCHEMY_SIGNING_KEY) {
+  console.error("❌ SECURITY ERROR: ALCHEMY_SIGNING_KEY is required in production!");
+  console.error("   Webhook signature verification cannot be skipped in production.");
+  console.error("   Get your signing key from: Alchemy Dashboard → Webhooks → Your Webhook → Signing Key");
   process.exit(1);
 }
 

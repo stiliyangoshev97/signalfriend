@@ -18,6 +18,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.28.1] - 2025-12-13 🔒 SECURITY: REQUIRE WEBHOOK SIGNING KEY IN PRODUCTION
+
+### Changed
+
+**Production Security Enforcement**
+- `ALCHEMY_SIGNING_KEY` is now **REQUIRED** in production mode
+- Server will refuse to start in `NODE_ENV=production` without the signing key
+- Prevents accidental deployment without webhook signature verification
+- Clear error message directs to Alchemy dashboard for key retrieval
+
+**Development Flexibility**
+- Added `SKIP_WEBHOOK_SIGNATURE` environment variable (default: `false`)
+- When set to `true` in development mode, allows local testing without Alchemy webhooks
+- This flag is **IGNORED** in production - signature verification is always enforced
+
+**Improved Webhook Logging**
+- Clearer warning when signature verification is skipped (dev only)
+- Added warning log for signature mismatch (possible spoofing attempt)
+
+### Updated
+- `.env.example` with documentation about production requirement and `SKIP_WEBHOOK_SIGNATURE`
+
+### Security
+- This change prevents spoofed webhook attacks in production
+- Attackers cannot forge fake `SignalPurchased` or `PredictorJoined` events
+- Development mode allows optional bypass for local testing convenience
+
+---
+
 ## [0.28.0] - 2025-12-12 🧪 COMPREHENSIVE BACKEND TESTING
 
 ### Added

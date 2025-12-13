@@ -54,21 +54,39 @@ export class WebhookService {
    * Verifies the HMAC-SHA256 signature of an Alchemy webhook request.
    * Ensures the webhook payload hasn't been tampered with.
    *
+   * Security behavior:
+   * - Production: ALWAYS validates (server won't start without ALCHEMY_SIGNING_KEY)
+   * - Development with key: Validates signature
+   * - Development without key: Only skips if SKIP_WEBHOOK_SIGNATURE=true
+   *
    * @param body - The raw JSON string body of the webhook request
    * @param signature - The x-alchemy-signature header value
-   * @returns True if signature is valid or signing key not configured
+   * @returns True if signature is valid, false otherwise
    */
   static verifySignature(body: string, signature: string): boolean {
-    if (!env.ALCHEMY_SIGNING_KEY) {
-      logger.warn("ALCHEMY_SIGNING_KEY not set, skipping signature verification");
-      return true; // Allow in development
+    // If signing key is configured, always validate
+    if (env.ALCHEMY_SIGNING_KEY) {
+      const hmac = createHmac("sha256", env.ALCHEMY_SIGNING_KEY);
+      hmac.update(body);
+      const expectedSignature = hmac.digest("hex");
+
+      const isValid = signature === expectedSignature;
+      if (!isValid) {
+        logger.warn("Webhook signature mismatch - possible spoofing attempt");
+      }
+      return isValid;
     }
 
-    const hmac = createHmac("sha256", env.ALCHEMY_SIGNING_KEY);
-    hmac.update(body);
-    const expectedSignature = hmac.digest("hex");
+    // No signing key configured - check if skip is explicitly allowed
+    // Note: In production, server won't start without ALCHEMY_SIGNING_KEY (enforced in env.ts)
+    if (env.NODE_ENV !== "production" && env.SKIP_WEBHOOK_SIGNATURE) {
+      logger.warn("⚠️  SKIP_WEBHOOK_SIGNATURE=true - bypassing signature verification (DEV ONLY)");
+      return true;
+    }
 
-    return signature === expectedSignature;
+    // No key and skip not enabled - reject for safety
+    logger.error("❌ ALCHEMY_SIGNING_KEY not set and SKIP_WEBHOOK_SIGNATURE is false - rejecting webhook");
+    return false;
   }
 
   /**
