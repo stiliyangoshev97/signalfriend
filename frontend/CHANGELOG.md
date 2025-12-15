@@ -14,6 +14,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.18.1] - 2025-12-15 🐛 FIX: MY SIGNALS PAGE QUERY INVALIDATION
+
+### Fixed
+
+**My Signals Page Not Updating After Purchase**
+- Fixed query cache invalidation after signal purchase
+- The "My Signals" page (`/my-signals`) now immediately shows newly purchased signals
+- Previously required a manual page refresh to see new purchases
+- Root cause: Incorrect query key used for cache invalidation
+  - Was using `['receipts']` which didn't match the actual query key
+  - Now uses `['purchase', 'myReceipts', address]` which properly matches `useMyReceipts` hook
+
+**Modal Background Scroll When Interacting with Form Inputs**
+- Fixed background page scrolling when clicking on inputs inside modals (e.g., Edit Profile)
+- Modal now uses `position: fixed` body lock technique instead of just `overflow: hidden`
+- Saves and restores scroll position using a ref to persist across renders
+- Completely prevents scroll chaining from modal to the page behind it
+- Fixed radio button styling in Edit Profile modal that could cause scroll jumps
+  - Changed from `sr-only peer` to `absolute opacity-0 w-0 h-0 peer` to avoid off-screen positioning
+- Affected modals: Edit Profile, Create Signal, Purchase, and all other modals
+
+### Technical Details
+- Updated `usePurchaseFlow` hook in `src/features/signals/hooks/usePurchase.ts`
+- Query invalidation now properly targets all `myReceipts` queries for the current user
+- Multiple delayed invalidations (2s, 5s, 10s) handle webhook processing delays
+- Updated `Modal` component in `src/shared/components/ui/Modal.tsx` with proper body scroll lock
+
+---
+
 ## [0.18.0] - 2025-12-13 🔧 CONFIGURABLE SOCIAL LINKS & CI/CD
 
 ### Added
