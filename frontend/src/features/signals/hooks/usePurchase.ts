@@ -430,10 +430,13 @@ export function usePurchaseFlow(params: {
         queryClient.invalidateQueries({ 
           queryKey: signalKeys.detail(contentId) 
         });
-        // Invalidate user's receipts list
-        queryClient.invalidateQueries({ 
-          queryKey: ['receipts'] 
-        });
+        // Invalidate user's receipts list (My Signals page)
+        // Uses partial key match: any query starting with ['purchase', 'myReceipts', address]
+        if (address) {
+          queryClient.invalidateQueries({ 
+            queryKey: ['purchase', 'myReceipts', address],
+          });
+        }
         // Invalidate signal content (now accessible)
         queryClient.invalidateQueries({ 
           queryKey: purchaseKeys.content(contentId, address) 

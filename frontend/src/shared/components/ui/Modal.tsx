@@ -12,6 +12,7 @@
  * - Keyboard support (Escape to close)
  * - Click outside to close (backdrop click)
  * - Body scroll lock when open
+ * - Overscroll containment (prevents background scroll on input focus)
  * - Animated entrance (fade + slide)
  * - Optional title and description
  * - ModalFooter sub-component for action buttons
@@ -74,7 +75,7 @@
  * - Modal is always on top regardless of parent positioning
  */
 
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '../../utils/cn';
 
@@ -120,6 +121,9 @@ export function Modal({
   size = 'md',
   children,
 }: ModalProps) {
+  // Store scroll position in a ref to persist across renders
+  const scrollPositionRef = useRef(0);
+
   // Handle escape key and body scroll lock
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -128,13 +132,30 @@ export function Modal({
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      // Prevent body scroll when modal is open
+      
+      // Save current scroll position and lock body scroll
+      // Using position:fixed prevents background scroll when interacting with modal inputs
+      scrollPositionRef.current = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollPositionRef.current}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
       document.body.style.overflow = 'hidden';
+      
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+        // Restore body scroll position
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, scrollPositionRef.current);
+      };
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
     };
   }, [isOpen, onClose]);
 
@@ -152,11 +173,11 @@ export function Modal({
       />
 
       {/* Modal container - centered */}
-      <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto overscroll-contain">
         <div
           className={cn(
             'relative w-full bg-dark-800 border border-dark-700 rounded-xl shadow-2xl',
-            'animate-slide-up max-h-[90vh] flex flex-col',
+            'animate-slide-up max-h-[90vh] flex flex-col overscroll-contain',
             sizes[size]
           )}
           role="dialog"
@@ -180,8 +201,8 @@ export function Modal({
             </div>
           )}
 
-          {/* Content - scrollable */}
-          <div className="px-6 py-4 overflow-y-auto flex-1">{children}</div>
+          {/* Content - scrollable with overscroll containment to prevent background scroll */}
+          <div className="px-6 py-4 overflow-y-auto flex-1 overscroll-contain">{children}</div>
 
           {/* Close button (X) - top right */}
           <button

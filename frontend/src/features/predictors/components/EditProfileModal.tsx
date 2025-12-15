@@ -627,7 +627,7 @@ export function EditProfileModal({
                   type="radio"
                   value="telegram"
                   {...register('preferredContact')}
-                  className="sr-only peer"
+                  className="absolute opacity-0 w-0 h-0 peer"
                 />
                 <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-dark-500 bg-dark-800 peer-checked:border-brand-200 peer-checked:bg-brand-200/10 hover:border-dark-400 transition-all">
                   <svg className="w-4 h-4 text-fur-cream/70 peer-checked:text-brand-200" viewBox="0 0 24 24" fill="currentColor">
@@ -641,7 +641,7 @@ export function EditProfileModal({
                   type="radio"
                   value="discord"
                   {...register('preferredContact')}
-                  className="sr-only peer"
+                  className="absolute opacity-0 w-0 h-0 peer"
                 />
                 <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-dark-500 bg-dark-800 peer-checked:border-brand-200 peer-checked:bg-brand-200/10 hover:border-dark-400 transition-all">
                   <svg className="w-4 h-4 text-fur-cream/70" viewBox="0 0 24 24" fill="currentColor">
