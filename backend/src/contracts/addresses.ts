@@ -43,11 +43,11 @@ export const contractAddresses: Record<ChainId, ContractAddresses> = {
     signalKeyNFT: "0xfb26Df6101e1a52f9477f52F54b91b99fb016aed",
     usdt: "0xF87d17a5ca95F3f992f82Baabf4eBC5301A178a5", // MockUSDT
   },
-  // BNB Mainnet (Chain ID 56) - TO BE UPDATED AFTER MAINNET DEPLOYMENT
+  // BNB Mainnet (Chain ID 56) - Deployed December 15, 2025
   56: {
-    signalFriendMarket: "0x0000000000000000000000000000000000000000", // TODO: Deploy and update
-    predictorAccessPass: "0x0000000000000000000000000000000000000000", // TODO: Deploy and update
-    signalKeyNFT: "0x0000000000000000000000000000000000000000", // TODO: Deploy and update
+    signalFriendMarket: "0xAebec2Cd5c2dB4c0875de215515B3060a7a652FB",
+    predictorAccessPass: "0x198Cd0549A0Dba09Aa3aB88e0B51CEb8dd335d07",
+    signalKeyNFT: "0x2A5F920133e584773Ef4Ac16260c2F954824491f",
     usdt: "0x55d398326f99059fF775485246999027B3197955", // Official BSC USDT
   },
 };

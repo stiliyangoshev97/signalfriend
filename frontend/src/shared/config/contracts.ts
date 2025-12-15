@@ -68,11 +68,11 @@ export const CONTRACT_ADDRESSES: Record<number, ContractAddresses> = {
     USDT: '0xF87d17a5ca95F3f992f82Baabf4eBC5301A178a5', // MockUSDT on testnet
   },
   
-  // BNB Chain Mainnet (56) - TO BE DEPLOYED
+  // BNB Chain Mainnet (56) - Deployed December 15, 2025
   [CHAIN_IDS.BNB_MAINNET]: {
-    SignalFriendMarket: '0x0000000000000000000000000000000000000000',
-    PredictorAccessPass: '0x0000000000000000000000000000000000000000',
-    SignalKeyNFT: '0x0000000000000000000000000000000000000000',
+    SignalFriendMarket: '0xAebec2Cd5c2dB4c0875de215515B3060a7a652FB',
+    PredictorAccessPass: '0x198Cd0549A0Dba09Aa3aB88e0B51CEb8dd335d07',
+    SignalKeyNFT: '0x2A5F920133e584773Ef4Ac16260c2F954824491f',
     USDT: '0x55d398326f99059fF775485246999027B3197955', // Real USDT on BSC
   },
 } as const;

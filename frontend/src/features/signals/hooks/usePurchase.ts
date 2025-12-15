@@ -25,7 +25,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
 import { useEffect, useRef } from 'react';
-import { getContractAddresses, SIGNAL_FRIEND_MARKET_ABI, ERC20_ABI } from '@/shared/config';
+import { getContractAddresses, SIGNAL_FRIEND_MARKET_ABI, ERC20_ABI, env } from '@/shared/config';
 import { checkPurchase, fetchContentIdentifier, fetchMyReceipts, fetchSignalContent } from '../api';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { signalKeys } from './useSignals';
@@ -179,7 +179,7 @@ export function useContentIdentifier(contentId: string) {
  * @param chainId - Chain ID to use for contract addresses
  * @returns Current USDT balance in wei and formatted
  */
-export function useUSDTBalance(chainId: number = 97) {
+export function useUSDTBalance(chainId: number = env.CHAIN_ID) {
   const { address } = useAccount();
   const addresses = getContractAddresses(chainId);
 
@@ -210,7 +210,7 @@ export function useUSDTBalance(chainId: number = 97) {
  * @param chainId - Chain ID to use for contract addresses
  * @returns Current allowance in wei and formatted
  */
-export function useUSDTAllowance(chainId: number = 97) {
+export function useUSDTAllowance(chainId: number = env.CHAIN_ID) {
   const { address } = useAccount();
   const addresses = getContractAddresses(chainId);
 
@@ -247,7 +247,7 @@ export function useUSDTAllowance(chainId: number = 97) {
  * // Approve 100 USDT
  * await approve(100);
  */
-export function useApproveUSDT(chainId: number = 97) {
+export function useApproveUSDT(chainId: number = env.CHAIN_ID) {
   const addresses = getContractAddresses(chainId);
   const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
 
@@ -291,7 +291,7 @@ export function useApproveUSDT(chainId: number = 97) {
  *   contentIdentifier: '0x...',
  * });
  */
-export function useBuySignal(chainId: number = 97) {
+export function useBuySignal(chainId: number = env.CHAIN_ID) {
   const addresses = getContractAddresses(chainId);
   const queryClient = useQueryClient();
   const { address } = useAccount();
@@ -377,7 +377,7 @@ export function usePurchaseFlow(params: {
   predictorAddress: `0x${string}`;
   chainId?: number;
 }) {
-  const { contentId, priceUsdt, predictorAddress, chainId = 97 } = params;
+  const { contentId, priceUsdt, predictorAddress, chainId = env.CHAIN_ID } = params;
   const queryClient = useQueryClient();
   const { address } = useAccount();
   

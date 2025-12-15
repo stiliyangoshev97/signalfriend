@@ -1,8 +1,8 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** December 13, 2025  
-> **Current Phase:** Production Ready - Security Audit Complete  
-> **Project Status:** 🟢 **Backend v0.28.2** - 290 Tests Passing, CI/CD Active  
+> **Last Updated:** December 15, 2025  
+> **Current Phase:** Production - BSC Mainnet Live  
+> **Project Status:** 🟢 **Backend v0.29.0** - BSC Mainnet Deployed, 290 Tests Passing, CI/CD Active  
 > **Branch:** `feature/improvements-and-audits`
 
 ---
@@ -83,7 +83,23 @@ backend/
 
 ## 🔗 Smart Contract Integration
 
-### Contract Addresses (BNB Testnet - Chain ID 97)
+### Contract Addresses (BSC Mainnet - Chain ID 56) 🚀 LIVE
+| Contract | Address | Purpose |
+|----------|---------|---------|
+| SignalFriendMarket | `0xaebec2cd5c2db4c0875de215515b3060a7a652fb` | Main orchestrator |
+| PredictorAccessPass | `0x198cd0549a0dba09aa3ab88e0b51ceb8dd335d07` | Predictor NFT (soulbound) |
+| SignalKeyNFT | `0x2a5f920133e584773ef4ac16260c2f954824491f` | Purchase receipt NFT |
+| USDT | `0x55d398326f99059fF775485246999027B3197955` | BSC native USDT |
+| Treasury | `0x76e3363f7aF2e46DFdb4824FA143264E58884e1b` | Platform treasury |
+
+### MultiSig Signers (3 of 3 required for admin operations)
+| # | Address |
+|---|---------|
+| 1 | `0x38f4B0DcA1d681c18D41543f6D78bd4B08578B11` |
+| 2 | `0xa2AD948278cA7018f8c05e1A995575AeF3B02EAB` |
+| 3 | `0x62E3Ba865c11f911A83E01771105E4edbc4Bf148` |
+
+### Contract Addresses (BNB Testnet - Chain ID 97) - Legacy
 | Contract | Address | Purpose |
 |----------|---------|---------|
 | SignalFriendMarket | `0x5133397a4B9463c5270beBa05b22301e6dD184ca` | Main orchestrator |

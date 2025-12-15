@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 13 December 2025 (v0.18.0 - Configurable Social Links & CI/CD)
+> Last Updated: 15 December 2025 (v0.19.0 - BSC Mainnet Deployment)
 
 ---
 
@@ -589,9 +589,21 @@ setStep('success');
 
 ### Supported Chains
 - **BNB Chain Testnet** (97) - Development
-- **BNB Chain Mainnet** (56) - Production
+- **BNB Chain Mainnet** (56) - Production 🚀 **LIVE**
 
-### Contract Addresses (Testnet)
+### Contract Addresses (BSC Mainnet - Chain ID 56) 🚀 LIVE
+- SignalFriendMarket: `0xaebec2cd5c2db4c0875de215515b3060a7a652fb`
+- PredictorAccessPass: `0x198cd0549a0dba09aa3ab88e0b51ceb8dd335d07`
+- SignalKeyNFT: `0x2a5f920133e584773ef4ac16260c2f954824491f`
+- USDT: `0x55d398326f99059fF775485246999027B3197955` (BSC native USDT)
+- Treasury: `0x76e3363f7aF2e46DFdb4824FA143264E58884e1b`
+
+### MultiSig Signers (Admin Operations)
+- `0x38f4B0DcA1d681c18D41543f6D78bd4B08578B11`
+- `0xa2AD948278cA7018f8c05e1A995575AeF3B02EAB`
+- `0x62E3Ba865c11f911A83E01771105E4edbc4Bf148`
+
+### Contract Addresses (Testnet - Legacy)
 - SignalFriendMarket: `0x5133397a4B9463c5270beBa05b22301e6dD184ca`
 - PredictorAccessPass: `0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4`
 - SignalKeyNFT: `0xfb26Df6101e1a52f9477f52F54b91b99fb016aed`

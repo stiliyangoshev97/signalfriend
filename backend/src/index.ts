@@ -17,6 +17,7 @@ import cookieParser from "cookie-parser";
 import { env } from "./shared/config/env.js";
 import { logger } from "./shared/config/logger.js";
 import { connectDatabase, disconnectDatabase } from "./shared/config/database.js";
+import { runStartupSeeds } from "./shared/services/seedOnStartup.js";
 import { securityMiddleware, corsMiddleware } from "./shared/middleware/security.js";
 import { 
   rateLimiter, 
@@ -145,6 +146,9 @@ async function startServer(): Promise<void> {
   try {
     // Connect to database
     await connectDatabase();
+
+    // Seed essential data if missing (categories, etc.)
+    await runStartupSeeds();
 
     // Start listening
     app.listen(env.PORT, () => {
