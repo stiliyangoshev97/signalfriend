@@ -28,16 +28,16 @@ contract DeployScript is Script {
     // ============================================
 
     // Set to true for testnet (uses MockUSDT), false for mainnet (uses real USDT)
-    bool constant IS_TESTNET = true;
+    bool constant IS_TESTNET = false;
 
     // BNB Chain Mainnet USDT (Binance-Peg BSC-USD)
     address constant MAINNET_USDT = 0x55d398326f99059fF775485246999027B3197955;
 
     // Metadata URIs (can be empty for initial deployment, update via MultiSig later)
     string constant PREDICTOR_METADATA_URI =
-        "ipfs://bafkreicq55af3scx6eixkeegaq75ghjl2odoyw4nfplrqtokv4w5re3u6e";
+        "ipfs://bafkreicawkvcpu2gcr7e7ayhd4x7v73vrm2kge46ejp22a2zv4mwaqxlh4/";
     string constant SIGNAL_KEY_METADATA_URI =
-        "ipfs://bafkreidmq2zqmlkummwzrdwmpau5bgs4xqfy5yu2cmhmfxipqe7cbpdk6e";
+        "ipfs://bafkreicbr7yd7mlepymzwtdpyuwca3utx3qw7kknhfbo5hz4edhnrmjktu/";
 
     // ============================================
     // DEPLOYED CONTRACTS (set after deployment)

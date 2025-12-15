@@ -14,6 +14,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.19.0] - 2025-12-15 🚀 BSC MAINNET DEPLOYMENT
+
+### Added
+
+**BSC Mainnet Smart Contracts**
+- SignalFriend is now live on BSC Mainnet (Chain ID: 56)
+- **SignalFriendMarket**: `0xaebec2cd5c2db4c0875de215515b3060a7a652fb`
+- **PredictorAccessPass**: `0x198cd0549a0dba09aa3ab88e0b51ceb8dd335d07`
+- **SignalKeyNFT**: `0x2a5f920133e584773ef4ac16260c2f954824491f`
+- **USDT Token**: `0x55d398326f99059fF775485246999027B3197955` (BSC native USDT)
+
+**MultiSig Admin Configuration**
+- 3 signers for admin operations (blacklist proposals, etc.)
+
+### Changed
+- Production environment now targets BSC Mainnet
+- Contract addresses configuration updated for mainnet
+- Users can now trade with real USDT on mainnet
+
+### Technical Details
+- Deployment timestamp: 1765823707
+- Block: `0x44701cb`
+
+---
+
 ## [0.18.1] - 2025-12-15 🐛 FIX: MY SIGNALS PAGE QUERY INVALIDATION
 
 ### Fixed
@@ -68,7 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `Dummy.txt` for Vercel preview workflow triggers
 
 **News Page Updates**
-- Updated all dates from 2024 to 2025
+- Updated all dates from 2024 to 5
 - Added referral program announcement ("Earn 5 USDT per referred predictor!")
 - Removed outdated maintenance notice
 
@@ -797,7 +822,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Clear error message: "Only JPG, PNG, and GIF images are allowed (no SVG for security reasons)"
 
 - **Profile Completeness Check**:
-  - Now requires **all 6 fields**: Display Name, Bio, Avatar URL, Twitter/X, Telegram, Discord
+  - Now requires **all 6 fields**: Display Name, Bio, Avatar URL, Twitter, Telegram, Discord
   - Updated banner message to mention all required fields
 
 ### Security

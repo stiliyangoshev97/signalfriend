@@ -2,13 +2,18 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 13, 2025
+Last Updated: December 15, 2025
 
 ================================================================================
 COMPLETED FEATURES ✅
 ================================================================================
 
 [x] Smart contracts deployed on BNB Testnet
+[x] 🚀 Smart contracts deployed on BSC Mainnet (December 15, 2025)
+    - SignalFriendMarket: 0xaebec2cd5c2db4c0875de215515b3060a7a652fb
+    - PredictorAccessPass: 0x198cd0549a0dba09aa3ab88e0b51ceb8dd335d07
+    - SignalKeyNFT: 0x2a5f920133e584773ef4ac16260c2f954824491f
+    - Treasury: 0x76e3363f7aF2e46DFdb4824FA143264E58884e1b
 [x] Backend API with all core features
 [x] Frontend with marketplace, dashboard, profiles
 [x] SIWE authentication

@@ -35,6 +35,7 @@ import {
   SIGNAL_FRIEND_MARKET_ABI,
   PREDICTOR_ACCESS_PASS_ABI,
   ERC20_ABI,
+  env,
 } from '@/shared/config';
 import { predictorKeys } from './usePredictorDashboard';
 import { predictorListKeys } from './usePredictors';
@@ -56,7 +57,7 @@ const USDT_DECIMALS = 18;
  *   // User is already a predictor
  * }
  */
-export function usePredictorNFTBalance(chainId: number = 97) {
+export function usePredictorNFTBalance(chainId: number = env.CHAIN_ID) {
   const { address } = useAccount();
   const addresses = getContractAddresses(chainId);
 
@@ -88,7 +89,7 @@ export function usePredictorNFTBalance(chainId: number = 97) {
  * const { joinFee, joinFeeFormatted } = usePlatformParameters();
  * console.log(`Join fee: ${joinFeeFormatted} USDT`);
  */
-export function usePlatformParameters(chainId: number = 97) {
+export function usePlatformParameters(chainId: number = env.CHAIN_ID) {
   const addresses = getContractAddresses(chainId);
 
   const { data, ...rest } = useReadContract({
@@ -129,7 +130,7 @@ export function usePlatformParameters(chainId: number = 97) {
  * @param chainId - Chain ID to use for contract addresses
  * @returns Current USDT balance in wei and formatted
  */
-export function useUSDTBalanceForPredictor(chainId: number = 97) {
+export function useUSDTBalanceForPredictor(chainId: number = env.CHAIN_ID) {
   const { address } = useAccount();
   const addresses = getContractAddresses(chainId);
 
@@ -160,7 +161,7 @@ export function useUSDTBalanceForPredictor(chainId: number = 97) {
  * @param chainId - Chain ID to use for contract addresses
  * @returns Current allowance in wei and formatted
  */
-export function useUSDTAllowanceForPredictor(chainId: number = 97) {
+export function useUSDTAllowanceForPredictor(chainId: number = env.CHAIN_ID) {
   const { address } = useAccount();
   const addresses = getContractAddresses(chainId);
 
@@ -195,7 +196,7 @@ export function useUSDTAllowanceForPredictor(chainId: number = 97) {
  * const { approve, isApproving, approvalHash } = useApproveUSDTForPredictor();
  * await approve(20); // Approve 20 USDT for join fee
  */
-export function useApproveUSDTForPredictor(chainId: number = 97) {
+export function useApproveUSDTForPredictor(chainId: number = env.CHAIN_ID) {
   const addresses = getContractAddresses(chainId);
   const { writeContractAsync, data: hash, isPending, error, reset } = useWriteContract();
 
@@ -236,7 +237,7 @@ export function useApproveUSDTForPredictor(chainId: number = 97) {
  * await join(); // No referrer
  * await join('0x...'); // With referrer
  */
-export function useJoinAsPredictor(chainId: number = 97) {
+export function useJoinAsPredictor(chainId: number = env.CHAIN_ID) {
   const addresses = getContractAddresses(chainId);
   const queryClient = useQueryClient();
   const { writeContractAsync, data: hash, isPending, error, reset } = useWriteContract();
@@ -288,7 +289,7 @@ export function useJoinAsPredictor(chainId: number = 97) {
  * @param chainId - Chain ID to use for contract addresses
  * @returns Complete state for become-predictor flow
  */
-export function useBecomePredictor(chainId: number = 97) {
+export function useBecomePredictor(chainId: number = env.CHAIN_ID) {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
   

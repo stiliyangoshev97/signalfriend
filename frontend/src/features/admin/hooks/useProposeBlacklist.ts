@@ -15,6 +15,7 @@ import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagm
 import { decodeEventLog } from 'viem';
 import { getContractAddresses } from '@/shared/config/contracts';
 import { PREDICTOR_ACCESS_PASS_ABI } from '@/shared/config/abis';
+import { env } from '@/shared/config/env';
 import { parseWalletError, isUserRejectionError } from '@/shared/utils/walletErrors';
 
 /**
@@ -69,7 +70,7 @@ export interface UseProposeBlacklistState {
  * await proposeUnblacklist('0x456...');
  * ```
  */
-export function useProposeBlacklist(chainId: number = 97) {
+export function useProposeBlacklist(chainId: number = env.CHAIN_ID) {
   const { address } = useAccount();
   const contracts = getContractAddresses(chainId);
   
