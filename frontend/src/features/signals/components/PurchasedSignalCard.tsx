@@ -9,6 +9,7 @@
 
 import { Link } from 'react-router-dom';
 import { format, parseISO, isValid } from 'date-fns';
+import { getExplorerTxUrl } from '@/shared/utils';
 import type { Receipt } from '../api/purchase.api';
 
 /** Props for PurchasedSignalCard component */
@@ -108,7 +109,7 @@ export function PurchasedSignalCard({ receipt }: PurchasedSignalCardProps): Reac
   const signalTitle = receipt.signal?.title || 'Untitled Signal';
   const categoryName = receipt.signal?.category?.name;
   const purchaseDate = formatDate(receipt.purchasedAt);
-  const explorerUrl = `https://testnet.bscscan.com/tx/${receipt.transactionHash}`;
+  const explorerUrl = getExplorerTxUrl(receipt.transactionHash);
 
   return (
     <div className="bg-dark-800 border border-dark-600 rounded-xl p-5 hover:border-fur-light/30 transition-all duration-300">

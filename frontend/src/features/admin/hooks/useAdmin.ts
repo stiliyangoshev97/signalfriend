@@ -213,9 +213,11 @@ export function useUpdateVerification() {
     onSuccess: (_data, { address }) => {
       // Invalidate pending verifications list
       queryClient.invalidateQueries({ queryKey: adminKeys.pendingVerifications() });
-      // Invalidate predictor profile in case they're viewing it
+      // Invalidate predictor profile queries (singular - profile pages)
       queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address) });
       queryClient.invalidateQueries({ queryKey: ['predictor', address] });
+      // Invalidate predictors list queries (plural - list pages)
+      queryClient.invalidateQueries({ queryKey: ['predictors'] });
     },
   });
 }
@@ -229,9 +231,11 @@ export function useManualVerifyPredictor() {
   return useMutation({
     mutationFn: (address: string) => manualVerifyPredictor(address),
     onSuccess: (_data, address) => {
-      // Invalidate predictor profile queries
+      // Invalidate predictor profile queries (singular - profile pages)
       queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address) });
       queryClient.invalidateQueries({ queryKey: ['predictor'] });
+      // Invalidate predictors list queries (plural - list pages)
+      queryClient.invalidateQueries({ queryKey: ['predictors'] });
       queryClient.invalidateQueries({ queryKey: adminKeys.pendingVerifications() });
     },
   });
@@ -246,9 +250,11 @@ export function useUnverifyPredictor() {
   return useMutation({
     mutationFn: (address: string) => unverifyPredictor(address),
     onSuccess: (_data, address) => {
-      // Invalidate predictor profile queries
+      // Invalidate predictor profile queries (singular - profile pages)
       queryClient.invalidateQueries({ queryKey: adminKeys.predictorProfile(address) });
       queryClient.invalidateQueries({ queryKey: ['predictor'] });
+      // Invalidate predictors list queries (plural - list pages)
+      queryClient.invalidateQueries({ queryKey: ['predictors'] });
     },
   });
 }

@@ -4,12 +4,20 @@
  * @description
  * Displays a blacklist dispute for admin review with status management.
  * Disputes are created by blacklisted predictors to appeal their status.
+ * 
+ * IMPORTANT: Resolve & Unblacklist is a MultiSig action requiring 3 signatures.
+ * - This component only creates the PROPOSAL (1st signature)
+ * - The predictor remains blacklisted until all 3 signatures are collected
+ * - Database is updated automatically by webhook when PredictorBlacklisted event fires
+ * - Dispute status is updated to "contacted" to indicate proposal was submitted
  */
 
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { Button, Badge, CopyableAddress } from '@/shared/components/ui';
+import { Button, Badge, CopyableAddress, Modal } from '@/shared/components/ui';
+import { getExplorerTxUrl } from '@/shared/utils';
+import { useProposeBlacklist } from '../hooks/useProposeBlacklist';
 import type { AdminDispute, DisputeStatus } from '../types';
 
 interface DisputeCardProps {
@@ -19,7 +27,6 @@ interface DisputeCardProps {
     status: DisputeStatus,
     adminNotes?: string
   ) => Promise<void>;
-  onResolve: (disputeId: string, adminNotes?: string) => Promise<void>;
   isExpanded?: boolean;
   onToggleExpand?: () => void;
 }
@@ -75,12 +82,15 @@ function ContactIcon({ type }: { type: string }) {
 export function DisputeCard({
   dispute,
   onUpdateStatus,
-  onResolve,
   isExpanded,
   onToggleExpand,
 }: DisputeCardProps) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [adminNotes, setAdminNotes] = useState(dispute.adminNotes);
+  const [showUnblacklistModal, setShowUnblacklistModal] = useState(false);
+  
+  // Smart contract hook for unblacklist
+  const { proposeUnblacklist, state: unblacklistState, reset: resetUnblacklist } = useProposeBlacklist();
 
   const handleStatusUpdate = async (newStatus: DisputeStatus) => {
     setIsUpdating(true);
@@ -91,13 +101,38 @@ export function DisputeCard({
     }
   };
 
-  const handleResolve = async () => {
-    setIsUpdating(true);
+  /**
+   * Handle resolve with smart contract call
+   * 
+   * MultiSig Flow (requires 3 signatures):
+   * 1. Call smart contract to propose unblacklist (1st signature)
+   * 2. Update dispute status to "contacted" to indicate proposal was submitted
+   * 3. Predictor REMAINS BLACKLISTED until 2 more signers approve
+   * 4. When 3rd signer approves, smart contract emits event
+   * 5. Backend webhook updates database (unblacklists predictor, resolves dispute)
+   * 
+   * NOTE: We do NOT call onResolve here because the predictor is not yet unblacklisted.
+   * Instead we update status to "contacted" to track that a proposal was submitted.
+   */
+  const handleResolveWithContract = async () => {
     try {
-      await onResolve(dispute._id, adminNotes);
-    } finally {
-      setIsUpdating(false);
+      // Call smart contract to propose unblacklist (1st of 3 required signatures)
+      await proposeUnblacklist(dispute.predictorAddress);
+      
+      // Update dispute status to "contacted" to indicate proposal was submitted
+      // The dispute will be fully resolved by the webhook when all 3 signatures confirm
+      await onUpdateStatus(dispute._id, 'contacted', adminNotes || 'Unblacklist proposal submitted. Awaiting 2 more MultiSig approvals.');
+      
+      // Show success modal (state is updated by the hook)
+    } catch (error) {
+      // Error is handled by the hook state
+      console.error('Failed to submit unblacklist proposal:', error);
     }
+  };
+
+  const handleCloseModal = () => {
+    setShowUnblacklistModal(false);
+    resetUnblacklist();
   };
 
   const isActive = dispute.status === 'pending' || dispute.status === 'contacted';
@@ -250,7 +285,7 @@ export function DisputeCard({
               <Button
                 size="sm"
                 variant="primary"
-                onClick={handleResolve}
+                onClick={() => setShowUnblacklistModal(true)}
                 isLoading={isUpdating}
               >
                 Resolve & Unblacklist
@@ -287,6 +322,139 @@ export function DisputeCard({
           )}
         </div>
       )}
+
+      {/* Unblacklist Confirmation Modal */}
+      <Modal
+        isOpen={showUnblacklistModal}
+        onClose={handleCloseModal}
+        title="Resolve Dispute & Unblacklist"
+      >
+        <div className="space-y-4">
+          {/* Initial State - Confirmation */}
+          {!unblacklistState.isPending && !unblacklistState.isConfirming && !unblacklistState.isSuccess && !unblacklistState.error && (
+            <>
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                <p className="text-yellow-300 text-sm">
+                  <strong>⚠️ Smart Contract Transaction Required</strong>
+                </p>
+                <p className="text-yellow-300/80 text-sm mt-2">
+                  This will create a MultiSig proposal to unblacklist{' '}
+                  <span className="font-mono text-xs">{dispute.predictor?.displayName || dispute.predictorAddress}</span>.
+                </p>
+                <p className="text-yellow-300/80 text-sm mt-2">
+                  You will need to sign a transaction. After your signature, 2 more admin approvals 
+                  are required on BscScan to execute the unblacklist.
+                </p>
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <Button variant="ghost" onClick={handleCloseModal}>
+                  Cancel
+                </Button>
+                <Button variant="primary" onClick={handleResolveWithContract}>
+                  Sign & Create Proposal
+                </Button>
+              </div>
+            </>
+          )}
+
+          {/* Pending State */}
+          {unblacklistState.isPending && (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500 mx-auto mb-3" />
+              <p className="text-fur-cream">Waiting for wallet signature...</p>
+              <p className="text-gray-main text-sm mt-1">Please confirm in your wallet</p>
+            </div>
+          )}
+
+          {/* Confirming State */}
+          {unblacklistState.isConfirming && (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500 mx-auto mb-3" />
+              <p className="text-fur-cream">Confirming transaction...</p>
+              <p className="text-gray-main text-sm mt-1">Please wait for blockchain confirmation</p>
+            </div>
+          )}
+
+          {/* Success State */}
+          {unblacklistState.isSuccess && unblacklistState.result && (
+            <>
+              <div className="bg-success-500/10 border border-success-500/30 rounded-lg p-4">
+                <p className="text-success-400 font-semibold">
+                  ✅ Proposal Created Successfully!
+                </p>
+                <p className="text-success-300/80 text-sm mt-2">
+                  Unblacklist proposal submitted. The predictor <strong>remains blacklisted</strong> until 2 more MultiSig signers approve on BscScan.
+                </p>
+              </div>
+
+              <div className="bg-dark-700 rounded-lg p-4 space-y-3">
+                <div>
+                  <p className="text-xs text-fur-cream/50 mb-1">Transaction Hash</p>
+                  <a
+                    href={getExplorerTxUrl(unblacklistState.result.transactionHash)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-brand-200 hover:underline break-all"
+                  >
+                    {unblacklistState.result.transactionHash}
+                  </a>
+                </div>
+                {unblacklistState.result.actionId && (
+                  <div>
+                    <p className="text-xs text-fur-cream/50 mb-1">Action ID (for approvals)</p>
+                    <p className="text-sm text-fur-cream/80 break-all font-mono">
+                      {unblacklistState.result.actionId}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                <p className="text-blue-300 text-sm">
+                  <strong>Next Steps:</strong>
+                </p>
+                <ol className="text-blue-300/80 text-sm mt-2 list-decimal list-inside space-y-1">
+                  <li>Go to BscScan and find the PredictorAccessPass contract</li>
+                  <li>Two more admin signers must call <code className="bg-dark-700 px-1 rounded">approveAction({unblacklistState.result.actionId || 'actionId'})</code></li>
+                  <li>After 3/3 approvals, the predictor will be unblacklisted on-chain</li>
+                </ol>
+              </div>
+
+              <div className="flex justify-end">
+                <Button variant="primary" onClick={handleCloseModal}>
+                  Done
+                </Button>
+              </div>
+            </>
+          )}
+
+          {/* Error State */}
+          {unblacklistState.error && (
+            <>
+              <div className="bg-error-500/10 border border-error-500/30 rounded-lg p-4">
+                <p className="text-error-400 font-semibold">
+                  {unblacklistState.isUserRejection ? '❌ Transaction Rejected' : '❌ Transaction Failed'}
+                </p>
+                <p className="text-error-300/80 text-sm mt-2">
+                  {unblacklistState.error}
+                </p>
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <Button variant="ghost" onClick={handleCloseModal}>
+                  Cancel
+                </Button>
+                <Button variant="primary" onClick={() => {
+                  resetUnblacklist();
+                }}>
+                  Try Again
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }

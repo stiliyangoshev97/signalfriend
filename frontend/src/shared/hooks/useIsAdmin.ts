@@ -49,6 +49,7 @@ import { useAccount } from 'wagmi';
 
 /**
  * Admin addresses for off-chain operations.
+ * Read from VITE_ADMIN_ADDRESSES environment variable.
  * These must match ADMIN_ADDRESSES in the backend .env
  * 
  * Admin privileges (off-chain only):
@@ -58,13 +59,18 @@ import { useAccount } from 'wagmi';
  * 
  * Note: On-chain operations (blacklisting) require MultiSig wallet signatures
  * on the smart contract - these admin addresses alone cannot blacklist.
+ * 
+ * SECURITY NOTE:
+ * Exposing admin addresses in the frontend is NOT a security risk because:
+ * 1. This hook is purely for UX (showing/hiding admin UI elements)
+ * 2. All actual admin operations are validated server-side
+ * 3. These addresses are already public on-chain as MultiSig signers
+ * 4. On-chain operations require cryptographic signatures
  */
-const ADMIN_ADDRESSES = [
-  '0x4Cca77ba15B0D85d7B733E0838a429E7bEF42DD2', // Admin 1 (MultiSig Signer)
-  '0xC119B9152afcC5f40C019aABd78A312d37C63926', // Admin 2 (MultiSig Signer)
-  '0x6499fe8016cE2C2d3a21d08c3016345Edf3467F1', // Admin 3 (MultiSig Signer)
-  // Add new admins below (they can handle reports/disputes but NOT blacklist)
-].map((addr) => addr.toLowerCase());
+const ADMIN_ADDRESSES = (import.meta.env.VITE_ADMIN_ADDRESSES || '')
+  .split(',')
+  .map((addr: string) => addr.trim().toLowerCase())
+  .filter((addr: string) => addr.length > 0);
 
 export function useIsAdmin(): boolean {
   const { address, isConnected } = useAccount();
