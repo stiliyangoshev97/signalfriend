@@ -12,7 +12,7 @@ import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useChainId } from 'wagmi';
 import { Avatar, Badge, Button, CopyableAddress, Modal } from '@/shared/components/ui';
-import { formatAddress } from '@/shared/utils/format';
+import { formatAddress, getExplorerTxUrl } from '@/shared/utils';
 import { FilterPanel, SignalGrid, Pagination } from '@/features/signals/components';
 import { useCategories, useMyPurchasedContentIds } from '@/features/signals/hooks';
 import { useAuthStore } from '@/features/auth';
@@ -797,7 +797,7 @@ export function PredictorProfilePage(): React.ReactElement {
                 <div>
                   <p className="text-xs text-fur-cream/50 mb-1">Transaction Hash</p>
                   <a
-                    href={`https://testnet.bscscan.com/tx/${blacklistProposalSuccess.txHash}`}
+                    href={getExplorerTxUrl(blacklistProposalSuccess.txHash)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-brand-200 hover:underline break-all"

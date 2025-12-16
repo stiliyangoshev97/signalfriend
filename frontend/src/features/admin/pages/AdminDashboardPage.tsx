@@ -18,9 +18,7 @@ import {
   useBlacklistedPredictors,
   useUpdateReport,
   useUpdateDispute,
-  useResolveDispute,
   useUpdateVerification,
-  useUnblacklistPredictor,
 } from '../hooks';
 import {
   AdminStatsCard,
@@ -77,9 +75,7 @@ export function AdminDashboardPage() {
   // Mutation hooks
   const updateReport = useUpdateReport();
   const updateDispute = useUpdateDispute();
-  const resolveDispute = useResolveDispute();
   const updateVerification = useUpdateVerification();
-  const unblacklistPredictor = useUnblacklistPredictor();
 
   // Tab configuration with counts
   const tabs: Tab[] = [
@@ -105,13 +101,6 @@ export function AdminDashboardPage() {
     [updateDispute]
   );
 
-  const handleDisputeResolve = useCallback(
-    async (disputeId: string, adminNotes?: string) => {
-      await resolveDispute.mutateAsync({ disputeId, adminNotes });
-    },
-    [resolveDispute]
-  );
-
   const handleApproveVerification = useCallback(
     async (address: string) => {
       await updateVerification.mutateAsync({ address, approved: true });
@@ -124,13 +113,6 @@ export function AdminDashboardPage() {
       await updateVerification.mutateAsync({ address, approved: false });
     },
     [updateVerification]
-  );
-
-  const handleUnblacklist = useCallback(
-    async (address: string) => {
-      await unblacklistPredictor.mutateAsync(address);
-    },
-    [unblacklistPredictor]
   );
 
   return (
@@ -352,7 +334,6 @@ export function AdminDashboardPage() {
                     key={dispute._id}
                     dispute={dispute}
                     onUpdateStatus={handleDisputeStatusUpdate}
-                    onResolve={handleDisputeResolve}
                     isExpanded={expandedDisputeId === dispute._id}
                     onToggleExpand={() =>
                       setExpandedDisputeId(
@@ -415,8 +396,6 @@ export function AdminDashboardPage() {
                 <BlacklistedPredictorCard
                   key={predictor._id}
                   predictor={predictor}
-                  onUnblacklist={handleUnblacklist}
-                  isProcessing={unblacklistPredictor.isPending}
                 />
               ))
             )}

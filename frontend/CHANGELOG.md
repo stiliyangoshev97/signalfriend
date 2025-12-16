@@ -14,6 +14,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.20.0] - 2025-12-16 🐛 BUG FIXES & IMPROVEMENTS
+
+### Added
+
+**Dynamic Explorer URLs**
+- New `src/shared/utils/explorer.ts` with chain-aware URL generation
+- `getExplorerTxUrl(txHash)` - Transaction URL for mainnet/testnet
+- `getExplorerAddressUrl(address)` - Address URL for mainnet/testnet
+- `getExplorerTokenUrl(tokenAddress)` - Token URL for mainnet/testnet
+- URLs automatically switch based on `VITE_CHAIN_ID` (56=mainnet, 97=testnet)
+
+**Admin Addresses from Environment**
+- Admin addresses now read from `VITE_ADMIN_ADDRESSES` environment variable
+- Easier to switch between testnet and mainnet admin wallets
+- Updated `useIsAdmin.ts` hook to parse env variable
+
+**Dispute Resolution Smart Contract Integration**
+- "Resolve & Unblacklist" button in admin disputes tab now calls smart contract
+- Creates MultiSig proposal for on-chain unblacklist (1st of 3 required signatures)
+- Predictor **remains blacklisted** until all 3 signatures collected
+- Database updated automatically by backend webhook when smart contract event fires
+- Dispute status changed to "contacted" to indicate proposal was submitted
+- New confirmation modal with transaction status, hash, Action ID, and next steps
+
+**Blacklisted Tab Smart Contract Integration**
+- "Unblacklist" button in admin blacklisted tab now calls smart contract
+- Rewrote `BlacklistedPredictorCard.tsx` with full smart contract flow
+- Creates MultiSig proposal (1st signature), predictor **remains blacklisted**
+- No immediate database update - waits for webhook after all 3 signatures
+- Confirmation modal with MultiSig explanation and transaction status
+- Shows transaction hash and Action ID for other signers to approve
+
+### Fixed
+
+**Hardcoded Testnet Explorer URLs**
+- Fixed `PredictorProfilePage.tsx` - blacklist success modal was linking to testnet
+- Fixed `PurchasedSignalCard.tsx` - receipt transaction was linking to testnet
+- Both now use dynamic `getExplorerTxUrl()` based on chain ID
+
+**Dispute Resolution Database-Only Bug**
+- Previously, resolving a dispute updated the database immediately after 1st signature
+- This caused predictor to appear unblacklisted before all 3 MultiSig signatures
+- Now only submits proposal to smart contract (1st signature)
+- Dispute status changed to "contacted" instead of "resolved"
+- Database only updated when backend webhook receives `PredictorBlacklisted` event after 3rd signature
+
+**Blacklisted Tab Database-Only Bug**
+- Previously, unblacklisting updated database immediately after 1st signature
+- Predictor incorrectly appeared unblacklisted in UI before MultiSig completion
+- Now only submits proposal to smart contract
+- Predictor remains in blacklist until all 3 signatures collected
+- Database update handled by backend webhook for proper state synchronization
+
+**Predictor Verification Cache Invalidation**
+- Fixed: Verifying/unverifying predictor from profile didn't update Predictors list
+- `useManualVerifyPredictor` and `useUnverifyPredictor` hooks now invalidate `['predictors']`
+- Previously only invalidated `['predictor']` (singular) which didn't match list query key
+
+### Changed
+- Updated `.env.example` with `VITE_ADMIN_ADDRESSES` configuration
+- `DisputeCard` component now includes smart contract integration
+- `BlacklistedPredictorCard` component fully rewritten with smart contract integration
+- Better documentation in `useIsAdmin.ts` explaining security model
+
+---
+
 ## [0.19.0] - 2025-12-15 🚀 BSC MAINNET DEPLOYMENT
 
 ### Added
