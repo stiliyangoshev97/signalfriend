@@ -9,12 +9,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### In Progress
+- Production deployment to Render (v0.30.0)
+
 ### Planned
 - Docker configuration
 - Redis-based rate limiting for horizontal scaling
 
 ### Note
 - Admin blacklist via smart contract integration is now handled entirely on the frontend (v0.11.0), calling `proposeBlacklist()` directly on the PredictorAccessPass smart contract
+
+---
+
+## [0.30.0] - 2025-12-17 📦 PRODUCTION DEPLOYMENT PREPARATION
+
+### Added
+
+**Deployment Documentation**
+- Created comprehensive `DEPLOYMENT_RENDER.md` guide
+  - Step-by-step Render setup instructions
+  - Environment variables configuration
+  - Custom domain setup with Cloudflare
+  - Alchemy webhook configuration
+  - Testing and troubleshooting guides
+  - Cost estimation and scaling recommendations
+
+**Production Readiness**
+- All environment variables documented for production
+- MongoDB Atlas integration guide ready
+- Rate limiting verified for production workload
+- Security checklist completed
+- Webhook signature validation enforced in production
+
+### Notes
+- Backend is production-ready for Render deployment
+- 290 tests passing ✅
+- Security score: 93/100 ✅
+- CI/CD pipeline active ✅
 
 ---
 

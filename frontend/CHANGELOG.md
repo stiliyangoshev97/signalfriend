@@ -9,8 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### In Progress
+- Production deployment to Vercel (v0.21.0)
+
 ### Planned
 - Signal outcome tracking
+
+---
+
+## [0.21.0] - 2025-12-17 📦 PRODUCTION DEPLOYMENT PREPARATION
+
+### Added
+
+**Deployment Documentation**
+- Created comprehensive `DEPLOYMENT_VERCEL.md` guide
+  - Step-by-step Vercel setup instructions
+  - Environment variables configuration for production
+  - Custom domain setup with Cloudflare
+  - SSL/TLS configuration guide
+  - Testing and troubleshooting guides
+  - WalletConnect Project ID setup
+  - Sentry integration guide
+  - Performance optimization checklist
+
+**Production Readiness**
+- All environment variables documented for BSC Mainnet
+- Custom domain configuration ready
+- Security headers configured in `vercel.json`
+- Mobile responsive testing guide
+- Post-deployment testing checklist
+
+### Notes
+- Frontend is production-ready for Vercel deployment
+- All features complete ✅
+- SEO & meta tags configured ✅
+- Mobile responsive ✅
 
 ---
 
