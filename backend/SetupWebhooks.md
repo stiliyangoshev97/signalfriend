@@ -18,10 +18,12 @@ The backend uses Alchemy webhooks to listen for blockchain events and sync them 
 
 ### Contracts to Monitor
 
-| Contract | Testnet Address (Chain ID 97) |
-|----------|-------------------------------|
-| SignalFriendMarket | `0x5133397a4B9463c5270beBa05b22301e6dD184ca` |
-| PredictorAccessPass | `0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4` |
+| Environment | Contract | Address |
+|-------------|----------|---------|
+| **Mainnet (Chain ID 56)** | SignalFriendMarket | `0xaebec2cd5c2db4c0875de215515b3060a7a652fb` |
+| **Mainnet (Chain ID 56)** | PredictorAccessPass | `0x198cd0549a0dba09aa3ab88e0b51ceb8dd335d07` |
+| **Testnet (Chain ID 97)** | SignalFriendMarket | `0x5133397a4B9463c5270beBa05b22301e6dD184ca` |
+| **Testnet (Chain ID 97)** | PredictorAccessPass | `0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4` |
 
 > ⚠️ **Note:** We do NOT need to monitor SignalKeyNFT - the `SignalPurchased` event from SignalFriendMarket contains all the data we need.
 
@@ -52,12 +54,57 @@ The backend uses Alchemy webhooks to listen for blockchain events and sync them 
 3. Select **"Custom Webhook"** (this uses GraphQL)
 4. Configure:
    - **Chain**: BNB Smart Chain
-   - **Network**: BNB Smart Chain Testnet
-   - **Webhook URL**: Your backend endpoint (e.g., `https://your-ngrok-url.ngrok-free.dev/api/webhooks/alchemy`)
+   - **Network**: BNB Smart Chain Mainnet (for production) or Testnet (for testing)
+   - **Webhook URL**: 
+     - **Production**: `https://api.signalfriend.com/api/webhooks/alchemy`
+     - **Development**: Your ngrok URL (e.g., `https://your-ngrok-url.ngrok-free.dev/api/webhooks/alchemy`)
 
 ### Step 4: Configure GraphQL Query
 
-**This is the exact GraphQL query we use (copy-paste ready):**
+**For BSC Mainnet (Production) - Use these contract addresses:**
+
+```graphql
+{
+  block {
+    hash,
+    number,
+    timestamp,
+    logs(filter: {addresses: ["0xaebec2cd5c2db4c0875de215515b3060a7a652fb", "0x198cd0549a0dba09aa3ab88e0b51ceb8dd335d07"]}) { 
+      data,
+      topics,
+      index,
+      account {
+        address
+      },
+      transaction {
+        hash,
+        nonce,
+        index,
+        from {
+          address
+        },
+        to {
+          address
+        },
+        value,
+        gasPrice,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        gas,
+        status,
+        gasUsed,
+        cumulativeGasUsed,
+        effectiveGasPrice,
+        createdContract {
+          address
+        }
+      }
+    }
+  }
+}
+```
+
+**For BSC Testnet (Development) - Use these contract addresses:**
 
 ```graphql
 {
@@ -114,11 +161,17 @@ The backend uses Alchemy webhooks to listen for blockchain events and sync them 
 | `transaction.from.address` | Who initiated the transaction |
 | `transaction.status` | Success/failure status |
 
-**Contract Addresses (Testnet):**
+**Contract Addresses:**
+
+**BSC Mainnet (Production - Chain ID 56):**
+- `0xaebec2cd5c2db4c0875de215515b3060a7a652fb` - SignalFriendMarket (PredictorJoined, SignalPurchased)
+- `0x198cd0549a0dba09aa3ab88e0b51ceb8dd335d07` - PredictorAccessPass (PredictorBlacklisted)
+
+**BSC Testnet (Development - Chain ID 97):**
 - `0x5133397a4B9463c5270beBa05b22301e6dD184ca` - SignalFriendMarket (PredictorJoined, SignalPurchased)
 - `0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4` - PredictorAccessPass (PredictorBlacklisted)
 
-> ⚠️ **For Mainnet:** Replace these addresses with your mainnet contract addresses.
+> ⚠️ **Important:** Use the correct addresses for your environment (mainnet vs testnet).
 
 ### Step 5: Copy the Signing Key
 
@@ -194,7 +247,16 @@ Our backend handles this structure in `webhook.service.ts` → `processGraphqlWe
 
 Your webhook endpoint is: `/api/webhooks/alchemy`
 
-### Option A: Local Development with ngrok (Recommended for Testing)
+### Option A: Production (Recommended)
+
+**Use this URL for your production Alchemy webhook:**
+```
+https://api.signalfriend.com/api/webhooks/alchemy
+```
+
+✅ This points to your Render backend with custom domain.
+
+### Option B: Local Development with ngrok (For Testing)
 
 1. Install ngrok:
    ```bash
