@@ -3,6 +3,23 @@
 > Express + MongoDB + Viem backend API for the SignalFriend platform.  
 > **Version:** 0.24.0 | **Last Updated:** December 2025
 
+## 🌐 Production
+
+| Service | URL |
+|---------|-----|
+| **API Base** | https://api.signalfriend.com |
+| **Health Check** | https://api.signalfriend.com/health |
+
+**Infrastructure:**
+- **Hosting:** Render (Starter Plan, $7/month)
+- **Database:** MongoDB Atlas (M0 Free Tier)
+- **Region:** Frankfurt (EU Central)
+
+**Deployment:**
+- Auto-deploys from `main` branch on push
+- Build: `npm ci && npm run build`
+- Start: `npm start`
+
 ## Tech Stack
 
 - **Runtime**: Node.js 20+

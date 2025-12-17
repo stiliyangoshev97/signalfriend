@@ -1,7 +1,25 @@
 # 📱 SignalFriend Frontend
 
 > React + TypeScript + Vite frontend for the SignalFriend Web3 Signal Marketplace.  
-> **Version:** 0.12.0 | **Last Updated:** December 2025
+> **Version:** 0.17.0 | **Last Updated:** December 2025
+
+## 🌐 Production
+
+| Service | URL |
+|---------|-----|
+| **Live Site** | https://signalfriend.com |
+| **WWW (Redirect)** | https://www.signalfriend.com |
+| **Vercel Preview** | https://signalfriend.vercel.app |
+
+**Infrastructure:**
+- **Hosting:** Vercel (Pro Trial, then $20/month)
+- **CDN:** Vercel Edge Network
+- **DNS/SSL:** Cloudflare
+
+**Deployment:**
+- Auto-deploys from `main` branch on push
+- Build: `npm run build`
+- Output: `dist` directory
 
 ---
 

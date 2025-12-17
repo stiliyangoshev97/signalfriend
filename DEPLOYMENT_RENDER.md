@@ -137,9 +137,12 @@ Server listening on port 10000
 ### 6. Get Your Backend URL
 
 Once deployed, your backend will be available at:
-```
-https://signalfriend-backend.onrender.com
-```
+
+| Environment | URL |
+|-------------|-----|
+| **Production** | `https://signalfriend-backend.onrender.com` |
+| **Health Check** | `https://signalfriend-backend.onrender.com/health` |
+| **API Base** | `https://signalfriend-backend.onrender.com/api` |
 
 Or if you set a custom domain:
 ```
