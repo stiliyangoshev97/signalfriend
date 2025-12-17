@@ -4,6 +4,24 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![BNB Chain](https://img.shields.io/badge/Chain-BNB-F0B90B)](https://www.bnbchain.org/)
+[![Production](https://img.shields.io/badge/Status-LIVE-brightgreen)](https://signalfriend.com)
+
+---
+
+## 🌐 Production URLs
+
+| Service | URL | Status |
+|---------|-----|--------|
+| **Frontend** | https://signalfriend.com | ✅ Live |
+| **Backend API** | https://api.signalfriend.com | ✅ Live |
+| **Health Check** | https://api.signalfriend.com/health | ✅ Online |
+
+**BSC Mainnet Smart Contracts:**
+| Contract | Address |
+|----------|---------|
+| SignalFriendMarket | `0xaebec2cd5c2db4c0875de215515b3060a7a652fb` |
+| PredictorAccessPass | `0x198cd0549a0dba09aa3ab88e0b51ceb8dd335d07` |
+| SignalKeyNFT | `0x2a5f920133e584773ef4ac16260c2f954824491f` |
 
 ---
 
