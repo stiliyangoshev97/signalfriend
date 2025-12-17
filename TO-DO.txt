@@ -2,7 +2,7 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 15, 2025
+Last Updated: December 18, 2025
 
 ================================================================================
 COMPLETED FEATURES ✅
@@ -32,6 +32,18 @@ COMPLETED FEATURES ✅
 [x] Verification reapplication progress tracking (December 12, 2025)
 [x] Security audit + CI/CD pipeline (December 13, 2025)
 [x] Configurable social links via environment variables (December 13, 2025)
+[x] 🔧 Production SPA routing fix (December 18, 2025) - vercel.json rewrites
+
+================================================================================
+PHASE 13: PRODUCTION BUG FIXES ✅ COMPLETE (December 18, 2025)
+================================================================================
+
+[x] #1 Fix 404 errors on page refresh/direct navigation in production
+    - Root cause: Vercel server didn't know to serve index.html for client-side routes
+    - Solution: Added rewrites configuration to vercel.json
+    - Impact: All routes (/signals, /predictors, etc.) now work on refresh
+    - Configuration: "/(.*)" → "/index.html" rewrite rule
+    - Documentation: Updated frontend README.md with deployment section
 
 ================================================================================
 PHASE 3: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)

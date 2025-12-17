@@ -9,11 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### In Progress
-- Production deployment to Vercel (v0.21.0)
-
 ### Planned
 - Signal outcome tracking
+
+---
+
+## [0.22.0] - 2025-12-18 🔧 PRODUCTION FIX - SPA ROUTING
+
+### Fixed
+
+**404 Errors on Page Refresh**
+- Added `rewrites` configuration to `vercel.json` to fix SPA routing
+- Issue: Direct navigation or page refresh on routes like `/signals`, `/predictors` returned 404
+- Root cause: Vercel server didn't know to serve `index.html` for client-side routes
+- Solution: Added rewrite rule `"/(.*)" → "/index.html"` to let React Router handle all routing
+- All routes now work correctly on refresh or direct URL access
+
+**Technical Details**
+```json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
+
+### Notes
+- This is a critical production fix for SPA (Single Page Application) routing
+- Security headers remain unchanged (X-Content-Type-Options, X-Frame-Options, etc.)
 
 ---
 

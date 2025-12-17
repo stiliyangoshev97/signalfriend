@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 16 December 2025 (v0.20.0 - Bug Fixes & Improvements)
+> Last Updated: 18 December 2025 (v0.22.0 - Production SPA Routing Fix)
 
 ---
 

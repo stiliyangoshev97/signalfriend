@@ -2,8 +2,22 @@
                         SIGNALFRIEND FRONTEND TO-DO LIST
 ================================================================================
 
-Last Updated: 2025-12-17
-Current Version: v0.17.0 (Production Deployment)
+Last Updated: 2025-12-18
+Current Version: v0.22.0 (Production SPA Routing Fix)
+
+================================================================================
+PHASE 8: PRODUCTION BUG FIXES ✅ COMPLETE (December 18, 2025)
+================================================================================
+
+[✅] Fix 404 Errors on Page Refresh/Direct Navigation
+    - Issue: Refreshing or directly accessing routes like /signals, /predictors returned 404
+    - Root cause: Vercel server didn't serve index.html for client-side routes
+    - Solution: Added rewrites configuration to vercel.json
+    - Configuration: { "source": "/(.*)", "destination": "/index.html" }
+    - Impact: All routes now work correctly on refresh and direct URL access
+    - Documentation: Added deployment section to README.md
+    - Updated CHANGELOG.md with v0.22.0 entry
+    - Updated PROJECT_CONTEXT.md header date
 
 ================================================================================
 PHASE 7: IMPROVEMENTS & AUDITS ✅ COMPLETE (December 13, 2025)
