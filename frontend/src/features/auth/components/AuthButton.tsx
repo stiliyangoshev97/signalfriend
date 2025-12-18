@@ -173,11 +173,11 @@ export function AuthButton() {
 
   // Fully authenticated - show user info with logout
   return (
-    <div className="flex items-center gap-3">
-      {/* Admin wallet indicator */}
+    <div className="flex items-center gap-1.5 sm:gap-3">
+      {/* Admin wallet indicator - hidden on mobile to save space */}
       {isAdmin && (
         <span 
-          className="px-2 py-1 text-xs font-medium bg-fur-main/20 text-fur-main border border-fur-main/30 rounded-lg"
+          className="hidden sm:inline px-2 py-1 text-xs font-medium bg-fur-main/20 text-fur-main border border-fur-main/30 rounded-lg"
           title="Connected with admin wallet"
         >
           🔐 Admin
@@ -187,30 +187,30 @@ export function AuthButton() {
       {/* User avatar/address via RainbowKit for wallet management */}
       <ConnectButton.Custom>
         {({ account, chain, openAccountModal, openChainModal }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Chain indicator */}
             {chain && (
               <button
                 onClick={openChainModal}
-                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
+                className="flex items-center gap-1 p-1.5 sm:px-2 sm:py-1.5 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
               >
                 {chain.hasIcon && chain.iconUrl && (
                   <img
                     src={chain.iconUrl}
                     alt={chain.name ?? 'Chain icon'}
-                    className="w-5 h-5 md:w-4 md:h-4"
+                    className="w-5 h-5"
                   />
                 )}
               </button>
             )}
             
-            {/* Account button */}
+            {/* Account button - show only icon on mobile */}
             <button
               onClick={openAccountModal}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
+              className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
             >
               {account?.displayName && (
-                <span className="text-sm text-fur-cream">
+                <span className="text-xs sm:text-sm text-fur-cream max-w-[60px] sm:max-w-none truncate">
                   {account.displayName}
                 </span>
               )}
@@ -219,13 +219,18 @@ export function AuthButton() {
         )}
       </ConnectButton.Custom>
       
-      {/* Sign Out button */}
+      {/* Sign Out button - icon only on mobile */}
       <Button
         onClick={logout}
         variant="ghost"
         size="sm"
+        className="px-2 sm:px-3"
+        title="Sign Out"
       >
-        Sign Out
+        <span className="hidden sm:inline">Sign Out</span>
+        <svg className="w-4 h-4 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
       </Button>
     </div>
   );
