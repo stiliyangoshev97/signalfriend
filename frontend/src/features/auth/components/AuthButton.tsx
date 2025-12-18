@@ -173,7 +173,7 @@ export function AuthButton() {
 
   // Fully authenticated - show user info with logout
   return (
-    <div className="flex items-center gap-1 sm:gap-3">
+    <div className="flex items-center gap-1 sm:gap-2">
       {/* Admin wallet indicator - hidden on mobile to save space */}
       {isAdmin && (
         <span 
@@ -188,17 +188,17 @@ export function AuthButton() {
       <ConnectButton.Custom>
         {({ account, chain, openAccountModal, openChainModal }) => (
           <div className="flex items-center gap-1 sm:gap-2">
-            {/* Chain indicator - hidden on mobile */}
+            {/* Chain indicator */}
             {chain && (
               <button
                 onClick={openChainModal}
-                className="hidden sm:flex items-center gap-1 px-2 py-1.5 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
+                className="flex items-center p-1 sm:px-2 sm:py-1.5 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
               >
                 {chain.hasIcon && chain.iconUrl && (
                   <img
                     src={chain.iconUrl}
                     alt={chain.name ?? 'Chain icon'}
-                    className="w-4 h-4"
+                    className="w-4 h-4 sm:w-5 sm:h-5"
                   />
                 )}
               </button>
@@ -207,7 +207,7 @@ export function AuthButton() {
             {/* Account button */}
             <button
               onClick={openAccountModal}
-              className="flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
+              className="flex items-center px-1.5 py-1 sm:px-3 sm:py-2 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
             >
               {account?.displayName && (
                 <span className="text-xs sm:text-sm text-fur-cream">
@@ -224,7 +224,7 @@ export function AuthButton() {
         onClick={logout}
         variant="ghost"
         size="sm"
-        className="px-1.5 sm:px-3"
+        className="px-1 sm:px-3"
         title="Sign Out"
       >
         <span className="hidden sm:inline">Sign Out</span>
