@@ -127,10 +127,8 @@ export function Header() {
 
           {/* Right side: Auth Button + Mobile Menu Toggle */}
           <div className="flex items-center gap-2 md:gap-4">
-            {/* Auth Button - smaller on mobile */}
-            <div className="scale-90 md:scale-100 origin-right">
-              <AuthButton />
-            </div>
+            {/* Auth Button */}
+            <AuthButton />
 
             {/* Mobile Hamburger Button */}
             <button

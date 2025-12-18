@@ -38,6 +38,29 @@ interface NewsItem {
  */
 const newsItems: NewsItem[] = [
   {
+    id: 'production-launch-2025-12',
+    title: '🚀 SignalFriend is Now LIVE on BNB Chain Mainnet!',
+    date: '2025-12-18',
+    category: 'general',
+    summary: 'We\'re officially live! SignalFriend has launched on BNB Chain mainnet. Start trading signals today!',
+    content: [
+      'We\'re thrilled to announce that SignalFriend is now officially LIVE on BNB Chain mainnet! 🎉',
+      'After extensive testing and community feedback during our beta phase, we\'re ready to bring decentralized signal trading to everyone.',
+      'What\'s new in production:',
+      '• Full mainnet deployment on BNB Chain (Chain ID: 56)',
+      '• Real USDT payments for signal purchases',
+      '• Secure smart contracts audited and battle-tested',
+      '• All your favorite features now on mainnet',
+      'Getting started:',
+      '• Connect your wallet to BNB Chain mainnet',
+      '• Browse signals from verified predictors',
+      '• Purchase signals with USDT and receive your SignalKey NFT',
+      '• Become a predictor and start earning!',
+      'Thank you to our amazing community of early testers who helped us get here. Your feedback has been invaluable in shaping SignalFriend into what it is today.',
+      'Welcome to the future of decentralized signal trading! 🦊',
+    ],
+  },
+  {
     id: 'referral-program-2025-01',
     title: '🎁 Referral Program Now Live!',
     date: '2025-01-15',

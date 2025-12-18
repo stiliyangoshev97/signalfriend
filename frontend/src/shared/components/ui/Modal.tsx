@@ -172,8 +172,8 @@ export function Modal({
         aria-hidden="true"
       />
 
-      {/* Modal container - centered */}
-      <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto overscroll-contain">
+      {/* Modal container - centered, NO scroll on this container */}
+      <div className="fixed inset-0 flex items-center justify-center p-4 overflow-hidden">
         <div
           className={cn(
             'relative w-full bg-dark-800 border border-dark-700 rounded-xl shadow-2xl',
@@ -183,6 +183,7 @@ export function Modal({
           role="dialog"
           aria-modal="true"
           aria-labelledby={title ? 'modal-title' : undefined}
+          onClick={(e) => e.stopPropagation()} // Prevent clicks inside modal from closing it
         >
           {/* Header (optional) */}
           {(title || description) && (

@@ -135,7 +135,7 @@ export function SignalsPage(): React.ReactElement {
             Signal Marketplace
           </h1>
           <p className="text-fur-cream/60 max-w-2xl">
-            Browse trading signals sorted by rating, sales, and verified status. 
+            Browse trading signals sorted by rating and sales. 
             All purchases are secured by smart contracts on BNB Chain.
           </p>
         </div>
