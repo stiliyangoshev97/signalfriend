@@ -196,7 +196,7 @@ export function SignalCard({ signal, isPurchased = false }: SignalCardProps): Re
             <span className="text-sm text-fur-cream/80 truncate">
               {signal.predictor.displayName || (predictorAddress ? `${predictorAddress.slice(0, 6)}...${predictorAddress.slice(-4)}` : 'Unknown')}
             </span>
-            {signal.predictor.verificationStatus === 'verified' && (
+            {signal.predictor.isVerified && (
               <svg className="w-4 h-4 text-fur-light flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
