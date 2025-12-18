@@ -3,6 +3,7 @@
  *
  * Defines all routes for the SignalFriend application using React Router v6.
  * Routes are organized into public, authenticated, predictor, and admin sections.
+ * Updated: Dec 18, 2025
  *
  * @module router
  *
@@ -56,6 +57,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { lazy } from 'react';
 import RootLayout from './RootLayout';
 import { ProtectedRoute, AdminRoute, PredictorRoute } from './guards';
+import { ChunkErrorBoundary } from '@/shared/components/ChunkErrorBoundary';
 
 // Lazy load pages for code splitting
 // Public pages (most visited, load immediately for SEO)
@@ -87,6 +89,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <RootLayout />,
+    errorElement: <ChunkErrorBoundary />,
     children: [
       // ===== PUBLIC ROUTES =====
       {

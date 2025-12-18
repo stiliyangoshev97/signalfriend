@@ -1,0 +1,34 @@
+# SignalFriend Backend - Render Deployment Trigger File
+# ============================================================================
+# 
+# PURPOSE:
+# This file is used to trigger Render deployments in a monorepo setup.
+# Since SignalFriend uses a monorepo (frontend + backend in same repo), Render
+# may not always detect changes that require a new deployment, especially when
+# only frontend changes are made but you need to verify backend connectivity.
+#
+# HOW TO USE:
+# 1. When you push frontend changes to Vercel and need a corresponding backend
+#    deployment to test the full stack together, simply update this file.
+# 2. Add a new entry below with the date and reason for the trigger.
+# 3. Commit and push to trigger Render's auto-deploy.
+#
+# WHY THIS FILE?
+# - Render watches the /backend folder for changes
+# - When testing frontend + backend integration, both need fresh deploys
+# - This avoids making unnecessary code changes just to trigger a deployment
+# - Acts as a deployment log for tracking when manual triggers were needed
+#
+# ALTERNATIVE METHODS:
+# - Use Render Dashboard to manually trigger "Manual Deploy"
+# - Make a real change to any backend file
+# - Use deploy hooks (requires Render paid plan features)
+#
+# ============================================================================
+# DEPLOYMENT TRIGGER LOG:
+# ============================================================================
+#
+# [Date] - [Reason]
+# -------------------
+# 2025-12-18 - Initial creation of trigger file for monorepo deployments
+#
