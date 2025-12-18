@@ -126,7 +126,7 @@ export function Header() {
           </nav>
 
           {/* Right side: Auth Button + Mobile Menu Toggle */}
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-0 md:gap-4">
             {/* Auth Button */}
             <AuthButton />
 

@@ -224,7 +224,7 @@ export function AuthButton() {
         onClick={logout}
         variant="ghost"
         size="sm"
-        className="px-1 sm:px-3"
+        className="p-1 sm:px-3 sm:py-2"
         title="Sign Out"
       >
         <span className="hidden sm:inline">Sign Out</span>
