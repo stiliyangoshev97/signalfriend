@@ -173,7 +173,7 @@ export function AuthButton() {
 
   // Fully authenticated - show user info with logout
   return (
-    <div className="flex items-center gap-1.5 sm:gap-3">
+    <div className="flex items-center gap-1 sm:gap-2">
       {/* Admin wallet indicator - hidden on mobile to save space */}
       {isAdmin && (
         <span 
@@ -187,30 +187,30 @@ export function AuthButton() {
       {/* User avatar/address via RainbowKit for wallet management */}
       <ConnectButton.Custom>
         {({ account, chain, openAccountModal, openChainModal }) => (
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {/* Chain indicator */}
             {chain && (
               <button
                 onClick={openChainModal}
-                className="flex items-center gap-1 p-1.5 sm:px-2 sm:py-1.5 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
+                className="flex items-center p-1 sm:px-2 sm:py-1.5 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
               >
                 {chain.hasIcon && chain.iconUrl && (
                   <img
                     src={chain.iconUrl}
                     alt={chain.name ?? 'Chain icon'}
-                    className="w-5 h-5"
+                    className="w-4 h-4 sm:w-5 sm:h-5"
                   />
                 )}
               </button>
             )}
             
-            {/* Account button - show only icon on mobile */}
+            {/* Account button */}
             <button
               onClick={openAccountModal}
-              className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
+              className="flex items-center px-1.5 py-1 sm:px-3 sm:py-2 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
             >
               {account?.displayName && (
-                <span className="text-xs sm:text-sm text-fur-cream max-w-[60px] sm:max-w-none truncate">
+                <span className="text-xs sm:text-sm text-fur-cream">
                   {account.displayName}
                 </span>
               )}
@@ -224,7 +224,7 @@ export function AuthButton() {
         onClick={logout}
         variant="ghost"
         size="sm"
-        className="px-2 sm:px-3"
+        className="px-1 sm:px-3"
         title="Sign Out"
       >
         <span className="hidden sm:inline">Sign Out</span>
