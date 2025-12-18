@@ -24,7 +24,7 @@ interface SignalContentProps {
 function LockIcon(): React.ReactElement {
   return (
     <svg
-      className="w-16 h-16 text-fur-cream/30"
+      className="w-16 h-16 text-fur-cream/30 mx-auto"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
