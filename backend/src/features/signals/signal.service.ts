@@ -252,7 +252,7 @@ export class SignalService {
         .skip(skip)
         .limit(limit)
         .populate("categoryId", "name slug icon mainGroup")
-        .populate("predictorId", "displayName avatarUrl averageRating isBlacklisted")
+        .populate("predictorId", "displayName avatarUrl averageRating isBlacklisted isVerified")
         .lean(),
       Signal.countDocuments(filter),
     ]);
@@ -662,7 +662,7 @@ export class SignalService {
       .select(SignalService.PUBLIC_FIELDS)
       .sort({ [sortField]: sortDirection })
       .populate("categoryId", "name slug icon mainGroup")
-      .populate("predictorId", "displayName avatarUrl averageRating")
+      .populate("predictorId", "displayName avatarUrl averageRating isVerified")
       .lean();
 
     // Transform field names for frontend compatibility

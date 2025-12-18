@@ -7,6 +7,7 @@
  */
 
 import { useAccount } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Button } from '@/shared/components/ui';
 import { useAuth } from '@/features/auth';
 
@@ -69,10 +70,11 @@ export function PurchaseCard({
   onPurchase,
 }: PurchaseCardProps): React.ReactElement {
   const { isConnected } = useAccount();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, login, isLoading: isSigningIn } = useAuth();
 
   /**
    * Determine button state and text
+   * Returns action type to handle different click behaviors
    */
   const getButtonState = () => {
     if (isExpired) {
@@ -80,6 +82,7 @@ export function PurchaseCard({
         text: 'Signal Expired',
         disabled: true,
         variant: 'secondary' as const,
+        actionType: 'none' as const,
       };
     }
 
@@ -89,6 +92,7 @@ export function PurchaseCard({
         text: 'Signal Unavailable',
         disabled: true,
         variant: 'secondary' as const,
+        actionType: 'none' as const,
       };
     }
 
@@ -98,6 +102,7 @@ export function PurchaseCard({
         text: 'Predictor Blacklisted',
         disabled: true,
         variant: 'secondary' as const,
+        actionType: 'none' as const,
       };
     }
 
@@ -107,22 +112,25 @@ export function PurchaseCard({
         text: 'This Is Your Signal',
         disabled: true,
         variant: 'secondary' as const,
+        actionType: 'none' as const,
       };
     }
 
     if (!isConnected) {
       return {
         text: 'Connect Wallet to Purchase',
-        disabled: true,
-        variant: 'secondary' as const,
+        disabled: false,
+        variant: 'primary' as const,
+        actionType: 'connect' as const,
       };
     }
 
     if (!isAuthenticated) {
       return {
-        text: 'Sign In to Purchase',
-        disabled: true,
-        variant: 'secondary' as const,
+        text: isSigningIn ? 'Signing In...' : 'Sign In to Purchase',
+        disabled: isSigningIn,
+        variant: 'primary' as const,
+        actionType: 'signin' as const,
       };
     }
 
@@ -130,7 +138,7 @@ export function PurchaseCard({
       text: 'Purchase Signal',
       disabled: false,
       variant: 'primary' as const,
-      action: onPurchase,
+      actionType: 'purchase' as const,
     };
   };
 
@@ -174,16 +182,55 @@ export function PurchaseCard({
         </div>
       </div>
 
-      {/* Purchase Button */}
-      <Button
-        className="w-full"
-        size="lg"
-        variant={buttonState.variant}
-        disabled={buttonState.disabled}
-        onClick={buttonState.action}
-      >
-        {buttonState.text}
-      </Button>
+      {/* Purchase Button - Different rendering based on action type */}
+      {buttonState.actionType === 'connect' ? (
+        // Use RainbowKit's ConnectButton.Custom to open connect modal
+        <ConnectButton.Custom>
+          {({ openConnectModal }) => (
+            <Button
+              className="w-full"
+              size="lg"
+              variant={buttonState.variant}
+              disabled={buttonState.disabled}
+              onClick={openConnectModal}
+            >
+              {buttonState.text}
+            </Button>
+          )}
+        </ConnectButton.Custom>
+      ) : buttonState.actionType === 'signin' ? (
+        // Trigger sign-in flow
+        <Button
+          className="w-full"
+          size="lg"
+          variant={buttonState.variant}
+          disabled={buttonState.disabled}
+          onClick={() => login()}
+        >
+          {buttonState.text}
+        </Button>
+      ) : buttonState.actionType === 'purchase' ? (
+        // Trigger purchase modal
+        <Button
+          className="w-full"
+          size="lg"
+          variant={buttonState.variant}
+          disabled={buttonState.disabled}
+          onClick={onPurchase}
+        >
+          {buttonState.text}
+        </Button>
+      ) : (
+        // Disabled state (expired, unavailable, etc.)
+        <Button
+          className="w-full"
+          size="lg"
+          variant={buttonState.variant}
+          disabled={buttonState.disabled}
+        >
+          {buttonState.text}
+        </Button>
+      )}
 
       {/* Additional Info */}
       <div className="mt-4 space-y-2">
@@ -236,16 +283,16 @@ export function PurchaseCard({
       </div>
 
       {/* Not Connected Message */}
-      {!isConnected && !isExpired && (
+      {!isConnected && !isExpired && isActive && !isPredictorBlacklisted && (
         <p className="mt-4 text-sm text-fur-cream/50 text-center">
-          Connect your wallet using the button in the header to purchase this signal.
+          Click the button above to connect your wallet and start the purchase process.
         </p>
       )}
 
       {/* Not Authenticated Message */}
-      {isConnected && !isAuthenticated && !isExpired && (
+      {isConnected && !isAuthenticated && !isExpired && isActive && !isPredictorBlacklisted && (
         <p className="mt-4 text-sm text-fur-cream/50 text-center">
-          Sign in with your wallet to verify your identity before purchasing.
+          Click the button above to sign in and verify your identity.
         </p>
       )}
     </div>
