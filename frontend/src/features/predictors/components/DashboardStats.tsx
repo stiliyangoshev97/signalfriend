@@ -51,7 +51,7 @@ function StatCard({
   return (
     <Card padding="md" className="relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-20 h-20 opacity-5">
+      <div className="absolute top-0 right-0 w-20 h-20 opacity-5 [&>svg]:w-full [&>svg]:h-full">
         {icon}
       </div>
       
