@@ -368,12 +368,18 @@ export function CreateSignalModal({
                         : 'bg-red-500/20 border-red-500 text-red-400'
                       : 'bg-dark-700 border-dark-600 text-fur-cream/70 hover:border-dark-500'
                   }`}
+                  onClick={(e) => {
+                    // Prevent scroll when clicking radio label inside modal
+                    e.preventDefault();
+                    setValue('riskLevel', level, { shouldValidate: true });
+                  }}
                 >
                   <input
                     type="radio"
                     value={level}
                     {...register('riskLevel')}
                     className="sr-only"
+                    tabIndex={-1}
                   />
                   <span className="text-sm font-medium capitalize">{level}</span>
                 </label>
@@ -402,12 +408,18 @@ export function CreateSignalModal({
                         : 'bg-fur-main/20 border-fur-main text-fur-main'
                       : 'bg-dark-700 border-dark-600 text-fur-cream/70 hover:border-dark-500'
                   }`}
+                  onClick={(e) => {
+                    // Prevent scroll when clicking radio label inside modal
+                    e.preventDefault();
+                    setValue('potentialReward', reward, { shouldValidate: true });
+                  }}
                 >
                   <input
                     type="radio"
                     value={reward}
                     {...register('potentialReward')}
                     className="sr-only"
+                    tabIndex={-1}
                   />
                   <span className="text-sm font-medium capitalize">{reward}</span>
                 </label>

@@ -192,13 +192,13 @@ export function AuthButton() {
             {chain && (
               <button
                 onClick={openChainModal}
-                className="flex items-center gap-1 px-2 py-1 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
+                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-dark-600 hover:bg-dark-500 transition-colors"
               >
                 {chain.hasIcon && chain.iconUrl && (
                   <img
                     src={chain.iconUrl}
                     alt={chain.name ?? 'Chain icon'}
-                    className="w-4 h-4"
+                    className="w-5 h-5 md:w-4 md:h-4"
                   />
                 )}
               </button>

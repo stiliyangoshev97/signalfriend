@@ -13,6 +13,7 @@
  * - Error state with red border and error message
  * - Placeholder option support
  * - Uses `cn()` for class merging
+ * - Prevents scroll-to-bottom issue when used inside modals
  * 
  * REACT HOOK FORM INTEGRATION:
  * Uses forwardRef to work with React Hook Form's `register()`:
@@ -110,9 +111,30 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
  * @param ref - Forwarded ref for React Hook Form integration
  */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, options, placeholder, className, id, ...props }, ref) => {
+  ({ label, error, options, placeholder, className, id, onFocus, onClick, ...props }, ref) => {
     // Generate ID from label if not provided
     const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
+
+    /**
+     * Prevents page scroll when clicking on select inside a modal.
+     * The browser sometimes tries to scroll to ensure the select is visible,
+     * which causes unwanted page jumps when the modal already handles scroll.
+     */
+    const handleClick = (e: React.MouseEvent<HTMLSelectElement>) => {
+      // Prevent any scroll behavior triggered by click
+      e.currentTarget.focus({ preventScroll: true });
+      onClick?.(e);
+    };
+
+    /**
+     * Prevents page scroll when focusing on select (e.g., via Tab key).
+     * Uses preventScroll option to avoid unwanted scrolling in modals.
+     */
+    const handleFocus = (e: React.FocusEvent<HTMLSelectElement>) => {
+      // Re-focus with preventScroll to avoid page jumping
+      e.currentTarget.focus({ preventScroll: true });
+      onFocus?.(e);
+    };
 
     return (
       <div className="w-full">
@@ -131,6 +153,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <select
             ref={ref}
             id={selectId}
+            onClick={handleClick}
+            onFocus={handleFocus}
             className={cn(
               // Base styles (matches Input component)
               'w-full px-4 py-3 bg-dark-800 border rounded-lg',

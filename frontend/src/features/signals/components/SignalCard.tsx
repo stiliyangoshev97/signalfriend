@@ -182,9 +182,17 @@ export function SignalCard({ signal, isPurchased = false }: SignalCardProps): Re
       <div className="flex items-center gap-2 mb-4">
         {signal.predictor ? (
           <>
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-fur-light to-fur-main flex items-center justify-center text-xs font-bold text-dark-900 flex-shrink-0">
-              {signal.predictor.displayName?.charAt(0) || 'P'}
-            </div>
+            {signal.predictor.avatarUrl ? (
+              <img 
+                src={signal.predictor.avatarUrl} 
+                alt={signal.predictor.displayName || 'Predictor'} 
+                className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+              />
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-fur-light to-fur-main flex items-center justify-center text-xs font-bold text-dark-900 flex-shrink-0">
+                {signal.predictor.displayName?.charAt(0) || 'P'}
+              </div>
+            )}
             <span className="text-sm text-fur-cream/80 truncate">
               {signal.predictor.displayName || (predictorAddress ? `${predictorAddress.slice(0, 6)}...${predictorAddress.slice(-4)}` : 'Unknown')}
             </span>

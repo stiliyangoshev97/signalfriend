@@ -142,17 +142,28 @@ export function useUpdateProfile() {
       // Update auth store with new predictor data
       setPredictor(updatedPredictor);
       
-      // Invalidate profile queries
+      // Invalidate dashboard profile query
       queryClient.invalidateQueries({
         queryKey: predictorKeys.profile(address!),
       });
-      // Also invalidate public predictor profile
+      // Invalidate public predictor profile (used on /predictors/:address page)
+      // Note: Uses lowercase address to match publicPredictorKeys.profile() pattern
       queryClient.invalidateQueries({
-        queryKey: ['predictors', 'profile', address!],
+        queryKey: ['predictor', 'public-profile', address!.toLowerCase()],
       });
-      // Invalidate predictor list (in case name changed)
+      // Invalidate public predictor signals (in case predictor info is displayed)
+      queryClient.invalidateQueries({
+        queryKey: ['predictor', 'public-signals', address!.toLowerCase()],
+        exact: false, // Match all filter variations
+      });
+      // Invalidate predictor list (in case name/avatar changed)
       queryClient.invalidateQueries({
         queryKey: ['predictors', 'list'],
+      });
+      // Invalidate signals list (signal cards display predictor avatar/name)
+      queryClient.invalidateQueries({
+        queryKey: ['signals', 'list'],
+        exact: false, // Match all filter variations
       });
     },
   });
