@@ -183,7 +183,7 @@ const faqItems: FaqItem[] = [
         </p>
         <p className="text-sm text-gray-main">
           Note: If your application is rejected, you can reapply after gaining an additional 
-          50 sales and $500 USDT in earnings since your last application.
+          100 sales and $1,000 USDT in earnings since your last application.
         </p>
       </div>
     ),
@@ -425,19 +425,23 @@ const faqItems: FaqItem[] = [
     answer: (
       <div className="space-y-4">
         <p>
-          SignalFriend supports any wallet compatible with WalletConnect and BNB Chain, including:
+          SignalFriend uses <strong className="text-fur-cream">RainbowKit</strong>, which supports 
+          <strong className="text-fur-cream"> 100+ wallets</strong> compatible with WalletConnect and BNB Chain. 
+          Popular options include:
         </p>
         <ul className="list-disc list-inside space-y-1 ml-2">
           <li>MetaMask (Desktop & Mobile)</li>
           <li>Rabby Wallet</li>
           <li>Trust Wallet</li>
+          <li>Bitget Wallet</li>
           <li>Coinbase Wallet</li>
+          <li>OKX Wallet</li>
           <li>Rainbow Wallet</li>
           <li>And many more via WalletConnect</li>
         </ul>
         <p className="text-sm text-gray-main">
-          Make sure your wallet is connected to BNB Chain (BSC Mainnet, Chain ID: 56) and you have 
-          USDT for purchases.
+          If your wallet supports WalletConnect and BNB Chain, it should work with SignalFriend. 
+          Make sure you're connected to BNB Chain (BSC Mainnet, Chain ID: 56) and have USDT for purchases.
         </p>
       </div>
     ),

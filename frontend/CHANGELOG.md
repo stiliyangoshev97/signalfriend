@@ -14,6 +14,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.23.1] - 2025-12-19 🔧 FAQ & NAVIGATION FIXES
+
+### Fixed
+
+**Scroll to Top on Navigation**
+- Added `ScrollToTop` component that scrolls to page top on every route change
+- Fixed issue where navigating between pages (FAQ → About → Home) would land in the middle of the page
+- All internal navigation now correctly scrolls to the top
+
+**FAQ Content Corrections**
+- Fixed verification reapplication requirements: "50 sales and $500 USDT" → "100 sales and $1,000 USDT"
+- Matches actual backend requirements (MIN_SALES_FOR_VERIFICATION = 100, MIN_EARNINGS_FOR_VERIFICATION = 1000)
+
+**Wallet Support List**
+- Updated to mention RainbowKit and 100+ wallet support
+- Added Bitget Wallet and OKX Wallet to the list
+- Clarified that any WalletConnect-compatible wallet works
+
+---
+
 ## [0.23.0] - 2025-12-19 📄 ABOUT PAGE, FAQ PAGE & BLOCKAID ANNOUNCEMENT
 
 ### Added
