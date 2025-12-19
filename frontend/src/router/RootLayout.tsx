@@ -58,12 +58,16 @@
 import { Outlet, Link } from 'react-router-dom';
 import { Suspense } from 'react';
 import { Spinner, AnnouncementBanner } from '../shared/components/ui';
+import { ScrollToTop } from '../shared/components/ScrollToTop';
 import Header from './Header';
 import { socialLinks } from '../shared/config/social';
 
 export function RootLayout() {
   return (
     <div className="min-h-screen bg-dark-700 flex flex-col">
+      {/* Scroll to top on route change */}
+      <ScrollToTop />
+      
       {/* Announcement banner (controlled via env vars) */}
       <AnnouncementBanner />
       
