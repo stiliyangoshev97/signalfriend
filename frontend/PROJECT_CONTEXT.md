@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 18 December 2025 (v0.22.0 - Production SPA Routing Fix)
+> Last Updated: 19 December 2025 (v0.23.0 - About Page, FAQ Page & Blockaid Announcement)
 
 ---
 
@@ -47,6 +47,8 @@
 | **SEO & Meta Tags** | ✅ 100% | useSEO hook, Open Graph, Twitter Cards, page-specific meta |
 | **Performance** | ✅ 100% | React.lazy route splitting, useDebounce for search |
 | **Security Headers** | ✅ 100% | vercel.json with HTTP security headers for production |
+| **About Page** | ✅ 100% | Official contract addresses, Blockaid verification |
+| **FAQ Page** | ✅ 100% | Comprehensive FAQ with category filtering |
 
 **Overall Progress: ~100%** (All core features complete + production-ready)
 

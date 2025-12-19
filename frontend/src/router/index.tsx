@@ -3,7 +3,7 @@
  *
  * Defines all routes for the SignalFriend application using React Router v6.
  * Routes are organized into public, authenticated, predictor, and admin sections.
- * Updated: Dec 18, 2025
+ * Updated: Dec 19, 2025
  *
  * @module router
  *
@@ -15,6 +15,10 @@
  * ├── /signals/:contentId    [PUBLIC]     Signal detail page
  * ├── /predictors            [PUBLIC]     Predictor listing
  * ├── /predictors/:address   [PUBLIC]     Predictor profile
+ * ├── /terms                 [PUBLIC]     Terms and conditions
+ * ├── /news                  [PUBLIC]     Platform news
+ * ├── /about                 [PUBLIC]     About & contract addresses
+ * ├── /faq                   [PUBLIC]     Frequently asked questions
  * │
  * ├── /my-signals            [AUTH]       User's purchased signals
  * ├── /profile               [AUTH]       User profile settings
@@ -74,6 +78,8 @@ const BecomePredictorPage = lazy(() => import('@/features/predictors/pages/Becom
 const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage'));
 const TermsPage = lazy(() => import('@/features/legal/pages/TermsPage'));
 const NewsPage = lazy(() => import('@/features/news/pages/NewsPage'));
+const AboutPage = lazy(() => import('@/features/about/pages/AboutPage'));
+const FaqPage = lazy(() => import('@/features/faq/pages/FaqPage'));
 
 // Placeholder pages (to be replaced with actual pages)
 const PlaceholderPage = ({ title }: { title: string }) => (
@@ -119,6 +125,14 @@ export const router = createBrowserRouter([
       {
         path: 'news',
         element: <NewsPage />,
+      },
+      {
+        path: 'about',
+        element: <AboutPage />,
+      },
+      {
+        path: 'faq',
+        element: <FaqPage />,
       },
       
       // ===== AUTHENTICATED ROUTES =====

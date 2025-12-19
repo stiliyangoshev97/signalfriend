@@ -117,6 +117,10 @@ export function Header() {
               News
             </NavLink>
             
+            <NavLink to="/faq" className={navLinkClass}>
+              FAQ
+            </NavLink>
+            
             {/* Admin link - only visible to admin wallets */}
             {isAdmin && (
               <NavLink to="/admin" className={navLinkClass}>
@@ -176,6 +180,10 @@ export function Header() {
             
             <NavLink to="/news" className={mobileNavLinkClass} onClick={closeMobileMenu}>
               News
+            </NavLink>
+            
+            <NavLink to="/faq" className={mobileNavLinkClass} onClick={closeMobileMenu}>
+              FAQ
             </NavLink>
             
             {/* Admin link - only visible to admin wallets */}

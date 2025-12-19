@@ -3,11 +3,13 @@
  *
  * Displays a timeline of platform news, updates, and announcements.
  * Each news item shows title, date, category, and full content.
+ * Supports both plain text and React nodes for rich content (clickable links).
  *
  * @module features/news/pages/NewsPage
  */
 
 import { Link } from 'react-router-dom';
+import { getExplorerAddressUrl } from '@/shared/utils/explorer';
 
 // =============================================================================
 // Types
@@ -19,7 +21,27 @@ interface NewsItem {
   date: string; // ISO date string
   category: 'update' | 'feature' | 'maintenance' | 'security' | 'general';
   summary: string;
-  content: string[];
+  content: React.ReactNode[]; // Supports strings and React elements
+}
+
+// =============================================================================
+// Helper: Contract Link Component
+// =============================================================================
+
+function ContractLink({ name, address }: { name: string; address: string }) {
+  return (
+    <span>
+      • {name}:{' '}
+      <a
+        href={getExplorerAddressUrl(address)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-accent-gold hover:underline break-all"
+      >
+        {address}
+      </a>
+    </span>
+  );
 }
 
 // =============================================================================
@@ -37,6 +59,27 @@ interface NewsItem {
  * 5. Add content paragraphs as array items
  */
 const newsItems: NewsItem[] = [
+  {
+    id: 'blockaid-security-2025-12',
+    title: '🔒 Blockaid Security Verification Complete!',
+    date: '2025-12-19',
+    category: 'security',
+    summary: 'All SignalFriend smart contracts and our domain have been reviewed and whitelisted by Blockaid.',
+    content: [
+      'We\'re excited to announce that Blockaid, a leading Web3 security provider, has completed their review of SignalFriend! 🛡️',
+      'What this means for you:',
+      '• All 3 of our smart contracts have been verified and whitelisted',
+      '• Our domain (signalfriend.com) has been approved as safe',
+      '• Your wallet extensions (MetaMask, Rabby, etc.) will recognize our contracts as legitimate',
+      '• No more security warnings when interacting with SignalFriend',
+      'Verified Contracts (click to view on BscScan):',
+      <ContractLink key="market" name="SignalFriend Market" address="0xAebec2Cd5c2dB4c0875de215515B3060a7a652FB" />,
+      <ContractLink key="pass" name="Predictor Access Pass" address="0x198Cd0549A0Dba09Aa3aB88e0B51CEb8dd335d07" />,
+      <ContractLink key="key" name="Signal Key NFT" address="0x2A5F920133e584773Ef4Ac16260c2F954824491f" />,
+      'This verification is an important milestone in our commitment to security and transparency. Always verify contract addresses before interacting with any Web3 application.',
+      <>View our official contract addresses on the <Link to="/about" className="text-accent-gold hover:underline">About page</Link> for easy verification.</>,
+    ],
+  },
   {
     id: 'production-launch-2025-12',
     title: '🚀 SignalFriend is Now LIVE on BNB Chain Mainnet!',

@@ -102,6 +102,13 @@ export function RootLayout() {
             
             <div className="flex items-center gap-3">
               <Link
+                to="/about"
+                className="text-gray-main hover:text-fur-cream transition-colors"
+              >
+                About
+              </Link>
+              <span className="text-gray-main/50">|</span>
+              <Link
                 to="/terms"
                 className="text-gray-main hover:text-fur-cream transition-colors"
               >

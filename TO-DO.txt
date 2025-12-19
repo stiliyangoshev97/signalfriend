@@ -410,7 +410,7 @@ Deployment Steps:
     [x] Tested full integration (frontend → backend → database)
     [x] Sentry error tracking enabled
     [x] Frontend smoke tests passed
-    [ ] Update Alchemy webhook URL to production API
+    [x] Update Alchemy webhook URL to production API ✅
     [ ] Mobile testing on real devices
     [ ] Monitor for 48 hours
 
