@@ -2,8 +2,53 @@
                         SIGNALFRIEND FRONTEND TO-DO LIST
 ================================================================================
 
-Last Updated: 2025-12-18
-Current Version: v0.22.0 (Production SPA Routing Fix)
+Last Updated: 2025-12-19
+Current Version: v0.23.0 (About Page, FAQ Page & Blockaid Announcement)
+
+================================================================================
+PHASE 9: ABOUT & FAQ PAGES ✅ COMPLETE (December 19, 2025)
+================================================================================
+
+[✅] About Page (/about)
+    - Official contract addresses with BscScan links
+    - CopyableAddress component for each contract
+    - Blockaid security verification badge
+    - Platform overview section
+    - Key features grid
+    - Links to FAQ, Terms, News
+    - Added to footer navigation
+
+[✅] FAQ Page (/faq)
+    - Comprehensive FAQ with 15+ questions
+    - Expandable accordion UI
+    - Category filtering (Wallet, Predictor, Trading, Fees, Security, General)
+    - Questions cover:
+      - NFT mobile wallet import
+      - Blank NFT images
+      - NFT differences (Predictor Pass vs Signal Key)
+      - Becoming a predictor
+      - Verification requirements
+      - Blacklist/dispute process
+      - Signal purchase flow
+      - Rating system
+      - Signal expiration
+      - Fee structure
+      - Referral program
+      - Payment security
+      - Contract verification
+      - Supported wallets
+      - Getting USDT on BNB Chain
+    - Community links (Discord, X)
+    - Added to navbar navigation
+
+[✅] Blockaid Security Announcement
+    - Added news item for Blockaid verification
+    - All 3 contracts whitelisted
+    - Domain (signalfriend.com) approved
+
+[✅] Navigation Updates
+    - Added "FAQ" to navbar (desktop + mobile)
+    - Added "About" to footer
 
 ================================================================================
 PHASE 8: PRODUCTION BUG FIXES ✅ COMPLETE (December 18, 2025)

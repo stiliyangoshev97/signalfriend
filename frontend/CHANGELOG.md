@@ -14,6 +14,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.23.0] - 2025-12-19 📄 ABOUT PAGE, FAQ PAGE & BLOCKAID ANNOUNCEMENT
+
+### Added
+
+**About Page (`/about`)**
+- New page displaying official SignalFriend contract addresses
+- All 3 contract addresses with copy buttons and BscScan links
+- Security verification badge (Blockaid whitelisted)
+- Platform overview and key features section
+- Links to FAQ, Terms, and News pages
+- Accessible from footer navigation
+
+**FAQ Page (`/faq`)**
+- Comprehensive FAQ with expandable accordion sections
+- Category filtering (Wallet & NFTs, Predictors, Trading, Fees, Security, General)
+- Questions about:
+  - NFT visibility on mobile wallets (MetaMask import guide)
+  - Blank NFT images explanation
+  - Difference between Predictor Pass and Signal Key NFTs
+  - How to become a predictor
+  - Verification requirements (100 sales + $1,000 earnings)
+  - Blacklist and dispute process
+  - Signal purchase flow
+  - Rating system
+  - Signal expiration
+  - Fee structure breakdown
+  - Referral program details
+  - Payment security
+  - Contract verification
+  - Supported wallets
+  - Where to get USDT on BNB Chain
+- Community links (Discord, X/Twitter)
+- Accessible from navbar navigation
+
+**Blockaid Security Announcement**
+- Added news item announcing Blockaid security verification
+- All 3 contracts and domain (signalfriend.com) whitelisted
+- Contract addresses listed in announcement
+
+### Changed
+
+**Navigation Updates**
+- Added "FAQ" link to navbar (desktop and mobile)
+- Added "About" link to footer (before Terms)
+- Updated router documentation with new routes
+
+**File Structure**
+```
+src/features/
+├── about/
+│   ├── index.ts
+│   └── pages/
+│       └── AboutPage.tsx
+├── faq/
+│   ├── index.ts
+│   └── pages/
+│       └── FaqPage.tsx
+```
+
+---
+
 ## [0.22.0] - 2025-12-18 🔧 PRODUCTION FIX - SPA ROUTING
 
 ### Fixed
