@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 19 December 2025 (v0.23.0 - About Page, FAQ Page & Blockaid Announcement)
+> Last Updated: 20 December 2025 (v0.25.0 - Mobile Fixes & Optional Social Links)
 
 ---
 

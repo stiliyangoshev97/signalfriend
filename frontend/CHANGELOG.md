@@ -14,6 +14,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.25.0] - 2025-12-20 🔧 MOBILE FIXES & UX IMPROVEMENTS
+
+### Fixed
+
+**About Page - Contract Addresses Mobile Overflow**
+- Fixed horizontal scroll issue on mobile caused by full contract addresses overflowing container
+- Removed `showFull` prop from `CopyableAddress` - addresses now show truncated format (e.g., `0xAebe...52FB`)
+- Changed layout to stack vertically on mobile (`flex-col`), horizontally on desktop (`sm:flex-row`)
+- Added `overflow-hidden` to container to prevent any potential overflow
+- Users can still copy full address or click "View on BscScan" link
+
+### Changed
+
+**Edit Profile Modal - Smart Optional Social Links**
+- Made Telegram and Discord fields **optional** instead of required
+- Implemented smart preferred contact auto-selection logic:
+  - **Only Telegram filled** → Telegram auto-selected as preferred (no choice needed)
+  - **Only Discord filled** → Discord auto-selected as preferred (no choice needed)  
+  - **Both filled** → User must choose preferred contact method (radio buttons shown)
+  - **Neither filled** → No preferred contact (radio buttons hidden)
+- Added helper text: "Optional — recommended for faster support & trust"
+- Shows info message when only one social is filled: "Telegram/Discord will be set as your preferred contact method"
+- Save button shows "Select Preferred Contact" when both socials filled but no choice made
+- Removed confusing "None" option from preferred contact selector
+- Added helper text: "Optional — recommended for faster support & trust"
+- Added "None" option for Preferred Contact Method
+- Updated Zod schema to allow empty strings for both social fields
+- Smart handling: If user selects a preferred contact but leaves that field empty, system auto-clears preference
+- Removed required asterisk (*) from Telegram and Discord labels
+
+**Improved User Experience**
+- New predictors no longer blocked from saving profile if they don't have both social accounts
+- Existing predictors can now remove their social handles if desired
+- Preferred Contact section now clearly indicates it's optional
+
+---
+
 ## [0.24.0] - 2025-12-20 🔧 UI FIXES & CACHE IMPROVEMENTS
 
 ### Fixed

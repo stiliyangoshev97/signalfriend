@@ -2,7 +2,7 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 18, 2025
+Last Updated: December 20, 2025
 
 ================================================================================
 COMPLETED FEATURES ✅
@@ -33,20 +33,30 @@ COMPLETED FEATURES ✅
 [x] Security audit + CI/CD pipeline (December 13, 2025)
 [x] Configurable social links via environment variables (December 13, 2025)
 [x] 🔧 Production SPA routing fix (December 18, 2025) - vercel.json rewrites
+[x] 🔧 Client feedback fixes (December 20, 2025)
+    - About page mobile overflow fix (contract addresses)
+    - Smart optional Telegram/Discord with auto-preferred contact selection
+
+================================================================================
+PHASE 14: CLIENT FEEDBACK FIXES ✅ COMPLETE (December 20, 2025)
+================================================================================
+
+[x] #1 About page - Fix contract addresses overflow on mobile
+    - Removed showFull prop from CopyableAddress
+    - Changed layout to flex-col on mobile, flex-row on desktop
+    - Added overflow-hidden to container
+
+[x] #2 Edit Profile - Smart optional social links
+    - Made Telegram and Discord fields optional
+    - Smart auto-selection: only telegram → telegram preferred, only discord → discord preferred
+    - Both filled → user must choose preferred (radio buttons shown)
+    - Neither filled → no preferred contact (radio buttons hidden)
+    - Helper text: "Optional — recommended for faster support & trust"
+    - Added helper text: "Optional — recommended for faster support & trust"
+    - Smart handling of preferredContact when social field is empty
 
 ================================================================================
 PHASE 13: PRODUCTION BUG FIXES ✅ COMPLETE (December 18, 2025)
-================================================================================
-
-[x] #1 Fix 404 errors on page refresh/direct navigation in production
-    - Root cause: Vercel server didn't know to serve index.html for client-side routes
-    - Solution: Added rewrites configuration to vercel.json
-    - Impact: All routes (/signals, /predictors, etc.) now work on refresh
-    - Configuration: "/(.*)" → "/index.html" rewrite rule
-    - Documentation: Updated frontend README.md with deployment section
-
-================================================================================
-PHASE 3: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)
 ================================================================================
 
 [x] #1 Fix "You have already reported" → "You have reported" message

@@ -3,7 +3,30 @@
 ================================================================================
 
 Last Updated: 2025-12-20
-Current Version: v0.24.0 (UI Fixes & Cache Improvements)
+Current Version: v0.25.0 (Mobile Fixes & UX Improvements)
+
+================================================================================
+PHASE 11: CLIENT FEEDBACK FIXES ✅ COMPLETE (December 20, 2025)
+================================================================================
+
+[✅] About Page - Mobile Contract Addresses Overflow
+    - Fixed: Contract addresses caused horizontal scroll on mobile devices
+    - Removed showFull prop from CopyableAddress (now shows truncated format)
+    - Changed layout to flex-col on mobile, flex-row on desktop
+    - Added overflow-hidden to container
+    - Users can still copy full address or click BscScan link
+
+[✅] Edit Profile Modal - Smart Optional Social Links
+    - Made Telegram and Discord fields optional instead of required
+    - Added helper text: "Optional — recommended for faster support & trust"
+    - Implemented smart preferred contact auto-selection:
+      * Only Telegram filled → Telegram auto-selected as preferred
+      * Only Discord filled → Discord auto-selected as preferred
+      * Both filled → User MUST choose preferred (radio buttons shown)
+      * Neither filled → No preferred contact (radio buttons hidden)
+    - Shows info message when only one social is filled
+    - Save button shows "Select Preferred Contact" when both filled but no choice
+    - Removed confusing "None" option from selector
 
 ================================================================================
 PHASE 10: BUG FIXES & IMPROVEMENTS ✅ COMPLETE (December 20, 2025)
