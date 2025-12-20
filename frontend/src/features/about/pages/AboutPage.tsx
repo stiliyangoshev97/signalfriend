@@ -68,13 +68,13 @@ function ContractCard({ contract }: { contract: ContractInfo }) {
       
       <p className="text-sm text-gray-main mb-4">{contract.description}</p>
       
-      <div className="flex items-center gap-2">
-        <CopyableAddress address={contract.address} showFull className="text-sm" />
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 overflow-hidden">
+        <CopyableAddress address={contract.address} className="text-sm" />
         <a
           href={explorerUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-accent-gold hover:underline"
+          className="text-xs text-accent-gold hover:underline whitespace-nowrap"
         >
           View on BscScan →
         </a>

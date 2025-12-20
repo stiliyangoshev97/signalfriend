@@ -171,22 +171,26 @@ const editProfileSchema = z.object({
     .or(z.literal('')),
   telegram: z
     .string()
-    .min(1, 'Telegram handle is required')
     .max(32, 'Telegram handle too long')
-    .regex(/^[a-zA-Z0-9_]+$/, 'Only letters, numbers, and underscores allowed')
+    .regex(/^[a-zA-Z0-9_]*$/, 'Only letters, numbers, and underscores allowed')
     .refine(
-      (val) => !isReservedSocialHandle(val),
+      (val) => !val || !isReservedSocialHandle(val),
       'This Telegram handle is reserved and cannot be used'
-    ),
+    )
+    .optional()
+    .or(z.literal('')),
   discord: z
     .string()
-    .min(1, 'Discord handle is required')
     .max(32, 'Discord handle too long')
     .refine(
-      (val) => !isReservedSocialHandle(val),
+      (val) => !val || !isReservedSocialHandle(val),
       'This Discord handle is reserved and cannot be used'
-    ),
-  preferredContact: z.enum(['telegram', 'discord']),
+    )
+    .optional()
+    .or(z.literal('')),
+  // preferredContact is only required when BOTH telegram and discord are filled
+  // Otherwise it's auto-determined: telegram only → telegram, discord only → discord, neither → undefined
+  preferredContact: z.enum(['telegram', 'discord']).optional(),
 });
 
 type EditProfileFormData = z.infer<typeof editProfileSchema>;
@@ -249,7 +253,7 @@ export function EditProfileModal({
       twitter: '',
       telegram: '',
       discord: '',
-      preferredContact: 'discord',
+      preferredContact: undefined,
     },
   });
 
@@ -258,6 +262,19 @@ export function EditProfileModal({
   const telegramValue = watch('telegram') || '';
   const discordValue = watch('discord') || '';
   const bioValue = watch('bio') || '';
+  const preferredContactValue = watch('preferredContact');
+
+  // Determine the social links state for smart preferred contact logic
+  const hasTelegram = telegramValue.trim() !== '';
+  const hasDiscord = discordValue.trim() !== '';
+  const hasBothSocials = hasTelegram && hasDiscord;
+  const hasOnlyTelegram = hasTelegram && !hasDiscord;
+  const hasOnlyDiscord = hasDiscord && !hasTelegram;
+
+  // If both are filled, user must choose. Otherwise it's auto-determined.
+  const needsPreferredContactChoice = hasBothSocials;
+  // Block save if both are filled but no preference selected
+  const missingPreferredContact = hasBothSocials && !preferredContactValue;
 
   // Real-time uniqueness checks (only when modal is open and field is different from current)
   const shouldCheckDisplayName = isOpen && 
@@ -311,11 +328,11 @@ export function EditProfileModal({
   // Pre-fill form when predictor data changes
   useEffect(() => {
     if (predictor && isOpen) {
-      // Default to 'discord' if preferredContact is not set or is an invalid value
-      const validPreferredContact = 
+      // Set preferredContact from existing data, or undefined if not set
+      const existingPreferredContact = 
         predictor.preferredContact === 'telegram' || predictor.preferredContact === 'discord'
           ? predictor.preferredContact
-          : 'discord';
+          : undefined;
       
       reset({
         displayName: predictor.displayName || '',
@@ -324,7 +341,7 @@ export function EditProfileModal({
         twitter: predictor.socialLinks?.twitter || '',
         telegram: predictor.socialLinks?.telegram || '',
         discord: predictor.socialLinks?.discord || '',
-        preferredContact: validPreferredContact,
+        preferredContact: existingPreferredContact,
       });
     }
   }, [predictor, isOpen, reset]);
@@ -360,8 +377,34 @@ export function EditProfileModal({
       payload.socialLinks = socialLinks;
     }
 
-    if (data.preferredContact && data.preferredContact !== predictor?.preferredContact) {
-      payload.preferredContact = data.preferredContact;
+    // Smart preferredContact logic:
+    // - Only telegram → telegram
+    // - Only discord → discord  
+    // - Both → user's choice (data.preferredContact)
+    // - Neither → undefined
+    const telegramFinal = data.telegram?.trim() || '';
+    const discordFinal = data.discord?.trim() || '';
+    const hasTelegramFinal = telegramFinal !== '';
+    const hasDiscordFinal = discordFinal !== '';
+    
+    let preferredContactToSave: 'telegram' | 'discord' | undefined;
+    
+    if (hasTelegramFinal && hasDiscordFinal) {
+      // Both filled - use user's explicit choice
+      preferredContactToSave = data.preferredContact;
+    } else if (hasTelegramFinal && !hasDiscordFinal) {
+      // Only telegram - auto-select telegram
+      preferredContactToSave = 'telegram';
+    } else if (hasDiscordFinal && !hasTelegramFinal) {
+      // Only discord - auto-select discord
+      preferredContactToSave = 'discord';
+    } else {
+      // Neither filled - no preferred contact
+      preferredContactToSave = undefined;
+    }
+
+    if (preferredContactToSave !== predictor?.preferredContact) {
+      payload.preferredContact = preferredContactToSave;
     }
 
     // If nothing changed, just close
@@ -551,13 +594,13 @@ export function EditProfileModal({
           {/* Telegram - Private */}
           <div className="relative">
             <label className="block text-sm font-medium text-fur-cream mb-1.5">
-              Telegram <span className="text-accent-red">*</span>
+              Telegram
             </label>
             <Input
               placeholder="username (without @)"
               {...register('telegram')}
               error={errors.telegram?.message || telegramError || undefined}
-              helperText="Must be unique across all predictors"
+              helperText="Optional — recommended for faster support & trust"
             />
             {/* Uniqueness check indicator */}
             {shouldCheckTelegram && (
@@ -583,13 +626,13 @@ export function EditProfileModal({
           {/* Discord - Private */}
           <div className="relative">
             <label className="block text-sm font-medium text-fur-cream mb-1.5">
-              Discord <span className="text-accent-red">*</span>
+              Discord
             </label>
             <Input
               placeholder="username"
               {...register('discord')}
               error={errors.discord?.message || discordError || undefined}
-              helperText="Must be unique across all predictors"
+              helperText="Optional — recommended for faster support & trust"
             />
             {/* Uniqueness check indicator */}
             {shouldCheckDiscord && (
@@ -612,46 +655,65 @@ export function EditProfileModal({
             )}
           </div>
 
-          {/* Preferred Contact */}
-          <div>
-            <label className="block text-sm font-medium text-fur-cream mb-2">
-              Preferred Contact Method
-              <span className="text-accent-red font-normal ml-1">*</span>
-            </label>
-            <p className="text-xs text-fur-cream/40 mb-3">
-              How should admins contact you if needed? This is required.
-            </p>
-            <div className="flex gap-3">
-              <label className="flex-1 cursor-pointer">
-                <input
-                  type="radio"
-                  value="telegram"
-                  {...register('preferredContact')}
-                  className="absolute opacity-0 w-0 h-0 peer"
-                />
-                <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-dark-500 bg-dark-800 peer-checked:border-brand-200 peer-checked:bg-brand-200/10 hover:border-dark-400 transition-all">
-                  <svg className="w-4 h-4 text-fur-cream/70 peer-checked:text-brand-200" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-                  </svg>
-                  <span className="text-sm font-medium text-fur-cream">Telegram</span>
-                </div>
+          {/* Preferred Contact - Only show when BOTH telegram and discord are filled */}
+          {needsPreferredContactChoice && (
+            <div>
+              <label className="block text-sm font-medium text-fur-cream mb-2">
+                Preferred Contact Method
+                <span className="text-accent-red font-normal ml-1">*</span>
               </label>
-              <label className="flex-1 cursor-pointer">
-                <input
-                  type="radio"
-                  value="discord"
-                  {...register('preferredContact')}
-                  className="absolute opacity-0 w-0 h-0 peer"
-                />
-                <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-dark-500 bg-dark-800 peer-checked:border-brand-200 peer-checked:bg-brand-200/10 hover:border-dark-400 transition-all">
-                  <svg className="w-4 h-4 text-fur-cream/70" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-                  </svg>
-                  <span className="text-sm font-medium text-fur-cream">Discord</span>
-                </div>
-              </label>
+              <p className="text-xs text-fur-cream/40 mb-3">
+                You've provided both Telegram and Discord. Please choose which one admins should use to contact you.
+              </p>
+              <div className="flex gap-3">
+                <label className="flex-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    value="telegram"
+                    {...register('preferredContact')}
+                    className="absolute opacity-0 w-0 h-0 peer"
+                  />
+                  <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-dark-500 bg-dark-800 peer-checked:border-brand-200 peer-checked:bg-brand-200/10 hover:border-dark-400 transition-all">
+                    <svg className="w-4 h-4 text-fur-cream/70 peer-checked:text-brand-200" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                    </svg>
+                    <span className="text-sm font-medium text-fur-cream">Telegram</span>
+                  </div>
+                </label>
+                <label className="flex-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    value="discord"
+                    {...register('preferredContact')}
+                    className="absolute opacity-0 w-0 h-0 peer"
+                  />
+                  <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-dark-500 bg-dark-800 peer-checked:border-brand-200 peer-checked:bg-brand-200/10 hover:border-dark-400 transition-all">
+                    <svg className="w-4 h-4 text-fur-cream/70" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                    </svg>
+                    <span className="text-sm font-medium text-fur-cream">Discord</span>
+                  </div>
+                </label>
+              </div>
+              {missingPreferredContact && (
+                <p className="mt-2 text-xs text-error-400">
+                  Please select your preferred contact method to save changes.
+                </p>
+              )}
             </div>
-          </div>
+          )}
+
+          {/* Auto-selected info message when only one social is filled */}
+          {(hasOnlyTelegram || hasOnlyDiscord) && (
+            <div className="flex items-center gap-2 p-2 bg-dark-700/50 rounded-md border border-dark-600 text-xs text-fur-cream/60">
+              <svg className="w-4 h-4 text-success-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span>
+                {hasOnlyTelegram ? 'Telegram' : 'Discord'} will be set as your preferred contact method.
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Actions */}
@@ -667,9 +729,9 @@ export function EditProfileModal({
           <Button
             type="submit"
             isLoading={isPending || isCheckingUniqueness}
-            disabled={!isDirty || !isValid || isPending || hasUniquenessError || isCheckingUniqueness}
+            disabled={!isDirty || !isValid || isPending || hasUniquenessError || isCheckingUniqueness || missingPreferredContact}
           >
-            {isCheckingUniqueness ? 'Checking...' : 'Save Changes'}
+            {isCheckingUniqueness ? 'Checking...' : missingPreferredContact ? 'Select Preferred Contact' : 'Save Changes'}
           </Button>
         </div>
       </form>
