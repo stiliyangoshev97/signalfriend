@@ -3,7 +3,7 @@
 ================================================================================
 
 Last Updated: 2025-12-20
-Current Version: v0.23.3 (Homepage Stats Improvement)
+Current Version: v0.24.0 (UI Fixes & Cache Improvements)
 
 ================================================================================
 PHASE 10: BUG FIXES & IMPROVEMENTS ✅ COMPLETE (December 20, 2025)
@@ -19,6 +19,32 @@ PHASE 10: BUG FIXES & IMPROVEMENTS ✅ COMPLETE (December 20, 2025)
     - Root cause: usePurchaseFlow only invalidated purchaseKeys and signalKeys.detail, not signalKeys.lists()
     - Solution: Added signalKeys.lists() to cache invalidation in usePurchaseFlow
     - Impact: Signals now disappear immediately from Signals page after purchase confirmation
+
+[✅] Become Predictor Page - Help Link Fix
+    - Changed broken external docs link to internal /faq page
+    - Now uses React Router Link component
+
+[✅] Purchase Modal - Insufficient Balance After Success Fix
+    - Fixed: "Insufficient Balance" warning shown after successful purchase
+    - Root cause: Balance check ran before success state check
+    - Solution: Check isPurchaseConfirmed first in step determination
+
+[✅] Purchase Modal - Layout Shift Fix
+    - Fixed: Modal "stretches then shrinks" after purchase
+    - Root cause: Progress steps disappeared when balance dropped
+    - Solution: Keep progress steps visible on success state
+
+[✅] My Signals Page - Card Layout Consistency
+    - Fixed: Separator line at different positions based on title/description length
+    - Solution: flex-col + flex-grow for variable content, fixed content at bottom
+
+[✅] Predictor Dashboard - Signal Card Layout Consistency
+    - Same fix applied to MySignalCard component
+    - Price/Sales/Earnings boxes now aligned across all cards
+
+[✅] New Signal Cache Invalidation
+    - Fixed: New signals don't appear on Signals page without refresh
+    - Added signalKeys.lists() invalidation to useCreateSignal hook
 
 ================================================================================
 PHASE 9: ABOUT & FAQ PAGES ✅ COMPLETE (December 19, 2025)

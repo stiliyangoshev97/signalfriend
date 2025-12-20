@@ -115,43 +115,47 @@ export function MySignalCard({
   return (
     <Card 
       padding="none" 
-      className="relative overflow-hidden group"
+      className="relative overflow-hidden group h-full"
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
       {/* Status indicator bar */}
       <div className={`h-1 ${isActive ? 'bg-success-500' : 'bg-gray-600'}`} />
       
-      <div className="p-5">
-        {/* Header: Status badges */}
-        <div className="flex items-center gap-2 mb-3 flex-wrap">
-          {isActive ? (
-            <Badge variant="success">Active</Badge>
-          ) : expiry.isExpired ? (
-            <Badge variant="error">Expired</Badge>
-          ) : (
-            <Badge variant="default">Inactive</Badge>
-          )}
-          {!expiry.isExpired && expiry.urgency === 'warning' && (
-            <Badge variant="warning">{expiry.text}</Badge>
-          )}
+      <div className="p-5 flex flex-col h-full">
+        {/* Variable content area - grows to fill space */}
+        <div className="flex-grow">
+          {/* Header: Status badges */}
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            {isActive ? (
+              <Badge variant="success">Active</Badge>
+            ) : expiry.isExpired ? (
+              <Badge variant="error">Expired</Badge>
+            ) : (
+              <Badge variant="default">Inactive</Badge>
+            )}
+            {!expiry.isExpired && expiry.urgency === 'warning' && (
+              <Badge variant="warning">{expiry.text}</Badge>
+            )}
+          </div>
+
+          {/* Title */}
+          <Link 
+            to={`/signals/${signal.contentId}`}
+            className="block group/title"
+          >
+            <h3 className="text-lg font-semibold text-fur-cream mb-2 line-clamp-2 group-hover/title:text-fur-light transition-colors">
+              {signal.title || 'Untitled Signal'}
+            </h3>
+          </Link>
+
+          {/* Description */}
+          <p className="text-sm text-fur-cream/60 mb-4 line-clamp-2">
+            {signal.description || 'No description'}
+          </p>
         </div>
 
-        {/* Title */}
-        <Link 
-          to={`/signals/${signal.contentId}`}
-          className="block group/title"
-        >
-          <h3 className="text-lg font-semibold text-fur-cream mb-2 line-clamp-2 group-hover/title:text-fur-light transition-colors">
-            {signal.title || 'Untitled Signal'}
-          </h3>
-        </Link>
-
-        {/* Description */}
-        <p className="text-sm text-fur-cream/60 mb-4 line-clamp-2">
-          {signal.description || 'No description'}
-        </p>
-
+        {/* Fixed content area - always at bottom */}
         {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           {/* Price */}

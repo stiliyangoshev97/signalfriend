@@ -14,6 +14,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.24.0] - 2025-12-20 🔧 UI FIXES & CACHE IMPROVEMENTS
+
+### Fixed
+
+**Become Predictor Page - Help Link**
+- Changed "Need Help? Read our predictor guide" link from broken external docs URL to internal `/faq` page
+- Now uses React Router `Link` component instead of external `<a>` tag
+
+**Purchase Modal - Insufficient Balance Message After Success**
+- Fixed bug where "Insufficient Balance" warning appeared after successful purchase
+- Root cause: Balance check ran before success check, so when balance dropped post-purchase, warning showed
+- Solution: Check `isPurchaseConfirmed` first in step determination logic
+- Also added `step !== 'success'` condition to balance warning display
+
+**Purchase Modal - Layout Shift After Success**
+- Fixed modal "stretching then shrinking" after purchase confirmation
+- Root cause: Progress steps disappeared when `hasEnoughBalance` became false after purchase
+- Solution: Keep progress steps visible on success with `(hasEnoughBalance || step === 'success')`
+
+**My Signals Page - Card Layout Consistency**
+- Fixed inconsistent separator line position across purchased signal cards
+- Cards with shorter titles/descriptions now align with cards having longer content
+- Solution: Added `flex flex-col h-full` with `flex-grow` wrapper for variable content
+- Separator line and action buttons now always at consistent vertical position
+
+**Predictor Dashboard - Signal Card Layout Consistency**
+- Same fix applied to `MySignalCard` component on Predictor Dashboard
+- Price/Sales/Earnings boxes now aligned across all signal cards regardless of title/description length
+
+**New Signal Not Appearing on Signals Page**
+- Fixed: Creating a signal from Predictor Dashboard didn't show on Signals page without refresh
+- Added `signalKeys.lists()` invalidation to `useCreateSignal` hook
+- New signals now appear immediately on the Signals page
+
+---
+
 ## [0.23.3] - 2025-12-20 📊 HOMEPAGE STATS IMPROVEMENT
 
 ### Changed

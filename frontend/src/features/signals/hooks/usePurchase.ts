@@ -473,10 +473,15 @@ export function usePurchaseFlow(params: {
   const canPurchase = hasEnoughBalance && !needsApproval && !!contentIdData?.contentIdentifier;
 
   // Determine current step
+  // IMPORTANT: Check isPurchaseConfirmed FIRST - once purchase succeeds, always show success
+  // regardless of balance (which will be lower after spending USDT)
   type PurchaseStep = 'loading' | 'error' | 'insufficient-balance' | 'approve' | 'approving' | 'ready' | 'purchasing' | 'success';
   let step: PurchaseStep = 'loading';
 
-  if (isLoadingBalance || isLoadingAllowance || isLoadingContentId) {
+  if (isPurchaseConfirmed) {
+    // Purchase succeeded - always show success, even if balance is now lower
+    step = 'success';
+  } else if (isLoadingBalance || isLoadingAllowance || isLoadingContentId) {
     step = 'loading';
   } else if (contentIdError) {
     // API error (e.g., rate limit) - show error state
@@ -491,8 +496,6 @@ export function usePurchaseFlow(params: {
     }
   } else if (isPurchasing || isConfirmingPurchase) {
     step = 'purchasing';
-  } else if (isPurchaseConfirmed) {
-    step = 'success';
   } else {
     step = 'ready';
   }

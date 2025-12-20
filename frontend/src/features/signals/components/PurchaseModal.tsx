@@ -273,8 +273,8 @@ export function PurchaseModal({
           </div>
         </div>
 
-        {/* Balance Warning */}
-        {!hasEnoughBalance && step !== 'loading' && (
+        {/* Balance Warning - hide on success since balance will be lower after purchase */}
+        {!hasEnoughBalance && step !== 'loading' && step !== 'success' && (
           <div className="bg-accent-red/10 border border-accent-red/30 rounded-lg p-4">
             <div className="flex items-start gap-3">
               <svg className="w-5 h-5 text-accent-red mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -290,8 +290,8 @@ export function PurchaseModal({
           </div>
         )}
 
-        {/* Progress Steps */}
-        {hasStarted && hasEnoughBalance && (
+        {/* Progress Steps - keep visible on success even if balance dropped */}
+        {hasStarted && (hasEnoughBalance || step === 'success') && (
           <div className="space-y-4">
             {/* Step 1: Approve (only show if needed) */}
             {needsApproval && (

@@ -112,36 +112,40 @@ export function PurchasedSignalCard({ receipt }: PurchasedSignalCardProps): Reac
   const explorerUrl = getExplorerTxUrl(receipt.transactionHash);
 
   return (
-    <div className="bg-dark-800 border border-dark-600 rounded-xl p-5 hover:border-fur-light/30 transition-all duration-300">
-      {/* Header: Category & Owned Badge */}
-      <div className="flex items-center justify-between mb-3">
-        {categoryName ? (
-          <span className="text-xs font-medium text-fur-light bg-fur-light/10 px-2 py-1 rounded-full">
-            {categoryName}
+    <div className="bg-dark-800 border border-dark-600 rounded-xl p-5 hover:border-fur-light/30 transition-all duration-300 flex flex-col h-full">
+      {/* Variable content area - grows to fill space */}
+      <div className="flex-grow">
+        {/* Header: Category & Owned Badge */}
+        <div className="flex items-center justify-between mb-3">
+          {categoryName ? (
+            <span className="text-xs font-medium text-fur-light bg-fur-light/10 px-2 py-1 rounded-full">
+              {categoryName}
+            </span>
+          ) : (
+            <span className="text-xs font-medium text-fur-cream/50 bg-dark-700 px-2 py-1 rounded-full">
+              Uncategorized
+            </span>
+          )}
+          <span className="flex items-center gap-1.5 text-xs font-medium text-success-400 bg-success-400/10 px-2 py-1 rounded-full">
+            <KeyIcon />
+            Owned
           </span>
-        ) : (
-          <span className="text-xs font-medium text-fur-cream/50 bg-dark-700 px-2 py-1 rounded-full">
-            Uncategorized
-          </span>
+        </div>
+
+        {/* Title */}
+        <h3 className="text-lg font-semibold text-fur-cream mb-2 line-clamp-2">
+          {signalTitle}
+        </h3>
+
+        {/* Signal Description (if available) */}
+        {receipt.signal?.description && (
+          <p className="text-sm text-fur-cream/60 mb-4 line-clamp-2">
+            {receipt.signal.description}
+          </p>
         )}
-        <span className="flex items-center gap-1.5 text-xs font-medium text-success-400 bg-success-400/10 px-2 py-1 rounded-full">
-          <KeyIcon />
-          Owned
-        </span>
       </div>
 
-      {/* Title */}
-      <h3 className="text-lg font-semibold text-fur-cream mb-2 line-clamp-2">
-        {signalTitle}
-      </h3>
-
-      {/* Signal Description (if available) */}
-      {receipt.signal?.description && (
-        <p className="text-sm text-fur-cream/60 mb-4 line-clamp-2">
-          {receipt.signal.description}
-        </p>
-      )}
-
+      {/* Fixed content area - always at bottom */}
       {/* Purchase Info Grid */}
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="bg-dark-900/50 rounded-lg p-3">
