@@ -14,6 +14,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.23.3] - 2025-12-20 📊 HOMEPAGE STATS IMPROVEMENT
+
+### Changed
+
+**Homepage Stats: "Signals Purchased" Replaces "Total Signals"**
+- Changed first stat on homepage CTA section from "Total Signals" to "Signals Purchased"
+- Displays `totalPurchases` instead of `totalSignals` from the public stats API
+- More meaningful metric showing actual marketplace activity vs just content count
+- Backend already provided `totalPurchases` in `/api/stats` response (no API changes needed)
+
+---
+
+## [0.23.2] - 2025-12-20 🔧 SIGNALS CACHE INVALIDATION FIX
+
+### Fixed
+
+**Purchased Signals Now Immediately Disappear from Signals Page**
+- Fixed bug where purchased signals would briefly remain visible on the Signals page after purchase
+- Added `signalKeys.lists()` to cache invalidation in `usePurchaseFlow`
+- Signals list now refetches immediately after purchase confirmation, removing the purchased signal
+
+**Root Cause**
+- After purchase, cache invalidation was missing for the signals list query
+- Only `purchaseKeys.check`, `signalKeys.detail`, and `myReceipts` were being invalidated
+- The Signals page uses `excludeBuyerAddress` filter which depends on backend Receipt records
+- Without list invalidation, stale cache showed purchased signal until 2-minute staleTime expired
+
+---
+
 ## [0.23.1] - 2025-12-19 🔧 FAQ & NAVIGATION FIXES
 
 ### Fixed

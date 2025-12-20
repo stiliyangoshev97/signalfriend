@@ -2,8 +2,23 @@
                         SIGNALFRIEND FRONTEND TO-DO LIST
 ================================================================================
 
-Last Updated: 2025-12-19
-Current Version: v0.23.0 (About Page, FAQ Page & Blockaid Announcement)
+Last Updated: 2025-12-20
+Current Version: v0.23.3 (Homepage Stats Improvement)
+
+================================================================================
+PHASE 10: BUG FIXES & IMPROVEMENTS ✅ COMPLETE (December 20, 2025)
+================================================================================
+
+[✅] Homepage Stats Improvement
+    - Changed "Total Signals" → "Signals Purchased" on homepage CTA section
+    - Shows totalPurchases instead of totalSignals (already in API response)
+    - Better metric showing actual marketplace activity
+
+[✅] Signals Cache Invalidation Fix
+    - Fixed: Purchased signals remained visible on Signals page for ~2 minutes after purchase
+    - Root cause: usePurchaseFlow only invalidated purchaseKeys and signalKeys.detail, not signalKeys.lists()
+    - Solution: Added signalKeys.lists() to cache invalidation in usePurchaseFlow
+    - Impact: Signals now disappear immediately from Signals page after purchase confirmation
 
 ================================================================================
 PHASE 9: ABOUT & FAQ PAGES ✅ COMPLETE (December 19, 2025)

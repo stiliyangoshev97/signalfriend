@@ -441,6 +441,11 @@ export function usePurchaseFlow(params: {
         queryClient.invalidateQueries({ 
           queryKey: purchaseKeys.content(contentId, address) 
         });
+        // Invalidate signals list cache so the purchased signal is removed from
+        // the Signals page (backend excludes signals user has already purchased)
+        queryClient.invalidateQueries({ 
+          queryKey: signalKeys.lists() 
+        });
       };
       
       // Immediate invalidation
