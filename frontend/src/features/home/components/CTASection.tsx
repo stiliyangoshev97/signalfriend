@@ -72,10 +72,10 @@ export function CTASection() {
                 <div className="flex justify-center"><Spinner size="sm" /></div>
               ) : (
                 <div className="text-2xl md:text-3xl font-bold text-fur-cream">
-                  {stats?.totalSignals ?? 0}
+                  {stats?.totalPurchases ?? 0}
                 </div>
               )}
-              <div className="text-sm text-gray-main">Total Signals</div>
+              <div className="text-sm text-gray-main">Signals Purchased</div>
             </div>
             <div>
               {isLoading ? (
