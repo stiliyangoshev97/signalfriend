@@ -16,7 +16,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { isAddress, getAddress } from 'viem';
@@ -851,14 +851,12 @@ export default function BecomePredictorPage() {
       {isConnected && isAuthenticated && step === 'info' && !isPredictor && (
         <p className="text-center text-sm text-fur-cream/50 mt-6">
           Need help?{' '}
-          <a
-            href="https://docs.signalfriend.com/predictors"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/faq"
             className="text-accent-gold hover:underline"
           >
-            Read our predictor guide
-          </a>
+            Check our FAQ
+          </Link>
         </p>
       )}
     </div>

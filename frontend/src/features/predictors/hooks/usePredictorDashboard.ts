@@ -29,6 +29,7 @@ import {
   reactivateSignal,
   checkFieldUniqueness,
 } from '../api';
+import { signalKeys } from '@/features/signals/hooks/useSignals';
 import type { CreateSignalData } from '@/shared/types';
 
 /** Query key factory for predictor queries */
@@ -217,13 +218,17 @@ export function useCreateSignal() {
   return useMutation({
     mutationFn: (data: CreateSignalData) => createSignal(data),
     onSuccess: () => {
-      // Invalidate signals list
+      // Invalidate predictor's own signals list (dashboard)
       queryClient.invalidateQueries({
         queryKey: predictorKeys.signals(address!, {}),
       });
       // Invalidate earnings (new signal may affect stats)
       queryClient.invalidateQueries({
         queryKey: predictorKeys.earnings(address!),
+      });
+      // Invalidate main signals list (Signals page) so new signal appears
+      queryClient.invalidateQueries({
+        queryKey: signalKeys.lists(),
       });
     },
   });
