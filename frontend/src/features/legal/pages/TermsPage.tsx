@@ -28,7 +28,7 @@ export function TermsPage() {
             Terms and Conditions
           </h1>
           <p className="text-fur-cream/60">
-            Last updated: December 9, 2025
+            Last updated: December 21, 2025
           </p>
         </div>
       </header>
@@ -52,18 +52,65 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 2: Platform Nature */}
-          <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">2. Nature of the Platform</h2>
+          {/* Section 2: Jurisdictional Restrictions - EU/EEA Exclusion */}
+          <section className="bg-error-500/10 border border-error-500/30 rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">2. Jurisdictional Restrictions (EU/EEA Exclusion)</h2>
             
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">2.1 NFT Marketplace</h3>
+            <p className="text-gray-main leading-relaxed">
+              <strong className="text-error-400">IMPORTANT:</strong> SignalFriend is <strong className="text-fur-cream">not offered to, 
+              directed at, or intended for use</strong> by any person or entity who is:
+            </p>
+            
+            <ul className="list-disc list-inside text-gray-main space-y-2 mt-4 ml-4">
+              <li>located in,</li>
+              <li>resident in, or</li>
+              <li>acting on behalf of a person or entity located in</li>
+            </ul>
+            
+            <p className="text-gray-main leading-relaxed mt-4">
+              the <strong className="text-fur-cream">European Union (EU)</strong> or the{' '}
+              <strong className="text-fur-cream">European Economic Area (EEA)</strong> (collectively, the "Restricted Jurisdictions").
+            </p>
+
+            <p className="text-gray-main leading-relaxed mt-4">
+              Users from Restricted Jurisdictions are <strong className="text-fur-cream">strictly prohibited</strong> from accessing or 
+              using the Platform, including but not limited to purchasing, selling, minting, or interacting with SignalKey NFTs 
+              or PredictorAccessPass NFTs through the Platform's official interface.
+            </p>
+
+            <div className="bg-dark-900/50 border border-dark-600 rounded-lg p-4 mt-6">
+              <h3 className="text-lg font-semibold text-fur-cream mb-2">MiCA Compliance Notice</h3>
+              <p className="text-gray-main leading-relaxed text-sm">
+                SignalFriend does <strong className="text-fur-cream">not</strong> offer crypto-asset services within the meaning of 
+                Regulation (EU) 2023/1114 (Markets in Crypto-Assets Regulation – "MiCA"), and does not seek authorization or 
+                registration under MiCA. The Platform operates exclusively as an NFT marketplace for digital content access, 
+                not as a crypto-asset service provider.
+              </p>
+            </div>
+
+            <p className="text-gray-main leading-relaxed mt-4 text-sm">
+              If you access or use the Platform from a Restricted Jurisdiction, you do so in violation of these Terms, and 
+              SignalFriend assumes <strong className="text-fur-cream">no responsibility or liability</strong> for such unauthorized use. 
+              We reserve the right to restrict, suspend, or terminate access for users who violate these jurisdictional restrictions.
+            </p>
+          </section>
+
+          {/* Section 3: Nature of the Platform */}
+          <section>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">3. Nature of the Platform</h2>
+            
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.1 NFT Marketplace — Not a Crypto-Asset Service</h3>
             <p className="text-gray-main leading-relaxed">
               SignalFriend is an <strong className="text-fur-cream">NFT marketplace for digital information access</strong>. When you purchase 
               a "Signal" on our Platform, you are purchasing a Non-Fungible Token (SignalKey NFT) that grants you access to view 
               specific digital content created by a Predictor. The NFT serves as a receipt and access key to the content.
             </p>
+            <p className="text-gray-main leading-relaxed mt-4">
+              <strong className="text-fur-cream">What you are purchasing:</strong> A unique digital collectible (NFT) that functions as an 
+              access key to view content. The NFT is the product; the content is the utility associated with owning that NFT.
+            </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">2.2 Not Financial Advice</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.2 Not Financial Advice or Investment Services</h3>
             <p className="text-gray-main leading-relaxed">
               <strong className="text-error-500">IMPORTANT:</strong> SignalFriend, its operators, and its affiliates are 
               <strong className="text-fur-cream"> NOT</strong> registered investment advisers, broker-dealers, or financial planners. 
@@ -72,15 +119,15 @@ export function TermsPage() {
               financial advice.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">2.3 Not Gambling</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.3 Not Gambling</h3>
             <p className="text-gray-main leading-relaxed">
               SignalFriend is <strong className="text-fur-cream">NOT a gambling, betting, or wagering platform</strong>. The purchase of 
-              SignalKey NFTs constitutes a one-time exchange of value for access to digital information content. There are no 
-              contingent payouts, prizes, or refunds based on the accuracy of predictions. The value exchanged is for the 
-              information content itself, not for any future outcome.
+              SignalKey NFTs constitutes a one-time exchange of value for a digital collectible (NFT) that provides access to 
+              information content. There are no contingent payouts, prizes, or refunds based on the accuracy of predictions. 
+              You are purchasing an NFT; the value exchanged is for the digital asset itself and its associated content access utility.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">2.4 Independent Predictors</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.4 Independent Predictors</h3>
             <p className="text-gray-main leading-relaxed">
               Predictors are independent third-party content creators who use our Platform to distribute their content. 
               SignalFriend does not employ, control, endorse, or guarantee the accuracy of any Predictor or their content. 
@@ -88,9 +135,9 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 3: User Responsibilities */}
+          {/* Section 4: User Responsibilities */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">3. User Responsibilities and Acknowledgments</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">4. User Responsibilities and Acknowledgments</h2>
             
             <p className="text-gray-main leading-relaxed">By using SignalFriend, you acknowledge and agree that:</p>
             
@@ -108,8 +155,9 @@ export function TermsPage() {
                 consult with qualified financial professionals before making any investment decisions.
               </li>
               <li>
-                <strong className="text-fur-cream">No Refunds:</strong> Purchases of SignalKey NFTs are final. There are no 
-                refunds for purchased content, regardless of the accuracy of predictions contained therein.
+                <strong className="text-fur-cream">No Refunds on NFT Purchases:</strong> Purchases of SignalKey NFTs are final and 
+                non-refundable. You are purchasing a digital collectible (NFT); there are no refunds regardless of the 
+                accuracy or usefulness of the content associated with the NFT.
               </li>
               <li>
                 <strong className="text-fur-cream">Blockchain Transactions:</strong> All transactions are processed on the 
@@ -123,14 +171,21 @@ export function TermsPage() {
                 <strong className="text-fur-cream">Legal Compliance:</strong> You are responsible for ensuring that your use 
                 of the Platform complies with all applicable laws in your jurisdiction.
               </li>
+              <li>
+                <strong className="text-fur-cream">Jurisdictional Eligibility:</strong> You confirm that you are not located in, 
+                resident in, or acting on behalf of any person in the European Union (EU) or European Economic Area (EEA), 
+                and that you are legally permitted to purchase NFTs and use the Platform in your jurisdiction.
+              </li>
             </ul>
           </section>
 
-          {/* Section 4: Predictor Terms */}
+          {/* Section 5: Predictor Terms */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">4. Predictor Terms</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">5. Predictor Terms</h2>
             
-            <p className="text-gray-main leading-relaxed">If you register as a Predictor, you additionally agree that:</p>
+            <p className="text-gray-main leading-relaxed">
+              If you register as a Predictor by purchasing a PredictorAccessPass NFT, you additionally agree that:
+            </p>
             
             <ul className="list-disc list-inside text-gray-main space-y-3 mt-4">
               <li>
@@ -153,22 +208,28 @@ export function TermsPage() {
               </li>
               <li>
                 The one-time registration fee ($20 USDT) is non-refundable and grants you a soulbound 
-                PredictorAccessPass NFT.
+                PredictorAccessPass NFT — a non-transferable digital collectible that serves as your license to 
+                create and sell SignalKey NFTs on the Platform.
+              </li>
+              <li>
+                You confirm that you are not located in, resident in, or acting on behalf of any person in the 
+                European Union (EU) or European Economic Area (EEA).
               </li>
             </ul>
           </section>
 
-          {/* Section 5: Fees */}
+          {/* Section 6: Fees */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">5. Fees and Payments</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">6. Fees and Payments</h2>
             
             <ul className="list-disc list-inside text-gray-main space-y-3">
               <li>
-                <strong className="text-fur-cream">Predictor Registration:</strong> $20 USDT one-time, non-refundable fee.
+                <strong className="text-fur-cream">Predictor Registration (NFT Purchase):</strong> $20 USDT one-time, 
+                non-refundable fee to mint a PredictorAccessPass NFT.
               </li>
               <li>
-                <strong className="text-fur-cream">Signal Purchases:</strong> Price set by Predictor (minimum $1 USDT) plus 
-                a $0.50 USDT platform access fee.
+                <strong className="text-fur-cream">Signal Purchases (NFT Minting):</strong> Price set by Predictor 
+                (minimum $1 USDT) plus a $0.50 USDT platform access fee to mint a SignalKey NFT.
               </li>
               <li>
                 <strong className="text-fur-cream">Platform Commission:</strong> 5% of the signal price is retained by the 
@@ -185,25 +246,26 @@ export function TermsPage() {
             </ul>
           </section>
 
-          {/* Section 6: NFT Ownership */}
+          {/* Section 7: NFT Ownership */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">6. NFT Ownership and Rights</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">7. NFT Ownership and Rights</h2>
             
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">6.1 SignalKey NFT (Buyers)</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">7.1 SignalKey NFT (Buyers)</h3>
             <p className="text-gray-main leading-relaxed">
-              When you purchase a Signal, you receive a SignalKey NFT that grants you perpetual access to view the 
-              associated content. This NFT is transferable and can be sold or traded on secondary markets. Transfer 
-              of the NFT transfers the content access rights.
+              When you purchase a Signal, you receive a SignalKey NFT — a unique digital collectible minted on the 
+              BNB Chain blockchain. This NFT grants you perpetual access to view the associated content. The SignalKey NFT 
+              is transferable and can be sold or traded on secondary markets. Transfer of the NFT transfers the content 
+              access rights to the new owner.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">6.2 PredictorAccessPass NFT (Predictors)</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">7.2 PredictorAccessPass NFT (Predictors)</h3>
             <p className="text-gray-main leading-relaxed">
-              Predictor registration grants a soulbound (non-transferable) PredictorAccessPass NFT. This NFT cannot 
-              be sold or transferred and is permanently linked to your wallet address. Only one PredictorAccessPass 
-              can exist per wallet.
+              Predictor registration involves purchasing a soulbound (non-transferable) PredictorAccessPass NFT. This NFT 
+              serves as your license to create and sell SignalKey NFTs on the Platform. It cannot be sold or transferred 
+              and is permanently linked to your wallet address. Only one PredictorAccessPass can exist per wallet.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">6.3 Content Rights</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">7.3 Content Rights</h3>
             <p className="text-gray-main leading-relaxed">
               Predictors retain intellectual property rights to their content. Purchasing a SignalKey NFT grants you 
               a license to view the content for personal use only. You may not reproduce, distribute, or commercially 
@@ -211,14 +273,15 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 7: Prohibited Activities */}
+          {/* Section 8: Prohibited Activities */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">7. Prohibited Activities</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">8. Prohibited Activities</h2>
             
             <p className="text-gray-main leading-relaxed">Users are prohibited from:</p>
             
             <ul className="list-disc list-inside text-gray-main space-y-3 mt-4">
               <li>Using the Platform for any illegal purpose</li>
+              <li>Accessing the Platform from a Restricted Jurisdiction (EU/EEA)</li>
               <li>Impersonating SignalFriend staff, moderators, or administrators</li>
               <li>Manipulating ratings or creating fake reviews</li>
               <li>Distributing malware or engaging in phishing attempts</li>
@@ -230,51 +293,52 @@ export function TermsPage() {
             </ul>
           </section>
 
-          {/* Section 8: Disclaimers */}
+          {/* Section 9: Disclaimers */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">8. Disclaimers and Limitation of Liability</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">9. Disclaimers and Limitation of Liability</h2>
             
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">8.1 "As Is" Basis</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">9.1 "As Is" Basis</h3>
             <p className="text-gray-main leading-relaxed">
               THE PLATFORM AND ALL CONTENT ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, 
               EXPRESS OR IMPLIED. WE DISCLAIM ALL WARRANTIES, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR 
               PURPOSE, AND NON-INFRINGEMENT.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">8.2 No Liability for Losses</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">9.2 No Liability for Losses</h3>
             <p className="text-gray-main leading-relaxed">
               SIGNALFRIEND SHALL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR 
-              PUNITIVE DAMAGES ARISING FROM YOUR USE OF THE PLATFORM OR RELIANCE ON ANY CONTENT, INCLUDING BUT NOT 
-              LIMITED TO TRADING LOSSES, LOSS OF PROFITS, OR LOSS OF DATA.
+              PUNITIVE DAMAGES ARISING FROM YOUR USE OF THE PLATFORM, PURCHASE OF NFTS, OR RELIANCE ON ANY CONTENT, 
+              INCLUDING BUT NOT LIMITED TO TRADING LOSSES, LOSS OF PROFITS, OR LOSS OF DATA.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">8.3 Third-Party Content</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">9.3 Third-Party Content</h3>
             <p className="text-gray-main leading-relaxed">
               We are not responsible for the accuracy, completeness, or reliability of any content created by 
               Predictors. Your reliance on such content is at your own risk.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">8.4 Blockchain Risks</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">9.4 Blockchain and NFT Risks</h3>
             <p className="text-gray-main leading-relaxed">
-              You acknowledge the inherent risks of blockchain technology, including but not limited to: smart 
-              contract vulnerabilities, network congestion, regulatory changes, and cryptocurrency volatility.
+              You acknowledge the inherent risks of blockchain technology and NFTs, including but not limited to: smart 
+              contract vulnerabilities, network congestion, regulatory changes, cryptocurrency volatility, and the 
+              potential loss of access to NFTs due to wallet security issues.
             </p>
           </section>
 
-          {/* Section 9: Indemnification */}
+          {/* Section 10: Indemnification */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">9. Indemnification</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">10. Indemnification</h2>
             <p className="text-gray-main leading-relaxed">
               You agree to indemnify, defend, and hold harmless SignalFriend, its operators, affiliates, and their 
               respective officers, directors, employees, and agents from any claims, damages, losses, or expenses 
-              (including legal fees) arising from your use of the Platform, violation of these Terms, or infringement 
-              of any third-party rights.
+              (including legal fees) arising from your use of the Platform, purchase of NFTs, violation of these Terms, 
+              violation of jurisdictional restrictions, or infringement of any third-party rights.
             </p>
           </section>
 
-          {/* Section 10: Modifications */}
+          {/* Section 11: Modifications */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">10. Modifications to Terms</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">11. Modifications to Terms</h2>
             <p className="text-gray-main leading-relaxed">
               We reserve the right to modify these Terms at any time. Changes will be effective immediately upon 
               posting to the Platform. Your continued use of the Platform after changes constitutes acceptance of 
@@ -282,9 +346,9 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 11: Governing Law */}
+          {/* Section 12: Governing Law */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">11. Governing Law and Disputes</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">12. Governing Law and Disputes</h2>
             <p className="text-gray-main leading-relaxed">
               These Terms shall be governed by and construed in accordance with applicable laws. Any disputes 
               arising from these Terms or your use of the Platform shall be resolved through good-faith negotiation. 
@@ -292,9 +356,9 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 12: Contact */}
+          {/* Section 13: Contact */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">12. Contact Information</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">13. Contact Information</h2>
             <p className="text-gray-main leading-relaxed">
               For questions about these Terms, please contact us through our official channels:
             </p>

@@ -14,6 +14,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.26.0] - 2025-12-21 🇪🇺 MICA COMPLIANCE & LEGAL UPDATES
+
+### Added
+
+**EU/EEA Region Disclaimer Modal**
+- New `RegionDisclaimerModal` component blocks access until user confirms they are not from EU/EEA
+- Shows on first visit, stores acknowledgment in localStorage
+- Checkbox confirmation: "I confirm that I am not a resident of, located in, or acting on behalf of a person in the European Union or European Economic Area"
+- Links to Terms page for full details
+- Similar approach to Uniswap's legal disclaimer
+
+**FAQ - Signal Categories**
+- Added new FAQ entry: "What categories can I post signals in?"
+- Documents all supported signal categories:
+  - **Crypto**: Bitcoin, Ethereum, Altcoins, DeFi, NFTs, Layer 1/2, Meme Coins, Futures/Perpetuals, Others
+  - **Traditional Finance**: US Stock - Tech, US Stock - General, Forex - Majors, Commodities - Metals, Commodities - Energy, Others
+  - **Macro/Other**: Economic Data, Geopolitical Events, Sports, Others
+- Styled with category tags/chips for easy reading
+
+### Changed
+
+**Terms & Conditions - MiCA Compliance Updates**
+- Added **Section 2: Jurisdictional Restrictions (EU/EEA Exclusion)** with prominent warning styling
+- Added MiCA Compliance Notice explaining platform does NOT offer crypto-asset services under MiCA
+- Strengthened NFT-based language throughout:
+  - Section 3.1: "NFT Marketplace — Not a Crypto-Asset Service"
+  - Clarified purchases are for "digital collectibles (NFTs)" not just content access
+  - Section 3.3: Updated gambling disclaimer to emphasize NFT purchase
+  - Section 4: Added "Jurisdictional Eligibility" user acknowledgment
+  - Section 5: Added EU/EEA confirmation for Predictors
+  - Section 6: Clarified purchases as "NFT Minting"
+  - Section 7: Strengthened SignalKey NFT as "unique digital collectible"
+  - Section 8: Added "Accessing from Restricted Jurisdiction" as prohibited activity
+  - Section 9: Added NFT-specific risks and liability language
+  - Section 10: Added "violation of jurisdictional restrictions" to indemnification
+- Renumbered all sections (now 13 sections)
+- Updated date to December 21, 2025
+
+### Files Changed
+- `src/shared/components/RegionDisclaimerModal.tsx` (new)
+- `src/App.tsx` - Added RegionDisclaimerModal
+- `src/features/legal/pages/TermsPage.tsx` - MiCA compliance updates
+- `src/features/faq/pages/FaqPage.tsx` - Signal categories FAQ
+
+---
+
 ## [0.25.0] - 2025-12-20 🔧 MOBILE FIXES & UX IMPROVEMENTS
 
 ### Fixed
