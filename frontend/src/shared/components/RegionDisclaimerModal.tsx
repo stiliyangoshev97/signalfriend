@@ -9,6 +9,10 @@
  * - Stores acknowledgment in localStorage
  * - Blocks all interaction until acknowledged
  *
+ * CONFIGURATION:
+ * Set VITE_REGION_DISCLAIMER_ENABLED=true in .env to enable the modal.
+ * If not set or set to false, the modal will not be displayed.
+ *
  * @module shared/components/RegionDisclaimerModal
  */
 
@@ -16,6 +20,13 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 const STORAGE_KEY = 'signalfriend-region-disclaimer-acknowledged';
+
+/**
+ * Check if the region disclaimer is enabled via environment variable.
+ * Only "true" (case-insensitive) enables the disclaimer.
+ */
+const isRegionDisclaimerEnabled =
+  import.meta.env.VITE_REGION_DISCLAIMER_ENABLED?.toLowerCase() === 'true';
 
 /**
  * Check if user has already acknowledged the disclaimer
@@ -46,7 +57,8 @@ export function RegionDisclaimerModal() {
 
   // Check on mount if disclaimer needs to be shown
   useEffect(() => {
-    if (!hasAcknowledged()) {
+    // Only show if enabled via env variable AND user hasn't acknowledged
+    if (isRegionDisclaimerEnabled && !hasAcknowledged()) {
       setIsOpen(true);
       // Prevent body scroll when modal is open
       document.body.style.overflow = 'hidden';
@@ -64,8 +76,8 @@ export function RegionDisclaimerModal() {
     document.body.style.overflow = '';
   };
 
-  // Don't render anything if already acknowledged
-  if (!isOpen) return null;
+  // Don't render if disabled via env or already acknowledged
+  if (!isRegionDisclaimerEnabled || !isOpen) return null;
 
   return createPortal(
     <div
