@@ -81,6 +81,8 @@ import { useAuth } from '../api';
 import { Button } from '@/shared/components/ui';
 import { formatAddress } from '@/shared/utils';
 import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
+import { useAccount, useDisconnect } from 'wagmi';
+import { bsc } from 'wagmi/chains';
 
 export function AuthButton() {
   const { 
@@ -94,6 +96,11 @@ export function AuthButton() {
     isUserRejection,
   } = useAuth();
   const isAdmin = useIsAdmin();
+  const { chainId } = useAccount();
+  const { disconnect } = useDisconnect();
+  
+  // Check if connected to wrong chain (not BNB Chain)
+  const isWrongChain = isConnected && chainId !== bsc.id;
 
   // Not connected - show RainbowKit connect button
   if (!isConnected) {
@@ -118,8 +125,18 @@ export function AuthButton() {
   if (!isAuthenticated) {
     return (
       <div className="flex items-center gap-3">
+        {/* Wrong chain warning */}
+        {isWrongChain && (
+          <span 
+            className="text-sm text-yellow-500 hidden sm:inline"
+            title="Please switch to BNB Chain"
+          >
+            Wrong Network
+          </span>
+        )}
+        
         {/* Show error if any - user rejection shown as yellow, other errors as red */}
-        {parsedError && (
+        {parsedError && !isWrongChain && (
           <span
             className={`text-sm max-w-[200px] truncate ${
               isUserRejection ? 'text-yellow-500' : 'text-error-500'
@@ -131,7 +148,7 @@ export function AuthButton() {
         )}
         
         {/* Admin wallet indicator (before sign in) */}
-        {isAdmin && (
+        {isAdmin && !isWrongChain && (
           <span 
             className="px-2 py-1 text-xs font-medium bg-fur-main/20 text-fur-main border border-fur-main/30 rounded-lg hidden sm:inline"
             title="Admin wallet detected"
@@ -145,28 +162,40 @@ export function AuthButton() {
           {formatAddress(address!)}
         </span>
         
-        {/* Sign In button */}
-        <Button
-          onClick={handleLogin}
-          disabled={isLoading}
-          variant="primary"
-          size="sm"
-        >
-          {isLoading ? 'Signing...' : 'Sign In'}
-        </Button>
+        {/* Sign In button - disabled on wrong chain */}
+        {!isWrongChain ? (
+          <Button
+            onClick={handleLogin}
+            disabled={isLoading}
+            variant="primary"
+            size="sm"
+          >
+            {isLoading ? 'Signing...' : 'Sign In'}
+          </Button>
+        ) : (
+          <ConnectButton.Custom>
+            {({ openChainModal }) => (
+              <Button
+                onClick={openChainModal}
+                variant="primary"
+                size="sm"
+              >
+                Switch Network
+              </Button>
+            )}
+          </ConnectButton.Custom>
+        )}
         
-        {/* Disconnect option */}
-        <ConnectButton.Custom>
-          {({ openAccountModal }) => (
-            <button
-              onClick={openAccountModal}
-              className="text-sm text-gray-main hover:text-fur-cream transition-colors"
-              title="Wallet options"
-            >
-              ⋮
-            </button>
-          )}
-        </ConnectButton.Custom>
+        {/* Direct Disconnect button - always works regardless of chain */}
+        <button
+          onClick={() => disconnect()}
+          className="p-1.5 text-gray-main hover:text-fur-cream hover:bg-dark-600 rounded transition-colors"
+          title="Disconnect wallet"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
     );
   }

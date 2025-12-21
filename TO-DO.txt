@@ -2,7 +2,7 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 20, 2025
+Last Updated: December 21, 2025
 
 ================================================================================
 COMPLETED FEATURES ✅
@@ -36,6 +36,32 @@ COMPLETED FEATURES ✅
 [x] 🔧 Client feedback fixes (December 20, 2025)
     - About page mobile overflow fix (contract addresses)
     - Smart optional Telegram/Discord with auto-preferred contact selection
+[x] 🇪🇺 MiCA Compliance & Legal Updates (December 21, 2025)
+    - EU/EEA Region Disclaimer Modal
+    - Terms & Conditions MiCA compliance updates
+    - FAQ signal categories documentation
+
+================================================================================
+PHASE 15: MICA COMPLIANCE & LEGAL UPDATES ✅ COMPLETE (December 21, 2025)
+================================================================================
+
+[x] #1 EU/EEA Region Disclaimer Modal
+    - Created RegionDisclaimerModal (Uniswap-style legal disclaimer)
+    - Shows on first visit, blocks all interaction until acknowledged
+    - Checkbox confirmation for EU/EEA exclusion
+    - Stores acknowledgment in localStorage
+
+[x] #2 Terms & Conditions - MiCA Compliance
+    - Added Section 2: Jurisdictional Restrictions (EU/EEA Exclusion)
+    - Added MiCA Compliance Notice box
+    - Strengthened NFT-based language throughout
+    - Added jurisdictional eligibility acknowledgments
+    - Renumbered all sections (now 13 total)
+
+[x] #3 FAQ - Signal Categories
+    - Added "What categories can I post signals in?" FAQ entry
+    - Documented Crypto, Traditional Finance, Macro/Other categories
+    - Styled with category tags
 
 ================================================================================
 PHASE 14: CLIENT FEEDBACK FIXES ✅ COMPLETE (December 20, 2025)

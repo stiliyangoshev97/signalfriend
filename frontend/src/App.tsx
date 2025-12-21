@@ -36,6 +36,7 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 import { useSessionSync } from './features/auth';
 import { MaintenancePage } from './features/maintenance';
+import { RegionDisclaimerModal } from './shared/components/RegionDisclaimerModal';
 
 /**
  * Check if maintenance mode is enabled via environment variable.
@@ -54,7 +55,12 @@ function App() {
     return <MaintenancePage />;
   }
   
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RegionDisclaimerModal />
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 export default App;

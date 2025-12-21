@@ -2,8 +2,36 @@
                         SIGNALFRIEND FRONTEND TO-DO LIST
 ================================================================================
 
-Last Updated: 2025-12-20
-Current Version: v0.25.0 (Mobile Fixes & UX Improvements)
+Last Updated: 2025-12-21
+Current Version: v0.26.0 (MiCA Compliance & Legal Updates)
+
+================================================================================
+PHASE 12: MICA COMPLIANCE & LEGAL UPDATES ✅ COMPLETE (December 21, 2025)
+================================================================================
+
+[✅] EU/EEA Region Disclaimer Modal
+    - Created RegionDisclaimerModal component (Uniswap-style legal disclaimer)
+    - Shows on first visit, blocks all interaction until acknowledged
+    - Checkbox confirmation for EU/EEA exclusion
+    - Stores acknowledgment in localStorage
+    - Added to App.tsx as global component
+
+[✅] Terms & Conditions - MiCA Compliance
+    - Added Section 2: Jurisdictional Restrictions (EU/EEA Exclusion)
+    - Added MiCA Compliance Notice (not offering crypto-asset services)
+    - Strengthened NFT-based language throughout all sections
+    - Clarified platform sells NFTs (digital collectibles), not crypto services
+    - Added jurisdictional eligibility acknowledgments for users and predictors
+    - Added "Accessing from Restricted Jurisdiction" as prohibited activity
+    - Renumbered all sections (now 13 total)
+    - Updated date to December 21, 2025
+
+[✅] FAQ - Signal Categories Documentation
+    - Added "What categories can I post signals in?" FAQ entry
+    - Documented all signal categories with styled tags:
+      * Crypto: Bitcoin, Ethereum, Altcoins, DeFi, NFTs, Layer 1/2, Meme Coins, Futures/Perpetuals, Others
+      * Traditional Finance: US Stock - Tech, US Stock - General, Forex - Majors, Commodities - Metals, Commodities - Energy, Others
+      * Macro/Other: Economic Data, Geopolitical Events, Sports, Others
 
 ================================================================================
 PHASE 11: CLIENT FEEDBACK FIXES ✅ COMPLETE (December 20, 2025)

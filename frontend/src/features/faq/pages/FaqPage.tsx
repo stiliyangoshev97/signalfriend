@@ -163,6 +163,65 @@ const faqItems: FaqItem[] = [
     ),
   },
   {
+    id: 'signal-categories',
+    category: 'predictor',
+    question: 'What categories can I post signals in?',
+    answer: (
+      <div className="space-y-4">
+        <p>
+          SignalFriend supports a wide range of signal categories across <strong className="text-fur-cream">three main groups</strong>:
+        </p>
+        
+        {/* Crypto */}
+        <div className="bg-dark-800/50 rounded-lg p-4">
+          <h4 className="font-semibold text-fur-cream mb-3 flex items-center gap-2">
+            <span className="text-lg">🪙</span> Crypto
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {['Bitcoin', 'Ethereum', 'Altcoins', 'DeFi', 'NFTs', 'Layer 1/2', 'Meme Coins', 'Futures/Perpetuals', 'Others'].map((cat) => (
+              <span key={cat} className="px-3 py-1 bg-dark-700 text-gray-main text-sm rounded-full border border-dark-600">
+                {cat}
+              </span>
+            ))}
+          </div>
+        </div>
+        
+        {/* Traditional Finance */}
+        <div className="bg-dark-800/50 rounded-lg p-4">
+          <h4 className="font-semibold text-fur-cream mb-3 flex items-center gap-2">
+            <span className="text-lg">📈</span> Traditional Finance
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {['US Stock - Tech', 'US Stock - General', 'Forex - Majors', 'Commodities - Metals', 'Commodities - Energy', 'Others'].map((cat) => (
+              <span key={cat} className="px-3 py-1 bg-dark-700 text-gray-main text-sm rounded-full border border-dark-600">
+                {cat}
+              </span>
+            ))}
+          </div>
+        </div>
+        
+        {/* Macro / Other */}
+        <div className="bg-dark-800/50 rounded-lg p-4">
+          <h4 className="font-semibold text-fur-cream mb-3 flex items-center gap-2">
+            <span className="text-lg">🌍</span> Macro / Other
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {['Economic Data', 'Geopolitical Events', 'Sports', 'Others'].map((cat) => (
+              <span key={cat} className="px-3 py-1 bg-dark-700 text-gray-main text-sm rounded-full border border-dark-600">
+                {cat}
+              </span>
+            ))}
+          </div>
+        </div>
+        
+        <p className="text-sm text-gray-main">
+          When creating a signal, you'll select a main category and subcategory. Buyers can filter 
+          signals by category to find exactly what they're looking for.
+        </p>
+      </div>
+    ),
+  },
+  {
     id: 'get-verified',
     category: 'predictor',
     question: 'How do I get verified as a Predictor?',
