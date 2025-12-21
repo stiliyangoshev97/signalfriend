@@ -143,7 +143,8 @@ export function TermsPage() {
             <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.3 Governance (3-of-3 MultiSig)</h3>
             <p className="text-gray-main leading-relaxed">
               The Protocol includes governance mechanisms controlled by a <strong className="text-fur-cream">3-of-3 MultiSignature 
-              arrangement</strong>:
+              arrangement</strong>. The MultiSig wallets are operated by SignalFriend team members, who deployed the Protocol's 
+              smart contracts. All governance actions require unanimous approval from all three signers:
             </p>
             <ul className="list-disc list-inside text-gray-main space-y-2 mt-4 ml-4">
               <li>Three designated wallet addresses must unanimously approve any protocol parameter changes.</li>
