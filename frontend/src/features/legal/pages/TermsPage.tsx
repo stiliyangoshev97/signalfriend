@@ -128,7 +128,10 @@ export function TermsPage() {
 
             <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.2 Non-Custodial Architecture</h3>
             <p className="text-gray-main leading-relaxed">
-              SignalFriend is entirely <strong className="text-fur-cream">non-custodial</strong>:
+              SignalFriend is entirely <strong className="text-fur-cream">non-custodial</strong>. The Interface is purely 
+              informational — it reads blockchain data and displays it in a user-friendly format. It does not custody funds, 
+              mint NFTs, or execute transactions. All state-changing actions occur via the decentralized Protocol when users 
+              sign transactions with their own wallets.
             </p>
             <ul className="list-disc list-inside text-gray-main space-y-2 mt-4 ml-4">
               <li>Users connect their own wallets and sign transactions directly to the blockchain.</li>
@@ -285,11 +288,23 @@ export function TermsPage() {
                 European Union (EU) or European Economic Area (EEA).
               </li>
             </ul>
+
+            <p className="text-gray-main leading-relaxed mt-4">
+              <strong className="text-fur-cream">Note:</strong> When you complete registration, the Protocol's smart contract 
+              mints the PredictorAccessPass NFT directly to your wallet. The Interface facilitates this interaction but does 
+              not mint NFTs on your behalf — all minting is performed autonomously by the Protocol.
+            </p>
           </section>
 
           {/* Section 7: Fees */}
           <section>
             <h2 className="text-2xl font-bold text-fur-cream mb-4">7. Fees and Payments</h2>
+            
+            <p className="text-gray-main leading-relaxed mb-4">
+              All fees and payments are processed automatically by the Protocol's smart contracts on BNB Chain. 
+              SignalFriend does not collect, hold, or process payments directly — all fund transfers occur on-chain 
+              when users sign transactions with their wallets.
+            </p>
             
             <ul className="list-disc list-inside text-gray-main space-y-3">
               <li>
