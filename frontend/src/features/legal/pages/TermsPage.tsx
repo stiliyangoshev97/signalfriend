@@ -28,7 +28,7 @@ export function TermsPage() {
             Terms and Conditions
           </h1>
           <p className="text-fur-cream/60">
-            Last updated: December 21, 2025
+            Last updated: December 22, 2025
           </p>
         </div>
       </header>
@@ -46,9 +46,16 @@ export function TermsPage() {
               to these Terms, do not use the Platform.
             </p>
             <p className="text-gray-main leading-relaxed mt-4">
-              SignalFriend operates as a <strong className="text-fur-cream">decentralized NFT-based digital information marketplace</strong> on 
-              the BNB Chain blockchain. The Platform facilitates the purchase and sale of digital content access tokens (NFTs) 
-              that unlock trading-related information created by independent third-party content creators ("Predictors").
+              SignalFriend operates as a <strong className="text-fur-cream">Web3 signal marketplace</strong> — a user interface 
+              ("Interface") that enables interaction with the <strong className="text-fur-cream">SignalFriend Protocol</strong>, a set 
+              of permissionless smart contracts deployed on BNB Chain. The Protocol autonomously handles all transactions, NFT 
+              minting, and fund distribution. SignalFriend (the team/operators) develops and maintains this Interface and 
+              participates in Protocol governance through a multi-signature arrangement.
+            </p>
+            <p className="text-gray-main leading-relaxed mt-4">
+              The Platform facilitates the purchase and sale of digital content access tokens (NFTs) that unlock trading-related 
+              information created by independent third-party content creators ("Predictors"). When you use SignalFriend, you are 
+              interacting directly with blockchain smart contracts — the Interface merely provides a convenient way to do so.
             </p>
           </section>
 
@@ -95,11 +102,73 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 3: Nature of the Platform */}
+          {/* Section 3: Protocol Architecture & Governance */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">3. Nature of the Platform</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">3. Protocol Architecture & Governance</h2>
             
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.1 NFT Marketplace — Not a Crypto-Asset Service</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.1 The SignalFriend Protocol</h3>
+            <p className="text-gray-main leading-relaxed">
+              SignalFriend consists of two distinct components:
+            </p>
+            <ul className="list-disc list-inside text-gray-main space-y-2 mt-4 ml-4">
+              <li>
+                <strong className="text-fur-cream">The Protocol:</strong> Smart contracts deployed on BNB Chain that handle 
+                all transactions, NFT minting, payment distribution, and business logic.
+              </li>
+              <li>
+                <strong className="text-fur-cream">The Interface:</strong> This website (signalfriend.com) which provides a 
+                user-friendly way to interact with the Protocol.
+              </li>
+            </ul>
+            <p className="text-gray-main leading-relaxed mt-4">
+              All purchases, payments, and NFT minting occur directly on the blockchain through the Protocol's smart contracts. 
+              The Interface does not process payments, custody funds, or mint NFTs — these actions are executed autonomously 
+              by the Protocol when users sign transactions with their wallets.
+            </p>
+
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.2 Non-Custodial Architecture</h3>
+            <p className="text-gray-main leading-relaxed">
+              SignalFriend is entirely <strong className="text-fur-cream">non-custodial</strong>:
+            </p>
+            <ul className="list-disc list-inside text-gray-main space-y-2 mt-4 ml-4">
+              <li>Users connect their own wallets and sign transactions directly to the blockchain.</li>
+              <li>Funds flow directly between users and the Protocol — never through SignalFriend servers.</li>
+              <li>The Interface only reads blockchain data and provides a UI for transaction signing.</li>
+              <li>SignalFriend does not have access to your funds, private keys, or the ability to move assets on your behalf.</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.3 Governance (3-of-3 MultiSig)</h3>
+            <p className="text-gray-main leading-relaxed">
+              The Protocol includes governance mechanisms controlled by a <strong className="text-fur-cream">3-of-3 MultiSignature 
+              arrangement</strong>:
+            </p>
+            <ul className="list-disc list-inside text-gray-main space-y-2 mt-4 ml-4">
+              <li>Three designated wallet addresses must unanimously approve any protocol parameter changes.</li>
+              <li>Governance can modify: fee rates, minimum prices, treasury address, and emergency pause functionality.</li>
+              <li>All governance actions are transparent and permanently recorded on-chain.</li>
+              <li>Proposals automatically expire after 1 hour if not fully approved by all three signers.</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.4 Alternative Interfaces</h3>
+            <p className="text-gray-main leading-relaxed">
+              The Protocol's smart contracts are public and verified on BSCScan. Anyone can:
+            </p>
+            <ul className="list-disc list-inside text-gray-main space-y-2 mt-4 ml-4">
+              <li>Build alternative interfaces to interact with the Protocol.</li>
+              <li>Verify the contract source code independently.</li>
+              <li>Interact directly with the contracts via blockchain explorers (e.g., BSCScan).</li>
+            </ul>
+            <p className="text-gray-main leading-relaxed mt-4">
+              The existence of this Interface does not prevent others from accessing the Protocol through other means. 
+              SignalFriend is simply one way to interact with the underlying decentralized Protocol.
+            </p>
+          </section>
+
+          {/* Section 4: Nature of the Platform */}
+          <section>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">4. Nature of the Platform</h2>
+            
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">4.1 NFT Marketplace — Not a Crypto-Asset Service</h3>
             <p className="text-gray-main leading-relaxed">
               SignalFriend is an <strong className="text-fur-cream">NFT marketplace for digital information access</strong>. When you purchase 
               a "Signal" on our Platform, you are purchasing a Non-Fungible Token (SignalKey NFT) that grants you access to view 
@@ -110,7 +179,7 @@ export function TermsPage() {
               access key to view content. The NFT is the product; the content is the utility associated with owning that NFT.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.2 Not Financial Advice or Investment Services</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">4.2 Not Financial Advice or Investment Services</h3>
             <p className="text-gray-main leading-relaxed">
               <strong className="text-error-500">IMPORTANT:</strong> SignalFriend, its operators, and its affiliates are 
               <strong className="text-fur-cream"> NOT</strong> registered investment advisers, broker-dealers, or financial planners. 
@@ -119,7 +188,7 @@ export function TermsPage() {
               financial advice.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.3 Not Gambling</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">4.3 Not Gambling</h3>
             <p className="text-gray-main leading-relaxed">
               SignalFriend is <strong className="text-fur-cream">NOT a gambling, betting, or wagering platform</strong>. The purchase of 
               SignalKey NFTs constitutes a one-time exchange of value for a digital collectible (NFT) that provides access to 
@@ -127,7 +196,7 @@ export function TermsPage() {
               You are purchasing an NFT; the value exchanged is for the digital asset itself and its associated content access utility.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">3.4 Independent Predictors</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">4.4 Independent Predictors</h3>
             <p className="text-gray-main leading-relaxed">
               Predictors are independent third-party content creators who use our Platform to distribute their content. 
               SignalFriend does not employ, control, endorse, or guarantee the accuracy of any Predictor or their content. 
@@ -135,9 +204,9 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 4: User Responsibilities */}
+          {/* Section 5: User Responsibilities */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">4. User Responsibilities and Acknowledgments</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">5. User Responsibilities and Acknowledgments</h2>
             
             <p className="text-gray-main leading-relaxed">By using SignalFriend, you acknowledge and agree that:</p>
             
@@ -179,9 +248,9 @@ export function TermsPage() {
             </ul>
           </section>
 
-          {/* Section 5: Predictor Terms */}
+          {/* Section 6: Predictor Terms */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">5. Predictor Terms</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">6. Predictor Terms</h2>
             
             <p className="text-gray-main leading-relaxed">
               If you register as a Predictor by purchasing a PredictorAccessPass NFT, you additionally agree that:
@@ -218,9 +287,9 @@ export function TermsPage() {
             </ul>
           </section>
 
-          {/* Section 6: Fees */}
+          {/* Section 7: Fees */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">6. Fees and Payments</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">7. Fees and Payments</h2>
             
             <ul className="list-disc list-inside text-gray-main space-y-3">
               <li>
@@ -246,11 +315,11 @@ export function TermsPage() {
             </ul>
           </section>
 
-          {/* Section 7: NFT Ownership */}
+          {/* Section 8: NFT Ownership */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">7. NFT Ownership and Rights</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">8. NFT Ownership and Rights</h2>
             
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">7.1 SignalKey NFT (Buyers)</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">8.1 SignalKey NFT (Buyers)</h3>
             <p className="text-gray-main leading-relaxed">
               When you purchase a Signal, you receive a SignalKey NFT — a unique digital collectible minted on the 
               BNB Chain blockchain. This NFT grants you perpetual access to view the associated content. The SignalKey NFT 
@@ -258,14 +327,14 @@ export function TermsPage() {
               access rights to the new owner.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">7.2 PredictorAccessPass NFT (Predictors)</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">8.2 PredictorAccessPass NFT (Predictors)</h3>
             <p className="text-gray-main leading-relaxed">
               Predictor registration involves purchasing a soulbound (non-transferable) PredictorAccessPass NFT. This NFT 
               serves as your license to create and sell SignalKey NFTs on the Platform. It cannot be sold or transferred 
               and is permanently linked to your wallet address. Only one PredictorAccessPass can exist per wallet.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">7.3 Content Rights</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">8.3 Content Rights</h3>
             <p className="text-gray-main leading-relaxed">
               Predictors retain intellectual property rights to their content. Purchasing a SignalKey NFT grants you 
               a license to view the content for personal use only. You may not reproduce, distribute, or commercially 
@@ -273,9 +342,9 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 8: Prohibited Activities */}
+          {/* Section 9: Prohibited Activities */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">8. Prohibited Activities</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">9. Prohibited Activities</h2>
             
             <p className="text-gray-main leading-relaxed">Users are prohibited from:</p>
             
@@ -293,31 +362,31 @@ export function TermsPage() {
             </ul>
           </section>
 
-          {/* Section 9: Disclaimers */}
+          {/* Section 10: Disclaimers */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">9. Disclaimers and Limitation of Liability</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">10. Disclaimers and Limitation of Liability</h2>
             
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">9.1 "As Is" Basis</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">10.1 "As Is" Basis</h3>
             <p className="text-gray-main leading-relaxed">
               THE PLATFORM AND ALL CONTENT ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, 
               EXPRESS OR IMPLIED. WE DISCLAIM ALL WARRANTIES, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR 
               PURPOSE, AND NON-INFRINGEMENT.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">9.2 No Liability for Losses</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">10.2 No Liability for Losses</h3>
             <p className="text-gray-main leading-relaxed">
               SIGNALFRIEND SHALL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR 
               PUNITIVE DAMAGES ARISING FROM YOUR USE OF THE PLATFORM, PURCHASE OF NFTS, OR RELIANCE ON ANY CONTENT, 
               INCLUDING BUT NOT LIMITED TO TRADING LOSSES, LOSS OF PROFITS, OR LOSS OF DATA.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">9.3 Third-Party Content</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">10.3 Third-Party Content</h3>
             <p className="text-gray-main leading-relaxed">
               We are not responsible for the accuracy, completeness, or reliability of any content created by 
               Predictors. Your reliance on such content is at your own risk.
             </p>
 
-            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">9.4 Blockchain and NFT Risks</h3>
+            <h3 className="text-xl font-semibold text-fur-light mt-6 mb-3">10.4 Blockchain and NFT Risks</h3>
             <p className="text-gray-main leading-relaxed">
               You acknowledge the inherent risks of blockchain technology and NFTs, including but not limited to: smart 
               contract vulnerabilities, network congestion, regulatory changes, cryptocurrency volatility, and the 
@@ -325,9 +394,9 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 10: Indemnification */}
+          {/* Section 11: Indemnification */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">10. Indemnification</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">11. Indemnification</h2>
             <p className="text-gray-main leading-relaxed">
               You agree to indemnify, defend, and hold harmless SignalFriend, its operators, affiliates, and their 
               respective officers, directors, employees, and agents from any claims, damages, losses, or expenses 
@@ -336,9 +405,9 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 11: Modifications */}
+          {/* Section 12: Modifications */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">11. Modifications to Terms</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">12. Modifications to Terms</h2>
             <p className="text-gray-main leading-relaxed">
               We reserve the right to modify these Terms at any time. Changes will be effective immediately upon 
               posting to the Platform. Your continued use of the Platform after changes constitutes acceptance of 
@@ -346,9 +415,9 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 12: Governing Law */}
+          {/* Section 13: Governing Law */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">12. Governing Law and Disputes</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">13. Governing Law and Disputes</h2>
             <p className="text-gray-main leading-relaxed">
               These Terms shall be governed by and construed in accordance with applicable laws. Any disputes 
               arising from these Terms or your use of the Platform shall be resolved through good-faith negotiation. 
@@ -356,9 +425,9 @@ export function TermsPage() {
             </p>
           </section>
 
-          {/* Section 13: Contact */}
+          {/* Section 14: Contact */}
           <section>
-            <h2 className="text-2xl font-bold text-fur-cream mb-4">13. Contact Information</h2>
+            <h2 className="text-2xl font-bold text-fur-cream mb-4">14. Contact Information</h2>
             <p className="text-gray-main leading-relaxed">
               For questions about these Terms, please contact us through our official channels:
             </p>
