@@ -46,6 +46,9 @@ export async function fetchPredictorSignalsPublic(
   // Add predictor address filter
   params.append('predictorAddress', address.toLowerCase());
 
+  // Add status filter (active, inactive, or all)
+  if (filters.status) params.append('status', filters.status);
+
   // Add other filters
   if (filters.category) params.append('categoryId', filters.category);
   if (filters.riskLevel) params.append('riskLevel', filters.riskLevel);

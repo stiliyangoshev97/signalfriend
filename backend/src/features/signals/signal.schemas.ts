@@ -36,12 +36,14 @@ export const listSignalsSchema = z.object({
     .string()
     .regex(ethereumAddressRegex, "Invalid Ethereum address")
     .optional(),
-  /** Only show active signals (default: true) */
+  /** Only show active signals (default: true) - DEPRECATED, use 'status' instead */
   active: z
     .string()
     .optional()
     .default("true")
     .transform((val) => val === "true"),
+  /** Signal status filter: 'active' (default), 'inactive', or 'all' */
+  status: z.enum(["active", "inactive", "all"]).optional().default("active"),
   /** Sort field (undefined = quality-first default sort) */
   sortBy: z
     .enum(["createdAt", "totalSales", "averageRating", "priceUsdt"])

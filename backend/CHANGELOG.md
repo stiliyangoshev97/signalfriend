@@ -21,6 +21,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.31.0] - 2025-12-23 📊 SIGNAL STATUS FILTER API
+
+### Added
+
+**Signal Status Filter Parameter**
+- New `status` query parameter for `/api/signals` endpoint
+- Supports three values:
+  - `active` (default): Only active signals that haven't expired
+  - `inactive`: Signals that are deactivated OR expired
+  - `all`: No status filtering, returns all signals
+- Backward compatible with existing `active` boolean parameter (deprecated)
+
+### Changed
+
+**Signal Service Query Logic**
+- Updated `getAll` method to handle new `status` parameter
+- `inactive` status uses `$or` filter: `{ isActive: false } OR { expiresAt <= now }`
+- `all` status removes both `isActive` and `expiresAt` filters
+- Maintains backward compatibility: `active=true` still works as before
+
+### Technical
+- Updated `listSignalsSchema` with new `status` enum validation
+- New `status` parameter takes precedence over deprecated `active` parameter
+
+---
+
 ## [0.30.0] - 2025-12-17 📦 PRODUCTION DEPLOYMENT PREPARATION
 
 ### Added

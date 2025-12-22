@@ -14,6 +14,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.27.0] - 2025-12-23 📊 PREDICTOR PROFILE SIGNAL TABS
+
+### Added
+
+**Inactive/Expired Signals Tab on Predictor Profile**
+- New tab system on predictor profile page: "Active Signals" | "Expired / Deactivated"
+- Users can now view a predictor's inactive (expired or manually deactivated) signals
+- Each tab shows count badge with number of signals in that category
+- Separate query for "other tab" count to always show both counts
+- Stats header shows total signals count (`predictor.totalSignals`) - sum of all active + inactive
+
+**Signal Filter Status Schema**
+- Added `signalFilterStatusSchema` to frontend schemas (`active`, `inactive`, `all`)
+- Updated `SignalFilters` type to support new status filter
+- API integration for `status` parameter in predictor signals endpoint
+
+### Changed
+
+**Predictor Profile Page UX**
+- Stats header "Signals" now shows total count (active + expired/deactivated)
+- Tab buttons use consistent dark styling (`bg-dark-600`) when selected
+- Dynamic signal count label: "active signals" vs "expired/deactivated signals"
+- Reset to page 1 when switching between tabs
+- Filters persist across tab switches
+
+### Technical
+- Added `activeTab` state management with `'active' | 'inactive'` type
+- Added `otherTabData` query for inactive tab count display
+- Updated `fetchPredictorSignalsPublic` API to pass `status` parameter
+- Removed redundant `activeSignalsForStats` query (now uses `predictor.totalSignals`)
+
+---
+
 ## [0.26.0] - 2025-12-21 🇪🇺 MICA COMPLIANCE & LEGAL UPDATES
 
 ### Added

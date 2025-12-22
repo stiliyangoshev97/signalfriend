@@ -1,9 +1,9 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** December 15, 2025  
+> **Last Updated:** December 23, 2025  
 > **Current Phase:** Production - BSC Mainnet Live  
-> **Project Status:** 🟢 **Backend v0.29.0** - BSC Mainnet Deployed, 290 Tests Passing, CI/CD Active  
-> **Branch:** `feature/improvements-and-audits`
+> **Project Status:** 🟢 **Backend v0.31.0** - BSC Mainnet Deployed, 290 Tests Passing, CI/CD Active  
+> **Branch:** `fix/predictor-profile-signal-count`
 
 ---
 
@@ -319,6 +319,25 @@ MAIN_GROUPS = {
 | PUT | `/api/predictors/:address` | Yes | Update own profile |
 | GET | `/api/signals` | No | List signals (filter, paginate) |
 | GET | `/api/signals/predictor/:address` | No | Get predictor's signals |
+
+### Signal Status Filter
+The `/api/signals` endpoint supports a `status` query parameter:
+| Value | Filter | Description |
+|-------|--------|-------------|
+| `active` (default) | `isActive: true` AND `expiresAt > now` | Only purchasable signals |
+| `inactive` | `isActive: false` OR `expiresAt <= now` | Deactivated or expired signals |
+| `all` | No filter | All signals regardless of status |
+
+```bash
+# Examples
+GET /api/signals?status=active          # Default behavior
+GET /api/signals?status=inactive        # Expired/deactivated only
+GET /api/signals?predictorAddress=0x...&status=inactive  # Predictor's inactive signals
+```
+
+### Signal Endpoints (continued)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | GET | `/api/signals/:contentId` | No | Get signal metadata |
 | GET | `/api/signals/:contentId/content` | Yes | Get protected content |
 | GET | `/api/signals/:contentId/content-identifier` | Yes | Get bytes32 for purchase (blocks self-purchase) |
