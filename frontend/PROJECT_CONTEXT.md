@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 20 December 2025 (v0.25.0 - Mobile Fixes & Optional Social Links)
+> Last Updated: 23 December 2025 (v0.27.0 - Predictor Profile Signal Tabs)
 
 ---
 
@@ -380,6 +380,39 @@ useMyPurchasedContentIds(enabled)  // Fetch purchased IDs when authenticated
 3. `SignalGrid` receives `purchasedContentIds` prop
 4. Creates Set for O(1) lookup, passes `isPurchased` to each `SignalCard`
 5. `SignalCard` shows "Purchased" badge when `isPurchased === true`
+
+---
+
+## 📊 Predictor Profile Signal Tabs
+
+### Overview
+Predictor profile pages now feature a tabbed interface to view both active and inactive/expired signals. This provides complete transparency about a predictor's signal history.
+
+### Tab System
+| Tab | Filter | Description |
+|-----|--------|-------------|
+| **Active Signals** | `status: 'active'` | Signals that are active AND not expired |
+| **Expired / Deactivated** | `status: 'inactive'` | Signals that are deactivated OR expired |
+
+### Stats Display
+| Stat | Source | Description |
+|------|--------|-------------|
+| **Signals** (header) | `predictor.totalSignals` | Total count of all signals (active + inactive) |
+| **Tab counts** | `signalsData.pagination.total` | Count specific to each tab's filter |
+
+### Key Features
+- Each tab displays badge with signal count
+- "Other tab" count fetched separately to always show both counts
+- Filters (category, price, etc.) persist across tab switches
+- Page resets to 1 when switching tabs
+- Consistent dark styling for selected tabs
+
+### API Integration
+```typescript
+// Frontend sends status parameter
+fetchPredictorSignalsPublic(address, { status: 'active' })   // Active tab
+fetchPredictorSignalsPublic(address, { status: 'inactive' }) // Inactive tab
+```
 
 ---
 

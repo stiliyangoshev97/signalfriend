@@ -100,6 +100,7 @@ export class SignalService {
       predictorAddress,
       excludeBuyerAddress,
       active,
+      status,
       sortBy,
       sortOrder,
       page,
@@ -114,11 +115,21 @@ export class SignalService {
     // Build filter
     const filter: Record<string, unknown> = {};
 
-    // Filter active signals (also excludes expired signals)
-    if (active) {
+    // Filter by signal status (new 'status' param takes precedence over deprecated 'active')
+    // 'active' = isActive: true AND not expired
+    // 'inactive' = isActive: false OR expired
+    // 'all' = no status filter
+    if (status === "active" || (status === undefined && active)) {
       filter.isActive = true;
       filter.expiresAt = { $gt: new Date() }; // Only non-expired signals
+    } else if (status === "inactive") {
+      // Inactive means: deactivated OR expired
+      filter.$or = [
+        { isActive: false },
+        { expiresAt: { $lte: new Date() } },
+      ];
     }
+    // status === "all" means no filter on isActive or expiresAt
 
     // Handle predictor filtering with blacklist check
     if (predictorAddress) {

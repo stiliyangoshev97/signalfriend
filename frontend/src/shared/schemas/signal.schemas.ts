@@ -16,6 +16,8 @@ import { categorySchema } from './category.schemas';
 export const riskLevelSchema = z.enum(['low', 'medium', 'high']);
 export const potentialRewardSchema = z.enum(['normal', 'medium', 'high']);
 export const signalStatusSchema = z.enum(['active', 'expired', 'deactivated']);
+/** Filter status for API queries - different from display status */
+export const signalFilterStatusSchema = z.enum(['active', 'inactive', 'all']);
 
 // ===========================================
 // Signal Schema
@@ -126,7 +128,8 @@ export const signalFiltersSchema = z.object({
   minPrice: z.number().optional(),
   maxPrice: z.number().optional(),
   predictor: z.string().optional(),
-  status: signalStatusSchema.optional(),
+  /** Filter status: 'active' (default), 'inactive' (expired/deactivated), or 'all' */
+  status: signalFilterStatusSchema.optional(),
   sortBy: z.enum(['newest', 'price-low', 'price-high', 'popular']).optional(),
   page: z.number().optional(),
   limit: z.number().optional(),
@@ -141,6 +144,7 @@ export const signalFiltersSchema = z.object({
 export type RiskLevel = z.infer<typeof riskLevelSchema>;
 export type PotentialReward = z.infer<typeof potentialRewardSchema>;
 export type SignalStatus = z.infer<typeof signalStatusSchema>;
+export type SignalFilterStatus = z.infer<typeof signalFilterStatusSchema>;
 export type Signal = z.infer<typeof signalSchema>;
 export type CreateSignalData = z.infer<typeof createSignalSchema>;
 export type SignalFilters = z.infer<typeof signalFiltersSchema>;

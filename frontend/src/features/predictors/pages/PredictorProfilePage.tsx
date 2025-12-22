@@ -159,6 +159,7 @@ export function PredictorProfilePage(): React.ReactElement {
     parseFiltersFromParams(searchParams)
   );
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'active' | 'inactive'>('active');
   const [blacklistModalOpen, setBlacklistModalOpen] = useState(false);
   const [blacklistProposalSuccess, setBlacklistProposalSuccess] = useState<{
     actionId: string;
@@ -282,14 +283,22 @@ export function PredictorProfilePage(): React.ReactElement {
   const queryFilters = useMemo(() => ({
     ...filters,
     limit: 12,
+    status: activeTab, // 'active' or 'inactive' based on selected tab
     // Note: excludeBuyerAddress is intentionally NOT included here
     // On predictor profiles, we show ALL signals (purchased ones get a badge)
-  }), [filters]);
+  }), [filters, activeTab]);
 
-  // Fetch predictor's signals
+  // Fetch predictor's signals (active or inactive based on tab)
   const { data: signalsData, isLoading: signalsLoading, error: signalsError } = usePublicPredictorSignals(
     address,
     queryFilters
+  );
+
+  // Also fetch count for the other tab to show in tab badge
+  const otherTabStatus = activeTab === 'active' ? 'inactive' : 'active';
+  const { data: otherTabData } = usePublicPredictorSignals(
+    address,
+    { limit: 1, status: otherTabStatus }
   );
 
   // Fetch user's purchased content IDs (only when authenticated with SIWE)
@@ -308,6 +317,12 @@ export function PredictorProfilePage(): React.ReactElement {
   // Handle filter changes
   const handleFilterChange = useCallback((newFilters: SignalFilters) => {
     setFilters(newFilters);
+  }, []);
+
+  // Handle tab change (reset page when switching tabs)
+  const handleTabChange = useCallback((tab: 'active' | 'inactive') => {
+    setActiveTab(tab);
+    setFilters((prev) => ({ ...prev, page: 1 }));
   }, []);
 
   // Handle page change
@@ -606,9 +621,51 @@ export function PredictorProfilePage(): React.ReactElement {
         </div>
       </header>
 
-      {/* Active Signals Section */}
+      {/* Signals Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <h2 className="text-xl font-semibold text-fur-cream mb-6">Active Signals</h2>
+        {/* Tabs for Active/Inactive Signals */}
+        <div className="flex items-center gap-2 mb-6">
+          <button
+            onClick={() => handleTabChange('active')}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'active'
+                ? 'bg-dark-600 text-fur-cream'
+                : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
+            }`}
+          >
+            Active Signals
+            {activeTab === 'active' && signalsData?.pagination && (
+              <span className="ml-2 px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
+                {signalsData.pagination.total}
+              </span>
+            )}
+            {activeTab === 'inactive' && otherTabData?.pagination && (
+              <span className="ml-2 px-2 py-0.5 bg-dark-700 rounded-full text-xs">
+                {otherTabData.pagination.total}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => handleTabChange('inactive')}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              activeTab === 'inactive'
+                ? 'bg-dark-600 text-fur-cream'
+                : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
+            }`}
+          >
+            Expired / Deactivated
+            {activeTab === 'inactive' && signalsData?.pagination && (
+              <span className="ml-2 px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
+                {signalsData.pagination.total}
+              </span>
+            )}
+            {activeTab === 'active' && otherTabData?.pagination && (
+              <span className="ml-2 px-2 py-0.5 bg-dark-700 rounded-full text-xs">
+                {otherTabData.pagination.total}
+              </span>
+            )}
+          </button>
+        </div>
         
         <div className="lg:grid lg:grid-cols-4 lg:gap-8">
             {/* Mobile Filter Toggle */}
@@ -668,7 +725,7 @@ export function PredictorProfilePage(): React.ReactElement {
                       <span className="font-medium text-fur-cream">
                         {signalsData.pagination.total}
                       </span>{' '}
-                      active signals
+                      {activeTab === 'active' ? 'active signals' : 'expired/deactivated signals'}
                     </>
                   ) : (
                     '0 signals found'
