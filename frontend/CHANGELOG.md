@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+**Mobile Tab Button Styling**
+- Fixed signal tab buttons ("Active" / "Expired / Inactive") not fitting well on mobile screens
+- Buttons now stack vertically on small screens (<640px) and display inline on larger screens
+- Shortened tab labels for better fit: "Active Signals" → "Active", "Expired / Deactivated" → "Expired / Inactive"
+- Reduced padding and font size on mobile (text-xs, px-3) with larger sizes on sm+ (text-sm, px-4)
+- Added flexbox centering and proper gap between text and count badges
+
 ### Planned
 - Signal outcome tracking
 

@@ -624,43 +624,43 @@ export function PredictorProfilePage(): React.ReactElement {
       {/* Signals Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Tabs for Active/Inactive Signals */}
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-6">
           <button
             onClick={() => handleTabChange('active')}
-            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
               activeTab === 'active'
                 ? 'bg-dark-600 text-fur-cream'
                 : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
             }`}
           >
-            Active Signals
+            <span className="whitespace-nowrap">Active</span>
             {activeTab === 'active' && signalsData?.pagination && (
-              <span className="ml-2 px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
                 {signalsData.pagination.total}
               </span>
             )}
             {activeTab === 'inactive' && otherTabData?.pagination && (
-              <span className="ml-2 px-2 py-0.5 bg-dark-700 rounded-full text-xs">
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-700 rounded-full text-xs">
                 {otherTabData.pagination.total}
               </span>
             )}
           </button>
           <button
             onClick={() => handleTabChange('inactive')}
-            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
               activeTab === 'inactive'
                 ? 'bg-dark-600 text-fur-cream'
                 : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
             }`}
           >
-            Expired / Deactivated
+            <span className="whitespace-nowrap">Expired / Inactive</span>
             {activeTab === 'inactive' && signalsData?.pagination && (
-              <span className="ml-2 px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
                 {signalsData.pagination.total}
               </span>
             )}
             {activeTab === 'active' && otherTabData?.pagination && (
-              <span className="ml-2 px-2 py-0.5 bg-dark-700 rounded-full text-xs">
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-700 rounded-full text-xs">
                 {otherTabData.pagination.total}
               </span>
             )}
