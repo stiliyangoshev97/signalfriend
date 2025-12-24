@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+**SEO: robots.txt and sitemap.xml**
+- Added `public/robots.txt` to guide search engine crawlers
+  - Allows all crawlers to index public pages
+  - Blocks `/admin` and `/dashboard` private areas
+  - Points to sitemap location
+- Added `public/sitemap.xml` with all public pages
+  - Homepage, Signals, Predictors, How It Works, Become Predictor
+  - Terms and Privacy legal pages
+  - Proper priority and change frequency for each page
+- Improves Google indexing and SEO discoverability
+
 ### Fixed
 
 **Mobile Tab Button Styling**
