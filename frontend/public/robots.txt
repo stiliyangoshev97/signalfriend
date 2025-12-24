@@ -1,0 +1,15 @@
+# SignalFriend robots.txt
+# https://signalfriend.com/robots.txt
+
+# Allow all crawlers to index public pages
+User-agent: *
+Allow: /
+
+# Block private/admin areas from indexing
+Disallow: /admin
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /dashboard/
+
+# Sitemap location
+Sitemap: https://signalfriend.com/sitemap.xml
