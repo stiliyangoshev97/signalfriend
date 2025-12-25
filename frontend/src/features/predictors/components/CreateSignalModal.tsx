@@ -32,7 +32,7 @@ interface CreateSignalModalProps {
  * - Protected signal content (only visible after purchase)
  * - Category selection
  * - Price in USDT (minimum $1)
- * - Expiry duration (1-30 days)
+ * - Expiry duration (1-7 days)
  * - Form validation with Zod
  * - Loading states and error handling
  * 
@@ -335,7 +335,7 @@ export function CreateSignalModal({
             <input
               type="range"
               min={1}
-              max={30}
+              max={7}
               {...register('expiryDays', { valueAsNumber: true })}
               className="flex-1 h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-fur-light"
             />
@@ -344,7 +344,7 @@ export function CreateSignalModal({
             </span>
           </div>
           <div className="mt-1 text-xs text-fur-cream/50">
-            Signal will be available for purchase for this duration (1-30 days)
+            Signal will be available for purchase for this duration (1-7 days)
           </div>
         </div>
 

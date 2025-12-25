@@ -99,8 +99,8 @@ export const createSignalSchema = z.object({
       (val) => Math.abs(Math.round(val * 100) - val * 100) < 0.0001,
       "Price can have at most 2 decimal places"
     ),
-  /** Number of days until signal expires (1-30 days) */
-  expiryDays: z.number().int().min(1).max(30),
+  /** Number of days until signal expires (1-7 days) */
+  expiryDays: z.number().int().min(1).max(7),
   /** Risk level assessment */
   riskLevel: z.enum(["low", "medium", "high"]),
   /** Potential reward assessment */
