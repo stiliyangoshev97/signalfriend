@@ -365,10 +365,10 @@ describe("Signal Schemas", () => {
         expect(result.success).toBe(true);
       });
 
-      it("should accept maximum expiry (30 days)", () => {
+      it("should accept maximum expiry (7 days)", () => {
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          expiryDays: 30,
+          expiryDays: 7,
         });
         expect(result.success).toBe(true);
       });
@@ -381,10 +381,10 @@ describe("Signal Schemas", () => {
         expect(result.success).toBe(false);
       });
 
-      it("should reject expiry more than 30 days", () => {
+      it("should reject expiry more than 7 days", () => {
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          expiryDays: 31,
+          expiryDays: 8,
         });
         expect(result.success).toBe(false);
       });

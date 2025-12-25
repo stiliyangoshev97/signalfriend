@@ -125,18 +125,19 @@ export function AdminDashboardPage() {
         </p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-dark-700 mb-6">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-3 text-sm font-medium transition-colors relative ${
-              activeTab === tab.id
-                ? 'text-brand-400 border-b-2 border-brand-400 -mb-px'
-                : 'text-gray-main hover:text-fur-cream'
-            }`}
-          >
+      {/* Tabs - horizontally scrollable on mobile */}
+      <div className="overflow-x-auto -mx-4 px-4 mb-6 scrollbar-hide">
+        <div className="flex border-b border-dark-700 min-w-max">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors relative whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'text-brand-400 border-b-2 border-brand-400 -mb-px'
+                  : 'text-gray-main hover:text-fur-cream'
+              }`}
+            >
             {tab.label}
             {tab.count !== undefined && tab.count > 0 && (
               <span
@@ -151,6 +152,7 @@ export function AdminDashboardPage() {
             )}
           </button>
         ))}
+        </div>
       </div>
 
       {/* Tab Content */}

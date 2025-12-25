@@ -319,7 +319,7 @@ const faqItems: FaqItem[] = [
     answer: (
       <div className="space-y-4">
         <p>
-          Predictors set an expiration date (1-30 days) when creating signals. When a signal expires:
+          Predictors set an expiration date (1-7 days) when creating signals. When a signal expires:
         </p>
         <ul className="list-disc list-inside space-y-2 ml-2">
           <li>It is automatically <strong>hidden from the marketplace</strong></li>

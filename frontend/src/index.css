@@ -1,5 +1,5 @@
 /* Import Google Fonts - must be first */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -8,14 +8,14 @@
 @layer base {
   /* Logo-inspired theme - warm greens and golden tones */
   :root {
-    --color-bg-primary: #2D5030;
-    --color-bg-secondary: #3E6B3F;
-    --color-bg-tertiary: #4A7D4B;
-    --color-text-primary: #FBE3A8;
-    --color-text-secondary: #F4C56A;
-    --color-text-muted: #A4AAB5;
-    --color-border: #4A7D4B;
-    --color-accent: #F4C56A;
+    --color-bg-primary: #2d5030;
+    --color-bg-secondary: #3e6b3f;
+    --color-bg-tertiary: #4a7d4b;
+    --color-text-primary: #fbe3a8;
+    --color-text-secondary: #f4c56a;
+    --color-text-muted: #a4aab5;
+    --color-border: #4a7d4b;
+    --color-accent: #f4c56a;
   }
 
   html {
@@ -141,5 +141,14 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
 }
