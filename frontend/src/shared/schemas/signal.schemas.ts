@@ -130,7 +130,7 @@ export const signalFiltersSchema = z.object({
   predictor: z.string().optional(),
   /** Filter status: 'active' (default), 'inactive' (expired/deactivated), or 'all' */
   status: signalFilterStatusSchema.optional(),
-  sortBy: z.enum(['newest', 'price-low', 'price-high', 'popular']).optional(),
+  sortBy: z.enum(['newest', 'price-low', 'price-high', 'popular', 'quality']).optional(),
   page: z.number().optional(),
   limit: z.number().optional(),
   /** Exclude signals already purchased by this address */

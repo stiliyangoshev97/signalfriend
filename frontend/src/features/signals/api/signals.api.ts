@@ -27,8 +27,9 @@ function buildQueryString(filters: SignalFilters): string {
   if (filters.predictor) params.append('predictorAddress', filters.predictor);
   if (filters.status) params.append('status', filters.status);
   if (filters.excludeBuyerAddress) params.append('excludeBuyerAddress', filters.excludeBuyerAddress);
-  if (filters.sortBy) {
+  if (filters.sortBy && filters.sortBy !== 'quality') {
     // Map frontend sort values to backend params
+    // 'quality' means no sortBy sent - backend uses default "Best Quality" sorting
     // Backend uses priceUsdt (lowercase) and totalSales (not totalBuyers)
     const sortMapping: Record<string, { sortBy: string; sortOrder: string }> = {
       'newest': { sortBy: 'createdAt', sortOrder: 'desc' },
