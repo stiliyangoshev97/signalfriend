@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.28.0] - 2025-12-26 🆕 DEFAULT SORT BY NEWEST
+
+### Changed
+
+**Signal Marketplace Default Sort**
+- Changed default sort from "Best Quality" to "Newest First"
+- Fresh signals now appear first on initial page load
+- Gives new predictors better visibility in the marketplace
+- Users can still switch to other sort options (Best Quality, Most Popular, Price)
+
+**Sort Options Reordered**
+- New order: Newest First → Best Quality → Most Popular → Price Low → Price High
+- Added explicit `quality` sort value for "Best Quality" option
+- "Best Quality" now persists correctly in URL (`?sort=quality`)
+
+### Technical
+- Updated `SignalsPage.tsx` to default `sortBy` to `'newest'`
+- Updated `FilterPanel.tsx` sort dropdown order and values
+- Added `'quality'` to `signalFiltersSchema` sortBy enum
+- Updated `signals.api.ts` to skip sortBy param when `quality` selected (uses backend default)
+
+---
+
 ## [Unreleased]
 
 ### Added

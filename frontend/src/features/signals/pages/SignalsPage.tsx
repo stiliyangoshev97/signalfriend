@@ -37,8 +37,11 @@ function parseFiltersFromParams(params: URLSearchParams): SignalFilters {
   }
   if (minPrice) filters.minPrice = parseFloat(minPrice);
   if (maxPrice) filters.maxPrice = parseFloat(maxPrice);
-  if (sortBy && ['newest', 'price-low', 'price-high', 'popular'].includes(sortBy)) {
+  // Default to 'newest' to prioritize fresh signals on initial load
+  if (sortBy && ['newest', 'price-low', 'price-high', 'popular', 'quality'].includes(sortBy)) {
     filters.sortBy = sortBy as SignalFilters['sortBy'];
+  } else {
+    filters.sortBy = 'newest';
   }
   if (page) filters.page = parseInt(page, 10);
 
