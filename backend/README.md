@@ -157,7 +157,8 @@ src/
 |--------|----------|------|-------------|
 | GET | `/api/predictors` | No | List predictors (filter, sort, paginate) |
 | GET | `/api/predictors/top` | No | Get leaderboard |
-| GET | `/api/predictors/:address` | No | Get predictor profile |
+| GET | `/api/predictors/check-unique` | No | Check if field value (displayName/telegram/discord) is available |
+| GET | `/api/predictors/:address` | Optional | Get predictor profile (private contacts if own profile) |
 | GET | `/api/predictors/:address/check` | No | Check if active predictor |
 | GET | `/api/predictors/:address/earnings` | Yes | Get own earnings breakdown |
 | PUT | `/api/predictors/:address` | Yes | Update own profile (displayName locked after 1 change) |
@@ -171,7 +172,7 @@ src/
 | GET | `/api/signals/predictor/:address` | No | Get predictor's signals |
 | GET | `/api/signals/:contentId` | No | Get signal metadata |
 | GET | `/api/signals/:contentId/content` | Yes | Get protected content (purchaser only) |
-| GET | `/api/signals/:contentId/content-identifier` | No | Get bytes32 for on-chain purchase |
+| GET | `/api/signals/:contentId/content-identifier` | Yes | Get bytes32 for on-chain purchase |
 | POST | `/api/signals` | Yes | Create signal (predictor only) |
 | PUT | `/api/signals/:contentId` | Yes | Update own signal |
 | DELETE | `/api/signals/:contentId` | Yes | Deactivate own signal |
@@ -213,18 +214,68 @@ src/
 | GET | `/api/reports/:tokenId` | No | Get report by token ID |
 | POST | `/api/reports` | Yes | Create report (purchaser only) |
 
-### Admin (MultiSig Wallet Only)
+### Disputes (Blacklist Appeals)
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
+| POST | `/api/disputes` | Yes | Create dispute (blacklisted predictor only) |
+| GET | `/api/disputes/me` | Yes | Get own dispute status |
+
+### Platform Statistics
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/stats` | No | Get public platform statistics |
+
+### Admin (MultiSig Wallet Only)
+
+#### Predictor Management
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/admin/predictors/blacklisted` | Admin | Get all blacklisted predictors |
 | GET | `/api/admin/predictors/:address` | Admin | Get full predictor info (includes contacts) |
 | POST | `/api/admin/predictors/:address/blacklist` | Admin | Blacklist predictor in DB |
 | POST | `/api/admin/predictors/:address/unblacklist` | Admin | Remove blacklist in DB |
+
+#### Verification Management
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | GET | `/api/admin/verification-requests` | Admin | List pending verification requests |
 | POST | `/api/admin/predictors/:address/verify` | Admin | Approve verification |
 | POST | `/api/admin/predictors/:address/reject` | Admin | Reject verification |
 | POST | `/api/admin/predictors/:address/unverify` | Admin | Remove verification badge |
+| POST | `/api/admin/predictors/:address/manual-verify` | Admin | Manually verify any predictor |
+
+#### Signal Management
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | DELETE | `/api/admin/signals/:contentId` | Admin | Deactivate signal (soft delete) |
+
+#### Reports Management
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/admin/reports` | Admin | List all reports for admin review |
+| GET | `/api/admin/reports/:id` | Admin | Get single report by ID |
+| PUT | `/api/admin/reports/:id` | Admin | Update report status |
+
+#### Disputes Management
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/admin/disputes` | Admin | List all disputes |
+| GET | `/api/admin/disputes/counts` | Admin | Get dispute counts by status |
+| PUT | `/api/admin/disputes/:id` | Admin | Update dispute status |
+| POST | `/api/admin/disputes/:id/resolve` | Admin | Resolve dispute and unblacklist |
+
+#### Platform Statistics
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/admin/stats` | Admin | Get platform earnings breakdown |
 
 > **Note:** Admin endpoints require authentication from one of the 3 MultiSig wallet addresses configured in `ADMIN_ADDRESSES`. Blacklist operations also require a manual on-chain MultiSig transaction for full effect.
 
@@ -233,6 +284,7 @@ src/
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | POST | `/api/webhooks/alchemy` | Signature | Alchemy event webhook |
+| GET | `/api/webhooks/health` | No | Webhook system health check |
 
 ### Health
 
@@ -330,86 +382,288 @@ npm run dev
 
 ## 🏗️ Building from Scratch - Code Review Guide
 
-This section helps reviewers understand the codebase architecture and where to start.
+This section provides a **step-by-step file creation order** for understanding dependencies or rebuilding the backend from scratch.
 
-### Entry Point
+---
 
-The application starts at **`src/index.ts`**:
-1. Loads environment variables via `src/shared/config/env.ts` (Zod validation)
-2. Connects to MongoDB via `src/shared/config/db.ts`
-3. Creates Express app with middleware (CORS, JSON, request logging)
-4. Mounts feature routers under `/api/v1/`
-5. Sets up global error handler
-6. Starts HTTP server
+### 📋 File Creation Order & Dependencies
 
-### Core Architecture
+> **Legend:** Files are listed in the order they should be created. Each file's dependencies are shown.
+
+---
+
+#### **Phase 1: Configuration & Core Utilities (No Dependencies)**
+
+These files have no internal dependencies and must be created first:
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 1 | `src/shared/config/env.ts` | Zod-validated environment variables | None |
+| 2 | `src/shared/config/logger.ts` | Pino logger instance | `env.ts` |
+| 3 | `src/shared/utils/ApiError.ts` | Custom error class | None |
+| 4 | `src/shared/utils/asyncHandler.ts` | Express async wrapper | None |
+| 5 | `src/shared/utils/contentId.ts` | UUID ↔ bytes32 conversion | None |
+| 6 | `src/shared/types/index.ts` | TypeScript types/interfaces | None |
+
+---
+
+#### **Phase 2: Database & Blockchain Setup**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 7 | `src/shared/config/db.ts` | MongoDB connection | `env.ts`, `logger.ts` |
+| 8 | `src/contracts/addresses.ts` | Contract addresses by chainId | None |
+| 9 | `src/contracts/abis/*.json` | Contract ABI files | None |
+| 10 | `src/contracts/clients.ts` | Viem public client | `env.ts`, `addresses.ts` |
+
+---
+
+#### **Phase 3: Middleware Layer**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 11 | `src/shared/middleware/validation.ts` | Zod validation middleware | `ApiError.ts` |
+| 12 | `src/shared/middleware/errorHandler.ts` | Global error handler | `ApiError.ts`, `logger.ts` |
+| 13 | `src/shared/middleware/rateLimiter.ts` | Rate limiting middleware | `env.ts` |
+| 14 | `src/shared/middleware/auth.ts` | JWT auth middleware | `env.ts`, `ApiError.ts` |
+| 15 | `src/shared/middleware/admin.ts` | Admin verification | `env.ts`, `auth.ts`, `ApiError.ts` |
+
+---
+
+#### **Phase 4: Feature Modules (Create in This Order)**
+
+Each feature has internal files that must be created in order. **Within each feature, always create files in this order:** Model → Schemas → Service → Controller → Routes → Index
+
+##### **4.1 Categories Feature (Simplest - Start Here)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 16 | `features/categories/category.model.ts` | Mongoose schema | None |
+| 17 | `features/categories/category.schemas.ts` | Zod validation | None |
+| 18 | `features/categories/category.service.ts` | Business logic | `model`, `ApiError` |
+| 19 | `features/categories/category.controller.ts` | Route handlers | `service`, `asyncHandler` |
+| 20 | `features/categories/category.routes.ts` | Express router | `controller`, middleware |
+| 21 | `features/categories/index.ts` | Barrel export | All above |
+
+##### **4.2 Auth Feature (Foundation for Protected Routes)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 22 | `features/auth/auth.schemas.ts` | Zod validation | None |
+| 23 | `features/auth/auth.service.ts` | SIWE + JWT logic | `env.ts`, nonce storage |
+| 24 | `features/auth/auth.controller.ts` | Route handlers | `service`, `asyncHandler` |
+| 25 | `features/auth/auth.routes.ts` | Express router | `controller`, middleware |
+| 26 | `features/auth/index.ts` | Barrel export | All above |
+
+##### **4.3 Predictors Feature**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 27 | `features/predictors/predictor.model.ts` | Mongoose schema | None |
+| 28 | `features/predictors/predictor.schemas.ts` | Zod validation | None |
+| 29 | `features/predictors/predictor.service.ts` | Business logic | `model`, `ApiError` |
+| 30 | `features/predictors/predictor.controller.ts` | Route handlers | `service`, `asyncHandler` |
+| 31 | `features/predictors/predictor.routes.ts` | Express router | `controller`, `auth` middleware |
+| 32 | `features/predictors/index.ts` | Barrel export | All above |
+
+##### **4.4 Signals Feature (Core Business Logic)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 33 | `features/signals/signal.model.ts` | Mongoose schema | `Category` model ref |
+| 34 | `features/signals/signal.schemas.ts` | Zod validation | None |
+| 35 | `features/signals/signal.service.ts` | Business logic | `model`, `Predictor`, `Receipt`, `contentId` |
+| 36 | `features/signals/signal.controller.ts` | Route handlers | `service`, `asyncHandler` |
+| 37 | `features/signals/signal.routes.ts` | Express router | `controller`, `auth` middleware |
+| 38 | `features/signals/index.ts` | Barrel export | All above |
+
+##### **4.5 Receipts Feature (Depends on Signals)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 39 | `features/receipts/receipt.model.ts` | Mongoose schema | `Signal` ref |
+| 40 | `features/receipts/receipt.schemas.ts` | Zod validation | None |
+| 41 | `features/receipts/receipt.service.ts` | Business logic | `model`, `Signal`, `Predictor` |
+| 42 | `features/receipts/receipt.controller.ts` | Route handlers | `service`, `asyncHandler` |
+| 43 | `features/receipts/receipt.routes.ts` | Express router | `controller`, `auth` middleware |
+| 44 | `features/receipts/index.ts` | Barrel export | All above |
+
+##### **4.6 Reviews Feature (Depends on Receipts)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 45 | `features/reviews/review.model.ts` | Mongoose schema | `Receipt` tokenId |
+| 46 | `features/reviews/review.schemas.ts` | Zod validation | None |
+| 47 | `features/reviews/review.service.ts` | Business logic | `model`, `Receipt`, `Predictor` |
+| 48 | `features/reviews/review.controller.ts` | Route handlers | `service`, `asyncHandler` |
+| 49 | `features/reviews/review.routes.ts` | Express router | `controller`, `auth` middleware |
+| 50 | `features/reviews/index.ts` | Barrel export | All above |
+
+##### **4.7 Reports Feature (Depends on Receipts)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 51 | `features/reports/report.model.ts` | Mongoose schema | `Receipt` tokenId |
+| 52 | `features/reports/report.schemas.ts` | Zod validation | None |
+| 53 | `features/reports/report.service.ts` | Business logic | `model`, `Receipt`, `Signal` |
+| 54 | `features/reports/report.controller.ts` | Route handlers | `service`, `asyncHandler` |
+| 55 | `features/reports/report.routes.ts` | Express router | `controller`, `auth` middleware |
+| 56 | `features/reports/index.ts` | Barrel export | All above |
+
+##### **4.8 Disputes Feature (Depends on Predictors)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 57 | `features/disputes/dispute.model.ts` | Mongoose schema | `Predictor` ref |
+| 58 | `features/disputes/dispute.service.ts` | Business logic | `model`, `Predictor` |
+| 59 | `features/disputes/dispute.controller.ts` | Route handlers | `service`, `asyncHandler` |
+| 60 | `features/disputes/dispute.routes.ts` | Express router | `controller`, `auth`, `admin` middleware |
+| 61 | `features/disputes/index.ts` | Barrel export | All above |
+
+##### **4.9 Stats Feature (Aggregation Layer)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 62 | `features/stats/stats.service.ts` | Aggregation queries | `Predictor`, `Signal`, `Receipt` models |
+| 63 | `features/stats/stats.controller.ts` | Route handlers | `service`, `asyncHandler` |
+| 64 | `features/stats/stats.routes.ts` | Express router | `controller` |
+| 65 | `features/stats/index.ts` | Barrel export | All above |
+
+##### **4.10 Webhooks Feature (Blockchain Integration)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 66 | `features/webhooks/webhook.service.ts` | Event handlers | `Predictor`, `Receipt`, `Signal` models |
+| 67 | `features/webhooks/webhook.controller.ts` | Alchemy handler | `service`, `env.ts` (signing key) |
+| 68 | `features/webhooks/webhook.routes.ts` | Express router | `controller` |
+| 69 | `features/webhooks/index.ts` | Barrel export | All above |
+
+##### **4.11 Admin Feature (Depends on All Models)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 70 | `features/admin/admin.service.ts` | Admin operations | All models |
+| 71 | `features/admin/admin.controller.ts` | Route handlers | `service`, `asyncHandler` |
+| 72 | `features/admin/admin.routes.ts` | Express router | `controller`, `auth`, `admin` middleware |
+| 73 | `features/admin/index.ts` | Barrel export | All above |
+
+---
+
+#### **Phase 5: Application Bootstrap**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 74 | `src/index.ts` | Express app & server | ALL feature routes, ALL middleware |
+
+---
+
+### 🔗 Dependency Diagram
 
 ```
-src/
-├── index.ts                    # 👈 START HERE - App bootstrap
-├── contracts/                  # Blockchain integration
-│   ├── addresses.ts            # Contract addresses by chainId
-│   ├── clients.ts              # Viem public client setup
-│   └── abis/                   # Contract ABI JSON files
-├── features/                   # Domain modules (review these in order)
-│   ├── auth/                   # 1️⃣ SIWE + JWT authentication
-│   ├── categories/             # 2️⃣ Signal categories (simple CRUD)
-│   ├── predictors/             # 3️⃣ Predictor profiles
-│   ├── signals/                # 4️⃣ Core business logic - signals
-│   ├── receipts/               # 5️⃣ Purchase receipts
-│   ├── reviews/                # 6️⃣ Ratings & reviews
-│   ├── reports/                # 7️⃣ Scam reporting
-│   ├── webhooks/               # 8️⃣ Alchemy event indexing
-│   └── admin/                  # 9️⃣ Admin operations
-└── shared/                     # Shared utilities
-    ├── config/                 # env.ts, db.ts, logger.ts
-    ├── middleware/             # auth, validation, errors
-    ├── services/               # blockchain.service.ts
-    └── utils/                  # ApiError, asyncHandler
+                    ┌─────────────────┐
+                    │     index.ts    │
+                    │  (Entry Point)  │
+                    └────────┬────────┘
+                             │
+         ┌───────────────────┼───────────────────┐
+         │                   │                   │
+         ▼                   ▼                   ▼
+   ┌──────────┐       ┌──────────┐        ┌──────────┐
+   │ shared/  │       │contracts/│        │features/ │
+   │  config  │       │  viem    │        │ modules  │
+   └────┬─────┘       └──────────┘        └────┬─────┘
+        │                                      │
+        ▼                                      │
+┌───────────────┐                              │
+│  middleware/  │◄─────────────────────────────┘
+│ auth, admin,  │
+│  validation   │
+└───────────────┘
+
+Feature Dependency Chain:
+
+┌────────────┐
+│ Categories │ ◄── No dependencies (start here)
+└────────────┘
+      │
+      ▼
+┌────────────┐
+│    Auth    │ ◄── Foundation for protected routes
+└────────────┘
+      │
+      ▼
+┌────────────┐
+│ Predictors │ ◄── Uses Auth middleware
+└────────────┘
+      │
+      ▼
+┌────────────┐
+│  Signals   │ ◄── Refs: Category, Predictor
+└────────────┘
+      │
+      ├────────────────────────┐
+      ▼                        ▼
+┌────────────┐          ┌────────────┐
+│  Receipts  │          │  Disputes  │
+│ (tokenId)  │          │(Predictor) │
+└────────────┘          └────────────┘
+      │
+      ├──────────────┐
+      ▼              ▼
+┌────────────┐ ┌────────────┐
+│  Reviews   │ │  Reports   │
+│ (tokenId)  │ │ (tokenId)  │
+└────────────┘ └────────────┘
+      │              │
+      └──────┬───────┘
+             ▼
+┌────────────────────────────┐
+│   Stats / Webhooks / Admin │
+│    (Aggregation Layer)     │
+└────────────────────────────┘
 ```
 
-### Feature Module Structure
+---
 
-Each feature follows a consistent pattern:
-```
-features/signals/
-├── signal.model.ts       # Mongoose schema & model
-├── signal.schemas.ts     # Zod validation schemas
-├── signal.service.ts     # Business logic (static methods)
-├── signal.controller.ts  # Express route handlers
-├── signal.routes.ts      # Router definition
-└── index.ts              # Barrel export
-```
+### 🎯 Quick Start for Reviewers
 
-### Recommended Review Order
+**If reviewing the codebase:**
+1. Start with `src/shared/config/env.ts` → understand configuration
+2. Read `src/shared/utils/ApiError.ts` → understand error handling
+3. Study `src/features/categories/` → simplest complete feature
+4. Study `src/features/auth/` → understand authentication flow
+5. Study `src/features/signals/` → core business logic
+6. Review `src/features/webhooks/` → blockchain integration
 
-1. **`src/shared/config/env.ts`** - Environment validation
-2. **`src/shared/utils/ApiError.ts`** - Error handling pattern
-3. **`src/features/auth/`** - Authentication flow (SIWE)
-4. **`src/features/signals/signal.model.ts`** - Core data model
-5. **`src/features/signals/signal.service.ts`** - Business logic
-6. **`src/features/webhooks/`** - Blockchain event indexing
+**If rebuilding from scratch:**
+1. Follow the Phase 1-5 order above
+2. Test each phase before moving to the next
+3. Use `npm run seed:categories` after Phase 4.1
 
-### Key Concepts
+---
 
-| Concept | File | Description |
-|---------|------|-------------|
+### 📊 Key Concepts Quick Reference
+
+| Concept | Primary File | Description |
+|---------|--------------|-------------|
 | Auth flow | `auth/auth.service.ts` | SIWE nonce → verify → JWT |
 | Protected content | `signals/signal.service.ts` | Content only revealed to purchasers |
 | ContentId bridge | `shared/utils/contentId.ts` | UUID ↔ bytes32 conversion |
 | Event indexing | `webhooks/webhook.service.ts` | Alchemy GraphQL → MongoDB |
 | Admin check | `shared/middleware/admin.ts` | MultiSig wallet verification |
+| Rating recalc | `reviews/review.service.ts` | Updates predictor averageRating |
 
-### Database Models
+### 📊 Database Models
 
 | Model | Collection | Key Fields |
 |-------|------------|------------|
 | Category | categories | name, mainGroup, slug |
-| Predictor | predictors | walletAddress, displayName, isVerified |
-| Signal | signals | contentId, content (protected), categoryId |
-| Receipt | receipts | tokenId, contentId, buyerAddress |
+| Predictor | predictors | walletAddress, displayName, isVerified, isBlacklisted |
+| Signal | signals | contentId, content (protected), categoryId, predictorAddress |
+| Receipt | receipts | tokenId, contentId, buyerAddress, predictorAddress |
 | Review | reviews | tokenId, rating (1-5), comment |
-| Report | reports | tokenId, reason, description |
+| Report | reports | tokenId, reason, description, status |
+| Dispute | disputes | predictorAddress, status, adminNotes |
 
 ---
 
