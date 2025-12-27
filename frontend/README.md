@@ -280,96 +280,322 @@ The color scheme is extracted from our cute doggy mascot logo:
 
 ## 🏗️ Building from Scratch - Code Review Guide
 
-This section helps reviewers understand the frontend architecture and where to start.
+This section provides a **step-by-step file creation order** for understanding dependencies or rebuilding the frontend from scratch.
 
-### Entry Point
+---
 
-The application starts at **`src/main.tsx`**:
-1. Renders `<App />` with React 19 root
-2. App.tsx wraps everything in providers (see below)
-3. React Router handles navigation
+### 📋 File Creation Order & Dependencies
 
-### Provider Hierarchy
+> **Legend:** Files are listed in the order they should be created. Dependencies are shown for each file.
 
-**`src/App.tsx`** sets up providers in this order:
+---
+
+#### **Phase 1: Configuration & Core Setup (No Dependencies)**
+
+These files have no internal dependencies and must be created first:
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 1 | `src/shared/config/env.ts` | Environment variable access | None |
+| 2 | `src/shared/config/contracts.ts` | Contract addresses by chainId | None |
+| 3 | `src/shared/types/index.ts` | TypeScript type definitions | None |
+| 4 | `src/shared/utils/format.ts` | Formatters (address, price, date) | None |
+| 5 | `src/shared/utils/constants.ts` | App-wide constants | None |
+| 6 | `src/index.css` | Tailwind imports + global styles | None |
+
+---
+
+#### **Phase 2: API & Schema Layer**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 7 | `src/shared/schemas/common.schemas.ts` | Shared Zod schemas | None |
+| 8 | `src/shared/api/client.ts` | Axios instance + interceptors | `env.ts` |
+| 9 | `src/shared/api/index.ts` | Barrel export | `client.ts` |
+
+---
+
+#### **Phase 3: Provider Setup (Critical Order)**
+
+Providers must be created and nested in this specific order:
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 10 | `src/providers/QueryProvider.tsx` | React Query client setup | None |
+| 11 | `src/providers/Web3Provider.tsx` | Wagmi + RainbowKit config | `env.ts`, `contracts.ts` |
+| 12 | `src/providers/SentryProvider.tsx` | Error tracking (optional) | `env.ts` |
+| 13 | `src/providers/index.ts` | Barrel export | All above |
+
+**Provider nesting order in `App.tsx`:**
 ```tsx
-<QueryClientProvider>      {/* React Query for server state */}
-  <WagmiProvider>          {/* Blockchain wallet state */}
-    <RainbowKitProvider>   {/* Wallet connection UI */}
-      <AuthProvider>       {/* SIWE auth state (Zustand) */}
-        <RouterProvider /> {/* React Router v7 */}
-      </AuthProvider>
-    </RainbowKitProvider>
-  </WagmiProvider>
-</QueryClientProvider>
+<QueryProvider>           {/* 1. React Query - outermost */}
+  <Web3Provider>          {/* 2. Wagmi + RainbowKit */}
+    <RouterProvider />    {/* 3. React Router - innermost */}
+  </Web3Provider>
+</QueryProvider>
 ```
 
-### Core Architecture
+---
+
+#### **Phase 4: Shared UI Components**
+
+Create reusable components before feature-specific ones:
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 14 | `src/shared/components/ui/LoadingSpinner.tsx` | Loading state | None |
+| 15 | `src/shared/components/ui/ErrorMessage.tsx` | Error display | None |
+| 16 | `src/shared/components/ui/EmptyState.tsx` | Empty list state | None |
+| 17 | `src/shared/components/ui/Badge.tsx` | Status badges | None |
+| 18 | `src/shared/components/ui/Button.tsx` | Button variants | None |
+| 19 | `src/shared/components/ui/Modal.tsx` | Modal wrapper | None |
+| 20 | `src/shared/components/ui/Pagination.tsx` | Page navigation | None |
+| 21 | `src/shared/components/ui/index.ts` | Barrel export | All above |
+
+---
+
+#### **Phase 5: Shared Hooks**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 22 | `src/shared/hooks/useDebounce.ts` | Debounce input values | None |
+| 23 | `src/shared/hooks/usePagination.ts` | Pagination state | None |
+| 24 | `src/shared/hooks/useContract.ts` | Contract interaction helpers | `contracts.ts` |
+| 25 | `src/shared/hooks/index.ts` | Barrel export | All above |
+
+---
+
+#### **Phase 6: Feature Modules (Create in This Order)**
+
+Each feature has internal files that must be created in order. **Within each feature, always create files in this order:** Types → Schemas → API → Store (if needed) → Hooks → Components → Pages → Index
+
+##### **6.1 Auth Feature (Foundation - Create First)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 26 | `features/auth/types/index.ts` | Auth types (User, etc.) | None |
+| 27 | `features/auth/api/auth.api.ts` | API functions (nonce, verify) | `client.ts` |
+| 28 | `features/auth/store/authStore.ts` | Zustand auth state | None |
+| 29 | `features/auth/hooks/useAuth.ts` | SIWE flow hook | `api`, `store`, wagmi |
+| 30 | `features/auth/hooks/useUser.ts` | Current user hook | `store` |
+| 31 | `features/auth/components/ConnectButton.tsx` | RainbowKit wrapper | `useAuth` |
+| 32 | `features/auth/components/AuthGuard.tsx` | Protected route wrapper | `useAuth` |
+| 33 | `features/auth/index.ts` | Barrel export | All above |
+
+##### **6.2 Home Feature (Landing Page)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 34 | `features/home/pages/HomePage.tsx` | Landing page | UI components |
+| 35 | `features/home/components/Hero.tsx` | Hero section | None |
+| 36 | `features/home/components/Features.tsx` | Feature showcase | None |
+| 37 | `features/home/components/Stats.tsx` | Platform stats | Stats API |
+| 38 | `features/home/index.ts` | Barrel export | All above |
+
+##### **6.3 Signals Feature (Core Marketplace)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 39 | `features/signals/types/index.ts` | Signal, Category types | None |
+| 40 | `features/signals/api/signals.api.ts` | Signal CRUD functions | `client.ts` |
+| 41 | `features/signals/api/categories.api.ts` | Categories fetch | `client.ts` |
+| 42 | `features/signals/hooks/useSignals.ts` | Signal list query | `api`, React Query |
+| 43 | `features/signals/hooks/useSignal.ts` | Single signal query | `api`, React Query |
+| 44 | `features/signals/hooks/useCategories.ts` | Categories query | `api`, React Query |
+| 45 | `features/signals/hooks/usePurchase.ts` | Purchase flow | `contracts.ts`, wagmi |
+| 46 | `features/signals/components/SignalCard.tsx` | Signal preview card | types, utils |
+| 47 | `features/signals/components/FilterPanel.tsx` | Category filters | `useCategories` |
+| 48 | `features/signals/components/PurchaseButton.tsx` | USDT approve + buy | `usePurchase` |
+| 49 | `features/signals/components/SignalContent.tsx` | Protected content | `useAuth` |
+| 50 | `features/signals/pages/SignalsPage.tsx` | Marketplace list | All hooks + components |
+| 51 | `features/signals/pages/SignalDetailPage.tsx` | Signal detail view | All hooks + components |
+| 52 | `features/signals/index.ts` | Barrel export | All above |
+
+##### **6.4 Predictors Feature (Predictor Dashboard)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 53 | `features/predictors/types/index.ts` | Predictor types | None |
+| 54 | `features/predictors/api/predictors.api.ts` | Predictor CRUD | `client.ts` |
+| 55 | `features/predictors/api/receipts.api.ts` | Sales receipts | `client.ts` |
+| 56 | `features/predictors/hooks/usePredictors.ts` | Predictor list query | `api`, React Query |
+| 57 | `features/predictors/hooks/usePredictor.ts` | Single predictor | `api`, React Query |
+| 58 | `features/predictors/hooks/useMySignals.ts` | Own signals query | `api`, React Query |
+| 59 | `features/predictors/hooks/useCreateSignal.ts` | Signal creation | `api`, React Query |
+| 60 | `features/predictors/components/PredictorCard.tsx` | Predictor preview | types, utils |
+| 61 | `features/predictors/components/MySignalCard.tsx` | Own signal view | types, utils |
+| 62 | `features/predictors/components/CreateSignalModal.tsx` | Signal form | `useCreateSignal` |
+| 63 | `features/predictors/components/ProfileEditor.tsx` | Edit profile | `usePredictor` |
+| 64 | `features/predictors/pages/PredictorsPage.tsx` | Leaderboard | All hooks + components |
+| 65 | `features/predictors/pages/PredictorProfilePage.tsx` | Profile view | All hooks + components |
+| 66 | `features/predictors/pages/DashboardPage.tsx` | Predictor dashboard | All hooks + components |
+| 67 | `features/predictors/index.ts` | Barrel export | All above |
+
+##### **6.5 Admin Feature (Admin Panel)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 68 | `features/admin/api/admin.api.ts` | Admin endpoints | `client.ts` |
+| 69 | `features/admin/hooks/useAdmin.ts` | Admin queries | `api`, `useAuth` |
+| 70 | `features/admin/components/AdminGuard.tsx` | Admin route protection | `useAuth` |
+| 71 | `features/admin/pages/AdminDashboard.tsx` | Admin panel | All hooks |
+| 72 | `features/admin/index.ts` | Barrel export | All above |
+
+##### **6.6 Static Pages (No Complex Dependencies)**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 73 | `features/about/pages/AboutPage.tsx` | About page | UI components |
+| 74 | `features/faq/pages/FAQPage.tsx` | FAQ page | UI components |
+| 75 | `features/legal/pages/*.tsx` | Terms, Privacy pages | UI components |
+| 76 | `features/news/pages/NewsPage.tsx` | News/updates page | UI components |
+| 77 | `features/maintenance/pages/*.tsx` | Maintenance mode | UI components |
+
+---
+
+#### **Phase 7: Router Configuration**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 78 | `src/router/routes.tsx` | Route definitions | ALL page components |
+| 79 | `src/router/index.tsx` | Router setup | `routes.tsx` |
+
+---
+
+#### **Phase 8: Application Entry**
+
+| Order | File | Purpose | Dependencies |
+|-------|------|---------|--------------|
+| 80 | `src/App.tsx` | Root component + providers | ALL providers, router |
+| 81 | `src/main.tsx` | React entry point | `App.tsx` |
+
+---
+
+### 🔗 Dependency Diagram
 
 ```
-src/
-├── main.tsx                    # 👈 START HERE - React entry
-├── App.tsx                     # Provider setup
-├── index.css                   # Tailwind imports + global styles
-├── features/                   # Domain modules (review in order)
-│   ├── auth/                   # 1️⃣ SIWE authentication
-│   ├── signals/                # 2️⃣ Signal marketplace
-│   ├── predictors/             # 3️⃣ Predictor profiles & dashboard
-│   └── admin/                  # 4️⃣ Admin panel
-├── shared/                     # Shared code
-│   ├── api/                    # Axios client + interceptors
-│   ├── components/ui/          # Reusable UI components
-│   ├── config/                 # API config, contract addresses
-│   ├── hooks/                  # useAuth, useContract hooks
-│   ├── schemas/                # Zod validation schemas
-│   └── types/                  # TypeScript type definitions
-├── providers/                  # Context providers setup
-│   ├── Web3Provider.tsx        # Wagmi + RainbowKit config
-│   └── AuthProvider.tsx        # SIWE auth context
-└── router/                     # React Router configuration
-    └── index.tsx               # Route definitions
+                    ┌─────────────────┐
+                    │    main.tsx     │
+                    │  (Entry Point)  │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │     App.tsx     │
+                    │   (Providers)   │
+                    └────────┬────────┘
+                             │
+         ┌───────────────────┼───────────────────┐
+         │                   │                   │
+         ▼                   ▼                   ▼
+   ┌──────────┐       ┌──────────┐        ┌──────────┐
+   │providers/│       │  router/ │        │ features/│
+   │Query,Web3│       │  routes  │        │ modules  │
+   └──────────┘       └──────────┘        └────┬─────┘
+                                               │
+                                               ▼
+                                        ┌──────────┐
+                                        │ shared/  │
+                                        │api,hooks,│
+                                        │components│
+                                        └──────────┘
+
+Feature Dependency Chain:
+
+┌────────────┐
+│   shared/  │ ◄── Create first (api, components, hooks)
+│  config,   │
+│    api     │
+└────────────┘
+      │
+      ▼
+┌────────────┐
+│    Auth    │ ◄── Foundation for protected features
+│ store,hook │
+└────────────┘
+      │
+      ├──────────────┬───────────────┐
+      ▼              ▼               ▼
+┌────────────┐ ┌────────────┐ ┌────────────┐
+│   Signals  │ │ Predictors │ │   Admin    │
+│ (uses Auth)│ │ (uses Auth)│ │(uses Auth) │
+└────────────┘ └────────────┘ └────────────┘
+      │              │
+      └──────┬───────┘
+             ▼
+┌────────────────────┐
+│  Pages (compose    │
+│  all components)   │
+└────────────────────┘
 ```
 
-### Feature Module Structure
+---
 
-Each feature follows a consistent pattern:
+### 📂 Feature Module Pattern
+
+Every feature follows this consistent structure:
+
 ```
-features/signals/
-├── components/           # UI components
-│   ├── SignalCard.tsx
-│   ├── FilterPanel.tsx
-│   └── ...
-├── hooks/                # React Query hooks
-│   ├── useSignals.ts
-│   └── usePurchase.ts
-├── pages/                # Route pages
-│   ├── SignalsPage.tsx
-│   └── SignalDetailPage.tsx
-├── api/                  # API functions
-│   └── signals.api.ts
-└── index.ts              # Barrel export
+features/[feature]/
+├── types/                # 1️⃣ TypeScript types (create first)
+│   └── index.ts
+├── api/                  # 2️⃣ API functions
+│   └── [feature].api.ts
+├── store/                # 3️⃣ Zustand store (if needed)
+│   └── [feature]Store.ts
+├── hooks/                # 4️⃣ React Query + custom hooks
+│   └── use[Feature].ts
+├── components/           # 5️⃣ Feature-specific components
+│   └── [Component].tsx
+├── pages/                # 6️⃣ Route page components
+│   └── [Feature]Page.tsx
+└── index.ts              # 7️⃣ Barrel export
 ```
 
-### Recommended Review Order
+**Within each feature, always create files in this order:** Types → API → Store → Hooks → Components → Pages → Index
 
-1. **`src/providers/Web3Provider.tsx`** - Wallet setup
-2. **`src/features/auth/`** - SIWE authentication flow
-3. **`src/shared/api/client.ts`** - Axios client with JWT
-4. **`src/features/signals/hooks/useSignals.ts`** - React Query pattern
-5. **`src/features/signals/pages/SignalsPage.tsx`** - Main marketplace
-6. **`src/features/predictors/`** - Dashboard for predictors
+---
 
-### Key Components
+### 🎯 Quick Start for Reviewers
 
-| Component | Path | Purpose |
-|-----------|------|---------|
+**If reviewing the codebase:**
+1. Start with `src/shared/api/client.ts` → understand API setup
+2. Read `src/providers/Web3Provider.tsx` → understand wallet integration
+3. Study `src/features/auth/` → SIWE authentication flow
+4. Study `src/features/signals/hooks/` → React Query patterns
+5. Review `src/features/signals/pages/SignalsPage.tsx` → main marketplace
+6. Check `src/features/predictors/` → predictor dashboard
+
+**If rebuilding from scratch:**
+1. Follow the Phase 1-8 order above
+2. Test each phase before moving to the next
+3. Start with a minimal router (home + signals) before adding all routes
+
+---
+
+### 📊 Key Patterns Quick Reference
+
+| Pattern | Location | Description |
+|---------|----------|-------------|
+| API client | `shared/api/client.ts` | Axios with JWT interceptor |
+| Auth state | `features/auth/store/authStore.ts` | Zustand for JWT + user |
+| Data fetching | `features/*/hooks/` | React Query hooks |
+| Wallet state | `providers/Web3Provider.tsx` | Wagmi + RainbowKit |
+| Form handling | Feature components | React Hook Form + Zod |
+| Protected routes | `features/auth/components/AuthGuard.tsx` | Redirect if unauthenticated |
+
+### 📊 Key Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
 | SignalCard | `features/signals/components/` | Signal preview in marketplace |
 | MySignalCard | `features/predictors/components/` | Predictor's own signal view |
 | FilterPanel | `features/signals/components/` | Two-step category filtering |
 | CreateSignalModal | `features/predictors/components/` | Signal creation form |
 | PurchaseButton | `features/signals/components/` | USDT approval + purchase flow |
+| ConnectButton | `features/auth/components/` | RainbowKit wallet connect |
 
-### State Management
+### 🔄 State Management
 
 | Type | Tool | Usage |
 |------|------|-------|
@@ -378,16 +604,6 @@ features/signals/
 | Wallet state | Wagmi | Connected address, chain |
 | Form state | React Hook Form | Form inputs, validation |
 | UI state | useState | Component-local state |
-
-### Key Hooks
-
-| Hook | File | Purpose |
-|------|------|---------|
-| `useAuth` | `features/auth/hooks/` | Auth state & SIWE flow |
-| `useSignals` | `features/signals/hooks/` | Fetch signal list |
-| `useBuySignal` | `features/signals/hooks/` | Purchase flow |
-| `useMySignals` | `features/predictors/hooks/` | Predictor's signals |
-| `useCategories` | `features/signals/hooks/` | Category list |
 
 ---
 
