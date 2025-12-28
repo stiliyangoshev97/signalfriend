@@ -280,6 +280,10 @@ export function useDeactivateSignal() {
       queryClient.invalidateQueries({
         queryKey: ['signals', 'detail'],
       });
+      // Invalidate public predictor signals (profile page)
+      queryClient.invalidateQueries({
+        queryKey: [...predictorKeys.all, 'public-signals', address!.toLowerCase()],
+      });
     },
   });
 }
@@ -307,6 +311,10 @@ export function useReactivateSignal() {
       // Invalidate signal detail page cache
       queryClient.invalidateQueries({
         queryKey: ['signals', 'detail'],
+      });
+      // Invalidate public predictor signals (profile page)
+      queryClient.invalidateQueries({
+        queryKey: [...predictorKeys.all, 'public-signals', address!.toLowerCase()],
       });
     },
   });

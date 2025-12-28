@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.28.1] - 2025-12-28 🐛 QUERY INVALIDATION FIX
+
+### Fixed
+
+**Signal Deactivation/Reactivation Query Invalidation**
+- Fixed bug where deactivating a signal on the predictor dashboard didn't update the predictor's public profile page
+- The signal would remain in the "active" tab on the profile page until manual refresh
+- **Root Cause:** `useDeactivateSignal` and `useReactivateSignal` hooks only invalidated dashboard queries (`['predictor', 'signals', ...]`) but not public profile queries (`['predictor', 'public-signals', ...]`)
+- **Fix:** Added query invalidation for `['predictor', 'public-signals', address]` to both hooks
+
+### Technical
+- Updated `usePredictorDashboard.ts`:
+  - `useDeactivateSignal()` now also invalidates public predictor signals
+  - `useReactivateSignal()` now also invalidates public predictor signals
+- Query key pattern: `['predictor', 'public-signals', address.toLowerCase()]`
+
+---
+
 ## [0.28.0] - 2025-12-26 🆕 DEFAULT SORT BY NEWEST
 
 ### Changed
