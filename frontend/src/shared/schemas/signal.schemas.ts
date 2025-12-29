@@ -110,7 +110,7 @@ export const createSignalSchema = z.object({
     .number()
     .int('Expiry must be a whole number of days')
     .min(1, 'Signal must be active for at least 1 day')
-    .max(7, 'Signal can be active for at most 7 days'),
+    .max(2, 'Signal can be active for at most 2 days'),
   riskLevel: riskLevelSchema,
   potentialReward: potentialRewardSchema,
 });

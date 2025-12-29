@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.28.2] - 2025-12-29 ⏱️ SIGNAL EXPIRY + FAVICON FIX
+
+### Changed
+
+**Signal Expiration Duration**
+- Reduced maximum signal expiration from 7 days to 2 days
+- Trading signals are time-sensitive; most become invalid after 2 days
+- Improves signal quality and buyer protection
+- Existing signals with longer expiry will age naturally (no migration)
+
+### Fixed
+
+**Google Favicon/Logo Display**
+- Added proper favicon files for Google indexing:
+  - `favicon.ico` (primary - Google looks for this)
+  - `favicon-16x16.png`, `favicon-32x32.png` (sized variants)
+  - `apple-touch-icon.png` (iOS)
+  - `android-chrome-192x192.png`, `android-chrome-512x512.png` (Android/PWA)
+- Added `site.webmanifest` with app name, icons, and theme colors
+- Updated `index.html` with proper favicon link tags
+- Google should now display the SignalFriend logo in search results
+
+### Technical
+- Updated `signal.schemas.ts`: `.max(7)` → `.max(2)` with new error message
+- Updated `CreateSignalModal.tsx`:
+  - Default expiry: `7` → `2` days
+  - Slider max: `7` → `2`
+  - Help text: "(1-7 days)" → "(1-2 days)"
+- New favicon files in `/public/`
+- New `site.webmanifest` with SignalFriend branding
+
+---
+
 ## [0.28.1] - 2025-12-28 🐛 QUERY INVALIDATION FIX
 
 ### Fixed
