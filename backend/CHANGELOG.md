@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.32.0] - 2025-12-29 ⏱️ SIGNAL EXPIRY LIMIT REDUCED
+
+### Changed
+
+**Signal Expiration Duration**
+- Reduced maximum signal expiration from 7 days to 2 days
+- Trading signals are time-sensitive; most become invalid after 2 days
+- Improves signal quality and protects buyers from stale signals
+- Existing signals with longer expiry will age naturally (no migration needed)
+
+### Technical
+- Updated `createSignalSchema` in `signal.schemas.ts`:
+  - `expiryDays`: `.max(7)` → `.max(2)`
+  - Updated JSDoc comment to reflect new limit
+
+---
+
 ## [Unreleased]
 
 ### In Progress

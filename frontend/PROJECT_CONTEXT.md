@@ -210,12 +210,12 @@ Located in `src/shared/config/abis/index.ts`:
 ## ⏰ Signal Expiration System
 
 ### Overview
-Signals have a mandatory expiration date (1-30 days from creation) to keep the marketplace fresh.
+Signals have a mandatory expiration date (1-2 days from creation) to keep the marketplace fresh with actionable trading signals.
 
 ### Rules
 | Scenario | Behavior |
 |----------|----------|
-| **Creation** | Predictor sets `expiryDays` (1-30), backend calculates `expiresAt` |
+| **Creation** | Predictor sets `expiryDays` (1-2), backend calculates `expiresAt` |
 | **Marketplace** | Expired signals hidden from listings (`active=true` filter) |
 | **Detail Page** | Shows "Expired" badge, purchase button disabled |
 | **API Block** | `getContentIdentifier` returns 400 for expired/inactive signals |

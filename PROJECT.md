@@ -110,11 +110,11 @@ This model stores all necessary content, metadata, and security fields for a sig
 | `reasoning`              | Predictor's detailed justification for the trade.                   | **Low (Hidden)**(Unlocked after purchase) | "The 4-hour RSI shows a bullish divergence from the daily chart..."           |
 | `fullContent`            | The *exact* trade parameters (entry, exit, stop-loss, duration).    | **Low (Hidden)**(Unlocked after purchase) | "Entry: $63,500. TP: $68,100. SL: $62,900."                                   |
 
-#### Signal Expiration Rules (Implemented v0.15.0)
+#### Signal Expiration Rules (Updated v0.32.0)
 
 | Rule | Description |
 | ---- | ----------- |
-| **Creation** | Predictors must set `expiryDays` (1-30) when creating a signal. Backend calculates `expiresAt` date. |
+| **Creation** | Predictors must set `expiryDays` (1-2) when creating a signal. Backend calculates `expiresAt` date. |
 | **Marketplace** | Expired signals (`expiresAt < now`) are automatically hidden from marketplace listings. |
 | **Deactivation** | Predictors can manually deactivate signals at any time by setting `isActive: false`. |
 | **Purchase Block** | Expired and deactivated signals cannot be purchased (API returns 400 error). |

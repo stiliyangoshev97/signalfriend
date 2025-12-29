@@ -118,7 +118,7 @@ export function CreateSignalModal({
       content: '',
       categoryId: '',
       priceUsdt: 5,
-      expiryDays: 7,
+      expiryDays: 2,
       riskLevel: 'medium',
       potentialReward: 'medium',
     },
@@ -335,16 +335,16 @@ export function CreateSignalModal({
             <input
               type="range"
               min={1}
-              max={7}
+              max={2}
               {...register('expiryDays', { valueAsNumber: true })}
               className="flex-1 h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-fur-light"
             />
             <span className="text-lg font-semibold text-fur-light min-w-[100px] text-right whitespace-nowrap">
-              {watch('expiryDays') || 7} days
+              {watch('expiryDays') || 2} days
             </span>
           </div>
           <div className="mt-1 text-xs text-fur-cream/50">
-            Signal will be available for purchase for this duration (1-7 days)
+            Signal will be available for purchase for this duration (1-2 days)
           </div>
         </div>
 

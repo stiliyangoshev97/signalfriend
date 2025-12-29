@@ -242,7 +242,7 @@ describe("Signal Schemas", () => {
       content: "Entry: $50,000, TP: $55,000, SL: $48,000",
       categoryId: "507f1f77bcf86cd799439011",
       priceUsdt: 10,
-      expiryDays: 7,
+      expiryDays: 2,
       riskLevel: "medium",
       potentialReward: "high",
     };
@@ -365,10 +365,10 @@ describe("Signal Schemas", () => {
         expect(result.success).toBe(true);
       });
 
-      it("should accept maximum expiry (7 days)", () => {
+      it("should accept maximum expiry (2 days)", () => {
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          expiryDays: 7,
+          expiryDays: 2,
         });
         expect(result.success).toBe(true);
       });
@@ -381,10 +381,10 @@ describe("Signal Schemas", () => {
         expect(result.success).toBe(false);
       });
 
-      it("should reject expiry more than 7 days", () => {
+      it("should reject expiry more than 2 days", () => {
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          expiryDays: 8,
+          expiryDays: 3,
         });
         expect(result.success).toBe(false);
       });
@@ -392,7 +392,7 @@ describe("Signal Schemas", () => {
       it("should reject non-integer expiry", () => {
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          expiryDays: 7.5,
+          expiryDays: 1.5,
         });
         expect(result.success).toBe(false);
       });
