@@ -44,7 +44,7 @@ function filtersToParams(filters: PredictorFilters): URLSearchParams {
   const params = new URLSearchParams();
 
   if (filters.search) params.set('search', filters.search);
-  if (filters.sortBy && filters.sortBy !== 'totalSales') params.set('sort', filters.sortBy);
+  if (filters.sortBy && filters.sortBy !== 'joinedAt') params.set('sort', filters.sortBy);
   if (filters.sortOrder && filters.sortOrder !== 'desc') params.set('order', filters.sortOrder);
   if (filters.page && filters.page > 1) params.set('page', filters.page.toString());
 
@@ -78,7 +78,7 @@ export function PredictorsPage(): React.ReactElement {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState<PredictorFilters>(() => ({
-    sortBy: 'totalSales',
+    sortBy: 'joinedAt',
     sortOrder: 'desc',
     limit: 12,
     ...parseFiltersFromParams(searchParams),
@@ -234,6 +234,7 @@ export function PredictorsPage(): React.ReactElement {
               <Pagination
                 pagination={pagination}
                 onPageChange={handlePageChange}
+                itemLabel="predictors"
               />
             )}
           </main>

@@ -2,8 +2,14 @@
 
 > **Last Updated:** December 30, 2025  
 > **Current Phase:** Production - BSC Mainnet Live  
-> **Project Status:** 🟢 **Backend v0.33.0** - Prediction Marketplace Pivot Complete  
+> **Project Status:** 🟢 **Backend v0.34.0** - Prediction Marketplace Complete  
 > **Branch:** `main`
+
+---
+
+## 🎯 Platform Overview
+
+**SignalFriend** is a **Web3 Prediction Signals Marketplace** where expert analysts (Predictors) sell prediction signals for events on platforms like Polymarket, Predict.fun, and others. Categories include Crypto, Finance, Politics, Sports, World Events, and Culture.
 
 ---
 

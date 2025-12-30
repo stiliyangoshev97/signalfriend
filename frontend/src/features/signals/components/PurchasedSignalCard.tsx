@@ -48,6 +48,18 @@ function truncateAddress(address: string): string {
 }
 
 /**
+ * Extract domain from URL for badge display
+ */
+function getUrlDomain(url: string): string | null {
+  try {
+    const domain = new URL(url).hostname.replace('www.', '');
+    return domain;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Key/unlock icon for owned signals
  */
 function KeyIcon(): React.ReactElement {
@@ -110,23 +122,35 @@ export function PurchasedSignalCard({ receipt }: PurchasedSignalCardProps): Reac
   const categoryName = receipt.signal?.category?.name;
   const purchaseDate = formatDate(receipt.purchasedAt);
   const explorerUrl = getExplorerTxUrl(receipt.transactionHash);
+  const eventUrl = receipt.signal?.eventUrl;
+  const domain = eventUrl ? getUrlDomain(eventUrl) : null;
 
   return (
     <div className="bg-dark-800 border border-dark-600 rounded-xl p-5 hover:border-fur-light/30 transition-all duration-300 flex flex-col h-full">
       {/* Variable content area - grows to fill space */}
       <div className="flex-grow">
-        {/* Header: Category & Owned Badge */}
-        <div className="flex items-center justify-between mb-3">
-          {categoryName ? (
-            <span className="text-xs font-medium text-fur-light bg-fur-light/10 px-2 py-1 rounded-full">
-              {categoryName}
-            </span>
-          ) : (
-            <span className="text-xs font-medium text-fur-cream/50 bg-dark-700 px-2 py-1 rounded-full">
-              Uncategorized
-            </span>
-          )}
-          <span className="flex items-center gap-1.5 text-xs font-medium text-success-400 bg-success-400/10 px-2 py-1 rounded-full">
+        {/* Header: Category, Domain & Owned Badge */}
+        <div className="flex items-center justify-between mb-3 gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            {categoryName ? (
+              <span className="text-xs font-medium text-fur-light bg-fur-light/10 px-2 py-1 rounded-full shrink-0">
+                {categoryName}
+              </span>
+            ) : (
+              <span className="text-xs font-medium text-fur-cream/50 bg-dark-700 px-2 py-1 rounded-full shrink-0">
+                Uncategorized
+              </span>
+            )}
+            {domain && (
+              <span className="text-xs font-medium px-2 py-1 rounded-full border flex items-center gap-1 bg-green-500/20 text-green-400 border-green-500/30 min-w-0 max-w-[120px]">
+                <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <span className="truncate">{domain}</span>
+              </span>
+            )}
+          </div>
+          <span className="flex items-center gap-1.5 text-xs font-medium text-success-400 bg-success-400/10 px-2 py-1 rounded-full shrink-0">
             <KeyIcon />
             Owned
           </span>

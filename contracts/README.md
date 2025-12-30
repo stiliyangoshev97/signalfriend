@@ -1,8 +1,8 @@
 # 🚀 SignalFriend Smart Contracts
 
-**Production-ready smart contracts for a Web3 NFT-based signal marketplace on BNB Chain.**
+**Production-ready smart contracts for the SignalFriend Web3 Prediction Signals Marketplace on BNB Chain.**
 
-SignalFriend connects verified prediction makers (Predictors) with traders through transparent, on-chain NFT mechanisms. Predictors sell trading signals as NFTs, and buyers receive transferable receipts that unlock premium content.
+SignalFriend connects verified prediction analysts (Predictors) with buyers seeking expert analysis for prediction market events (Polymarket, Predict.fun, etc.) through transparent, on-chain NFT mechanisms. Predictors sell prediction signals as NFTs, and buyers receive transferable receipts that unlock premium content.
 
 ---
 
@@ -23,7 +23,7 @@ SignalFriend connects verified prediction makers (Predictors) with traders throu
 
 ## 🎯 Overview
 
-SignalFriend is a Web3 signal marketplace built on BNB Chain that leverages:
+SignalFriend is a **Web3 Prediction Signals Marketplace** built on BNB Chain that leverages:
 
 - **PredictorAccessPass NFT** - Soulbound seller license (ERC-721)
 - **SignalKeyNFT** - Transferable buyer receipt with content identifier (ERC-721)

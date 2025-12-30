@@ -87,6 +87,18 @@ function formatCreatedAt(createdAt: string): string {
 }
 
 /**
+ * Extract domain from URL for badge display
+ */
+function getUrlDomain(url: string): string | null {
+  try {
+    const domain = new URL(url).hostname.replace('www.', '');
+    return domain;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Chevron right icon for breadcrumb
  */
 function ChevronRightIcon(): React.ReactElement {
@@ -308,26 +320,26 @@ export function SignalDetailPage(): React.ReactElement {
             </p>
 
             {/* Confidence Badge & Event URL */}
-            <div className="flex flex-wrap gap-3 items-center">
+            <div className="flex items-center gap-3">
               <span
-                className={`inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg border ${confidenceConfig.color}`}
+                className={`inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg border shrink-0 ${confidenceConfig.color}`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {confidenceConfig.label}
               </span>
-              {signal.eventUrl && (
+              {signal.eventUrl && getUrlDomain(signal.eventUrl) && (
                 <a
                   href={signal.eventUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg border bg-fur-light/10 text-fur-light border-fur-light/30 hover:bg-fur-light/20 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg border bg-green-500/10 text-green-400 border-green-500/30 hover:bg-green-500/20 transition-colors min-w-0 max-w-[200px]"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
-                  View Event
+                  <span className="truncate">{getUrlDomain(signal.eventUrl)}</span>
                 </a>
               )}
             </div>

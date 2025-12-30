@@ -14,6 +14,9 @@ import { FilterPanel, SignalGrid, Pagination } from '../components';
 import { useSEO, getSEOUrl } from '@/shared/hooks';
 import type { SignalFilters } from '@/shared/types';
 
+/** Status filter type for signal tabs */
+type StatusFilter = 'active' | 'inactive';
+
 /**
  * Parse URL search params into SignalFilters
  */
@@ -27,6 +30,7 @@ function parseFiltersFromParams(params: URLSearchParams): SignalFilters {
   const maxPrice = params.get('maxPrice');
   const sortBy = params.get('sort');
   const page = params.get('page');
+  const status = params.get('status');
 
   if (category) filters.category = category;
   if (minConfidence) filters.minConfidence = parseInt(minConfidence, 10);
@@ -40,6 +44,9 @@ function parseFiltersFromParams(params: URLSearchParams): SignalFilters {
     filters.sortBy = 'newest';
   }
   if (page) filters.page = parseInt(page, 10);
+  if (status && ['active', 'inactive'].includes(status)) {
+    filters.status = status as StatusFilter;
+  }
 
   return filters;
 }
@@ -57,6 +64,7 @@ function filtersToParams(filters: SignalFilters): URLSearchParams {
   if (filters.maxPrice !== undefined) params.set('maxPrice', filters.maxPrice.toString());
   if (filters.sortBy) params.set('sort', filters.sortBy);
   if (filters.page && filters.page > 1) params.set('page', filters.page.toString());
+  if (filters.status && filters.status !== 'active') params.set('status', filters.status);
 
   return params;
 }
@@ -90,6 +98,13 @@ export function SignalsPage(): React.ReactElement {
     parseFiltersFromParams(searchParams)
   );
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<StatusFilter>(() => {
+    const status = searchParams.get('status');
+    if (status && ['active', 'inactive'].includes(status)) {
+      return status as StatusFilter;
+    }
+    return 'active';
+  });
   
   // Get connected wallet address to exclude already purchased signals
   const { address } = useAccount();
@@ -98,11 +113,21 @@ export function SignalsPage(): React.ReactElement {
   const queryFilters = useMemo(() => ({
     ...filters,
     limit: 12, // Show 12 per page
+    status: activeTab,
     ...(address && { excludeBuyerAddress: address }),
-  }), [filters, address]);
+  }), [filters, address, activeTab]);
 
   // Fetch signals with current filters
   const { data, isLoading, error } = useSignals(queryFilters);
+
+  // Fetch count for the other tab to show in tab badge
+  const otherTabStatus = activeTab === 'active' ? 'inactive' : 'active';
+  const { data: otherTabData } = useSignals({
+    ...filters,
+    limit: 1,
+    status: otherTabStatus,
+    ...(address && { excludeBuyerAddress: address }),
+  });
 
   // Fetch categories for filter dropdown
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
@@ -116,6 +141,12 @@ export function SignalsPage(): React.ReactElement {
   // Handle filter changes
   const handleFilterChange = useCallback((newFilters: SignalFilters) => {
     setFilters(newFilters);
+  }, []);
+
+  // Handle tab change (reset page when switching tabs)
+  const handleTabChange = useCallback((tab: StatusFilter) => {
+    setActiveTab(tab);
+    setFilters((prev) => ({ ...prev, page: 1, status: tab }));
   }, []);
 
   // Handle page change
@@ -142,6 +173,50 @@ export function SignalsPage(): React.ReactElement {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Tabs for Active/Expired Signals */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-6">
+          <button
+            onClick={() => handleTabChange('active')}
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
+              activeTab === 'active'
+                ? 'bg-dark-600 text-fur-cream'
+                : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
+            }`}
+          >
+            <span className="whitespace-nowrap">Active</span>
+            {activeTab === 'active' && data?.pagination && (
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
+                {data.pagination.total}
+              </span>
+            )}
+            {activeTab === 'inactive' && otherTabData?.pagination && (
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-700 rounded-full text-xs">
+                {otherTabData.pagination.total}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => handleTabChange('inactive')}
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
+              activeTab === 'inactive'
+                ? 'bg-dark-600 text-fur-cream'
+                : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
+            }`}
+          >
+            <span className="whitespace-nowrap">Expired</span>
+            {activeTab === 'inactive' && data?.pagination && (
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
+                {data.pagination.total}
+              </span>
+            )}
+            {activeTab === 'active' && otherTabData?.pagination && (
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-700 rounded-full text-xs">
+                {otherTabData.pagination.total}
+              </span>
+            )}
+          </button>
+        </div>
+
         <div className="lg:grid lg:grid-cols-4 lg:gap-8">
           {/* Mobile Filter Toggle */}
           <div className="lg:hidden mb-6">

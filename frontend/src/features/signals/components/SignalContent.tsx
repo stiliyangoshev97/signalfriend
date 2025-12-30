@@ -98,8 +98,8 @@ export function SignalContent({
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-fur-cream">Full Strategy</p>
-              <p className="text-xs text-fur-cream/50">Complete analysis and recommendation</p>
+              <p className="text-sm font-medium text-fur-cream">Full Prediction</p>
+              <p className="text-xs text-fur-cream/50">Complete analysis and outcome recommendation</p>
             </div>
           </div>
 
@@ -110,8 +110,8 @@ export function SignalContent({
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-fur-cream">Entry & Exit Points</p>
-              <p className="text-xs text-fur-cream/50">Precise price targets</p>
+              <p className="text-sm font-medium text-fur-cream">Confidence Level</p>
+              <p className="text-xs text-fur-cream/50">Predictor's conviction on outcome</p>
             </div>
           </div>
 
@@ -123,7 +123,7 @@ export function SignalContent({
             </div>
             <div>
               <p className="text-sm font-medium text-fur-cream">Analysis & Reasoning</p>
-              <p className="text-xs text-fur-cream/50">Detailed market analysis</p>
+              <p className="text-xs text-fur-cream/50">Detailed research and insights</p>
             </div>
           </div>
 
@@ -135,7 +135,7 @@ export function SignalContent({
             </div>
             <div>
               <p className="text-sm font-medium text-fur-cream">Timeframe</p>
-              <p className="text-xs text-fur-cream/50">Expected duration for the trade</p>
+              <p className="text-xs text-fur-cream/50">Expected resolution timeline</p>
             </div>
           </div>
         </div>

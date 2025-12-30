@@ -87,7 +87,7 @@ export const createSignalSchema = z.object({
   /** Public description (1-1000 characters) */
   description: z.string().min(1).max(1000),
   /** Protected signal content (revealed after purchase) */
-  content: z.string().min(1).max(1000),
+  content: z.string().min(1).max(3000),
   /** Category ID */
   categoryId: z.string(),
   /** Price in USDT (min from env, default 1 USDT, max 2 decimal places) */
@@ -132,7 +132,7 @@ export const updateSignalSchema = z.object({
   /** Public description */
   description: z.string().min(1).max(1000).optional(),
   /** Protected signal content */
-  content: z.string().min(1).max(1000).optional(),
+  content: z.string().min(1).max(3000).optional(),
   /** Category ID */
   categoryId: z.string().optional(),
   /** Active status (soft delete) */

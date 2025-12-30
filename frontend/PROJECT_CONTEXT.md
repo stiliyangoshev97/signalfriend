@@ -1,7 +1,13 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 30 December 2025 (v0.30.0 - Prediction Marketplace Pivot)
+> Last Updated: 30 December 2025 (v0.31.0 - Prediction Marketplace Complete)
+
+---
+
+## 🎯 Platform Overview
+
+**SignalFriend** is a **Web3 Prediction Signals Marketplace** where expert analysts (Predictors) sell prediction signals for events on platforms like Polymarket, Predict.fun, and others. Categories include Crypto, Finance, Politics, Sports, World Events, and Culture.
 
 ---
 

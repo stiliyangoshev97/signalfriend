@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.34.0] - 2025-12-30 📝 DOCUMENTATION & RECEIPT UPDATE
+
+### Changed
+
+**Receipt Service**
+- Added `eventUrl` field to receipt response (select and transform)
+- Enables frontend to display event link on purchased signals
+
+**Documentation Updates**
+- Updated README.md to clarify "Web3 Prediction Signals Marketplace" positioning
+- Updated PROJECT_CONTEXT.md with current version and platform description
+- Clarified that platform is for prediction market events (Polymarket, Predict.fun, etc.)
+
+### Technical
+- Updated `receipt.service.ts`: Added eventUrl to select and transform
+
+---
+
 ## [0.33.0] - 2025-12-30 🔮 PREDICTION MARKETPLACE PIVOT (Phase 2 & 3: Schema + Categories)
 
 ### Changed

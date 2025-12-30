@@ -1,10 +1,16 @@
 # SignalFriend - Project Context
 
-> **Last Updated:** November 30, 2024  
-> **Current Phase:** Testnet Complete ✅ → Ready for Mainnet  
-> **Project Status:** 🟢 **Production-Ready (99/100)** - All Testing Complete  
+> **Last Updated:** December 30, 2025  
+> **Current Phase:** Production - BSC Mainnet Live ✅  
+> **Project Status:** 🟢 **Production-Ready** - Web3 Prediction Signals Marketplace  
 > **Security Score:** 99/100 (Post-Hardening + Full Test Coverage)  
 > **Test Coverage:** 125 Tests Passing ✅ (96 Unit + 11 Integration + 18 Fuzz)
+
+---
+
+## 🎯 Platform Overview
+
+**SignalFriend** is a **Web3 Prediction Signals Marketplace** where expert analysts (Predictors) sell prediction signals for events on platforms like Polymarket, Predict.fun, and others. Categories include Crypto, Finance, Politics, Sports, World Events, and Culture.
 
 ---
 

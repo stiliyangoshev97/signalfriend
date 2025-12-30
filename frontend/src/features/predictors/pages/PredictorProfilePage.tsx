@@ -649,7 +649,7 @@ export function PredictorProfilePage(): React.ReactElement {
                 : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
             }`}
           >
-            <span className="whitespace-nowrap">Expired / Inactive</span>
+            <span className="whitespace-nowrap">Expired</span>
             {activeTab === 'inactive' && signalsData?.pagination && (
               <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
                 {signalsData.pagination.total}

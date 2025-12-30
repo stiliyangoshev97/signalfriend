@@ -89,7 +89,7 @@ export const createSignalSchema = z.object({
   content: z
     .string()
     .min(50, 'Signal content must be at least 50 characters')
-    .max(1000, 'Signal content must be at most 1000 characters')
+    .max(3000, 'Signal content must be at most 3000 characters')
     .refine(
       (val) => !urlPattern.test(val),
       'Signal content cannot contain links or URLs'

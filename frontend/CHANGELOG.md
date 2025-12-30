@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.31.0] - 2025-12-30 📝 DOCUMENTATION & UI POLISH
+
+### Changed
+
+**Pagination Component**
+- Added `itemLabel` prop to Pagination component (defaults to "signals")
+- PredictorsPage now shows "total predictors" instead of "total signals"
+
+**Domain Badge Improvements**
+- Changed domain badge color from orange to green across all components
+- Domain badge now displays inline with confidence badge (not on new line)
+- Added truncation for long domain names with hover tooltip
+- Added domain badge to PurchasedSignalCard (My Signals page)
+
+**Documentation Updates**
+- Updated all README.md files to clarify "Web3 Prediction Signals Marketplace" positioning
+- Updated PROJECT_CONTEXT.md with current version and platform description
+- Clarified that platform is for prediction market events (Polymarket, Predict.fun, etc.)
+
+### Technical
+- Updated `Pagination.tsx`: New `itemLabel` prop
+- Updated `PredictorsPage.tsx`: Pass `itemLabel="predictors"` to Pagination
+- Updated `PurchasedSignalCard.tsx`: Added domain badge with getUrlDomain helper
+- Added `eventUrl` to Receipt type in `purchase.api.ts`
+
+---
+
 ## [0.30.0] - 2025-12-30 🔮 PREDICTION MARKETPLACE PIVOT (Phase 2 & 3: Schema + Categories)
 
 ### Changed
