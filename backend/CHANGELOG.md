@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.36.0] - 2025-12-30 📊 ACCURATE PLATFORM EARNINGS CALCULATION
+
+### Fixed
+
+**Platform Earnings from Predictor Joins**
+- Fixed admin dashboard showing inaccurate platform earnings
+- Previously: Assumed all predictors used referrals (`totalPredictors × $15`)
+- Now: Uses actual referral data from database
+  - Predictors WITH paid referral: platform got $15 each
+  - Predictors WITHOUT referral: platform got full $20 each
+- Added `predictorsWithReferral` and `predictorsWithoutReferral` to response
+
+### Changed
+
+**PlatformEarnings Interface**
+- Added `details.predictorsWithReferral` - Count of predictors who joined with a paid referral
+- Added `details.predictorsWithoutReferral` - Count of predictors who joined without referral
+
+### Technical
+- Updated `AdminService.getPlatformEarnings()` to query actual `referralPaid` status
+- Uses two parallel DB queries for efficiency (total count + referral count)
+
+---
+
 ## [0.35.0] - 2025-12-30 🌱 SEED SCRIPTS REFACTOR & 500 TEST SIGNALS
 
 ### Added

@@ -43,6 +43,10 @@ export interface PlatformEarnings {
   /** Breakdown details */
   details: {
     totalPredictors: number;
+    /** Predictors who joined WITH a paid referral (platform got $15) */
+    predictorsWithReferral: number;
+    /** Predictors who joined WITHOUT a referral (platform got $20) */
+    predictorsWithoutReferral: number;
     totalPurchases: number;
     totalSignalVolume: number;
   };
@@ -106,16 +110,20 @@ export class AdminService {
    *
    * Revenue sources:
    * 1. Predictor Joins: $20 fee, but $5 goes to referrer if valid referral
-   *    - We don't track referrals in DB, so we assume worst case (all had referrals)
-   *    - Calculation: predictors × $15 minimum platform keeps
+   *    - Predictors with referralPaid=true: platform got $15
+   *    - Predictors without referral: platform got $20
    * 2. Buyer Access Fees: $0.50 flat fee per purchase
    * 3. Commissions: 5% of signal price
    *
    * @returns Promise resolving to platform earnings breakdown
    */
   static async getPlatformEarnings(): Promise<PlatformEarnings> {
-    // Get total predictor count
-    const totalPredictors = await Predictor.countDocuments();
+    // Get predictor counts - split by referral status
+    const [totalPredictors, predictorsWithReferral] = await Promise.all([
+      Predictor.countDocuments(),
+      Predictor.countDocuments({ referralPaid: true }),
+    ]);
+    const predictorsWithoutReferral = totalPredictors - predictorsWithReferral;
 
     // Get all receipts for calculating fees
     const receipts = await Receipt.find({}, { priceUsdt: 1 }).lean();
@@ -127,12 +135,12 @@ export class AdminService {
       0
     );
 
-    // Calculate earnings
-    // Note: We use minimum $15 per predictor (assuming all had valid referrals)
-    // In reality, some may not have referrals so platform got full $20
+    // Calculate earnings from predictor joins (accurate based on actual referral data)
+    // - Predictors WITH paid referral: platform got $15 each ($20 - $5 referral bonus)
+    // - Predictors WITHOUT referral: platform got full $20 each
     const fromPredictorJoins =
-      totalPredictors *
-      (PLATFORM_FEES.PREDICTOR_JOIN_FEE - PLATFORM_FEES.REFERRAL_BONUS);
+      (predictorsWithReferral * (PLATFORM_FEES.PREDICTOR_JOIN_FEE - PLATFORM_FEES.REFERRAL_BONUS)) +
+      (predictorsWithoutReferral * PLATFORM_FEES.PREDICTOR_JOIN_FEE);
 
     const fromBuyerAccessFees =
       totalPurchases * PLATFORM_FEES.BUYER_ACCESS_FEE;
@@ -149,6 +157,8 @@ export class AdminService {
       total: Math.round(total * 100) / 100,
       details: {
         totalPredictors,
+        predictorsWithReferral,
+        predictorsWithoutReferral,
         totalPurchases,
         totalSignalVolume: Math.round(totalSignalVolume * 100) / 100,
       },

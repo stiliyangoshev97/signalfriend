@@ -70,9 +70,9 @@ function filtersToParams(filters: PredictorFilters): URLSearchParams {
 export function PredictorsPage(): React.ReactElement {
   // SEO for predictors leaderboard page
   useSEO({
-    title: 'Top Predictors Leaderboard',
+    title: 'Predictors',
     description:
-      'Discover top-rated prediction signal predictors. View rankings, ratings, and track records. Find verified predictors you can trust on SignalFriend.',
+      'Discover prediction signal predictors on SignalFriend. View ratings, track records, and find verified predictors you can trust.',
     url: getSEOUrl('/predictors'),
   });
 
@@ -162,10 +162,10 @@ export function PredictorsPage(): React.ReactElement {
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-fur-cream mb-2">
-            🏆 Top Predictors
+            Predictors
           </h1>
           <p className="text-gray-main">
-            Discover the best signal providers ranked by performance
+            Discover signal providers on the platform
           </p>
         </div>
 

@@ -21,6 +21,10 @@ export interface PlatformEarnings {
   /** Breakdown details */
   details: {
     totalPredictors: number;
+    /** Predictors who joined WITH a paid referral (platform got $15) */
+    predictorsWithReferral: number;
+    /** Predictors who joined WITHOUT a referral (platform got $20) */
+    predictorsWithoutReferral: number;
     totalPurchases: number;
     totalSignalVolume: number;
   };

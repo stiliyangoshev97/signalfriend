@@ -29,7 +29,7 @@ const SITE_NAME = 'SignalFriend';
 
 /** Default description used as fallback */
 const DEFAULT_DESCRIPTION =
-  'Get expert analysis for prediction market events. Purchase signals as NFTs and access premium insights on crypto, finance, politics, sports, and more. Secured by smart contracts on BNB Chain.';
+  'Get professional analysis for prediction market events. Purchase signals as NFTs and access premium insights on crypto, finance, politics, sports, and more. Secured by smart contracts on BNB Chain.';
 
 /** Default OG image */
 const DEFAULT_IMAGE = 'https://signalfriend.com/og-image.jpg?v=3';
