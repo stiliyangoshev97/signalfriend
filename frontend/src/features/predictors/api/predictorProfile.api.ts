@@ -51,8 +51,8 @@ export async function fetchPredictorSignalsPublic(
 
   // Add other filters
   if (filters.category) params.append('categoryId', filters.category);
-  if (filters.riskLevel) params.append('riskLevel', filters.riskLevel);
-  if (filters.potentialReward) params.append('potentialReward', filters.potentialReward);
+  if (filters.minConfidence !== undefined) params.append('minConfidence', filters.minConfidence.toString());
+  if (filters.maxConfidence !== undefined) params.append('maxConfidence', filters.maxConfidence.toString());
   if (filters.minPrice !== undefined) params.append('minPrice', filters.minPrice.toString());
   if (filters.maxPrice !== undefined) params.append('maxPrice', filters.maxPrice.toString());
   if (filters.excludeBuyerAddress) params.append('excludeBuyerAddress', filters.excludeBuyerAddress);

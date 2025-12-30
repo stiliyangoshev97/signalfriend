@@ -60,10 +60,10 @@ export const listSignalsSchema = z.object({
   minPrice: z.coerce.number().min(0).optional(),
   /** Maximum price filter */
   maxPrice: z.coerce.number().min(0).optional(),
-  /** Filter by risk level */
-  riskLevel: z.enum(["low", "medium", "high"]).optional(),
-  /** Filter by potential reward */
-  potentialReward: z.enum(["normal", "medium", "high"]).optional(),
+  /** Minimum confidence level filter */
+  minConfidence: z.coerce.number().min(1).max(100).optional(),
+  /** Maximum confidence level filter */
+  maxConfidence: z.coerce.number().min(1).max(100).optional(),
 });
 
 /**
@@ -87,7 +87,7 @@ export const createSignalSchema = z.object({
   /** Public description (1-1000 characters) */
   description: z.string().min(1).max(1000),
   /** Protected signal content (revealed after purchase) */
-  content: z.string().min(1).max(1000),
+  content: z.string().min(1).max(3000),
   /** Category ID */
   categoryId: z.string(),
   /** Price in USDT (min from env, default 1 USDT, max 2 decimal places) */
@@ -99,12 +99,26 @@ export const createSignalSchema = z.object({
       (val) => Math.abs(Math.round(val * 100) - val * 100) < 0.0001,
       "Price can have at most 2 decimal places"
     ),
-  /** Number of days until signal expires (1-2 days) */
-  expiryDays: z.number().int().min(1).max(2),
-  /** Risk level assessment */
-  riskLevel: z.enum(["low", "medium", "high"]),
-  /** Potential reward assessment */
-  potentialReward: z.enum(["normal", "medium", "high"]),
+  /** Expiration date for the signal (must be 1-90 days from now) */
+  expiresAt: z
+    .string()
+    .datetime()
+    .refine((date) => {
+      const expiry = new Date(date);
+      const now = new Date();
+      const minDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 1 day from now
+      const maxDate = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000); // 90 days from now
+      return expiry >= minDate && expiry <= maxDate;
+    }, "Expiration must be between 1 and 90 days from now"),
+  /** Predictor's confidence level in this prediction (1-100%) */
+  confidenceLevel: z.number().int().min(1).max(100),
+  /** Optional URL to the prediction market event */
+  eventUrl: z
+    .string()
+    .url("Must be a valid URL")
+    .max(500)
+    .optional()
+    .or(z.literal("")),
 });
 
 /**
@@ -118,7 +132,7 @@ export const updateSignalSchema = z.object({
   /** Public description */
   description: z.string().min(1).max(1000).optional(),
   /** Protected signal content */
-  content: z.string().min(1).max(1000).optional(),
+  content: z.string().min(1).max(3000).optional(),
   /** Category ID */
   categoryId: z.string().optional(),
   /** Active status (soft delete) */

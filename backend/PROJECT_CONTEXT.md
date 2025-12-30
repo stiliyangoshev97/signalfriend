@@ -1,9 +1,15 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** December 23, 2025  
+> **Last Updated:** December 30, 2025  
 > **Current Phase:** Production - BSC Mainnet Live  
-> **Project Status:** 🟢 **Backend v0.31.0** - BSC Mainnet Deployed, 290 Tests Passing, CI/CD Active  
-> **Branch:** `fix/predictor-profile-signal-count`
+> **Project Status:** 🟢 **Backend v0.34.0** - Prediction Marketplace Complete  
+> **Branch:** `main`
+
+---
+
+## 🎯 Platform Overview
+
+**SignalFriend** is a **Web3 Prediction Signals Marketplace** where expert analysts (Predictors) sell prediction signals for events on platforms like Polymarket, Predict.fun, and others. Categories include Crypto, Finance, Politics, Sports, World Events, and Culture.
 
 ---
 
@@ -184,13 +190,13 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
   categoryId: ObjectId,
   mainGroup: string,          // Denormalized from Category for efficient filtering
   priceUsdt: number,
-  expiresAt: Date,            // When signal can no longer be purchased
+  expiresAt: Date,            // When signal expires (1-90 days from creation)
+  confidenceLevel: number,    // Predictor's confidence 1-100%
+  eventUrl?: string,          // Optional link to prediction market event
   totalSales: number,
   averageRating: number,
   totalReviews: number,
   isActive: boolean,
-  riskLevel: enum,            // low, medium, high
-  potentialReward: enum,      // normal, medium, high
 }
 ```
 
@@ -251,24 +257,30 @@ BlockchainService.getSignalKeyContentId(tokenId): Promise<string | null>
 {
   name: string,               // Subcategory name (unique within mainGroup)
   slug: string,               // URL-friendly identifier (unique globally)
-  mainGroup: string,          // Main category: "Crypto", "Traditional Finance", "Macro / Other"
+  mainGroup: string,          // Main category: "Crypto", "Finance", "Politics", etc.
   description: string,
   icon: string,
   isActive: boolean,
   sortOrder: number,
 }
 
-// Main Groups (verticals)
+// Main Groups (6 verticals for prediction markets)
 MAIN_GROUPS = {
   CRYPTO: "Crypto",
-  TRADITIONAL_FINANCE: "Traditional Finance", 
-  MACRO_OTHER: "Macro / Other",
+  FINANCE: "Finance",
+  POLITICS: "Politics",
+  SPORTS: "Sports",
+  WORLD: "World",
+  CULTURE: "Culture",
 }
 
-// 19 subcategories across 3 main groups:
-// Crypto (9): Bitcoin, Ethereum, Altcoins, DeFi, NFTs, Layer 1/2, Meme Coins, Futures/Perpetuals, Other
-// Traditional Finance (6): US Stocks - Tech, US Stocks - General, Forex - Majors, Commodities - Metals, Commodities - Energy, Other
-// Macro / Other (4): Economic Data, Geopolitical Events, Sports, Other
+// 33 subcategories across 6 main groups:
+// Crypto (7): Bitcoin, Ethereum, Altcoins, DeFi, NFTs/Gaming, Meme Coins, Other
+// Finance (5): Stocks, Forex, Commodities, Earnings, Other
+// Politics (5): US Elections, World Politics, Policy, Legal, Other
+// Sports (7): Football, American Football, Basketball, Combat Sports, Horse Racing, Esports, Other
+// World (5): Geopolitics, Economy, Climate/Weather, Science, Other
+// Culture (5): Entertainment, Awards, Tech/AI, Social Media, Other
 ```
 
 ---

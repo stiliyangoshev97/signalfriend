@@ -41,40 +41,26 @@ import { useIsAdmin } from '@/shared/hooks/useIsAdmin';
 import { useSEO, getSEOUrl } from '@/shared/hooks';
 
 /**
- * Risk level badge colors and labels
+ * Confidence level badge colors based on percentage
  */
-const riskConfig: Record<string, { color: string; label: string }> = {
-  low: {
-    color: 'bg-green-500/20 text-green-400 border-green-500/30',
-    label: 'Low Risk',
-  },
-  medium: {
-    color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    label: 'Medium Risk',
-  },
-  high: {
-    color: 'bg-red-500/20 text-red-400 border-red-500/30',
-    label: 'High Risk',
-  },
-};
-
-/**
- * Potential reward badge colors and labels - matches filter panel theme
- */
-const rewardConfig: Record<string, { color: string; label: string }> = {
-  normal: {
-    color: 'bg-fur-cream/10 text-fur-cream border-fur-cream/30',
-    label: 'Normal Reward',
-  },
-  medium: {
-    color: 'bg-fur-light/20 text-fur-light border-fur-light/30',
-    label: 'Medium Reward',
-  },
-  high: {
-    color: 'bg-fur-main/20 text-fur-main border-fur-main/30',
-    label: 'High Reward',
-  },
-};
+function getConfidenceConfig(level: number): { color: string; label: string } {
+  if (level >= 80) {
+    return {
+      color: 'bg-green-500/20 text-green-400 border-green-500/30',
+      label: `${level}% Confidence`,
+    };
+  } else if (level >= 50) {
+    return {
+      color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+      label: `${level}% Confidence`,
+    };
+  } else {
+    return {
+      color: 'bg-red-500/20 text-red-400 border-red-500/30',
+      label: `${level}% Confidence`,
+    };
+  }
+}
 
 /**
  * Safely parse and format dates
@@ -98,6 +84,18 @@ function formatCreatedAt(createdAt: string): string {
   const date = parseDate(createdAt);
   if (!date) return 'Unknown';
   return format(date, 'MMM d, yyyy');
+}
+
+/**
+ * Extract domain from URL for badge display
+ */
+function getUrlDomain(url: string): string | null {
+  try {
+    const domain = new URL(url).hostname.replace('www.', '');
+    return domain;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -141,10 +139,10 @@ export function SignalDetailPage(): React.ReactElement {
 
   // Dynamic SEO based on signal data
   useSEO({
-    title: signal ? `${signal.title} - Trading Signal` : 'Signal Details',
+    title: signal ? `${signal.title} - Prediction Signal` : 'Signal Details',
     description: signal
-      ? `${signal.description.slice(0, 150)}${signal.description.length > 150 ? '...' : ''} - ${signal.riskLevel} risk, ${signal.potentialReward} reward potential.`
-      : 'View trading signal details, pricing, and predictor information on SignalFriend.',
+      ? `${signal.description.slice(0, 150)}${signal.description.length > 150 ? '...' : ''} - ${signal.confidenceLevel}% confidence prediction.`
+      : 'View prediction signal details, pricing, and predictor information on SignalFriend.',
     url: contentId ? getSEOUrl(`/signals/${contentId}`) : undefined,
     type: 'article',
   });
@@ -246,9 +244,9 @@ export function SignalDetailPage(): React.ReactElement {
   // Get status info - check both isActive and expiry
   const expiresAtDate = parseDate(signal.expiresAt);
   const isExpired = expiresAtDate ? expiresAtDate < new Date() : false;
-  const riskLevel = signal.riskLevel || 'medium';
-  const potentialReward = signal.potentialReward || 'normal';
+  const confidenceLevel = signal.confidenceLevel ?? 50;
   const isPredictorBlacklisted = signal.predictor?.isBlacklisted ?? false;
+  const confidenceConfig = getConfidenceConfig(confidenceLevel);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -321,24 +319,29 @@ export function SignalDetailPage(): React.ReactElement {
               {signal.description}
             </p>
 
-            {/* Risk & Reward Badges */}
-            <div className="flex flex-wrap gap-3">
+            {/* Confidence Badge & Event URL */}
+            <div className="flex items-center gap-3">
               <span
-                className={`inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg border ${riskConfig[riskLevel]?.color || riskConfig.medium.color}`}
+                className={`inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg border shrink-0 ${confidenceConfig.color}`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {riskConfig[riskLevel]?.label || 'Medium Risk'}
+                {confidenceConfig.label}
               </span>
-              <span
-                className={`inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg border ${rewardConfig[potentialReward]?.color || rewardConfig.normal.color}`}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-                {rewardConfig[potentialReward]?.label || 'Normal Reward'}
-              </span>
+              {signal.eventUrl && getUrlDomain(signal.eventUrl) && (
+                <a
+                  href={signal.eventUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg border bg-green-500/10 text-green-400 border-green-500/30 hover:bg-green-500/20 transition-colors min-w-0 max-w-[200px]"
+                >
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  <span className="truncate">{getUrlDomain(signal.eventUrl)}</span>
+                </a>
+              )}
             </div>
           </div>
 

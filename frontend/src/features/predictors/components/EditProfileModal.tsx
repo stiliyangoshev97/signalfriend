@@ -547,7 +547,7 @@ export function EditProfileModal({
         <div>
           <Textarea
             label="Bio"
-            placeholder="Tell buyers about your trading experience and expertise..."
+            placeholder="Tell buyers about your prediction experience and expertise..."
             rows={4}
             {...register('bio')}
             error={errors.bio?.message}

@@ -41,14 +41,14 @@ export function CTASection() {
         <div className="max-w-3xl mx-auto text-center">
           {/* Heading */}
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-fur-cream mb-6">
-            Ready to Trade with{' '}
+            Ready to Predict with{' '}
             <span className="text-brand-200">Confidence</span>?
           </h2>
 
           {/* Description */}
           <p className="text-lg md:text-xl text-gray-main mb-8">
             Join the marketplace where predictors build reputation through results, 
-            and buyers get transparent access to trading signals.
+            and buyers get transparent access to expert prediction signals.
           </p>
 
           {/* CTA Buttons */}

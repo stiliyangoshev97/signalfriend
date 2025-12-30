@@ -69,7 +69,7 @@ export class ReceiptService {
         .limit(limit)
         .populate({
           path: "signalId",
-          select: "title description categoryId predictorAddress",
+          select: "title description categoryId predictorAddress eventUrl",
           populate: {
             path: "categoryId",
             select: "name slug icon",
@@ -87,6 +87,7 @@ export class ReceiptService {
         description?: string;
         categoryId?: { name?: string; slug?: string; icon?: string };
         predictorAddress?: string;
+        eventUrl?: string;
       } | null;
 
       return {
@@ -95,6 +96,7 @@ export class ReceiptService {
           ? {
               title: signalData.title,
               description: signalData.description,
+              eventUrl: signalData.eventUrl,
               category: signalData.categoryId
                 ? {
                     name: signalData.categoryId.name,

@@ -1,6 +1,6 @@
 # 🐕 SignalFriend
 
-> **Web3 Transparent Signal Marketplace** — Connect verified prediction makers with traders via secure, on-chain NFT receipts on BNB Chain.
+> **Web3 Prediction Signals Marketplace** — Connect verified predictors with buyers seeking expert analysis for prediction market events (Polymarket, Predict.fun, etc.) via secure, on-chain NFT receipts on BNB Chain.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![BNB Chain](https://img.shields.io/badge/Chain-BNB-F0B90B)](https://www.bnbchain.org/)
@@ -27,13 +27,13 @@
 
 ## 📖 Project Explanation
 
-**SignalFriend** is a Web3 marketplace where expert traders (Predictors) sell trading signals to buyers (Traders) using blockchain technology for transparency and trust.
+**SignalFriend** is a **Web3 Prediction Signals Marketplace** where expert analysts (Predictors) sell prediction signals to buyers seeking insights for prediction market events across Crypto, Politics, Sports, Finance, World Events, and Culture.
 
 ### How It Works
 
 1. **Predictors Register** — Pay a one-time $20 USDT fee to become a verified seller and receive a non-transferable NFT pass
-2. **Create Signals** — Predictors post trading predictions with entry/exit points, stop-loss, and timeframes (hidden until purchased)
-3. **Buyers Purchase** — Traders browse signals by category, rating, and sales count, then purchase using USDT
+2. **Create Signals** — Predictors post prediction analyses with confidence levels, reasoning, and event links (hidden until purchased)
+3. **Buyers Purchase** — Browse signals by category, rating, and confidence level, then purchase using USDT
 4. **NFT Receipt** — Each purchase mints a unique NFT receipt that unlocks the full signal content
 5. **Rate & Review** — Buyers can rate signals (1-5 stars, one rating per purchase) to build predictor reputation
 
@@ -45,6 +45,7 @@
 - **💰 Fair Fees** — 5% platform commission, 95% goes to predictor
 - **🛡️ Dispute System** — Blacklist malicious predictors via MultiSig governance
 - **✅ Verification Badges** — Top predictors (100+ sales, $1000+ earnings) can apply for verification
+- **🔮 Multi-Category** — Crypto, Politics, Sports, Finance, World Events, Culture
 
 ### Legal Structure
 

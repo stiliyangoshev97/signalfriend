@@ -13,6 +13,8 @@ interface PaginationProps {
   pagination: PaginationType;
   /** Callback when page changes */
   onPageChange: (page: number) => void;
+  /** Label for items (e.g., "signals", "predictors"). Defaults to "signals" */
+  itemLabel?: string;
 }
 
 /**
@@ -36,6 +38,7 @@ interface PaginationProps {
 export function Pagination({
   pagination,
   onPageChange,
+  itemLabel = 'signals',
 }: PaginationProps): React.ReactElement | null {
   const { page, totalPages, total } = pagination;
 
@@ -109,7 +112,7 @@ export function Pagination({
       <p className="text-sm text-fur-cream/60">
         Showing page <span className="font-medium text-fur-cream">{page}</span>{' '}
         of <span className="font-medium text-fur-cream">{totalPages}</span>
-        {' '}({total} total signals)
+        {' '}({total} total {itemLabel})
       </p>
 
       {/* Page buttons */}

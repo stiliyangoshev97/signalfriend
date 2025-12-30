@@ -31,7 +31,7 @@ import { useSEO, getSEOUrl } from '@/shared/hooks';
  * 4. CTA - Final call to action with trust indicators
  *
  * The page is designed for:
- * - Signal buyers looking for verified trading signals
+ * - Signal buyers looking for verified prediction signals
  * - Predictors wanting to monetize their expertise
  * - New users learning about the platform
  *

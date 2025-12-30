@@ -14,7 +14,7 @@
  * // Full usage with all options
  * useSEO({
  *   title: 'BTC Signal - Buy Now',
- *   description: 'Premium Bitcoin trading signal from verified predictor',
+ *   description: 'Premium Bitcoin prediction signal from verified predictor',
  *   image: 'https://signalfriend.io/signal-preview.png',
  *   url: 'https://signalfriend.io/signals/abc123',
  *   type: 'article'
@@ -29,7 +29,7 @@ const SITE_NAME = 'SignalFriend';
 
 /** Default description used as fallback */
 const DEFAULT_DESCRIPTION =
-  'Buy and sell trading signals securely on the blockchain. Connect with verified predictors, access premium crypto signals, and trade with confidence on BNB Chain.';
+  'Get expert analysis for prediction market events. Purchase signals as NFTs and access premium insights on crypto, finance, politics, sports, and more. Secured by smart contracts on BNB Chain.';
 
 /** Default OG image */
 const DEFAULT_IMAGE = 'https://signalfriend.com/og-image.jpg?v=3';
@@ -116,8 +116,8 @@ function setCanonicalUrl(url: string): void {
  * ```tsx
  * function SignalsPage() {
  *   useSEO({
- *     title: 'Trading Signals',
- *     description: 'Browse premium trading signals from verified predictors'
+ *     title: 'Prediction Signals',
+ *     description: 'Browse premium prediction signals from verified predictors'
  *   });
  *
  *   return <div>...</div>;

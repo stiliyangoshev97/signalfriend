@@ -1,7 +1,7 @@
 # SignalFriend Backend
 
-> Express + MongoDB + Viem backend API for the SignalFriend platform.  
-> **Version:** 0.24.0 | **Last Updated:** December 2025
+> Express + MongoDB + Viem backend API for the SignalFriend **Web3 Prediction Signals Marketplace**.  
+> **Version:** 0.34.0 | **Last Updated:** December 2025
 
 ## 🌐 Production
 

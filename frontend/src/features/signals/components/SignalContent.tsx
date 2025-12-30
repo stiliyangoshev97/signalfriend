@@ -80,8 +80,8 @@ export function SignalContent({
             Content Locked
           </h4>
           <p className="text-fur-cream/60 mb-4 max-w-md mx-auto">
-            Purchase this signal to unlock the full trading strategy, entry/exit points,
-            and detailed analysis from the predictor.
+            Purchase this signal to unlock the full analysis, recommendation,
+            and detailed reasoning from the predictor.
           </p>
           <div className="inline-flex items-center gap-2 bg-fur-light/10 px-4 py-2 rounded-full">
             <span className="text-fur-light font-semibold">${priceUSDT} USDT</span>
@@ -98,8 +98,8 @@ export function SignalContent({
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-fur-cream">Full Strategy</p>
-              <p className="text-xs text-fur-cream/50">Complete trading strategy details</p>
+              <p className="text-sm font-medium text-fur-cream">Full Prediction</p>
+              <p className="text-xs text-fur-cream/50">Complete analysis and outcome recommendation</p>
             </div>
           </div>
 
@@ -110,8 +110,8 @@ export function SignalContent({
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-fur-cream">Entry & Exit Points</p>
-              <p className="text-xs text-fur-cream/50">Precise price targets</p>
+              <p className="text-sm font-medium text-fur-cream">Confidence Level</p>
+              <p className="text-xs text-fur-cream/50">Predictor's conviction on outcome</p>
             </div>
           </div>
 
@@ -123,7 +123,7 @@ export function SignalContent({
             </div>
             <div>
               <p className="text-sm font-medium text-fur-cream">Analysis & Reasoning</p>
-              <p className="text-xs text-fur-cream/50">Detailed market analysis</p>
+              <p className="text-xs text-fur-cream/50">Detailed research and insights</p>
             </div>
           </div>
 
@@ -135,7 +135,7 @@ export function SignalContent({
             </div>
             <div>
               <p className="text-sm font-medium text-fur-cream">Timeframe</p>
-              <p className="text-xs text-fur-cream/50">Expected duration for the trade</p>
+              <p className="text-xs text-fur-cream/50">Expected resolution timeline</p>
             </div>
           </div>
         </div>

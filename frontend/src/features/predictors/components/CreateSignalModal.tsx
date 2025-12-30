@@ -2,8 +2,8 @@
  * @fileoverview Create Signal Modal Component
  * @module features/predictors/components/CreateSignalModal
  * @description
- * Modal form for predictors to create new signals.
- * Includes validation, two-step category selection, and price input.
+ * Modal form for predictors to create new prediction signals.
+ * Includes validation, two-step category selection, confidence level, and date picker.
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -27,24 +27,16 @@ interface CreateSignalModalProps {
 /**
  * CreateSignalModal component
  * 
- * Full-featured form modal for creating a new signal with:
+ * Full-featured form modal for creating a new prediction signal with:
  * - Title and description fields
  * - Protected signal content (only visible after purchase)
- * - Category selection
+ * - Category selection (two-step: main group → subcategory)
  * - Price in USDT (minimum $1)
- * - Expiry duration (1-7 days)
+ * - Expiration date picker (1-90 days)
+ * - Confidence level slider (1-100%)
+ * - Optional event URL for prediction market links
  * - Form validation with Zod
  * - Loading states and error handling
- * 
- * @param props - Component props
- * @returns Modal element
- * 
- * @example
- * <CreateSignalModal
- *   isOpen={showCreateModal}
- *   onClose={() => setShowCreateModal(false)}
- *   onSuccess={() => refetchSignals()}
- * />
  */
 export function CreateSignalModal({
   isOpen,
@@ -60,8 +52,8 @@ export function CreateSignalModal({
   // Create signal mutation
   const { mutate: createSignal, isPending: isCreating } = useCreateSignal();
 
-  // Define explicit main group order (Crypto → Traditional Finance → Macro / Other)
-  const MAIN_GROUP_ORDER = ['Crypto', 'Traditional Finance', 'Macro / Other'];
+  // Define main group order for prediction markets
+  const MAIN_GROUP_ORDER = ['Crypto', 'Finance', 'Politics', 'Sports', 'World', 'Culture'];
 
   // Group categories by mainGroup
   const categoryGroups = useMemo(() => {
@@ -84,7 +76,6 @@ export function CreateSignalModal({
     const sortedMainGroups = Array.from(mainGroupsSet).sort((a, b) => {
       const indexA = MAIN_GROUP_ORDER.indexOf(a);
       const indexB = MAIN_GROUP_ORDER.indexOf(b);
-      // If not in predefined order, put at end
       const orderA = indexA === -1 ? MAIN_GROUP_ORDER.length : indexA;
       const orderB = indexB === -1 ? MAIN_GROUP_ORDER.length : indexB;
       return orderA - orderB;
@@ -100,6 +91,15 @@ export function CreateSignalModal({
   const subcategories = selectedMainGroup 
     ? categoryGroups.subcategoriesByGroup[selectedMainGroup] || []
     : [];
+
+  // Calculate min/max dates for the date picker
+  const today = new Date();
+  const minDate = new Date(today.getTime() + 24 * 60 * 60 * 1000); // Tomorrow
+  const maxDate = new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000); // 90 days from now
+  const defaultExpiry = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days default
+  
+  // Format date for input
+  const formatDateForInput = (date: Date) => date.toISOString().split('T')[0];
   
   // Form setup with Zod validation
   const {
@@ -118,22 +118,42 @@ export function CreateSignalModal({
       content: '',
       categoryId: '',
       priceUsdt: 5,
-      expiryDays: 2,
-      riskLevel: 'medium',
-      potentialReward: 'medium',
+      expiresAt: defaultExpiry.toISOString(),
+      confidenceLevel: 70,
+      eventUrl: '',
     },
   });
   
-  // Watch values for character counts
+  // Watch values for character counts and display
   const titleValue = watch('title') || '';
   const descriptionValue = watch('description') || '';
   const contentValue = watch('content') || '';
   const priceValue = watch('priceUsdt');
+  const confidenceValue = watch('confidenceLevel') || 70;
+  const eventUrlValue = watch('eventUrl') || '';
   
   // Calculate total buyer cost (price + $0.5 access fee)
   const buyerCost = (priceValue || 0) + 0.5;
   // Calculate predictor earnings (95% of price, platform takes 5%)
   const predictorEarnings = ((priceValue || 0) * 0.95).toFixed(2);
+
+  // Get confidence level color
+  const getConfidenceColor = (level: number) => {
+    if (level >= 80) return 'text-green-400';
+    if (level >= 60) return 'text-yellow-400';
+    if (level >= 40) return 'text-orange-400';
+    return 'text-red-400';
+  };
+
+  // Extract domain from URL
+  const getUrlDomain = (url: string) => {
+    try {
+      const domain = new URL(url).hostname.replace('www.', '');
+      return domain;
+    } catch {
+      return null;
+    }
+  };
   
   // Reset form when modal closes
   useEffect(() => {
@@ -148,7 +168,14 @@ export function CreateSignalModal({
   const onSubmit = (data: CreateSignalData) => {
     setSubmitError(null);
     
-    createSignal(data, {
+    // Convert date string to ISO format for backend
+    const formData = {
+      ...data,
+      expiresAt: new Date(data.expiresAt).toISOString(),
+      eventUrl: data.eventUrl || undefined, // Don't send empty string
+    };
+    
+    createSignal(formData, {
       onSuccess: () => {
         onSuccess?.();
         onClose();
@@ -171,12 +198,12 @@ export function CreateSignalModal({
         <div>
           <Input
             label="Signal Title"
-            placeholder="e.g., BTC Short-Term Breakout Alert"
+            placeholder="e.g., Will BTC reach $150k by 2027?"
             {...register('title')}
             error={errors.title?.message}
           />
           <div className="flex justify-between mt-1 text-xs text-fur-cream/50">
-            <span>A catchy, descriptive title for your signal</span>
+            <span>A clear prediction question or statement</span>
             <span className={titleValue.length > 100 ? 'text-error-400' : ''}>
               {titleValue.length}/100
             </span>
@@ -204,7 +231,7 @@ export function CreateSignalModal({
         <div>
           <Textarea
             label="Signal Content (Protected)"
-            placeholder="Your full analysis, entry/exit points, targets, stop-loss, reasoning, etc. This is ONLY visible after purchase."
+            placeholder="Your full analysis, prediction outcome, reasoning, and insights. This is ONLY visible after purchase."
             rows={8}
             {...register('content')}
             error={errors.content?.message}
@@ -216,66 +243,79 @@ export function CreateSignalModal({
               </svg>
               Protected - only buyers can see this
             </span>
-            <span className={contentValue.length > 1000 ? 'text-error-400' : ''}>
-              {contentValue.length}/1000
+            <span className={contentValue.length > 3000 ? 'text-error-400' : ''}>
+              {contentValue.length}/3000
             </span>
           </div>
         </div>
 
-        {/* Category & Price Row */}
+        {/* Category Selection */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Two-step Category Selection */}
-          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Main Group (Step 1) */}
-            <div>
-              {categoriesLoading ? (
-                <div className="h-10 bg-dark-700 rounded-lg flex items-center justify-center">
-                  <Spinner size="sm" />
-                </div>
-              ) : (
-                <Select
-                  label="Category Group"
-                  placeholder="Select a category group"
-                  value={selectedMainGroup}
-                  onChange={(e) => {
-                    setSelectedMainGroup(e.target.value);
-                    // Reset subcategory when main group changes
-                    setValue('categoryId', '', { shouldValidate: true });
-                  }}
-                  options={categoryGroups.mainGroups.map((group) => ({
-                    value: group,
-                    label: group,
-                  }))}
-                />
-              )}
-              <div className="mt-1 text-xs text-fur-cream/50">
-                First, choose the main category
+          {/* Main Group (Step 1) */}
+          <div>
+            {categoriesLoading ? (
+              <div className="h-10 bg-dark-700 rounded-lg flex items-center justify-center">
+                <Spinner size="sm" />
               </div>
-            </div>
-
-            {/* Subcategory (Step 2) */}
-            <div>
+            ) : (
               <Select
-                label="Subcategory"
-                placeholder={selectedMainGroup ? "Select a subcategory" : "Select a group first"}
-                disabled={!selectedMainGroup}
-                options={subcategories.map((category) => ({
-                  value: category._id,
-                  label: category.name,
+                label="Category Group"
+                placeholder="Select a category group"
+                value={selectedMainGroup}
+                onChange={(e) => {
+                  setSelectedMainGroup(e.target.value);
+                  setValue('categoryId', '', { shouldValidate: true });
+                }}
+                options={categoryGroups.mainGroups.map((group) => ({
+                  value: group,
+                  label: group,
                 }))}
-                {...register('categoryId')}
-                error={errors.categoryId?.message}
               />
-              <div className="mt-1 text-xs text-fur-cream/50">
-                Then, select the specific subcategory
-              </div>
+            )}
+            <div className="mt-1 text-xs text-fur-cream/50">
+              First, choose the main category
+            </div>
+          </div>
+
+          {/* Subcategory (Step 2) */}
+          <div>
+            <Select
+              label="Subcategory"
+              placeholder={selectedMainGroup ? "Select a subcategory" : "Select a group first"}
+              disabled={!selectedMainGroup}
+              options={subcategories.map((category) => ({
+                value: category._id,
+                label: category.name,
+              }))}
+              {...register('categoryId')}
+              error={errors.categoryId?.message}
+            />
+            <div className="mt-1 text-xs text-fur-cream/50">
+              Then, select the specific subcategory
             </div>
           </div>
         </div>
 
-        {/* Price Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Event URL (Optional) */}
+        <div>
+          <Input
+            label="Prediction Market URL (Optional)"
+            placeholder="e.g., https://polymarket.com/event/..."
+            {...register('eventUrl')}
+            error={errors.eventUrl?.message}
+          />
+          <div className="flex justify-between mt-1 text-xs text-fur-cream/50">
+            <span>Link to the prediction market event (Polymarket, Predict.fun, etc.)</span>
+            {eventUrlValue && getUrlDomain(eventUrlValue) && (
+              <span className="text-brand-400">
+                📎 {getUrlDomain(eventUrlValue)}
+              </span>
+            )}
+          </div>
+        </div>
 
+        {/* Price & Expiration Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Price */}
           <div>
             <Input
@@ -284,7 +324,6 @@ export function CreateSignalModal({
               label="Price (USDT)"
               placeholder="5.00"
               onKeyDown={(e) => {
-                // Block comma and non-numeric characters except period and control keys
                 const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
                 const isNumber = /^[0-9]$/.test(e.key);
                 const isPeriod = e.key === '.';
@@ -294,19 +333,16 @@ export function CreateSignalModal({
                 const isPaste = (e.ctrlKey || e.metaKey) && e.key === 'v';
                 const isCut = (e.ctrlKey || e.metaKey) && e.key === 'x';
                 
-                // Block comma - users should use period for decimals
                 if (e.key === ',') {
                   e.preventDefault();
                   return;
                 }
                 
-                // Allow only numbers, period (once), and control keys
                 if (!isNumber && !isPeriod && !isAllowedKey && !isSelectAll && !isCopy && !isPaste && !isCut) {
                   e.preventDefault();
                   return;
                 }
                 
-                // Only allow one period
                 if (isPeriod && (e.target as HTMLInputElement).value.includes('.')) {
                   e.preventDefault();
                 }
@@ -321,113 +357,50 @@ export function CreateSignalModal({
               error={errors.priceUsdt?.message}
             />
             <div className="mt-1 text-xs text-fur-cream/50">
-              Minimum $1 USDT • Use period (.) for decimals, e.g., 10.50
+              Minimum $1 USDT
+            </div>
+          </div>
+
+          {/* Expiration Date Picker */}
+          <div>
+            <label className="block text-sm font-medium text-fur-cream mb-2">
+              Expiration Date
+            </label>
+            <input
+              type="date"
+              min={formatDateForInput(minDate)}
+              max={formatDateForInput(maxDate)}
+              className="w-full px-4 py-2.5 bg-dark-700 border border-dark-600 rounded-lg text-fur-cream focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+              {...register('expiresAt')}
+            />
+            {errors.expiresAt && (
+              <p className="mt-1 text-xs text-error-400">{errors.expiresAt.message}</p>
+            )}
+            <div className="mt-1 text-xs text-fur-cream/50">
+              Signal can be purchased until this date (1-90 days)
             </div>
           </div>
         </div>
 
-        {/* Expiry Duration */}
+        {/* Confidence Level Slider */}
         <div>
           <label className="block text-sm font-medium text-fur-cream mb-2">
-            Active Duration (Days)
+            Confidence Level
           </label>
           <div className="flex items-center gap-4">
             <input
               type="range"
               min={1}
-              max={2}
-              {...register('expiryDays', { valueAsNumber: true })}
-              className="flex-1 h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-fur-light"
+              max={100}
+              {...register('confidenceLevel', { valueAsNumber: true })}
+              className="flex-1 h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-brand-500"
             />
-            <span className="text-lg font-semibold text-fur-light min-w-[100px] text-right whitespace-nowrap">
-              {watch('expiryDays') || 2} days
+            <span className={`text-lg font-semibold min-w-[60px] text-right ${getConfidenceColor(confidenceValue)}`}>
+              {confidenceValue}%
             </span>
           </div>
           <div className="mt-1 text-xs text-fur-cream/50">
-            Signal will be available for purchase for this duration (1-2 days)
-          </div>
-        </div>
-
-        {/* Risk Level & Potential Reward */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Risk Level */}
-          <div>
-            <label className="block text-sm font-medium text-fur-cream mb-2">
-              Risk Level
-            </label>
-            <div className="flex gap-2">
-              {(['low', 'medium', 'high'] as const).map((level) => (
-                <label
-                  key={level}
-                  className={`flex-1 text-center px-3 py-2 rounded-lg border cursor-pointer transition-all ${
-                    watch('riskLevel') === level
-                      ? level === 'low'
-                        ? 'bg-green-500/20 border-green-500 text-green-400'
-                        : level === 'medium'
-                        ? 'bg-yellow-500/20 border-yellow-500 text-yellow-400'
-                        : 'bg-red-500/20 border-red-500 text-red-400'
-                      : 'bg-dark-700 border-dark-600 text-fur-cream/70 hover:border-dark-500'
-                  }`}
-                  onClick={(e) => {
-                    // Prevent scroll when clicking radio label inside modal
-                    e.preventDefault();
-                    setValue('riskLevel', level, { shouldValidate: true });
-                  }}
-                >
-                  <input
-                    type="radio"
-                    value={level}
-                    {...register('riskLevel')}
-                    className="sr-only"
-                    tabIndex={-1}
-                  />
-                  <span className="text-sm font-medium capitalize">{level}</span>
-                </label>
-              ))}
-            </div>
-            <div className="mt-1 text-xs text-fur-cream/50">
-              Your assessment of the risk involved
-            </div>
-          </div>
-
-          {/* Potential Reward */}
-          <div>
-            <label className="block text-sm font-medium text-fur-cream mb-2">
-              Potential Reward
-            </label>
-            <div className="flex gap-2">
-              {(['normal', 'medium', 'high'] as const).map((reward) => (
-                <label
-                  key={reward}
-                  className={`flex-1 text-center px-3 py-2 rounded-lg border cursor-pointer transition-all ${
-                    watch('potentialReward') === reward
-                      ? reward === 'normal'
-                        ? 'bg-fur-cream/10 border-fur-cream/50 text-fur-cream'
-                        : reward === 'medium'
-                        ? 'bg-fur-light/20 border-fur-light text-fur-light'
-                        : 'bg-fur-main/20 border-fur-main text-fur-main'
-                      : 'bg-dark-700 border-dark-600 text-fur-cream/70 hover:border-dark-500'
-                  }`}
-                  onClick={(e) => {
-                    // Prevent scroll when clicking radio label inside modal
-                    e.preventDefault();
-                    setValue('potentialReward', reward, { shouldValidate: true });
-                  }}
-                >
-                  <input
-                    type="radio"
-                    value={reward}
-                    {...register('potentialReward')}
-                    className="sr-only"
-                    tabIndex={-1}
-                  />
-                  <span className="text-sm font-medium capitalize">{reward}</span>
-                </label>
-              ))}
-            </div>
-            <div className="mt-1 text-xs text-fur-cream/50">
-              Expected return potential
-            </div>
+            How confident are you in this prediction?
           </div>
         </div>
 

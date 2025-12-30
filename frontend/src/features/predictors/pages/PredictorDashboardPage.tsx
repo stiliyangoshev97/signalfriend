@@ -44,7 +44,7 @@ function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
           No signals yet
         </h3>
         <p className="text-fur-cream/60 mb-6 max-w-md">
-          Start sharing your trading insights with the community. Create your first signal to begin earning.
+          Start sharing your prediction insights with the community. Create your first signal to begin earning.
         </p>
         <Button onClick={onCreateClick} size="lg">
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,7 +101,7 @@ export function PredictorDashboardPage(): React.ReactElement {
   // SEO for dashboard - noIndex since it's a private page
   useSEO({
     title: 'Predictor Dashboard',
-    description: 'Manage your trading signals, view earnings, and track your performance as a SignalFriend predictor.',
+    description: 'Manage your prediction signals, view earnings, and track your performance as a SignalFriend predictor.',
     url: getSEOUrl('/dashboard'),
     noIndex: true, // Don't index private dashboard pages
   });

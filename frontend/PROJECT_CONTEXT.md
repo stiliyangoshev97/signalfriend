@@ -1,7 +1,13 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 23 December 2025 (v0.27.0 - Predictor Profile Signal Tabs)
+> Last Updated: 30 December 2025 (v0.31.0 - Prediction Marketplace Complete)
+
+---
+
+## 🎯 Platform Overview
+
+**SignalFriend** is a **Web3 Prediction Signals Marketplace** where expert analysts (Predictors) sell prediction signals for events on platforms like Polymarket, Predict.fun, and others. Categories include Crypto, Finance, Politics, Sports, World Events, and Culture.
 
 ---
 
@@ -306,13 +312,16 @@ const { data: contentData } = useSignalContent(contentId, isOwned);
 ## 🏷️ Category System
 
 ### Hierarchical Categories
-Categories are organized into 3 main groups with subcategories:
+Categories are organized into 6 main groups with subcategories (prediction market focused):
 
 | Main Group | Subcategories |
 |------------|---------------|
-| **Crypto** | Bitcoin, Ethereum, Altcoins, DeFi, NFTs, Layer 1/2, Meme Coins, Futures/Perpetuals, Other |
-| **Traditional Finance** | US Stocks - Tech, US Stocks - General, Forex - Majors, Commodities - Metals, Commodities - Energy, Other |
-| **Macro / Other** | Economic Data, Geopolitical Events, Sports, Other |
+| **Crypto** | Bitcoin, Ethereum, Altcoins, DeFi, NFTs/Gaming, Meme Coins, Other |
+| **Finance** | Stocks, Forex, Commodities, Earnings, Other |
+| **Politics** | US Elections, World Politics, Policy, Legal, Other |
+| **Sports** | Football, American Football, Basketball, Combat Sports, Horse Racing, Esports, Other |
+| **World** | Geopolitics, Economy, Climate/Weather, Science, Other |
+| **Culture** | Entertainment, Awards, Tech/AI, Social Media, Other |
 
 ### Display Format
 Categories are displayed as `"MainGroup > Subcategory"` throughout the UI:

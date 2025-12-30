@@ -2,7 +2,7 @@
  * @fileoverview Signal Marketplace Page
  * @module features/signals/pages/SignalsPage
  * @description
- * Main marketplace page for browsing and filtering trading signals.
+ * Main marketplace page for browsing and filtering prediction signals.
  * Combines filter panel, signal grid, and pagination.
  */
 
@@ -14,6 +14,9 @@ import { FilterPanel, SignalGrid, Pagination } from '../components';
 import { useSEO, getSEOUrl } from '@/shared/hooks';
 import type { SignalFilters } from '@/shared/types';
 
+/** Status filter type for signal tabs */
+type StatusFilter = 'active' | 'inactive';
+
 /**
  * Parse URL search params into SignalFilters
  */
@@ -21,20 +24,17 @@ function parseFiltersFromParams(params: URLSearchParams): SignalFilters {
   const filters: SignalFilters = {};
 
   const category = params.get('category');
-  const riskLevel = params.get('risk');
-  const potentialReward = params.get('reward');
+  const minConfidence = params.get('minConfidence');
+  const maxConfidence = params.get('maxConfidence');
   const minPrice = params.get('minPrice');
   const maxPrice = params.get('maxPrice');
   const sortBy = params.get('sort');
   const page = params.get('page');
+  const status = params.get('status');
 
   if (category) filters.category = category;
-  if (riskLevel && ['low', 'medium', 'high'].includes(riskLevel)) {
-    filters.riskLevel = riskLevel as SignalFilters['riskLevel'];
-  }
-  if (potentialReward && ['normal', 'medium', 'high'].includes(potentialReward)) {
-    filters.potentialReward = potentialReward as SignalFilters['potentialReward'];
-  }
+  if (minConfidence) filters.minConfidence = parseInt(minConfidence, 10);
+  if (maxConfidence) filters.maxConfidence = parseInt(maxConfidence, 10);
   if (minPrice) filters.minPrice = parseFloat(minPrice);
   if (maxPrice) filters.maxPrice = parseFloat(maxPrice);
   // Default to 'newest' to prioritize fresh signals on initial load
@@ -44,6 +44,9 @@ function parseFiltersFromParams(params: URLSearchParams): SignalFilters {
     filters.sortBy = 'newest';
   }
   if (page) filters.page = parseInt(page, 10);
+  if (status && ['active', 'inactive'].includes(status)) {
+    filters.status = status as StatusFilter;
+  }
 
   return filters;
 }
@@ -55,12 +58,13 @@ function filtersToParams(filters: SignalFilters): URLSearchParams {
   const params = new URLSearchParams();
 
   if (filters.category) params.set('category', filters.category);
-  if (filters.riskLevel) params.set('risk', filters.riskLevel);
-  if (filters.potentialReward) params.set('reward', filters.potentialReward);
+  if (filters.minConfidence !== undefined) params.set('minConfidence', filters.minConfidence.toString());
+  if (filters.maxConfidence !== undefined) params.set('maxConfidence', filters.maxConfidence.toString());
   if (filters.minPrice !== undefined) params.set('minPrice', filters.minPrice.toString());
   if (filters.maxPrice !== undefined) params.set('maxPrice', filters.maxPrice.toString());
   if (filters.sortBy) params.set('sort', filters.sortBy);
   if (filters.page && filters.page > 1) params.set('page', filters.page.toString());
+  if (filters.status && filters.status !== 'active') params.set('status', filters.status);
 
   return params;
 }
@@ -83,9 +87,9 @@ function filtersToParams(filters: SignalFilters): URLSearchParams {
 export function SignalsPage(): React.ReactElement {
   // SEO for signals marketplace page
   useSEO({
-    title: 'Trading Signals Marketplace',
+    title: 'Prediction Signals Marketplace',
     description:
-      'Browse premium trading signals from verified predictors. Filter by category, risk level, and price. All signals are secured on the blockchain.',
+      'Browse premium prediction signals from verified predictors. Get expert analysis for crypto, politics, sports, and more. All signals secured on BNB Chain.',
     url: getSEOUrl('/signals'),
   });
 
@@ -94,6 +98,13 @@ export function SignalsPage(): React.ReactElement {
     parseFiltersFromParams(searchParams)
   );
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<StatusFilter>(() => {
+    const status = searchParams.get('status');
+    if (status && ['active', 'inactive'].includes(status)) {
+      return status as StatusFilter;
+    }
+    return 'active';
+  });
   
   // Get connected wallet address to exclude already purchased signals
   const { address } = useAccount();
@@ -102,11 +113,21 @@ export function SignalsPage(): React.ReactElement {
   const queryFilters = useMemo(() => ({
     ...filters,
     limit: 12, // Show 12 per page
+    status: activeTab,
     ...(address && { excludeBuyerAddress: address }),
-  }), [filters, address]);
+  }), [filters, address, activeTab]);
 
   // Fetch signals with current filters
   const { data, isLoading, error } = useSignals(queryFilters);
+
+  // Fetch count for the other tab to show in tab badge
+  const otherTabStatus = activeTab === 'active' ? 'inactive' : 'active';
+  const { data: otherTabData } = useSignals({
+    ...filters,
+    limit: 1,
+    status: otherTabStatus,
+    ...(address && { excludeBuyerAddress: address }),
+  });
 
   // Fetch categories for filter dropdown
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
@@ -120,6 +141,12 @@ export function SignalsPage(): React.ReactElement {
   // Handle filter changes
   const handleFilterChange = useCallback((newFilters: SignalFilters) => {
     setFilters(newFilters);
+  }, []);
+
+  // Handle tab change (reset page when switching tabs)
+  const handleTabChange = useCallback((tab: StatusFilter) => {
+    setActiveTab(tab);
+    setFilters((prev) => ({ ...prev, page: 1, status: tab }));
   }, []);
 
   // Handle page change
@@ -138,7 +165,7 @@ export function SignalsPage(): React.ReactElement {
             Signal Marketplace
           </h1>
           <p className="text-fur-cream/60 max-w-2xl">
-            Browse trading signals sorted by rating and sales. 
+            Browse prediction signals sorted by rating and sales. 
             All purchases are secured by smart contracts on BNB Chain.
           </p>
         </div>
@@ -146,6 +173,50 @@ export function SignalsPage(): React.ReactElement {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Tabs for Active/Expired Signals */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-6">
+          <button
+            onClick={() => handleTabChange('active')}
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
+              activeTab === 'active'
+                ? 'bg-dark-600 text-fur-cream'
+                : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
+            }`}
+          >
+            <span className="whitespace-nowrap">Active</span>
+            {activeTab === 'active' && data?.pagination && (
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
+                {data.pagination.total}
+              </span>
+            )}
+            {activeTab === 'inactive' && otherTabData?.pagination && (
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-700 rounded-full text-xs">
+                {otherTabData.pagination.total}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => handleTabChange('inactive')}
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
+              activeTab === 'inactive'
+                ? 'bg-dark-600 text-fur-cream'
+                : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
+            }`}
+          >
+            <span className="whitespace-nowrap">Expired</span>
+            {activeTab === 'inactive' && data?.pagination && (
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
+                {data.pagination.total}
+              </span>
+            )}
+            {activeTab === 'active' && otherTabData?.pagination && (
+              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-700 rounded-full text-xs">
+                {otherTabData.pagination.total}
+              </span>
+            )}
+          </button>
+        </div>
+
         <div className="lg:grid lg:grid-cols-4 lg:gap-8">
           {/* Mobile Filter Toggle */}
           <div className="lg:hidden mb-6">

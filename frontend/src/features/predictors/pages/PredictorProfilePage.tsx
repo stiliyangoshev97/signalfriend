@@ -33,20 +33,16 @@ function parseFiltersFromParams(params: URLSearchParams): SignalFilters {
   const filters: SignalFilters = {};
 
   const category = params.get('category');
-  const riskLevel = params.get('risk');
-  const potentialReward = params.get('reward');
+  const minConfidence = params.get('minConfidence');
+  const maxConfidence = params.get('maxConfidence');
   const minPrice = params.get('minPrice');
   const maxPrice = params.get('maxPrice');
   const sortBy = params.get('sort');
   const page = params.get('page');
 
   if (category) filters.category = category;
-  if (riskLevel && ['low', 'medium', 'high'].includes(riskLevel)) {
-    filters.riskLevel = riskLevel as SignalFilters['riskLevel'];
-  }
-  if (potentialReward && ['normal', 'medium', 'high'].includes(potentialReward)) {
-    filters.potentialReward = potentialReward as SignalFilters['potentialReward'];
-  }
+  if (minConfidence) filters.minConfidence = parseInt(minConfidence, 10);
+  if (maxConfidence) filters.maxConfidence = parseInt(maxConfidence, 10);
   if (minPrice) filters.minPrice = parseFloat(minPrice);
   if (maxPrice) filters.maxPrice = parseFloat(maxPrice);
   if (sortBy && ['newest', 'price-low', 'price-high', 'popular'].includes(sortBy)) {
@@ -64,8 +60,8 @@ function filtersToParams(filters: SignalFilters): URLSearchParams {
   const params = new URLSearchParams();
 
   if (filters.category) params.set('category', filters.category);
-  if (filters.riskLevel) params.set('risk', filters.riskLevel);
-  if (filters.potentialReward) params.set('reward', filters.potentialReward);
+  if (filters.minConfidence !== undefined) params.set('minConfidence', filters.minConfidence.toString());
+  if (filters.maxConfidence !== undefined) params.set('maxConfidence', filters.maxConfidence.toString());
   if (filters.minPrice !== undefined) params.set('minPrice', filters.minPrice.toString());
   if (filters.maxPrice !== undefined) params.set('maxPrice', filters.maxPrice.toString());
   if (filters.sortBy) params.set('sort', filters.sortBy);
@@ -202,8 +198,8 @@ export function PredictorProfilePage(): React.ReactElement {
       ? `${predictor.displayName || formatAddress(predictor.walletAddress)} - Predictor Profile`
       : 'Predictor Profile',
     description: predictor
-      ? `${predictor.bio?.slice(0, 120) || 'Trading signal predictor'} - ${predictor.totalSignals || 0} signals, ${predictor.totalSales || 0} sales, ${predictor.averageRating?.toFixed(1) || 'N/A'} rating.`
-      : 'View predictor profile, trading signals, and performance stats on SignalFriend.',
+      ? `${predictor.bio?.slice(0, 120) || 'Prediction signal predictor'} - ${predictor.totalSignals || 0} signals, ${predictor.totalSales || 0} sales, ${predictor.averageRating?.toFixed(1) || 'N/A'} rating.`
+      : 'View predictor profile, prediction signals, and performance stats on SignalFriend.',
     url: address ? getSEOUrl(`/predictors/${address}`) : undefined,
     type: 'profile',
   });
@@ -653,7 +649,7 @@ export function PredictorProfilePage(): React.ReactElement {
                 : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
             }`}
           >
-            <span className="whitespace-nowrap">Expired / Inactive</span>
+            <span className="whitespace-nowrap">Expired</span>
             {activeTab === 'inactive' && signalsData?.pagination && (
               <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
                 {signalsData.pagination.total}

@@ -29,9 +29,18 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Button } from '@/shared/components/ui';
+import { Button, Spinner } from '@/shared/components/ui';
+import { usePublicStats } from '../api/stats';
+
+/**
+ * Formats a number as currency (e.g., 1234.56 → "$1,234")
+ */
+function formatCurrency(amount: number): string {
+  return `$${Math.floor(amount).toLocaleString()}`;
+}
 
 export function HeroSection() {
+  const { data: stats, isLoading } = usePublicStats();
   return (
     <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">
       {/* Background gradient */}
@@ -53,23 +62,23 @@ export function HeroSection() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/20 mb-6">
               <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
               <span className="text-sm font-medium text-brand-200">
-                Web3 Signal Marketplace
+                Web3 Prediction Signals Marketplace
               </span>
             </div>
 
             {/* Main Heading */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-fur-cream mb-6 leading-tight">
-              Trade Smarter with{' '}
+              Predict Smarter with{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-200 to-fur-light">
-                Verified Signals
+                Expert Signals
               </span>
             </h1>
 
             {/* Description */}
             <p className="text-lg md:text-xl text-gray-main mb-8 max-w-2xl mx-auto lg:mx-0">
-              Connect with crypto predictors, purchase trading signals as NFTs, 
-              and access premium market insights. All payments secured by smart contracts 
-              on BNB Chain.
+              Get expert analysis for prediction market events. Purchase signals as NFTs 
+              and access premium insights on crypto, finance, politics, sports, and more. 
+              Secured by smart contracts on BNB Chain.
             </p>
 
             {/* CTA Buttons */}
@@ -105,6 +114,40 @@ export function HeroSection() {
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>BNB Chain Secured</span>
+              </div>
+            </div>
+
+            {/* Platform Stats */}
+            <div className="grid grid-cols-3 gap-4 md:gap-6 mt-10 pt-8 border-t border-dark-600/50">
+              <div className="text-center lg:text-left">
+                {isLoading ? (
+                  <div className="flex justify-center lg:justify-start"><Spinner size="sm" /></div>
+                ) : (
+                  <div className="text-2xl md:text-3xl font-bold text-fur-cream">
+                    {stats?.totalPurchases ?? 0}
+                  </div>
+                )}
+                <div className="text-xs md:text-sm text-gray-main">Signals Purchased</div>
+              </div>
+              <div className="text-center lg:text-left">
+                {isLoading ? (
+                  <div className="flex justify-center lg:justify-start"><Spinner size="sm" /></div>
+                ) : (
+                  <div className="text-2xl md:text-3xl font-bold text-fur-cream">
+                    {stats?.totalPredictors ?? 0}
+                  </div>
+                )}
+                <div className="text-xs md:text-sm text-gray-main">Total Predictors</div>
+              </div>
+              <div className="text-center lg:text-left">
+                {isLoading ? (
+                  <div className="flex justify-center lg:justify-start"><Spinner size="sm" /></div>
+                ) : (
+                  <div className="text-2xl md:text-3xl font-bold text-fur-cream">
+                    {formatCurrency(stats?.totalPredictorEarnings ?? 0)}
+                  </div>
+                )}
+                <div className="text-xs md:text-sm text-gray-main">Predictor Earnings</div>
               </div>
             </div>
           </div>

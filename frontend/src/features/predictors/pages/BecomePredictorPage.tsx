@@ -503,8 +503,8 @@ function AuthPromptContent({
         </h2>
         <p className="text-fur-cream/70 mb-6">
           {isConnected
-            ? 'Please sign in with your wallet to become a predictor and start sharing your trading signals.'
-            : 'Connect your wallet to become a predictor and start earning from your trading insights.'}
+            ? 'Please sign in with your wallet to become a predictor and start sharing your prediction signals.'
+            : 'Connect your wallet to become a predictor and start earning from your prediction insights.'}
         </p>
       </div>
 
@@ -766,7 +766,7 @@ export default function BecomePredictorPage() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-fur-cream mb-2">Become a Predictor</h1>
         <p className="text-fur-cream/70">
-          Share your trading insights and earn USDT for your signals
+          Share your prediction insights and earn USDT for your signals
         </p>
       </div>
 

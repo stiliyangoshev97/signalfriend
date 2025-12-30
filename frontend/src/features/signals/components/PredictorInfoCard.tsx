@@ -171,15 +171,6 @@ export function PredictorInfoCard({
           <p className="text-xs text-fur-cream/50">Reviews</p>
         </div>
       </div>
-
-      {/* Bio (if available) */}
-      {predictor.bio && (
-        <div className="mt-4 pt-4 border-t border-dark-600">
-          <p className="text-sm text-fur-cream/70 line-clamp-3 break-all">
-            {predictor.bio}
-          </p>
-        </div>
-      )}
     </div>
   );
 }

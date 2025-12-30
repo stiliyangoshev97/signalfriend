@@ -8,9 +8,9 @@
  *
  * STEPS (For Buyers):
  * 1. Connect Wallet - Connect via MetaMask/WalletConnect
- * 2. Browse Signals - Find signals that match your strategy
+ * 2. Browse Signals - Find prediction signals that interest you
  * 3. Purchase Signal - Pay with USDT, receive SignalKey NFT
- * 4. View Content - Access the full signal details
+ * 4. View Content - Access the full analysis and recommendation
  * 5. Rate Signal - Help the community with feedback
  */
 
@@ -29,7 +29,7 @@ const buyerSteps: Step[] = [
   {
     number: 2,
     title: 'Browse Signals',
-    description: 'Explore signals from predictors. Filter by category, risk level, price, and ratings.',
+    description: 'Explore prediction signals from predictors. Filter by category, confidence level, price, and ratings.',
   },
   {
     number: 3,
@@ -39,12 +39,12 @@ const buyerSteps: Step[] = [
   {
     number: 4,
     title: 'Access Content',
-    description: 'View the full signal details including entry, target, stop-loss, and analysis.',
+    description: 'View the full signal details including expert analysis and recommended decision.',
   },
   {
     number: 5,
     title: 'Rate Signal',
-    description: 'After using the signal, rate it to help others and build predictor reputation.',
+    description: 'After reviewing the signal, rate it to help others and build predictor reputation.',
   },
 ];
 
@@ -57,7 +57,7 @@ const predictorSteps: Step[] = [
   {
     number: 2,
     title: 'Create Signals',
-    description: 'Publish your trading predictions with entry, target, stop-loss, and expiry date.',
+    description: 'Publish your prediction analysis with insights, reasoning, and recommended decisions.',
   },
   {
     number: 3,
@@ -112,7 +112,7 @@ export function HowItWorksSection() {
             How It Works
           </h2>
           <p className="text-lg text-gray-main max-w-2xl mx-auto">
-            Simple steps to start trading with verified signals or earning as a predictor.
+            Simple steps to start accessing prediction signals or earning as a predictor.
           </p>
         </div>
 

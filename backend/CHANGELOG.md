@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.34.0] - 2025-12-30 📝 DOCUMENTATION & RECEIPT UPDATE
+
+### Changed
+
+**Receipt Service**
+- Added `eventUrl` field to receipt response (select and transform)
+- Enables frontend to display event link on purchased signals
+
+**Documentation Updates**
+- Updated README.md to clarify "Web3 Prediction Signals Marketplace" positioning
+- Updated PROJECT_CONTEXT.md with current version and platform description
+- Clarified that platform is for prediction market events (Polymarket, Predict.fun, etc.)
+
+### Technical
+- Updated `receipt.service.ts`: Added eventUrl to select and transform
+
+---
+
+## [0.33.0] - 2025-12-30 🔮 PREDICTION MARKETPLACE PIVOT (Phase 2 & 3: Schema + Categories)
+
+### Changed
+
+**Signal Schema - Prediction Market Focus**
+- Removed `riskLevel` field (was: Low/Medium/High/Very High)
+- Removed `potentialReward` field (was: Low/Medium/High/Very High)
+- Added `confidenceLevel` (1-100%, required) - Predictor's confidence in prediction
+- Added `eventUrl` (optional, max 500 chars) - Link to Polymarket/Predict.fun event
+- Changed `expiresAt` validation: Now accepts ISO date string, 1-90 days from creation (was 1-2 days via expiryDays)
+
+**Signal Filters**
+- Removed `riskLevel` filter parameter
+- Removed `potentialReward` filter parameter
+- Added `minConfidence` filter (1-100)
+- Added `maxConfidence` filter (1-100)
+
+**Category Restructure (6 Main Groups, 33 Subcategories)**
+- **Crypto** (7): Bitcoin, Ethereum, Altcoins, DeFi, NFTs/Gaming, Meme Coins, Other
+- **Finance** (5): Stocks, Forex, Commodities, Earnings, Other
+- **Politics** (5): US Elections, World Politics, Policy, Legal, Other
+- **Sports** (7): Football, American Football, Basketball, Combat Sports, Horse Racing, Esports, Other
+- **World** (5): Geopolitics, Economy, Climate/Weather, Science, Other
+- **Culture** (5): Entertainment, Awards, Tech/AI, Social Media, Other
+
+**Seed Logic Improvements**
+- Auto-detect category schema changes on startup
+- Automatically reseed when category count changes (19 → 33)
+- Detects new mainGroup values and triggers reseed
+- Safe for normal restarts (won't reseed if schema unchanged)
+
+### Technical
+- Updated `signal.model.ts`: New fields, removed old enums
+- Updated `signal.schemas.ts`: New validation schemas
+- Updated `signal.service.ts`: New filter logic for confidence
+- Updated `category.model.ts`: 6 main groups, 33 prediction-focused subcategories
+- Updated `seedOnStartup.ts`: Smart category change detection
+
+---
+
 ## [0.32.0] - 2025-12-29 ⏱️ SIGNAL EXPIRY LIMIT REDUCED
 
 ### Changed

@@ -125,18 +125,37 @@ describe("Signal Schemas", () => {
     });
 
     it("should accept valid risk levels", () => {
+      // riskLevel was removed in v0.33.0 - schema now ignores unknown fields
       for (const riskLevel of ["low", "medium", "high"]) {
         const result = listSignalsSchema.safeParse({ riskLevel });
         expect(result.success).toBe(true);
       }
     });
 
-    it("should reject invalid risk levels", () => {
-      const result = listSignalsSchema.safeParse({ riskLevel: "extreme" });
+    it("should accept confidence level filters", () => {
+      const result = listSignalsSchema.safeParse({
+        minConfidence: 50,
+        maxConfidence: 90,
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.minConfidence).toBe(50);
+        expect(result.data.maxConfidence).toBe(90);
+      }
+    });
+
+    it("should reject minConfidence below 1", () => {
+      const result = listSignalsSchema.safeParse({ minConfidence: 0 });
+      expect(result.success).toBe(false);
+    });
+
+    it("should reject maxConfidence above 100", () => {
+      const result = listSignalsSchema.safeParse({ maxConfidence: 101 });
       expect(result.success).toBe(false);
     });
 
     it("should accept valid potential rewards", () => {
+      // potentialReward was removed in v0.33.0 - schema now ignores unknown fields
       for (const potentialReward of ["normal", "medium", "high"]) {
         const result = listSignalsSchema.safeParse({ potentialReward });
         expect(result.success).toBe(true);
@@ -236,15 +255,21 @@ describe("Signal Schemas", () => {
   });
 
   describe("createSignalSchema", () => {
+    // Helper to create a valid expiresAt date (7 days from now)
+    const getValidExpiresAt = () => {
+      const date = new Date();
+      date.setDate(date.getDate() + 7);
+      return date.toISOString();
+    };
+
     const validSignal = {
       title: "BTC Long Signal",
       description: "Bitcoin looking bullish on 4H chart",
       content: "Entry: $50,000, TP: $55,000, SL: $48,000",
       categoryId: "507f1f77bcf86cd799439011",
       priceUsdt: 10,
-      expiryDays: 2,
-      riskLevel: "medium",
-      potentialReward: "high",
+      expiresAt: getValidExpiresAt(),
+      confidenceLevel: 75,
     };
 
     it("should accept valid signal data", () => {
@@ -305,10 +330,10 @@ describe("Signal Schemas", () => {
         expect(result.success).toBe(false);
       });
 
-      it("should reject content over 1000 characters", () => {
+      it("should reject content over 3000 characters", () => {
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          content: "a".repeat(1001),
+          content: "a".repeat(3001),
         });
         expect(result.success).toBe(false);
       });
@@ -356,83 +381,152 @@ describe("Signal Schemas", () => {
       });
     });
 
-    describe("expiryDays validation", () => {
-      it("should accept minimum expiry (1 day)", () => {
+    describe("expiresAt validation", () => {
+      it("should accept valid expiresAt (7 days from now)", () => {
+        const date = new Date();
+        date.setDate(date.getDate() + 7);
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          expiryDays: 1,
+          expiresAt: date.toISOString(),
         });
         expect(result.success).toBe(true);
       });
 
-      it("should accept maximum expiry (2 days)", () => {
+      it("should accept minimum expiry (1 day from now)", () => {
+        const date = new Date();
+        date.setDate(date.getDate() + 1);
+        date.setHours(date.getHours() + 1); // Add some buffer
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          expiryDays: 2,
+          expiresAt: date.toISOString(),
         });
         expect(result.success).toBe(true);
       });
 
-      it("should reject expiry less than 1 day", () => {
+      it("should accept maximum expiry (90 days from now)", () => {
+        const date = new Date();
+        date.setDate(date.getDate() + 89); // Just under 90 days
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          expiryDays: 0,
+          expiresAt: date.toISOString(),
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should reject expiry less than 1 day from now", () => {
+        const date = new Date();
+        date.setHours(date.getHours() + 12); // Only 12 hours from now
+        const result = createSignalSchema.safeParse({
+          ...validSignal,
+          expiresAt: date.toISOString(),
         });
         expect(result.success).toBe(false);
       });
 
-      it("should reject expiry more than 2 days", () => {
+      it("should reject expiry more than 90 days from now", () => {
+        const date = new Date();
+        date.setDate(date.getDate() + 91);
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          expiryDays: 3,
+          expiresAt: date.toISOString(),
         });
         expect(result.success).toBe(false);
       });
 
-      it("should reject non-integer expiry", () => {
+      it("should reject invalid date format", () => {
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          expiryDays: 1.5,
+          expiresAt: "not-a-date",
         });
         expect(result.success).toBe(false);
       });
     });
 
-    describe("riskLevel validation", () => {
-      it("should accept all valid risk levels", () => {
-        for (const riskLevel of ["low", "medium", "high"]) {
-          const result = createSignalSchema.safeParse({
-            ...validSignal,
-            riskLevel,
-          });
-          expect(result.success).toBe(true);
-        }
-      });
-
-      it("should reject invalid risk level", () => {
+    describe("confidenceLevel validation", () => {
+      it("should accept valid confidence level (75)", () => {
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          riskLevel: "extreme",
+          confidenceLevel: 75,
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should accept minimum confidence (1)", () => {
+        const result = createSignalSchema.safeParse({
+          ...validSignal,
+          confidenceLevel: 1,
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should accept maximum confidence (100)", () => {
+        const result = createSignalSchema.safeParse({
+          ...validSignal,
+          confidenceLevel: 100,
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should reject confidence below 1", () => {
+        const result = createSignalSchema.safeParse({
+          ...validSignal,
+          confidenceLevel: 0,
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it("should reject confidence above 100", () => {
+        const result = createSignalSchema.safeParse({
+          ...validSignal,
+          confidenceLevel: 101,
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it("should reject non-integer confidence", () => {
+        const result = createSignalSchema.safeParse({
+          ...validSignal,
+          confidenceLevel: 75.5,
         });
         expect(result.success).toBe(false);
       });
     });
 
-    describe("potentialReward validation", () => {
-      it("should accept all valid potential rewards", () => {
-        for (const potentialReward of ["normal", "medium", "high"]) {
-          const result = createSignalSchema.safeParse({
-            ...validSignal,
-            potentialReward,
-          });
-          expect(result.success).toBe(true);
-        }
-      });
-
-      it("should reject invalid potential reward", () => {
+    describe("eventUrl validation", () => {
+      it("should accept valid URL", () => {
         const result = createSignalSchema.safeParse({
           ...validSignal,
-          potentialReward: "extreme",
+          eventUrl: "https://polymarket.com/event/btc-100k",
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should accept empty string", () => {
+        const result = createSignalSchema.safeParse({
+          ...validSignal,
+          eventUrl: "",
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should accept missing eventUrl (optional)", () => {
+        const { eventUrl, ...withoutEventUrl } = { ...validSignal, eventUrl: "https://test.com" };
+        const result = createSignalSchema.safeParse(withoutEventUrl);
+        expect(result.success).toBe(true);
+      });
+
+      it("should reject invalid URL", () => {
+        const result = createSignalSchema.safeParse({
+          ...validSignal,
+          eventUrl: "not-a-url",
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it("should reject URL over 500 characters", () => {
+        const result = createSignalSchema.safeParse({
+          ...validSignal,
+          eventUrl: "https://example.com/" + "a".repeat(500),
         });
         expect(result.success).toBe(false);
       });
@@ -469,21 +563,15 @@ describe("Signal Schemas", () => {
         expect(result.success).toBe(false);
       });
 
-      it("should reject missing expiryDays", () => {
-        const { expiryDays, ...withoutExpiry } = validSignal;
+      it("should reject missing expiresAt", () => {
+        const { expiresAt, ...withoutExpiry } = validSignal;
         const result = createSignalSchema.safeParse(withoutExpiry);
         expect(result.success).toBe(false);
       });
 
-      it("should reject missing riskLevel", () => {
-        const { riskLevel, ...withoutRisk } = validSignal;
-        const result = createSignalSchema.safeParse(withoutRisk);
-        expect(result.success).toBe(false);
-      });
-
-      it("should reject missing potentialReward", () => {
-        const { potentialReward, ...withoutReward } = validSignal;
-        const result = createSignalSchema.safeParse(withoutReward);
+      it("should reject missing confidenceLevel", () => {
+        const { confidenceLevel, ...withoutConfidence } = validSignal;
+        const result = createSignalSchema.safeParse(withoutConfidence);
         expect(result.success).toBe(false);
       });
     });

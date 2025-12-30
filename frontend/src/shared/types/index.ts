@@ -74,8 +74,6 @@ export type {
 // Signal types
 export type {
   Signal,
-  RiskLevel,
-  PotentialReward,
   SignalStatus,
   SignalFilters,
   CreateSignalData,

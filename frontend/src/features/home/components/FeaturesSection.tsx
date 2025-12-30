@@ -11,7 +11,7 @@
  * 2. NFT Receipts - Proof of purchase as SignalKey NFTs
  * 3. On-Chain Payments - USDT payments on BNB Chain
  * 4. Transparent Stats - Performance tracking via ratings
- * 5. Multi-Category Signals - Crypto, stocks, forex, etc.
+ * 5. Multi-Category Signals - Crypto, politics, sports, etc.
  * 6. Rating System - Rate signals after purchase
  */
 
@@ -67,7 +67,7 @@ const features: Feature[] = [
       </svg>
     ),
     title: 'Multi-Category',
-    description: 'Find signals for crypto, forex, stocks, commodities, and more. Filter by risk level, timeframe, and price.',
+    description: 'Find signals for crypto, politics, sports, economics, and more. Filter by category, confidence level, and price.',
   },
   {
     icon: (

@@ -79,6 +79,18 @@ function getCreatedText(createdAt: string): string {
 }
 
 /**
+ * Extract domain from URL for badge display
+ */
+function getUrlDomain(url: string): string | null {
+  try {
+    const domain = new URL(url).hostname.replace('www.', '');
+    return domain;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * MySignalCard component
  * 
  * Displays a signal card with:
@@ -136,6 +148,14 @@ export function MySignalCard({
             )}
             {!expiry.isExpired && expiry.urgency === 'warning' && (
               <Badge variant="warning">{expiry.text}</Badge>
+            )}
+            {signal.eventUrl && getUrlDomain(signal.eventUrl) && (
+              <span className="text-xs font-medium px-2 py-0.5 rounded border flex items-center gap-1 bg-green-500/20 text-green-400 border-green-500/30 min-w-0 max-w-[140px]">
+                <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <span className="truncate">{getUrlDomain(signal.eventUrl)}</span>
+              </span>
             )}
           </div>
 

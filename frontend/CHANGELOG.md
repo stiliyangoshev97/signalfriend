@@ -7,6 +7,139 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.31.0] - 2025-12-30 📝 DOCUMENTATION & UI POLISH
+
+### Changed
+
+**Pagination Component**
+- Added `itemLabel` prop to Pagination component (defaults to "signals")
+- PredictorsPage now shows "total predictors" instead of "total signals"
+
+**Domain Badge Improvements**
+- Changed domain badge color from orange to green across all components
+- Domain badge now displays inline with confidence badge (not on new line)
+- Added truncation for long domain names with hover tooltip
+- Added domain badge to PurchasedSignalCard (My Signals page)
+
+**Documentation Updates**
+- Updated all README.md files to clarify "Web3 Prediction Signals Marketplace" positioning
+- Updated PROJECT_CONTEXT.md with current version and platform description
+- Clarified that platform is for prediction market events (Polymarket, Predict.fun, etc.)
+
+### Technical
+- Updated `Pagination.tsx`: New `itemLabel` prop
+- Updated `PredictorsPage.tsx`: Pass `itemLabel="predictors"` to Pagination
+- Updated `PurchasedSignalCard.tsx`: Added domain badge with getUrlDomain helper
+- Added `eventUrl` to Receipt type in `purchase.api.ts`
+
+---
+
+## [0.30.0] - 2025-12-30 🔮 PREDICTION MARKETPLACE PIVOT (Phase 2 & 3: Schema + Categories)
+
+### Changed
+
+**Signal Schema Updates**
+- Removed `riskLevel` display (badge and filters)
+- Removed `potentialReward` display (badge and filters)
+- Added `confidenceLevel` badge (1-100%, color-coded: green ≥80%, yellow ≥50%, red <50%)
+- Added `eventUrl` display as "View Event" button on signal detail page
+
+**CreateSignalModal - Complete Redesign**
+- Replaced 1-2 day slider with date picker (1-90 days expiration)
+- Added confidence level slider (1-100%)
+- Added optional Event URL input with domain preview
+- Updated category group order to match new 6 groups
+
+**FilterPanel Updates**
+- Removed Risk Level filter section
+- Removed Potential Reward filter section
+- Added confidence level filter support (API ready)
+- Updated MAIN_GROUP_ORDER: Crypto, Finance, Politics, Sports, World, Culture
+
+**SignalCard Updates**
+- Replaced risk/reward badges with confidence level badge
+- Color-coded confidence display
+
+**SignalDetailPage Updates**
+- Replaced risk/reward config display with confidence level
+- Added clickable "View Event" button for eventUrl
+- Updated SEO description
+
+**API Integration Updates**
+- Updated `signals.api.ts`: Replaced riskLevel/potentialReward params with minConfidence/maxConfidence
+- Updated `predictorProfile.api.ts`: Same filter param changes
+- Updated URL param handling in SignalsPage and PredictorProfilePage
+
+**FAQ Page Updates**
+- Updated category documentation to show all 6 groups with correct subcategories
+- Crypto: Bitcoin, Ethereum, Altcoins, DeFi, NFTs/Gaming, Meme Coins
+- Finance: Stocks, Forex, Commodities, Earnings
+- Politics: US Elections, World Politics, Policy, Legal
+- Sports: Football, American Football, Basketball, Combat Sports, Horse Racing, Esports
+- World: Geopolitics, Economy, Climate/Weather, Science
+- Culture: Entertainment, Awards, Tech/AI, Social Media
+
+### Technical
+- Updated `signal.schemas.ts`: New schema fields, removed old enums
+- Updated `types/index.ts`: Removed RiskLevel and PotentialReward exports
+- All forms validated with Zod schemas
+
+---
+
+## [0.29.0] - 2025-12-30 🔮 PREDICTION MARKETPLACE PIVOT (Phase 1: Text/SEO)
+
+### Changed
+
+**Platform Messaging Pivot**
+- SignalFriend now positions as a **Prediction Signals Marketplace** (vs. trading signals)
+- Focus on analysis for prediction market events (Polymarket, Predict.fun, etc.)
+- Keeping "Signal" terminology while shifting narrative to predictions
+
+**SEO & Meta Tags**
+- Updated `index.html`:
+  - Title: "Decentralized Prediction Signals Marketplace"
+  - Description: "Get expert analysis for prediction market events..."
+  - Keywords: Added "prediction markets, polymarket analysis, predict.fun"
+- Updated Open Graph and Twitter Card meta tags
+- Updated `useSEO.ts` default description
+- Updated `site.webmanifest` description
+
+**Home Page**
+- HeroSection: "Predict Smarter with Expert Signals"
+- Badge: "Web3 Prediction Signals Marketplace"
+- Description: Focus on prediction market events, crypto, politics, sports
+- FeaturesSection: Updated multi-category description
+- HowItWorksSection: Updated buyer/predictor steps for predictions
+- CTASection: "Ready to Predict with Confidence"
+
+**Signals Pages**
+- SignalsPage: SEO title "Prediction Signals Marketplace"
+- SignalDetailPage: SEO now says "Prediction Signal" vs "Trading Signal"
+- MyPurchasedSignalsPage: Updated descriptions
+- SignalContent: "Full analysis and recommendation" vs "trading strategy"
+
+**Predictor Pages**
+- PredictorProfilePage: Updated SEO descriptions
+- PredictorDashboardPage: Updated SEO and empty state text
+- BecomePredictorPage: "prediction insights" vs "trading insights"
+- CreateSignalModal: Updated placeholder text
+- EditProfileModal: Updated bio placeholder
+
+**FAQ Page**
+- Renamed "Trading & Signals" category to "Signals & Purchases"
+- Updated signal expiry FAQ (1-2 days)
+- Updated purchase signal steps
+
+**News Page**
+- Updated launch announcements to reference "prediction signals"
+
+### Technical Notes
+- This is Phase 1 (text/SEO only) - no data model changes
+- Future phases will add: `sourceMarket`, `eventUrl`, `confidenceLevel` fields
+- Categories will be restructured in Phase 2
+
+---
+
 ## [0.28.2] - 2025-12-29 ⏱️ SIGNAL EXPIRY + FAVICON FIX
 
 ### Changed
@@ -93,7 +226,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `public/sitemap.xml` with all public pages
   - Homepage, Signals, Predictors, How It Works, Become Predictor
   - Terms and Privacy legal pages
-  - Proper priority and change frequency for each page
 - Improves Google indexing and SEO discoverability
 
 ### Fixed

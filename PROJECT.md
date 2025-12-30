@@ -1,13 +1,13 @@
 # SignalFriend
 
-> **Web3 Transparent Signal Marketplace** — Technical Specification  
+> **Web3 Prediction Signals Marketplace** — Technical Specification  
 > Last Updated: December 2025
 
 ---
 
 ## Overview
 
-SignalFriend is a **Web3 Transparent Signal Marketplace** that connects verified prediction makers (Predictors) with traders via a transparent, on-chain NFT mechanism. By structuring the core transaction around an **NFT as a data ticket** within a **gated room**, the platform is legally positioned as a **Digital Information Marketplace** rather than a gambling or betting platform.
+SignalFriend is a **Web3 Prediction Signals Marketplace** that connects verified prediction analysts (Predictors) with buyers seeking expert analysis for prediction market events (Polymarket, Predict.fun, etc.) via a transparent, on-chain NFT mechanism. By structuring the core transaction around an **NFT as a data ticket** within a **gated room**, the platform is legally positioned as a **Digital Information Marketplace** rather than a gambling or betting platform.
 
 ---
 
@@ -35,12 +35,13 @@ The key to avoiding the "gambling" classification is the **NFT as the purchased 
 
 | Category             | Detail                                                                                                                                                                                                  |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Project**          | **SignalFriend** (Web3 Transparent Signal Marketplace)                                                                                                                                                  |
-| **Objective**        | Connect verified prediction makers (Predictors) with traders (Traders) via a transparent, on-chain NFT mechanism that eliminates trust issues.                                                          |
-| **Product**          | Predictors sell individual trading signals/reports packaged as an **Non-Fungible Token (NFT)**. The NFT acts as a secure, one-time-use **key** to unlock the signal's private content stored off-chain. |
-| **Target Chain**     | **BNB Chain** (BEP-20/BEP-721).                                                                                                                                                                         |
-| **Payment Currency** | **USDT (BEP-20)** for all fees and signal purchases.                                                                                                                                                    |
-| **Legal Strategy**   | Platform is legally structured as an **NFT-based digital information marketplace** to mitigate risks associated with gambling, betting, or unregistered financial advising.                             |
+| **Project**          | **SignalFriend** (Web3 Prediction Signals Marketplace)                                                                                                                                                  |
+| **Objective**        | Connect verified prediction analysts (Predictors) with buyers seeking expert analysis for prediction market events via a transparent, on-chain NFT mechanism that eliminates trust issues.              |
+| **Product**          | Predictors sell individual prediction signals/analyses packaged as an **Non-Fungible Token (NFT)**. The NFT acts as a secure, one-time-use **key** to unlock the signal's private content stored off-chain. |
+| **Target Chain**     | **BNB Chain** (BEP-20/BEP-721).                                                                                                                                                                         |
+| **Payment Currency** | **USDT (BEP-20)** for all fees and signal purchases.                                                                                                                                                    |
+| **Legal Strategy**   | Platform is legally structured as an **NFT-based digital information marketplace** to mitigate risks associated with gambling, betting, or unregistered financial advising.                             |
+| **Categories**       | Crypto, Finance, Politics, Sports, World Events, Culture (33 subcategories total)                                                                                                                       |
 
 ---
 

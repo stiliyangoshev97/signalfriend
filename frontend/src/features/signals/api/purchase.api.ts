@@ -48,6 +48,7 @@ export interface Receipt {
     title: string;
     description: string;
     category?: { name: string };
+    eventUrl?: string;
   };
 }
 
