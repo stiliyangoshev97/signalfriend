@@ -7,6 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.30.0] - 2025-12-30 🔮 PREDICTION MARKETPLACE PIVOT (Phase 2 & 3: Schema + Categories)
+
+### Changed
+
+**Signal Schema Updates**
+- Removed `riskLevel` display (badge and filters)
+- Removed `potentialReward` display (badge and filters)
+- Added `confidenceLevel` badge (1-100%, color-coded: green ≥80%, yellow ≥50%, red <50%)
+- Added `eventUrl` display as "View Event" button on signal detail page
+
+**CreateSignalModal - Complete Redesign**
+- Replaced 1-2 day slider with date picker (1-90 days expiration)
+- Added confidence level slider (1-100%)
+- Added optional Event URL input with domain preview
+- Updated category group order to match new 6 groups
+
+**FilterPanel Updates**
+- Removed Risk Level filter section
+- Removed Potential Reward filter section
+- Added confidence level filter support (API ready)
+- Updated MAIN_GROUP_ORDER: Crypto, Finance, Politics, Sports, World, Culture
+
+**SignalCard Updates**
+- Replaced risk/reward badges with confidence level badge
+- Color-coded confidence display
+
+**SignalDetailPage Updates**
+- Replaced risk/reward config display with confidence level
+- Added clickable "View Event" button for eventUrl
+- Updated SEO description
+
+**API Integration Updates**
+- Updated `signals.api.ts`: Replaced riskLevel/potentialReward params with minConfidence/maxConfidence
+- Updated `predictorProfile.api.ts`: Same filter param changes
+- Updated URL param handling in SignalsPage and PredictorProfilePage
+
+**FAQ Page Updates**
+- Updated category documentation to show all 6 groups with correct subcategories
+- Crypto: Bitcoin, Ethereum, Altcoins, DeFi, NFTs/Gaming, Meme Coins
+- Finance: Stocks, Forex, Commodities, Earnings
+- Politics: US Elections, World Politics, Policy, Legal
+- Sports: Football, American Football, Basketball, Combat Sports, Horse Racing, Esports
+- World: Geopolitics, Economy, Climate/Weather, Science
+- Culture: Entertainment, Awards, Tech/AI, Social Media
+
+### Technical
+- Updated `signal.schemas.ts`: New schema fields, removed old enums
+- Updated `types/index.ts`: Removed RiskLevel and PotentialReward exports
+- All forms validated with Zod schemas
+
+---
+
 ## [0.29.0] - 2025-12-30 🔮 PREDICTION MARKETPLACE PIVOT (Phase 1: Text/SEO)
 
 ### Changed

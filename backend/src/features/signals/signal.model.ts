@@ -2,7 +2,7 @@
  * @fileoverview MongoDB model for Signal documents.
  *
  * Signals are the core content sold by predictors. Each signal has:
- * - Public metadata (title, description, price, ratings)
+ * - Public metadata (title, description, price, confidence)
  * - Protected content (revealed only after purchase)
  * - Statistics (sales count, average rating)
  *
@@ -33,8 +33,12 @@ export interface ISignal extends Document {
   mainGroup: string;
   /** Price in USDT */
   priceUsdt: number;
-  /** When the signal expires and can no longer be purchased */
+  /** When the signal expires and can no longer be purchased (1-90 days from creation) */
   expiresAt: Date;
+  /** Predictor's confidence level in this prediction (1-100%) */
+  confidenceLevel: number;
+  /** Optional URL to the prediction market event (Polymarket, Predict.fun, etc.) */
+  eventUrl?: string;
   /** Total number of purchases */
   totalSales: number;
   /** Average rating from reviews (0-5) */
@@ -43,10 +47,6 @@ export interface ISignal extends Document {
   totalReviews: number;
   /** Whether the signal is active (soft delete) */
   isActive: boolean;
-  /** Risk level assessment by predictor */
-  riskLevel: "low" | "medium" | "high";
-  /** Potential reward assessment by predictor */
-  potentialReward: "normal" | "medium" | "high";
   /** Timestamp when signal was created */
   createdAt: Date;
   /** Timestamp when signal was last updated */
@@ -112,6 +112,18 @@ const signalSchema = new Schema<ISignal>(
       required: true,
       index: true,
     },
+    confidenceLevel: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 100,
+      index: true,
+    },
+    eventUrl: {
+      type: String,
+      required: false,
+      maxlength: 500,
+    },
     totalSales: {
       type: Number,
       default: 0,
@@ -129,18 +141,6 @@ const signalSchema = new Schema<ISignal>(
     isActive: {
       type: Boolean,
       default: true,
-      index: true,
-    },
-    riskLevel: {
-      type: String,
-      enum: ["low", "medium", "high"],
-      required: true,
-      index: true,
-    },
-    potentialReward: {
-      type: String,
-      enum: ["normal", "medium", "high"],
-      required: true,
       index: true,
     },
   },

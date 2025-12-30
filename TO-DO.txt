@@ -2,7 +2,189 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 21, 2025
+Last Updated: December 30, 2025
+
+================================================================================
+PHASE 16: PREDICTION MARKETPLACE PIVOT 🔄 IN PROGRESS
+================================================================================
+
+Context: Pivoting SignalFriend from trading signals marketplace to prediction 
+signals marketplace. Platform will focus on analysis for prediction market events
+(Polymarket, Predict.fun, etc.) rather than trading signals with entry/exit points.
+
+--------------------------------------------------------------------------------
+PHASE 16.1: TEXT/SEO REFACTOR ✅ COMPLETE (December 30, 2025)
+--------------------------------------------------------------------------------
+
+[x] Update index.html meta tags (title, description, keywords, OG, Twitter)
+[x] Update site.webmanifest description
+[x] Update useSEO.ts default description
+[x] Update HeroSection.tsx (badge, heading, description)
+[x] Update FeaturesSection.tsx (multi-category description)
+[x] Update HowItWorksSection.tsx (buyer/predictor steps)
+[x] Update CTASection.tsx (heading, description)
+[x] Update HomePage.tsx (docstring)
+[x] Update SignalsPage.tsx (SEO, descriptions)
+[x] Update SignalDetailPage.tsx (SEO)
+[x] Update MyPurchasedSignalsPage.tsx (descriptions)
+[x] Update SignalContent.tsx (locked content text)
+[x] Update PredictorProfilePage.tsx (SEO)
+[x] Update PredictorDashboardPage.tsx (SEO, empty state)
+[x] Update BecomePredictorPage.tsx (CTA text)
+[x] Update CreateSignalModal.tsx (placeholder examples)
+[x] Update EditProfileModal.tsx (bio placeholder)
+[x] Update FaqPage.tsx (category name, expiry FAQ)
+[x] Update NewsPage.tsx (announcements)
+[x] Update TermsPage.tsx (trading → market-related)
+[x] Update AboutPage.tsx (platform description)
+[x] Update CHANGELOG.md (v0.29.0 entry)
+
+--------------------------------------------------------------------------------
+PHASE 16.2: CATEGORY RESTRUCTURE ✅ COMPLETE (December 30, 2025)
+--------------------------------------------------------------------------------
+
+New category structure for prediction markets:
+
+| Main Group | Subcategories                                              |
+|------------|------------------------------------------------------------|
+| Crypto     | Bitcoin, Ethereum, Altcoins, Meme Coins, DeFi, NFTs,       |
+|            | Layer 1/2                                                   |
+| Finance    | US Stocks, Forex, Commodities, Interest Rates, Indices     |
+| Politics   | US Elections, Global Elections, Policy & Legislation,      |
+|            | Geopolitics                                                 |
+| Sports     | Football/Soccer, American Football, Basketball,            |
+|            | Combat Sports, Esports, Other Sports                        |
+| World      | Economics, Climate & Weather, Science & Tech, Health       |
+| Culture    | Entertainment, Social Media, Awards Shows                   |
+
+Completed:
+[x] MongoDB Atlas: User dropped all collections manually
+[x] Update backend/src/features/categories/category.model.ts
+    - Updated MAIN_GROUPS constant (6 groups)
+    - Updated DEFAULT_CATEGORIES with 29 prediction-focused subcategories
+[x] Update frontend/src/features/signals/components/FilterPanel.tsx
+    - Updated MAIN_GROUP_ORDER
+    - Removed Risk Level and Potential Reward filter sections
+[x] Update frontend/src/features/predictors/components/CreateSignalModal.tsx
+    - Updated MAIN_GROUP_ORDER
+    - Complete rewrite with new fields
+[x] Update frontend/src/features/faq/pages/FaqPage.tsx
+    - Updated category documentation to 6 groups with new subcategories
+
+Pending:
+[ ] Deploy backend and run: npm run seed:categories
+[ ] MongoDB Atlas: Import predictors backup (assets/backup-database/signalfriend.predictors.json)
+[ ] Verify categories appear correctly in frontend
+
+--------------------------------------------------------------------------------
+PHASE 16.3: SIGNAL SCHEMA UPDATES ✅ COMPLETE (December 30, 2025)
+--------------------------------------------------------------------------------
+
+Schema changes for prediction marketplace:
+
+REMOVED FIELDS:
+- riskLevel (low/medium/high)
+- potentialReward (normal/medium/high)
+- expiryDays (1-2 days slider)
+
+NEW FIELDS:
+- confidenceLevel: number (required, 1-100%) - Predictor's confidence
+- eventUrl: string (optional, max 500 chars) - Link to prediction market event
+- expiresAt: Date (required, 1-90 days) - Date picker for expiration
+
+Backend Completed:
+[x] Update backend/src/features/signals/signal.model.ts
+    - Removed riskLevel and potentialReward fields
+    - Added confidenceLevel field (Number, required, min 1, max 100)
+    - Added eventUrl field (String, optional, maxlength 500)
+    - Updated interface and schema
+[x] Update backend/src/features/signals/signal.schemas.ts
+    - Updated createSignalSchema: replaced expiryDays with expiresAt (ISO date string, 1-90 days)
+    - Added confidenceLevel validation (1-100%)
+    - Added eventUrl validation (optional URL)
+    - Updated listSignalsSchema: replaced riskLevel/potentialReward with minConfidence/maxConfidence
+[x] Update backend/src/features/signals/signal.service.ts
+    - Updated getAll() to use confidence filters instead of risk/reward
+    - Updated create() to handle new fields (expiresAt as ISO string, confidenceLevel, eventUrl)
+
+Frontend Completed:
+[x] Update frontend/src/shared/schemas/signal.schemas.ts
+    - Removed riskLevelSchema and potentialRewardSchema
+    - Updated signalSchema with confidenceLevel and eventUrl
+    - Updated createSignalSchema with expiresAt, confidenceLevel, eventUrl
+    - Updated signalFiltersSchema with confidence filters
+[x] Update frontend/src/shared/types/index.ts
+    - Removed RiskLevel and PotentialReward type exports
+[x] Update frontend/src/features/predictors/components/CreateSignalModal.tsx
+    - Complete rewrite with new fields
+    - Date picker for expiration (1-90 days)
+    - Confidence level slider (1-100%)
+    - Optional eventUrl input with domain preview
+[x] Update frontend/src/features/signals/components/FilterPanel.tsx
+    - Removed Risk Level and Potential Reward filter sections
+    - Updated hasActiveFilters check
+[x] Update frontend/src/features/signals/components/SignalCard.tsx
+    - Replaced riskLevel/potentialReward badges with confidenceLevel badge
+    - Color-coded confidence (green ≥80%, yellow ≥50%, red <50%)
+[x] Update frontend/src/features/signals/pages/SignalDetailPage.tsx
+    - Replaced riskConfig/rewardConfig with confidenceLevel display
+    - Added eventUrl display as clickable "View Event" button
+    - Updated SEO description
+[x] Update frontend/src/features/signals/pages/SignalsPage.tsx
+    - Removed riskLevel/potentialReward URL param handling
+    - Added minConfidence/maxConfidence URL param handling
+[x] Update frontend/src/features/predictors/pages/PredictorProfilePage.tsx
+    - Removed riskLevel/potentialReward URL param handling
+    - Added minConfidence/maxConfidence URL param handling
+[x] Update frontend/src/features/signals/api/signals.api.ts
+    - Removed riskLevel/potentialReward filter params
+    - Added minConfidence/maxConfidence filter params
+[x] Update frontend/src/features/predictors/api/predictorProfile.api.ts
+    - Removed riskLevel/potentialReward filter params
+    - Added minConfidence/maxConfidence filter params
+[ ] Update backend/src/shared/services/seedOnStartup.ts (if categories change)
+[ ] Update API documentation
+
+Frontend Tasks:
+[ ] Update frontend/src/shared/types/signal.types.ts
+    - Add new field types to Signal interface
+[ ] Update frontend/src/shared/schemas/signal.schemas.ts
+    - Add validation for new fields
+[ ] Update frontend/src/features/predictors/components/CreateSignalModal.tsx
+    - Add sourceMarket dropdown (optional)
+    - Add eventUrl input field (optional)
+    - Add confidenceLevel slider/input (optional)
+    - Add predictionOutcome selector (optional)
+    - Add targetDate picker (optional)
+[ ] Update frontend/src/features/signals/components/SignalCard.tsx
+    - Display sourceMarket badge if present
+    - Display confidenceLevel if present
+[ ] Update frontend/src/features/signals/pages/SignalDetailPage.tsx
+    - Display eventUrl as clickable link
+    - Display all new fields in signal details
+[ ] Update frontend/src/features/signals/components/FilterPanel.tsx
+    - Add sourceMarket filter (optional future enhancement)
+
+--------------------------------------------------------------------------------
+PHASE 16.4: UI/UX ENHANCEMENTS 🔄 PENDING (Future)
+--------------------------------------------------------------------------------
+
+[ ] Add confidence level visualization enhancements (progress bar, gauge)
+[ ] Add "View on Polymarket/Predict.fun" smart buttons when eventUrl present
+[ ] Consider outcome tracking (mark predictions as correct/incorrect)
+[ ] Consider predictor accuracy stats based on outcomes
+[ ] Add confidence-based filtering UI in FilterPanel (slider or range inputs)
+
+--------------------------------------------------------------------------------
+PHASE 16.5: DOCUMENTATION UPDATES 🔄 PENDING
+--------------------------------------------------------------------------------
+
+[ ] Update PROJECT.md with new category structure
+[ ] Update backend/PROJECT_CONTEXT.md
+[ ] Update frontend/PROJECT_CONTEXT.md
+[ ] Update contracts/PROJECT_CONTEXT.md (if relevant)
+[ ] Update README.md files
+[ ] Update RUNBOOK.md files
 
 ================================================================================
 COMPLETED FEATURES ✅

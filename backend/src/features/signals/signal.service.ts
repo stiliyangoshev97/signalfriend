@@ -108,8 +108,8 @@ export class SignalService {
       search,
       minPrice,
       maxPrice,
-      riskLevel,
-      potentialReward,
+      minConfidence,
+      maxConfidence,
     } = query;
 
     // Build filter
@@ -201,14 +201,15 @@ export class SignalService {
       }
     }
 
-    // Filter by risk level
-    if (riskLevel) {
-      filter.riskLevel = riskLevel;
-    }
-
-    // Filter by potential reward
-    if (potentialReward) {
-      filter.potentialReward = potentialReward;
+    // Confidence level range filter
+    if (minConfidence !== undefined || maxConfidence !== undefined) {
+      filter.confidenceLevel = {};
+      if (minConfidence !== undefined) {
+        (filter.confidenceLevel as Record<string, number>).$gte = minConfidence;
+      }
+      if (maxConfidence !== undefined) {
+        (filter.confidenceLevel as Record<string, number>).$lte = maxConfidence;
+      }
     }
 
     // Build sort based on whether user explicitly selected a sort option
@@ -480,9 +481,8 @@ export class SignalService {
     // Generate unique contentId
     const contentId = randomUUID();
 
-    // Calculate expiry date from expiryDays
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + data.expiryDays);
+    // Parse expiration date from ISO string
+    const expiresAt = new Date(data.expiresAt);
 
     // Create signal with denormalized mainGroup for efficient filtering
     const signal = new Signal({
@@ -496,8 +496,8 @@ export class SignalService {
       mainGroup: category.mainGroup, // Denormalized for read performance
       priceUsdt: data.priceUsdt,
       expiresAt,
-      riskLevel: data.riskLevel,
-      potentialReward: data.potentialReward,
+      confidenceLevel: data.confidenceLevel,
+      eventUrl: data.eventUrl || undefined, // Store undefined if empty string
       totalSales: 0,
       averageRating: 0,
       totalReviews: 0,

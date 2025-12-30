@@ -13,8 +13,6 @@ import { categorySchema } from './category.schemas';
 // Enums
 // ===========================================
 
-export const riskLevelSchema = z.enum(['low', 'medium', 'high']);
-export const potentialRewardSchema = z.enum(['normal', 'medium', 'high']);
 export const signalStatusSchema = z.enum(['active', 'expired', 'deactivated']);
 /** Filter status for API queries - different from display status */
 export const signalFilterStatusSchema = z.enum(['active', 'inactive', 'all']);
@@ -42,7 +40,9 @@ export const signalSchema = z.object({
   categoryId: z.union([z.string(), z.object({ _id: z.string() }).passthrough()]).optional(),
   mainGroup: z.string().optional(), // Denormalized from category for efficient filtering
   priceUsdt: z.number(),
-  expiresAt: z.string(), // Required - when signal expires (max 30 days from creation)
+  expiresAt: z.string(), // Required - when signal expires (1-90 days from creation)
+  confidenceLevel: z.number().min(1).max(100), // Predictor's confidence 1-100%
+  eventUrl: z.string().optional(), // Optional link to prediction market event
   totalSales: z.number().default(0),
   averageRating: z.number().default(0),
   totalReviews: z.number().default(0),
@@ -54,9 +54,6 @@ export const signalSchema = z.object({
   // Populated fields from backend
   category: categorySchema.optional(),
   predictor: predictorSchema.optional(),
-  // Risk and reward assessment by predictor
-  riskLevel: riskLevelSchema,
-  potentialReward: potentialRewardSchema,
   // Legacy fields for compatibility (optional)
   status: signalStatusSchema.optional(),
 });
@@ -106,13 +103,18 @@ export const createSignalSchema = z.object({
       (val) => Math.abs(Math.round(val * 100) - val * 100) < 0.0001,
       'Price can have at most 2 decimal places (e.g., 10.50)'
     ),
-  expiryDays: z
+  expiresAt: z.string().min(1, 'Please select an expiration date'),
+  confidenceLevel: z
     .number()
-    .int('Expiry must be a whole number of days')
-    .min(1, 'Signal must be active for at least 1 day')
-    .max(2, 'Signal can be active for at most 2 days'),
-  riskLevel: riskLevelSchema,
-  potentialReward: potentialRewardSchema,
+    .int('Confidence must be a whole number')
+    .min(1, 'Confidence must be at least 1%')
+    .max(100, 'Confidence cannot exceed 100%'),
+  eventUrl: z
+    .string()
+    .url('Must be a valid URL')
+    .max(500, 'URL too long')
+    .optional()
+    .or(z.literal('')),
 });
 
 // ===========================================
@@ -121,10 +123,10 @@ export const createSignalSchema = z.object({
 
 export const signalFiltersSchema = z.object({
   category: z.string().optional(),
-  /** Filter by main category group (e.g., "Crypto", "Traditional Finance") */
+  /** Filter by main category group (e.g., "Crypto", "Finance", "Politics") */
   mainGroup: z.string().optional(),
-  riskLevel: riskLevelSchema.optional(),
-  potentialReward: potentialRewardSchema.optional(),
+  minConfidence: z.number().min(1).max(100).optional(),
+  maxConfidence: z.number().min(1).max(100).optional(),
   minPrice: z.number().optional(),
   maxPrice: z.number().optional(),
   predictor: z.string().optional(),
@@ -141,8 +143,6 @@ export const signalFiltersSchema = z.object({
 // Inferred Types
 // ===========================================
 
-export type RiskLevel = z.infer<typeof riskLevelSchema>;
-export type PotentialReward = z.infer<typeof potentialRewardSchema>;
 export type SignalStatus = z.infer<typeof signalStatusSchema>;
 export type SignalFilterStatus = z.infer<typeof signalFilterStatusSchema>;
 export type Signal = z.infer<typeof signalSchema>;

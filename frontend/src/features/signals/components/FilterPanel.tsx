@@ -3,8 +3,7 @@
  * @module features/signals/components/FilterPanel
  * @description
  * Sidebar filter panel for the signal marketplace.
- * Allows filtering by category (two-step: mainGroup then subcategory), 
- * risk level, potential reward, and price range.
+ * Allows filtering by category (two-step: mainGroup then subcategory) and price range.
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -27,21 +26,9 @@ interface FilterPanelProps {
  * 
  * Provides filtering options:
  * - Category dropdown (grouped by mainGroup)
- * - Risk level buttons
- * - Potential reward buttons
  * - Price range inputs
  * - Sort by dropdown
  * - Reset filters button
- * 
- * @param props - Component props
- * @returns Filter panel element
- * 
- * @example
- * <FilterPanel
- *   filters={currentFilters}
- *   onFilterChange={setFilters}
- *   categories={categories}
- * />
  */
 export function FilterPanel({
   filters,
@@ -54,8 +41,8 @@ export function FilterPanel({
   const [maxPrice, setMaxPrice] = useState<string>(filters.maxPrice?.toString() || '');
   const [selectedMainGroup, setSelectedMainGroup] = useState<string>('');
 
-  // Define explicit main group order
-  const MAIN_GROUP_ORDER = ['Crypto', 'Traditional Finance', 'Macro / Other'];
+  // Define main group order for prediction markets
+  const MAIN_GROUP_ORDER = ['Crypto', 'Finance', 'Politics', 'Sports', 'World', 'Culture'];
 
   // Group categories by mainGroup
   const categoryGroups = useMemo(() => {
@@ -146,10 +133,8 @@ export function FilterPanel({
 
   const hasActiveFilters =
     localFilters.category ||
-    localFilters.mainGroup || // Check mainGroup in filters
-    selectedMainGroup || // Also consider local mainGroup selection
-    localFilters.riskLevel ||
-    localFilters.potentialReward ||
+    localFilters.mainGroup ||
+    selectedMainGroup ||
     localFilters.minPrice !== undefined ||
     localFilters.maxPrice !== undefined;
 
@@ -226,68 +211,6 @@ export function FilterPanel({
             </select>
           </div>
         )}
-      </div>
-
-      {/* Risk Level Filter */}
-      <div>
-        <label className="block text-sm font-medium text-fur-cream/80 mb-2">
-          Risk Level
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {(['low', 'medium', 'high'] as const).map((level) => (
-            <button
-              key={level}
-              onClick={() =>
-                updateFilter(
-                  'riskLevel',
-                  localFilters.riskLevel === level ? undefined : level
-                )
-              }
-              className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
-                localFilters.riskLevel === level
-                  ? level === 'low'
-                    ? 'bg-green-500/20 border-green-500 text-green-400'
-                    : level === 'medium'
-                    ? 'bg-yellow-500/20 border-yellow-500 text-yellow-400'
-                    : 'bg-red-500/20 border-red-500 text-red-400'
-                  : 'bg-dark-900 border-dark-600 text-fur-cream/70 hover:border-dark-500 hover:text-fur-cream'
-              }`}
-            >
-              {level.charAt(0).toUpperCase() + level.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Potential Reward Filter */}
-      <div>
-        <label className="block text-sm font-medium text-fur-cream/80 mb-2">
-          Potential Reward
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {(['normal', 'medium', 'high'] as const).map((reward) => (
-            <button
-              key={reward}
-              onClick={() =>
-                updateFilter(
-                  'potentialReward',
-                  localFilters.potentialReward === reward ? undefined : reward
-                )
-              }
-              className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
-                localFilters.potentialReward === reward
-                  ? reward === 'normal'
-                    ? 'bg-fur-cream/10 border-fur-cream/50 text-fur-cream'
-                    : reward === 'medium'
-                    ? 'bg-fur-light/20 border-fur-light text-fur-light'
-                    : 'bg-fur-main/20 border-fur-main text-fur-main'
-                  : 'bg-dark-900 border-dark-600 text-fur-cream/70 hover:border-dark-500 hover:text-fur-cream'
-              }`}
-            >
-              {reward.charAt(0).toUpperCase() + reward.slice(1)}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Price Range Filter */}

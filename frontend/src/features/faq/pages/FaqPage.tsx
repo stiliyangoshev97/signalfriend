@@ -169,7 +169,7 @@ const faqItems: FaqItem[] = [
     answer: (
       <div className="space-y-4">
         <p>
-          SignalFriend supports a wide range of signal categories across <strong className="text-fur-cream">three main groups</strong>:
+          SignalFriend supports a wide range of prediction categories across <strong className="text-fur-cream">six main groups</strong>:
         </p>
         
         {/* Crypto */}
@@ -178,7 +178,7 @@ const faqItems: FaqItem[] = [
             <span className="text-lg">🪙</span> Crypto
           </h4>
           <div className="flex flex-wrap gap-2">
-            {['Bitcoin', 'Ethereum', 'Altcoins', 'DeFi', 'NFTs', 'Layer 1/2', 'Meme Coins', 'Futures/Perpetuals', 'Others'].map((cat) => (
+            {['Bitcoin', 'Ethereum', 'Altcoins', 'DeFi', 'NFTs/Gaming', 'Meme Coins'].map((cat) => (
               <span key={cat} className="px-3 py-1 bg-dark-700 text-gray-main text-sm rounded-full border border-dark-600">
                 {cat}
               </span>
@@ -186,13 +186,13 @@ const faqItems: FaqItem[] = [
           </div>
         </div>
         
-        {/* Traditional Finance */}
+        {/* Finance */}
         <div className="bg-dark-800/50 rounded-lg p-4">
           <h4 className="font-semibold text-fur-cream mb-3 flex items-center gap-2">
-            <span className="text-lg">📈</span> Traditional Finance
+            <span className="text-lg">📈</span> Finance
           </h4>
           <div className="flex flex-wrap gap-2">
-            {['US Stock - Tech', 'US Stock - General', 'Forex - Majors', 'Commodities - Metals', 'Commodities - Energy', 'Others'].map((cat) => (
+            {['Stocks', 'Forex', 'Commodities', 'Earnings'].map((cat) => (
               <span key={cat} className="px-3 py-1 bg-dark-700 text-gray-main text-sm rounded-full border border-dark-600">
                 {cat}
               </span>
@@ -200,13 +200,55 @@ const faqItems: FaqItem[] = [
           </div>
         </div>
         
-        {/* Macro / Other */}
+        {/* Politics */}
         <div className="bg-dark-800/50 rounded-lg p-4">
           <h4 className="font-semibold text-fur-cream mb-3 flex items-center gap-2">
-            <span className="text-lg">🌍</span> Macro / Other
+            <span className="text-lg">🏛️</span> Politics
           </h4>
           <div className="flex flex-wrap gap-2">
-            {['Economic Data', 'Geopolitical Events', 'Sports', 'Others'].map((cat) => (
+            {['US Elections', 'World Politics', 'Policy', 'Legal'].map((cat) => (
+              <span key={cat} className="px-3 py-1 bg-dark-700 text-gray-main text-sm rounded-full border border-dark-600">
+                {cat}
+              </span>
+            ))}
+          </div>
+        </div>
+        
+        {/* Sports */}
+        <div className="bg-dark-800/50 rounded-lg p-4">
+          <h4 className="font-semibold text-fur-cream mb-3 flex items-center gap-2">
+            <span className="text-lg">⚽</span> Sports
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {['Football/Soccer', 'American Football', 'Basketball', 'Combat Sports', 'Esports', 'Other Sports'].map((cat) => (
+              <span key={cat} className="px-3 py-1 bg-dark-700 text-gray-main text-sm rounded-full border border-dark-600">
+                {cat}
+              </span>
+            ))}
+          </div>
+        </div>
+        
+        {/* World */}
+        <div className="bg-dark-800/50 rounded-lg p-4">
+          <h4 className="font-semibold text-fur-cream mb-3 flex items-center gap-2">
+            <span className="text-lg">🌍</span> World
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {['Geopolitics', 'Economy', 'Climate/Weather', 'Science'].map((cat) => (
+              <span key={cat} className="px-3 py-1 bg-dark-700 text-gray-main text-sm rounded-full border border-dark-600">
+                {cat}
+              </span>
+            ))}
+          </div>
+        </div>
+        
+        {/* Culture */}
+        <div className="bg-dark-800/50 rounded-lg p-4">
+          <h4 className="font-semibold text-fur-cream mb-3 flex items-center gap-2">
+            <span className="text-lg">🎭</span> Culture
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {['Entertainment', 'Awards', 'Tech/AI', 'Social Media'].map((cat) => (
               <span key={cat} className="px-3 py-1 bg-dark-700 text-gray-main text-sm rounded-full border border-dark-600">
                 {cat}
               </span>
@@ -215,8 +257,8 @@ const faqItems: FaqItem[] = [
         </div>
         
         <p className="text-sm text-gray-main">
-          When creating a signal, you'll select a main category and subcategory. Buyers can filter 
-          signals by category to find exactly what they're looking for.
+          When creating a prediction signal, you'll select a main category and subcategory. Buyers can filter 
+          signals by category to find predictions on topics they're interested in.
         </p>
       </div>
     ),

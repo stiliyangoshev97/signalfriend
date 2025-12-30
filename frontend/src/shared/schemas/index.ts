@@ -17,7 +17,7 @@
  * - Auth      - SIWE, JWT, user profiles
  * - Category  - Signal categories
  * - Predictor - Predictor profiles, verification
- * - Signal    - Trading signals, filters
+ * - Signal    - Prediction signals, filters
  * - Review    - Signal reviews/ratings
  * - Receipt   - Purchase receipts (NFT)
  *

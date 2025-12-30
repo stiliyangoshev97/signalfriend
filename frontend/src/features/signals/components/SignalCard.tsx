@@ -19,22 +19,26 @@ interface SignalCardProps {
 }
 
 /**
- * Risk level badge colors
+ * Get confidence level badge styling based on percentage
  */
-const riskColors: Record<string, string> = {
-  low: 'bg-green-500/20 text-green-400 border-green-500/30',
-  medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  high: 'bg-red-500/20 text-red-400 border-red-500/30',
-};
-
-/**
- * Potential reward badge colors - matches filter panel theme
- */
-const rewardColors: Record<string, string> = {
-  normal: 'bg-fur-cream/10 text-fur-cream border-fur-cream/30',
-  medium: 'bg-fur-light/20 text-fur-light border-fur-light/30',
-  high: 'bg-fur-main/20 text-fur-main border-fur-main/30',
-};
+function getConfidenceBadge(level: number): { color: string; label: string } {
+  if (level >= 80) {
+    return {
+      color: 'bg-green-500/20 text-green-400 border-green-500/30',
+      label: `${level}%`,
+    };
+  } else if (level >= 50) {
+    return {
+      color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+      label: `${level}%`,
+    };
+  } else {
+    return {
+      color: 'bg-red-500/20 text-red-400 border-red-500/30',
+      label: `${level}%`,
+    };
+  }
+}
 
 /**
  * Safely parse and format expiry date
@@ -85,16 +89,6 @@ export function getExpiryInfo(expiresAt: string): { isExpired: boolean; text: st
 }
 
 /**
- * Capitalize first letter of a string
- * @param str - String to capitalize
- * @returns Capitalized string or empty string if invalid
- */
-function capitalize(str: string | undefined | null): string {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-/**
  * SignalCard component
  * 
  * Displays a signal's key information:
@@ -116,9 +110,9 @@ export function SignalCard({ signal, isPurchased = false }: SignalCardProps): Re
   // Get expiry info for display
   const { isExpired, text: expiryText } = getExpiryInfo(signal.expiresAt);
   
-  // Safe defaults for risk and reward (optional fields)
-  const riskLevel = signal.riskLevel || 'medium';
-  const potentialReward = signal.potentialReward || 'normal';
+  // Safe defaults for confidence level
+  const confidenceLevel = signal.confidenceLevel ?? 50;
+  const confidenceBadge = getConfidenceBadge(confidenceLevel);
   // Backend uses predictorAddress, not predictorWallet
   const predictorAddress = signal.predictorAddress || '';
   // Backend uses isActive for status - also check expiry
@@ -164,17 +158,15 @@ export function SignalCard({ signal, isPurchased = false }: SignalCardProps): Re
         {signal.title || 'Untitled Signal'}
       </h3>
 
-      {/* Risk & Reward Badges */}
+      {/* Confidence Badge */}
       <div className="flex flex-wrap gap-2 mb-3">
         <span
-          className={`text-xs font-medium px-2 py-1 rounded border ${riskColors[riskLevel] || riskColors.medium}`}
+          className={`text-xs font-medium px-2 py-1 rounded border flex items-center gap-1 ${confidenceBadge.color}`}
         >
-          {capitalize(riskLevel)} Risk
-        </span>
-        <span
-          className={`text-xs font-medium px-2 py-1 rounded border ${rewardColors[potentialReward] || rewardColors.normal}`}
-        >
-          {capitalize(potentialReward)} Reward
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {confidenceBadge.label} Confidence
         </span>
       </div>
 

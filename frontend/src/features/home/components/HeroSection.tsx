@@ -68,7 +68,7 @@ export function HeroSection() {
             {/* Description */}
             <p className="text-lg md:text-xl text-gray-main mb-8 max-w-2xl mx-auto lg:mx-0">
               Get expert analysis for prediction market events. Purchase signals as NFTs 
-              and access premium insights on crypto, politics, sports, and more. 
+              and access premium insights on crypto, finance, politics, sports, and more. 
               Secured by smart contracts on BNB Chain.
             </p>
 

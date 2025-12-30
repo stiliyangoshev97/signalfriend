@@ -20,8 +20,8 @@ function buildQueryString(filters: SignalFilters): string {
 
   if (filters.category) params.append('categoryId', filters.category);
   if (filters.mainGroup) params.append('mainGroup', filters.mainGroup);
-  if (filters.riskLevel) params.append('riskLevel', filters.riskLevel);
-  if (filters.potentialReward) params.append('potentialReward', filters.potentialReward);
+  if (filters.minConfidence !== undefined) params.append('minConfidence', filters.minConfidence.toString());
+  if (filters.maxConfidence !== undefined) params.append('maxConfidence', filters.maxConfidence.toString());
   if (filters.minPrice !== undefined) params.append('minPrice', filters.minPrice.toString());
   if (filters.maxPrice !== undefined) params.append('maxPrice', filters.maxPrice.toString());
   if (filters.predictor) params.append('predictorAddress', filters.predictor);
@@ -56,7 +56,7 @@ function buildQueryString(filters: SignalFilters): string {
  * @returns Paginated response with signals
  * 
  * @example
- * const { data, pagination } = await fetchSignals({ category: 'crypto', riskLevel: 'low' });
+ * const { data, pagination } = await fetchSignals({ category: 'crypto', minConfidence: 50 });
  */
 export async function fetchSignals(
   filters: SignalFilters = {}

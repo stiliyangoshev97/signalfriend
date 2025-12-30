@@ -33,20 +33,16 @@ function parseFiltersFromParams(params: URLSearchParams): SignalFilters {
   const filters: SignalFilters = {};
 
   const category = params.get('category');
-  const riskLevel = params.get('risk');
-  const potentialReward = params.get('reward');
+  const minConfidence = params.get('minConfidence');
+  const maxConfidence = params.get('maxConfidence');
   const minPrice = params.get('minPrice');
   const maxPrice = params.get('maxPrice');
   const sortBy = params.get('sort');
   const page = params.get('page');
 
   if (category) filters.category = category;
-  if (riskLevel && ['low', 'medium', 'high'].includes(riskLevel)) {
-    filters.riskLevel = riskLevel as SignalFilters['riskLevel'];
-  }
-  if (potentialReward && ['normal', 'medium', 'high'].includes(potentialReward)) {
-    filters.potentialReward = potentialReward as SignalFilters['potentialReward'];
-  }
+  if (minConfidence) filters.minConfidence = parseInt(minConfidence, 10);
+  if (maxConfidence) filters.maxConfidence = parseInt(maxConfidence, 10);
   if (minPrice) filters.minPrice = parseFloat(minPrice);
   if (maxPrice) filters.maxPrice = parseFloat(maxPrice);
   if (sortBy && ['newest', 'price-low', 'price-high', 'popular'].includes(sortBy)) {
@@ -64,8 +60,8 @@ function filtersToParams(filters: SignalFilters): URLSearchParams {
   const params = new URLSearchParams();
 
   if (filters.category) params.set('category', filters.category);
-  if (filters.riskLevel) params.set('risk', filters.riskLevel);
-  if (filters.potentialReward) params.set('reward', filters.potentialReward);
+  if (filters.minConfidence !== undefined) params.set('minConfidence', filters.minConfidence.toString());
+  if (filters.maxConfidence !== undefined) params.set('maxConfidence', filters.maxConfidence.toString());
   if (filters.minPrice !== undefined) params.set('minPrice', filters.minPrice.toString());
   if (filters.maxPrice !== undefined) params.set('maxPrice', filters.maxPrice.toString());
   if (filters.sortBy) params.set('sort', filters.sortBy);
