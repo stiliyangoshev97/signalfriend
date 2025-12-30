@@ -166,7 +166,13 @@ export function AdminDashboardPage() {
                 fromBuyerAccessFees: 0,
                 fromCommissions: 0,
                 total: 0,
-                details: { totalPredictors: 0, totalPurchases: 0, totalSignalVolume: 0 },
+                details: {
+                  totalPredictors: 0,
+                  predictorsWithReferral: 0,
+                  predictorsWithoutReferral: 0,
+                  totalPurchases: 0,
+                  totalSignalVolume: 0,
+                },
               }}
               isLoading={earningsLoading}
             />

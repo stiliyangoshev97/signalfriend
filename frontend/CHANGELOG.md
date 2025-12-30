@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.34.0] - 2025-12-30 ✨ PREMIUM SIGNALS BRANDING
+
+### Changed
+
+**Branding Update: "Expert Signals" → "Premium Signals"**
+- Updated HeroSection heading: "Predict Smarter with Premium Signals"
+- Updated all SEO meta descriptions to use "professional analysis" (index.html, useSEO.ts)
+- Updated HowItWorksSection step description
+- Updated SignalsPage SEO description
+- Consistent branding: "Premium Signals" + "professional analysis" throughout
+
+**Predictors Page Simplification**
+- Changed header from "🏆 Top Predictors" to "Predictors"
+- Changed subtitle to "Discover signal providers on the platform"
+- Updated SEO title from "Top Predictors Leaderboard" to "Predictors"
+- Simpler, more accurate description since page shows all predictors with filters
+
+---
+
+## [0.33.0] - 2025-12-30 📊 ACCURATE PLATFORM EARNINGS DISPLAY
+
+### Fixed
+
+**Admin Dashboard - Platform Earnings**
+- Fixed earnings display showing inaccurate calculation for predictor joins
+- Previously: Displayed `X predictors × $15` (assumed all used referrals)
+- Now: Shows accurate breakdown based on actual referral data
+  - `X × $20 + Y × $15 (referral)` when mixed
+  - `X predictors × $20` when none used referrals
+  - `X predictors × $15 (all with referral)` when all used referrals
+
+### Changed
+
+**PlatformEarnings Type**
+- Added `details.predictorsWithReferral` - Predictors who joined with paid referral
+- Added `details.predictorsWithoutReferral` - Predictors who joined without referral
+
+### Technical
+- Updated `AdminStatsCard.tsx`: Dynamic subtext based on referral breakdown
+- Updated `admin.types.ts`: New fields in PlatformEarnings interface
+- Updated `AdminDashboardPage.tsx`: Default values for new fields
+
+---
+
 ## [0.32.0] - 2025-12-30 📝 DOCUMENTATION SYNC
 
 ### Changed
@@ -120,7 +164,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `site.webmanifest` description
 
 **Home Page**
-- HeroSection: "Predict Smarter with Expert Signals"
+- HeroSection: "Predict Smarter with Premium Signals"
 - Badge: "Web3 Prediction Signals Marketplace"
 - Description: Focus on prediction market events, crypto, politics, sports
 - FeaturesSection: Updated multi-category description

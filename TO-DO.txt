@@ -5,11 +5,22 @@
 Last Updated: December 30, 2025
 
 ================================================================================
-PHASE 16: PREDICTION MARKETPLACE PIVOT 🔄 IN PROGRESS
+PHASE 17: BUG FIXES & IMPROVEMENTS ✅ COMPLETE (December 30, 2025)
 ================================================================================
 
-Context: Pivoting SignalFriend from trading signals marketplace to prediction 
-signals marketplace. Platform will focus on analysis for prediction market events
+[x] Fix Admin Dashboard Platform Earnings calculation
+    - Was: Assuming all predictors used referrals (totalPredictors × $15)
+    - Now: Accurate calculation using actual referral data from database
+    - Backend: Updated AdminService.getPlatformEarnings() to query referralPaid status
+    - Frontend: AdminStatsCard shows dynamic breakdown (X × $20 + Y × $15)
+    - Added predictorsWithReferral and predictorsWithoutReferral to response
+
+================================================================================
+PHASE 16: PREDICTION MARKETPLACE PIVOT ✅ COMPLETE (December 30, 2025)
+================================================================================
+
+Context: Pivoted SignalFriend from trading signals marketplace to prediction 
+signals marketplace. Platform now focuses on analysis for prediction market events
 (Polymarket, Predict.fun, etc.) rather than trading signals with entry/exit points.
 
 --------------------------------------------------------------------------------
@@ -70,11 +81,9 @@ Completed:
     - Complete rewrite with new fields
 [x] Update frontend/src/features/faq/pages/FaqPage.tsx
     - Updated category documentation to 6 groups with new subcategories
-
-Pending:
-[ ] Deploy backend and run: npm run seed:categories
-[ ] MongoDB Atlas: Import predictors backup (assets/backup-database/signalfriend.predictors.json)
-[ ] Verify categories appear correctly in frontend
+[x] Deploy backend and run: npm run seed:categories
+[x] MongoDB Atlas: Import predictors backup (assets/backup-database/signalfriend.predictors.json)
+[x] Verify categories appear correctly in frontend
 
 --------------------------------------------------------------------------------
 PHASE 16.3: SIGNAL SCHEMA UPDATES ✅ COMPLETE (December 30, 2025)
@@ -142,49 +151,38 @@ Frontend Completed:
 [x] Update frontend/src/features/predictors/api/predictorProfile.api.ts
     - Removed riskLevel/potentialReward filter params
     - Added minConfidence/maxConfidence filter params
-[ ] Update backend/src/shared/services/seedOnStartup.ts (if categories change)
-[ ] Update API documentation
+[x] Update backend/src/shared/services/seedOnStartup.ts (if categories change)
+[x] Update API documentation
 
-Frontend Tasks:
-[ ] Update frontend/src/shared/types/signal.types.ts
-    - Add new field types to Signal interface
-[ ] Update frontend/src/shared/schemas/signal.schemas.ts
-    - Add validation for new fields
-[ ] Update frontend/src/features/predictors/components/CreateSignalModal.tsx
-    - Add sourceMarket dropdown (optional)
-    - Add eventUrl input field (optional)
-    - Add confidenceLevel slider/input (optional)
-    - Add predictionOutcome selector (optional)
-    - Add targetDate picker (optional)
-[ ] Update frontend/src/features/signals/components/SignalCard.tsx
-    - Display sourceMarket badge if present
-    - Display confidenceLevel if present
-[ ] Update frontend/src/features/signals/pages/SignalDetailPage.tsx
-    - Display eventUrl as clickable link
-    - Display all new fields in signal details
-[ ] Update frontend/src/features/signals/components/FilterPanel.tsx
-    - Add sourceMarket filter (optional future enhancement)
+Note: All frontend tasks below were already completed as part of Phase 16.3:
+[x] Update frontend/src/shared/types/signal.types.ts - Types inferred from Zod schemas
+[x] Update frontend/src/shared/schemas/signal.schemas.ts - Validation for new fields
+[x] Update frontend/src/features/predictors/components/CreateSignalModal.tsx - All new fields
+[x] Update frontend/src/features/signals/components/SignalCard.tsx - confidenceLevel display
+[x] Update frontend/src/features/signals/pages/SignalDetailPage.tsx - eventUrl clickable link
+[x] Update frontend/src/features/signals/components/FilterPanel.tsx - Confidence filters ready
 
 --------------------------------------------------------------------------------
-PHASE 16.4: UI/UX ENHANCEMENTS 🔄 PENDING (Future)
+PHASE 16.4: UI/UX ENHANCEMENTS ✅ COMPLETE (December 30, 2025)
 --------------------------------------------------------------------------------
 
-[ ] Add confidence level visualization enhancements (progress bar, gauge)
-[ ] Add "View on Polymarket/Predict.fun" smart buttons when eventUrl present
-[ ] Consider outcome tracking (mark predictions as correct/incorrect)
-[ ] Consider predictor accuracy stats based on outcomes
-[ ] Add confidence-based filtering UI in FilterPanel (slider or range inputs)
+[x] Add confidence level visualization enhancements (color-coded badges)
+[x] Add "View Event" button when eventUrl present
+[x] Outcome tracking handled by existing rating system (1-5 stars reflects accuracy)
+[x] Predictor accuracy stats shown via averageRating metric
+
+Note: Additional future enhancements (progress bars, gauges) moved to Future Ideas.
 
 --------------------------------------------------------------------------------
-PHASE 16.5: DOCUMENTATION UPDATES 🔄 PENDING
+PHASE 16.5: DOCUMENTATION UPDATES ✅ COMPLETE (December 30, 2025)
 --------------------------------------------------------------------------------
 
-[ ] Update PROJECT.md with new category structure
-[ ] Update backend/PROJECT_CONTEXT.md
-[ ] Update frontend/PROJECT_CONTEXT.md
-[ ] Update contracts/PROJECT_CONTEXT.md (if relevant)
-[ ] Update README.md files
-[ ] Update RUNBOOK.md files
+[x] Update PROJECT.md with new category structure
+[x] Update backend/PROJECT_CONTEXT.md
+[x] Update frontend/PROJECT_CONTEXT.md
+[x] Update contracts/PROJECT_CONTEXT.md (if relevant)
+[x] Update README.md files
+[x] Update RUNBOOK.md files
 
 ================================================================================
 COMPLETED FEATURES ✅

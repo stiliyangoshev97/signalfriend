@@ -89,7 +89,7 @@ export function SignalsPage(): React.ReactElement {
   useSEO({
     title: 'Prediction Signals Marketplace',
     description:
-      'Browse premium prediction signals from verified predictors. Get expert analysis for crypto, politics, sports, and more. All signals secured on BNB Chain.',
+      'Browse premium prediction signals from verified predictors. Get professional analysis for crypto, politics, sports, and more. All signals secured on BNB Chain.',
     url: getSEOUrl('/signals'),
   });
 

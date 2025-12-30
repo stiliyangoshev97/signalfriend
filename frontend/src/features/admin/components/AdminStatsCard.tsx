@@ -63,7 +63,7 @@ function StatsRow({
  * AdminStatsCard Component
  * 
  * Displays platform earnings breakdown with:
- * - Earnings from predictor joins ($15 per join)
+ * - Earnings from predictor joins (accurate: $20 without referral, $15 with referral)
  * - Earnings from buyer access fees ($0.50 per purchase)
  * - Earnings from commissions (5% of signal volume)
  * - Total earnings
@@ -85,6 +85,14 @@ export function AdminStatsCard({ earnings, isLoading }: AdminStatsCardProps) {
     );
   }
 
+  // Build the subtext for predictor joins showing accurate breakdown
+  const { predictorsWithReferral = 0, predictorsWithoutReferral = 0, totalPredictors } = earnings.details;
+  const predictorJoinsSubtext = predictorsWithReferral > 0 && predictorsWithoutReferral > 0
+    ? `${predictorsWithoutReferral} × $20 + ${predictorsWithReferral} × $15 (referral)`
+    : predictorsWithReferral > 0
+    ? `${totalPredictors} predictors × $15 (all with referral)`
+    : `${totalPredictors} predictors × $20`;
+
   return (
     <div className="bg-dark-800 border border-dark-700 rounded-xl p-6 shadow-lg">
       <div className="flex items-center justify-between mb-4">
@@ -98,7 +106,7 @@ export function AdminStatsCard({ earnings, isLoading }: AdminStatsCardProps) {
         <StatsRow
           label="From Predictor Joins"
           value={formatUSD(earnings.fromPredictorJoins)}
-          subtext={`${earnings.details.totalPredictors} predictors × $15`}
+          subtext={predictorJoinsSubtext}
         />
         
         <StatsRow

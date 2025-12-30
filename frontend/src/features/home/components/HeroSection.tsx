@@ -61,13 +61,13 @@ export function HeroSection() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-fur-cream mb-6 leading-tight">
               Predict Smarter with{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-200 to-fur-light">
-                Expert Signals
+                Premium Signals
               </span>
             </h1>
 
             {/* Description */}
             <p className="text-lg md:text-xl text-gray-main mb-8 max-w-2xl mx-auto lg:mx-0">
-              Get expert analysis for prediction market events. Purchase signals as NFTs 
+              Get professional analysis for prediction market events. Purchase signals as NFTs 
               and access premium insights on crypto, finance, politics, sports, and more. 
               Secured by smart contracts on BNB Chain.
             </p>

@@ -39,7 +39,7 @@ const buyerSteps: Step[] = [
   {
     number: 4,
     title: 'Access Content',
-    description: 'View the full signal details including expert analysis and recommended decision.',
+    description: 'View the full signal details including premium analysis and recommended decision.',
   },
   {
     number: 5,
