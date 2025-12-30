@@ -1,7 +1,7 @@
 # SignalFriend Backend
 
 > Express + MongoDB + Viem backend API for the SignalFriend **Web3 Prediction Signals Marketplace**.  
-> **Version:** 0.34.0 | **Last Updated:** December 2025
+> **Version:** 0.35.0 | **Last Updated:** December 2025
 
 ## 🌐 Production
 
@@ -91,11 +91,23 @@ npm start
 ### Database Seeding
 
 ```bash
-# Seed categories
+# Seed categories (33 prediction market categories across 6 main groups)
 npm run seed:categories
 
-# Seed test signal (for webhook testing)
+# Seed single test prediction signal (for webhook testing)
 npx tsx src/scripts/seedTestSignal.ts
+
+# Seed 100 prediction signals (default)
+npx tsx src/scripts/seedTestSignals.ts
+
+# Seed 500 prediction signals
+npx tsx src/scripts/seedTestSignals.ts --count=500
+
+# Preview what would be created (dry run)
+npx tsx src/scripts/seedTestSignals.ts --count=500 --dry-run
+
+# Clear test signals before seeding
+npx tsx src/scripts/seedTestSignals.ts --clear --count=500
 ```
 
 ## Project Structure
@@ -110,19 +122,22 @@ src/
 ├── features/                # Feature-based modules
 │   ├── auth/                # SIWE + JWT authentication
 │   ├── predictors/          # Predictor profiles
-│   ├── signals/             # Trading signals
+│   ├── signals/             # Prediction signals (with confidenceLevel, eventUrl)
 │   ├── receipts/            # Purchase receipts (NFTs)
 │   ├── reviews/             # Ratings & reviews
-│   ├── categories/          # Signal categories
+│   ├── categories/          # Signal categories (6 main groups, 33 subcategories)
 │   ├── reports/             # Signal scam reports
 │   ├── disputes/            # Blacklist dispute appeals
 │   ├── admin/               # Admin endpoints
 │   ├── stats/               # Platform statistics
 │   └── webhooks/            # Alchemy event indexing (GraphQL)
 ├── scripts/                 # Utility scripts
-│   ├── seedCategories.ts
-│   ├── seedTestSignal.ts
-│   └── generateEventSignatures.ts
+│   ├── seedCategories.ts        # Seed 33 prediction market categories
+│   ├── seedTestSignal.ts        # Create single test prediction signal
+│   ├── seedTestSignals.ts       # Bulk seed 100/500 prediction signals
+│   ├── migrateConfidenceLevel.ts # Add confidenceLevel to old signals
+│   ├── migrateSignalExpiry.ts   # Migrate expiryDays to expiresAt
+│   └── generateEventSignatures.ts # Generate event topic hashes
 └── shared/                  # Shared utilities
     ├── config/              # Environment, DB, logger
     ├── middleware/          # Auth, validation, errors

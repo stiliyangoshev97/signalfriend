@@ -1,7 +1,7 @@
 # 📱 SignalFriend Frontend
 
 > React + TypeScript + Vite frontend for the SignalFriend **Web3 Prediction Signals Marketplace**.  
-> **Version:** 0.31.0 | **Last Updated:** December 2025
+> **Version:** 0.32.0 | **Last Updated:** December 2025
 
 ## 🌐 Production
 

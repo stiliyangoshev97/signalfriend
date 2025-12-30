@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.35.0] - 2025-12-30 🌱 SEED SCRIPTS REFACTOR & 500 TEST SIGNALS
+
+### Added
+
+**New Seeding Scripts for Prediction Marketplace**
+- Refactored `seedTestSignals.ts` for prediction market signals
+  - New prediction-focused titles (60+ across 6 categories)
+  - Polymarket/Predict.fun style content templates
+  - `confidenceLevel` (50-95%) with realistic distribution
+  - `eventUrl` generation (70% of signals have event links)
+  - Category distribution across Crypto, Finance, Politics, Sports, World, Culture
+- Refactored `seedTestSignal.ts` for single test signal creation
+  - Example prediction: "Will BTC hit $150k by Q2 2025?"
+  - Includes confidence level and event URL
+
+**New Migration Script**
+- Added `migrateConfidenceLevel.ts` - Adds confidenceLevel to signals missing it
+  - Sets random 50-85% confidence for old signals
+  - Useful for migrating pre-v0.33.0 signals
+
+**500 Test Prediction Signals Seeded**
+- Populated database with 500 realistic prediction signals
+- Distributed across all 38 predictors
+- Average confidence: ~72%
+- ~70% have event URLs
+
+### Changed
+
+**Deprecated Scripts**
+- Marked `migrateRiskReward.ts` as deprecated (v0.33.0 removed riskLevel/potentialReward)
+
+### Technical
+- Updated `seedTestSignals.ts`: Complete rewrite for prediction marketplace
+- Updated `seedTestSignal.ts`: New prediction-focused example
+- Created `migrateConfidenceLevel.ts`: Migration helper for old signals
+
+---
+
 ## [0.34.0] - 2025-12-30 📝 DOCUMENTATION & RECEIPT UPDATE
 
 ### Changed

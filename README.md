@@ -5,6 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![BNB Chain](https://img.shields.io/badge/Chain-BNB-F0B90B)](https://www.bnbchain.org/)
 [![Production](https://img.shields.io/badge/Status-LIVE-brightgreen)](https://signalfriend.com)
+[![Frontend](https://img.shields.io/badge/Frontend-v0.32.0-blue)](frontend/)
+[![Backend](https://img.shields.io/badge/Backend-v0.35.0-blue)](backend/)
 
 ---
 
