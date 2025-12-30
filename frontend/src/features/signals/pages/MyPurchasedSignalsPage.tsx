@@ -125,7 +125,7 @@ export function MyPurchasedSignalsPage(): React.ReactElement {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-fur-cream mb-2">My Signals</h1>
         <p className="text-fur-cream/60">
-          View and access all the trading signals you've purchased.
+          View and access all the prediction signals you've purchased.
         </p>
       </div>
 
@@ -186,8 +186,8 @@ export function MyPurchasedSignalsPage(): React.ReactElement {
             No signals purchased yet
           </h2>
           <p className="text-fur-cream/60 mb-6 max-w-md mx-auto">
-            Browse our marketplace to find trading signals from verified predictors.
-            Once you purchase a signal, you'll see it here with full access to the content.
+            Browse our marketplace to find prediction signals from verified predictors.
+            Once you purchase a signal, you'll see it here with full access to the analysis.
           </p>
           <Link
             to="/signals"
@@ -222,7 +222,7 @@ export function MyPurchasedSignalsPage(): React.ReactElement {
             Looking for more signals?
           </h3>
           <p className="text-fur-cream/60 mb-4">
-            Check out our marketplace for the latest trading signals from top predictors.
+            Check out our marketplace for the latest prediction signals from top predictors.
           </p>
           <Link
             to="/signals"

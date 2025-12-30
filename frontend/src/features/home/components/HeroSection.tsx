@@ -53,23 +53,23 @@ export function HeroSection() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/20 mb-6">
               <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
               <span className="text-sm font-medium text-brand-200">
-                Web3 Signal Marketplace
+                Web3 Prediction Signals Marketplace
               </span>
             </div>
 
             {/* Main Heading */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-fur-cream mb-6 leading-tight">
-              Trade Smarter with{' '}
+              Predict Smarter with{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-200 to-fur-light">
-                Verified Signals
+                Expert Signals
               </span>
             </h1>
 
             {/* Description */}
             <p className="text-lg md:text-xl text-gray-main mb-8 max-w-2xl mx-auto lg:mx-0">
-              Connect with crypto predictors, purchase trading signals as NFTs, 
-              and access premium market insights. All payments secured by smart contracts 
-              on BNB Chain.
+              Get expert analysis for prediction market events. Purchase signals as NFTs 
+              and access premium insights on crypto, politics, sports, and more. 
+              Secured by smart contracts on BNB Chain.
             </p>
 
             {/* CTA Buttons */}

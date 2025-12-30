@@ -275,7 +275,7 @@ const faqItems: FaqItem[] = [
     ),
   },
 
-  // ===== TRADING QUESTIONS =====
+  // ===== SIGNAL QUESTIONS =====
   {
     id: 'purchase-signal',
     category: 'trading',
@@ -288,7 +288,7 @@ const faqItems: FaqItem[] = [
           <li>Click the <strong>"Purchase Signal"</strong> button</li>
           <li>If this is your first purchase, approve USDT spending for the market contract</li>
           <li>Confirm the purchase transaction</li>
-          <li>Once confirmed, you'll receive a <strong>SignalKey NFT</strong> and can view the full signal content!</li>
+          <li>Once confirmed, you'll receive a <strong>SignalKey NFT</strong> and can view the full signal analysis!</li>
         </ol>
       </div>
     ),
@@ -319,12 +319,12 @@ const faqItems: FaqItem[] = [
     answer: (
       <div className="space-y-4">
         <p>
-          Predictors set an expiration date (1-7 days) when creating signals. When a signal expires:
+          Predictors set an expiration date (1-2 days) when creating signals. When a signal expires:
         </p>
         <ul className="list-disc list-inside space-y-2 ml-2">
           <li>It is automatically <strong>hidden from the marketplace</strong></li>
           <li>It <strong>cannot be purchased</strong> by new buyers</li>
-          <li>Existing buyers <strong>retain permanent access</strong> to the content</li>
+          <li>Existing buyers <strong>retain permanent access</strong> to the analysis</li>
           <li>The signal can still be viewed via direct URL (shows an "Expired" badge)</li>
         </ul>
       </div>
@@ -532,7 +532,7 @@ const faqItems: FaqItem[] = [
 const categoryLabels: Record<FaqItem['category'], { label: string; icon: string }> = {
   wallet: { label: 'Wallet & NFTs', icon: '👛' },
   predictor: { label: 'Predictors', icon: '📊' },
-  trading: { label: 'Trading & Signals', icon: '📈' },
+  trading: { label: 'Signals & Purchases', icon: '📈' },
   fees: { label: 'Fees & Payments', icon: '💰' },
   security: { label: 'Security', icon: '🔒' },
   general: { label: 'General', icon: '❓' },

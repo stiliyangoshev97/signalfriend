@@ -2,7 +2,7 @@
  * @fileoverview Signal Marketplace Page
  * @module features/signals/pages/SignalsPage
  * @description
- * Main marketplace page for browsing and filtering trading signals.
+ * Main marketplace page for browsing and filtering prediction signals.
  * Combines filter panel, signal grid, and pagination.
  */
 
@@ -83,9 +83,9 @@ function filtersToParams(filters: SignalFilters): URLSearchParams {
 export function SignalsPage(): React.ReactElement {
   // SEO for signals marketplace page
   useSEO({
-    title: 'Trading Signals Marketplace',
+    title: 'Prediction Signals Marketplace',
     description:
-      'Browse premium trading signals from verified predictors. Filter by category, risk level, and price. All signals are secured on the blockchain.',
+      'Browse premium prediction signals from verified predictors. Get expert analysis for crypto, politics, sports, and more. All signals secured on BNB Chain.',
     url: getSEOUrl('/signals'),
   });
 
@@ -138,7 +138,7 @@ export function SignalsPage(): React.ReactElement {
             Signal Marketplace
           </h1>
           <p className="text-fur-cream/60 max-w-2xl">
-            Browse trading signals sorted by rating and sales. 
+            Browse prediction signals sorted by rating and sales. 
             All purchases are secured by smart contracts on BNB Chain.
           </p>
         </div>

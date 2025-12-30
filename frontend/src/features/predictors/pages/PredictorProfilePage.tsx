@@ -202,8 +202,8 @@ export function PredictorProfilePage(): React.ReactElement {
       ? `${predictor.displayName || formatAddress(predictor.walletAddress)} - Predictor Profile`
       : 'Predictor Profile',
     description: predictor
-      ? `${predictor.bio?.slice(0, 120) || 'Trading signal predictor'} - ${predictor.totalSignals || 0} signals, ${predictor.totalSales || 0} sales, ${predictor.averageRating?.toFixed(1) || 'N/A'} rating.`
-      : 'View predictor profile, trading signals, and performance stats on SignalFriend.',
+      ? `${predictor.bio?.slice(0, 120) || 'Prediction signal predictor'} - ${predictor.totalSignals || 0} signals, ${predictor.totalSales || 0} sales, ${predictor.averageRating?.toFixed(1) || 'N/A'} rating.`
+      : 'View predictor profile, prediction signals, and performance stats on SignalFriend.',
     url: address ? getSEOUrl(`/predictors/${address}`) : undefined,
     type: 'profile',
   });

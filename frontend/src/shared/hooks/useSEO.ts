@@ -29,7 +29,7 @@ const SITE_NAME = 'SignalFriend';
 
 /** Default description used as fallback */
 const DEFAULT_DESCRIPTION =
-  'Buy and sell trading signals securely on the blockchain. Connect with verified predictors, access premium crypto signals, and trade with confidence on BNB Chain.';
+  'Get expert analysis for prediction market events. Access premium signals from verified predictors covering crypto, politics, sports, and more. Powered by BNB Chain.';
 
 /** Default OG image */
 const DEFAULT_IMAGE = 'https://signalfriend.com/og-image.jpg?v=3';

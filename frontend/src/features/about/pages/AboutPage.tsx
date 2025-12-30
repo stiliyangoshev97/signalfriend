@@ -176,18 +176,18 @@ export function AboutPage() {
           </h2>
           <div className="prose prose-invert prose-fur max-w-none space-y-4">
             <p className="text-gray-main leading-relaxed">
-              SignalFriend is a <strong className="text-fur-cream">Web3 transparent signal marketplace</strong> on 
-              BNB Chain that connects verified prediction makers (Predictors) with traders through a transparent, 
+              SignalFriend is a <strong className="text-fur-cream">Web3 prediction signals marketplace</strong> on 
+              BNB Chain that connects verified prediction analysts (Predictors) with users through a transparent, 
               on-chain NFT mechanism.
             </p>
             <p className="text-gray-main leading-relaxed">
               When you purchase a signal, you receive a <strong className="text-fur-cream">SignalKey NFT</strong> — 
-              a unique digital receipt that grants you access to the signal's content. This NFT is transferable, 
+              a unique digital receipt that grants you access to the signal's analysis and recommendation. This NFT is transferable, 
               meaning you can hold it for access or trade it on secondary markets.
             </p>
             <p className="text-gray-main leading-relaxed">
               Predictors hold a <strong className="text-fur-cream">Predictor Access Pass NFT</strong> — 
-              a soulbound (non-transferable) license that verifies their status as a registered signal provider 
+              a soulbound (non-transferable) license that verifies their status as a registered prediction analyst 
               on the platform.
             </p>
           </div>

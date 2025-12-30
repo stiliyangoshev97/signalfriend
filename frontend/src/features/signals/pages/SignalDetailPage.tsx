@@ -141,10 +141,10 @@ export function SignalDetailPage(): React.ReactElement {
 
   // Dynamic SEO based on signal data
   useSEO({
-    title: signal ? `${signal.title} - Trading Signal` : 'Signal Details',
+    title: signal ? `${signal.title} - Prediction Signal` : 'Signal Details',
     description: signal
-      ? `${signal.description.slice(0, 150)}${signal.description.length > 150 ? '...' : ''} - ${signal.riskLevel} risk, ${signal.potentialReward} reward potential.`
-      : 'View trading signal details, pricing, and predictor information on SignalFriend.',
+      ? `${signal.description.slice(0, 150)}${signal.description.length > 150 ? '...' : ''} - ${signal.riskLevel} confidence, ${signal.potentialReward} potential.`
+      : 'View prediction signal details, pricing, and predictor information on SignalFriend.',
     url: contentId ? getSEOUrl(`/signals/${contentId}`) : undefined,
     type: 'article',
   });

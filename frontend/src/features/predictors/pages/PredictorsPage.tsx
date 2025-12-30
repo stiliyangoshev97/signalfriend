@@ -72,7 +72,7 @@ export function PredictorsPage(): React.ReactElement {
   useSEO({
     title: 'Top Predictors Leaderboard',
     description:
-      'Discover top-rated trading signal predictors. View rankings, ratings, and track records. Find verified predictors you can trust on SignalFriend.',
+      'Discover top-rated prediction signal predictors. View rankings, ratings, and track records. Find verified predictors you can trust on SignalFriend.',
     url: getSEOUrl('/predictors'),
   });
 

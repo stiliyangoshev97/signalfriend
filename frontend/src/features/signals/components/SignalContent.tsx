@@ -80,8 +80,8 @@ export function SignalContent({
             Content Locked
           </h4>
           <p className="text-fur-cream/60 mb-4 max-w-md mx-auto">
-            Purchase this signal to unlock the full trading strategy, entry/exit points,
-            and detailed analysis from the predictor.
+            Purchase this signal to unlock the full analysis, recommendation,
+            and detailed reasoning from the predictor.
           </p>
           <div className="inline-flex items-center gap-2 bg-fur-light/10 px-4 py-2 rounded-full">
             <span className="text-fur-light font-semibold">${priceUSDT} USDT</span>
@@ -99,7 +99,7 @@ export function SignalContent({
             </div>
             <div>
               <p className="text-sm font-medium text-fur-cream">Full Strategy</p>
-              <p className="text-xs text-fur-cream/50">Complete trading strategy details</p>
+              <p className="text-xs text-fur-cream/50">Complete analysis and recommendation</p>
             </div>
           </div>
 

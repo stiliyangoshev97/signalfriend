@@ -53,8 +53,8 @@ export function TermsPage() {
               participates in Protocol governance through a multi-signature arrangement.
             </p>
             <p className="text-gray-main leading-relaxed mt-4">
-              The Platform facilitates the purchase and sale of digital content access tokens (NFTs) that unlock trading-related 
-              information created by independent third-party content creators ("Predictors"). When you use SignalFriend, you are 
+              The Platform facilitates the purchase and sale of digital content access tokens (NFTs) that unlock market-related 
+              information and analysis created by independent third-party content creators ("Predictors"). When you use SignalFriend, you are 
               interacting directly with blockchain smart contracts — the Interface merely provides a convenient way to do so.
             </p>
           </section>

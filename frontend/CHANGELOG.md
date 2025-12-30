@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.29.0] - 2025-12-30 🔮 PREDICTION MARKETPLACE PIVOT (Phase 1: Text/SEO)
+
+### Changed
+
+**Platform Messaging Pivot**
+- SignalFriend now positions as a **Prediction Signals Marketplace** (vs. trading signals)
+- Focus on analysis for prediction market events (Polymarket, Predict.fun, etc.)
+- Keeping "Signal" terminology while shifting narrative to predictions
+
+**SEO & Meta Tags**
+- Updated `index.html`:
+  - Title: "Decentralized Prediction Signals Marketplace"
+  - Description: "Get expert analysis for prediction market events..."
+  - Keywords: Added "prediction markets, polymarket analysis, predict.fun"
+- Updated Open Graph and Twitter Card meta tags
+- Updated `useSEO.ts` default description
+- Updated `site.webmanifest` description
+
+**Home Page**
+- HeroSection: "Predict Smarter with Expert Signals"
+- Badge: "Web3 Prediction Signals Marketplace"
+- Description: Focus on prediction market events, crypto, politics, sports
+- FeaturesSection: Updated multi-category description
+- HowItWorksSection: Updated buyer/predictor steps for predictions
+- CTASection: "Ready to Predict with Confidence"
+
+**Signals Pages**
+- SignalsPage: SEO title "Prediction Signals Marketplace"
+- SignalDetailPage: SEO now says "Prediction Signal" vs "Trading Signal"
+- MyPurchasedSignalsPage: Updated descriptions
+- SignalContent: "Full analysis and recommendation" vs "trading strategy"
+
+**Predictor Pages**
+- PredictorProfilePage: Updated SEO descriptions
+- PredictorDashboardPage: Updated SEO and empty state text
+- BecomePredictorPage: "prediction insights" vs "trading insights"
+- CreateSignalModal: Updated placeholder text
+- EditProfileModal: Updated bio placeholder
+
+**FAQ Page**
+- Renamed "Trading & Signals" category to "Signals & Purchases"
+- Updated signal expiry FAQ (1-2 days)
+- Updated purchase signal steps
+
+**News Page**
+- Updated launch announcements to reference "prediction signals"
+
+### Technical Notes
+- This is Phase 1 (text/SEO only) - no data model changes
+- Future phases will add: `sourceMarket`, `eventUrl`, `confidenceLevel` fields
+- Categories will be restructured in Phase 2
+
+---
+
 ## [0.28.2] - 2025-12-29 ⏱️ SIGNAL EXPIRY + FAVICON FIX
 
 ### Changed
@@ -93,7 +147,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `public/sitemap.xml` with all public pages
   - Homepage, Signals, Predictors, How It Works, Become Predictor
   - Terms and Privacy legal pages
-  - Proper priority and change frequency for each page
 - Improves Google indexing and SEO discoverability
 
 ### Fixed

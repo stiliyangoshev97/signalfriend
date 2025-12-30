@@ -171,12 +171,12 @@ export function CreateSignalModal({
         <div>
           <Input
             label="Signal Title"
-            placeholder="e.g., BTC Short-Term Breakout Alert"
+            placeholder="e.g., Will BTC reach $150k by 2027?"
             {...register('title')}
             error={errors.title?.message}
           />
           <div className="flex justify-between mt-1 text-xs text-fur-cream/50">
-            <span>A catchy, descriptive title for your signal</span>
+            <span>A clear prediction question or statement</span>
             <span className={titleValue.length > 100 ? 'text-error-400' : ''}>
               {titleValue.length}/100
             </span>
@@ -204,7 +204,7 @@ export function CreateSignalModal({
         <div>
           <Textarea
             label="Signal Content (Protected)"
-            placeholder="Your full analysis, entry/exit points, targets, stop-loss, reasoning, etc. This is ONLY visible after purchase."
+            placeholder="Your full analysis, recommendation, reasoning, and insights. This is ONLY visible after purchase."
             rows={8}
             {...register('content')}
             error={errors.content?.message}
