@@ -1,16 +1,15 @@
 /**
- * @fileoverview Migration script to add riskLevel and potentialReward to existing signals
+ * @fileoverview DEPRECATED - Migration script for old riskLevel/potentialReward fields
  * 
- * Usage:
- *   npx tsx src/scripts/migrateRiskReward.ts --dry-run  # Preview changes
- *   npx tsx src/scripts/migrateRiskReward.ts            # Apply changes
+ * NOTE: This script is DEPRECATED and should not be used.
+ * The riskLevel and potentialReward fields have been replaced with:
+ * - confidenceLevel (1-100%)
+ * - eventUrl (optional prediction market URL)
  * 
- * This script adds default values for the new riskLevel and potentialReward fields
- * to signals that were created before these fields existed.
+ * Use migrateConfidenceLevel.ts for new migrations.
  * 
- * Default values:
- * - riskLevel: "medium"
- * - potentialReward: "medium"
+ * @deprecated Use migrateConfidenceLevel.ts instead
+ * @module scripts/migrateRiskReward
  */
 
 import mongoose from "mongoose";
