@@ -2,7 +2,7 @@
 
 > **Last Updated:** December 30, 2025  
 > **Current Phase:** Production - BSC Mainnet Live  
-> **Project Status:** 🟢 **Backend v0.34.0** - Prediction Marketplace Complete  
+> **Project Status:** 🟢 **Backend v0.35.0** - Prediction Marketplace Complete  
 > **Branch:** `main`
 
 ---
@@ -52,16 +52,18 @@ backend/
 │   │   ├── webhooks/            # Alchemy event indexing ✅ (GraphQL + Address Activity)
 │   │   ├── categories/          # Signal categories ✅
 │   │   ├── predictors/          # Predictor profiles ✅
-│   │   ├── signals/             # Trading signals ✅
+│   │   ├── signals/             # Prediction signals ✅
 │   │   ├── receipts/            # Purchase receipts ✅
 │   │   ├── reviews/             # Ratings (1-5 score, off-chain) ✅
 │   │   ├── reports/             # Scam/false signal reports ✅
 │   │   ├── disputes/            # Blacklist dispute appeals ✅
 │   │   └── admin/               # Admin endpoints (MultiSig only) ✅
 │   ├── scripts/
-│   │   ├── seedCategories.ts    # Database seeding
-│   │   ├── seedTestSignal.ts    # Single test signal
-│   │   ├── seedTestSignals.ts   # Bulk test signals (100/500)
+│   │   ├── seedCategories.ts        # Database category seeding
+│   │   ├── seedTestSignal.ts        # Single test prediction signal
+│   │   ├── seedTestSignals.ts       # Bulk test signals (100/500) - Prediction marketplace style
+│   │   ├── migrateConfidenceLevel.ts # Add confidenceLevel to old signals
+│   │   ├── migrateSignalExpiry.ts   # Migrate expiryDays to expiresAt
 │   │   ├── modifyPredictorStats.ts  # Test verification flow
 │   │   └── generateEventSignatures.ts  # Event hash generator
 │   └── shared/

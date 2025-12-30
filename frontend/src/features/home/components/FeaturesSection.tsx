@@ -67,7 +67,7 @@ const features: Feature[] = [
       </svg>
     ),
     title: 'Multi-Category',
-    description: 'Find signals for crypto, politics, sports, economics, and more. Filter by category, confidence level, and price.',
+    description: 'Find signals for crypto, politics, sports, finance, and more. Filter by category and price range.',
   },
   {
     icon: (

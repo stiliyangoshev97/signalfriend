@@ -1,5 +1,7 @@
 /**
- * Script to create a test signal for webhook testing.
+ * Script to create a test prediction signal for webhook testing.
+ * 
+ * Creates a single prediction signal for the Web3 Prediction Signals Marketplace.
  * 
  * Usage:
  *   npx tsx src/scripts/seedTestSignal.ts --dry-run  # Preview changes
@@ -60,22 +62,46 @@ async function seedTestSignal() {
     }
 
     if (isDryRun) {
-      console.log("\n📋 Would create test signal:");
+      console.log("\n📋 Would create test prediction signal:");
       console.log("   contentId (UUID):", contentId);
       console.log("   contentIdentifier (bytes32):", uuidToBytes32(contentId));
-      console.log("   title: Test Signal for Webhook");
+      console.log("   title: Will BTC hit $150k by Q2 2025?");
       console.log("   price: 5 USDT");
+      console.log("   confidence: 75%");
       console.log("\n✅ Dry run complete! Run without --dry-run to create the signal.");
     } else {
+      // Calculate expiry (30 days from now)
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30);
+
       const signal = new Signal({
         contentId,
         predictorId: predictor._id,
         predictorAddress: predictor.walletAddress,
-        title: "Test Signal for Webhook",
-        description: "This is a test signal created for webhook testing",
-        content: "SECRET: This is the protected content revealed after purchase!",
+        title: "Will BTC hit $150k by Q2 2025?",
+        description: "My analysis of on-chain data and market structure suggests high probability for this outcome. Multiple indicators are aligning for this prediction.",
+        content: `📊 PREDICTION ANALYSIS
+
+Current Market Odds: 35%
+My Predicted Probability: 65%
+Edge: +30%
+
+KEY FACTORS:
+1. Institutional accumulation at record levels
+2. Bitcoin ETF inflows exceeding $50B
+3. Historical halving cycle patterns
+
+RECOMMENDATION: Strong YES position recommended
+
+TIMING: Enter now, event resolves in Q2 2025
+
+⚠️ Risk Note: Always size positions appropriately. This is analysis, not financial advice.`,
         categoryId: category._id,
+        mainGroup: category.mainGroup,
         priceUsdt: 5,
+        expiresAt,
+        confidenceLevel: 75,
+        eventUrl: "https://polymarket.com/event/btc-150k-q2-2025",
         totalSales: 0,
         averageRating: 0,
         totalReviews: 0,
@@ -84,9 +110,11 @@ async function seedTestSignal() {
 
       await signal.save();
 
-      console.log("\n✅ Test signal created!");
+      console.log("\n✅ Test prediction signal created!");
       console.log("   contentId (UUID):", contentId);
       console.log("   contentIdentifier (bytes32):", uuidToBytes32(contentId));
+      console.log("   confidence: 75%");
+      console.log("   eventUrl: https://polymarket.com/event/btc-150k-q2-2025");
       console.log("\n📝 Use this bytes32 value when calling buySignalNFT on-chain:");
       console.log("   ", uuidToBytes32(contentId));
     }

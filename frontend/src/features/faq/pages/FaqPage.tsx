@@ -163,6 +163,61 @@ const faqItems: FaqItem[] = [
     ),
   },
   {
+    id: 'create-signal',
+    category: 'predictor',
+    question: 'How do I create a prediction signal?',
+    answer: (
+      <div className="space-y-4">
+        <p>Once you're a registered predictor, creating signals is easy:</p>
+        <ol className="list-decimal list-inside space-y-2 ml-2">
+          <li>Go to your <Link to="/dashboard" className="text-accent-gold hover:underline">Predictor Dashboard</Link></li>
+          <li>Click the <strong className="text-fur-cream">"Create Signal"</strong> button</li>
+          <li>Fill out the signal form:</li>
+        </ol>
+        
+        <div className="bg-dark-800/50 rounded-lg p-4 space-y-3 mt-2">
+          <div>
+            <p className="font-medium text-fur-cream">📝 Title</p>
+            <p className="text-sm text-gray-main">A clear, compelling headline (max 100 characters). Example: "Will BTC reach $100k by March 2025?"</p>
+          </div>
+          <div>
+            <p className="font-medium text-fur-cream">📋 Description</p>
+            <p className="text-sm text-gray-main">A teaser visible before purchase (max 1000 characters). Hook buyers without revealing your full analysis.</p>
+          </div>
+          <div>
+            <p className="font-medium text-fur-cream">🔒 Full Content</p>
+            <p className="text-sm text-gray-main">Your complete prediction and reasoning (max 3000 characters). This is only revealed after purchase.</p>
+          </div>
+          <div>
+            <p className="font-medium text-fur-cream">📁 Category</p>
+            <p className="text-sm text-gray-main">Select a main category (Crypto, Finance, Politics, Sports, World, Culture) and subcategory.</p>
+          </div>
+          <div>
+            <p className="font-medium text-fur-cream">💰 Price</p>
+            <p className="text-sm text-gray-main">Set your price in USDT (minimum $1). Consider your track record when pricing.</p>
+          </div>
+          <div>
+            <p className="font-medium text-fur-cream">📊 Confidence Level</p>
+            <p className="text-sm text-gray-main">How confident are you? (1-100%). Be honest — your reputation depends on accuracy!</p>
+          </div>
+          <div>
+            <p className="font-medium text-fur-cream">🔗 Event URL (Optional)</p>
+            <p className="text-sm text-gray-main">Link to the prediction market event (Polymarket, Predict.fun, etc.) if applicable.</p>
+          </div>
+          <div>
+            <p className="font-medium text-fur-cream">⏰ Expiration</p>
+            <p className="text-sm text-gray-main">When does your signal expire? (1-90 days). Expired signals can't be purchased but remain viewable.</p>
+          </div>
+        </div>
+        
+        <p className="text-sm text-gray-main">
+          <strong>Tip:</strong> Quality signals with clear reasoning sell better. Build your reputation 
+          by providing valuable insights, and buyers will return for more!
+        </p>
+      </div>
+    ),
+  },
+  {
     id: 'signal-categories',
     category: 'predictor',
     question: 'What categories can I post signals in?',

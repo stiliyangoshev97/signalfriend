@@ -1,7 +1,8 @@
 # SignalFriend
 
 > **Web3 Prediction Signals Marketplace** — Technical Specification  
-> Last Updated: December 2025
+> Last Updated: December 30, 2025  
+> Version: Frontend v0.32.0 | Backend v0.35.0 | Contracts v1.0.0
 
 ---
 
@@ -101,17 +102,16 @@ This model stores all necessary content, metadata, and security fields for a sig
 | Field                    | Purpose                                                             | Visibility                                | Example Content                                                               |
 | ------------------------ | ------------------------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------- |
 | `contentId`(Primary Key) | The non-unique ID linking all receipts to this content.             | **Internal** (Used by `Receipt` model)    | `661a5b...1f09`                                                               |
-| **`name`**               | **The Headline/Title.** Primary, concise identifier for the signal. | **High** (Listings/Cards)                 | "BTC: Short-Term Breakout to $68k"                                            |
-| `description`            | Teaser hook for the signal, visible before purchase.                | **Medium** (Signal Detail Page)           | "Anticipating a swift move past key resistance at $65k based on volume data." |
-| `category`               | Platform-defined category (e.g., Crypto - DeFi).                    | **High**(Filters/Browsing)                | `"Ethereum (ETH)"`                                                            |
-| `riskLevel`              | Predictor-defined risk level (Low, Medium, High).                   | **High**(Filters/Browsing)                | `"Medium"`                                                                    |
-| `potentialReward`        | Predictor-defined reward potential (Normal, Medium, High).          | **High**(Filters/Browsing)                | `"High"`                                                                      |
-| `expiryDateTime`         | Time-to-live index for signal removal.                              | **High** (Displaying countdown)           | `2025-12-10T15:00:00Z`                                                        |
+| **`title`**              | **The Headline/Title.** Primary, concise identifier for the signal. | **High** (Listings/Cards)                 | "Will BTC hit $100k by Q1 2026?"                                              |
+| `description`            | Teaser hook for the signal, visible before purchase.                | **Medium** (Signal Detail Page)           | "Analysis of Bitcoin's momentum heading into Q1 based on historical cycles."  |
+| `category`               | Platform-defined category (e.g., Crypto > Bitcoin).                 | **High**(Filters/Browsing)                | `"Bitcoin"`                                                                   |
+| `confidenceLevel`        | Predictor's confidence in the prediction (1-100%).                  | **High**(Signal Cards/Detail)             | `75`                                                                          |
+| `eventUrl`               | Optional link to prediction market event (Polymarket, etc.).        | **Medium** (Signal Detail Page)           | `"https://polymarket.com/event/btc-100k"`                                     |
+| `expiresAt`              | Expiration date for the signal (1-90 days from creation).           | **High** (Displaying countdown)           | `2025-12-10T15:00:00Z`                                                        |
 | `isActive`               | Predictor can deactivate signals manually.                          | **Internal** (Filtering)                  | `true` or `false`                                                             |
-| `reasoning`              | Predictor's detailed justification for the trade.                   | **Low (Hidden)**(Unlocked after purchase) | "The 4-hour RSI shows a bullish divergence from the daily chart..."           |
-| `fullContent`            | The *exact* trade parameters (entry, exit, stop-loss, duration).    | **Low (Hidden)**(Unlocked after purchase) | "Entry: $63,500. TP: $68,100. SL: $62,900."                                   |
+| `content`                | The full prediction analysis and reasoning (hidden until purchase). | **Low (Hidden)**(Unlocked after purchase) | "Based on the 4-hour RSI divergence and on-chain metrics..."                  |
 
-#### Signal Expiration Rules (Updated v0.32.0)
+#### Signal Expiration Rules (Updated v0.33.0)
 
 | Rule | Description |
 | ---- | ----------- |
@@ -299,13 +299,13 @@ This model holds the signal's public and private content, ready to be unlocked.
 | ----------------- | -------- | ------------------------ | ------------------------------------------------------------------ |
 | `contentId`       | `String` | **Unique** (PRIMARY KEY) | The non-unique ID passed to the NFT upon purchase (e.g., `SIG-A`). |
 | `predictorWallet` | `String` | Indexed                  | Reference to Predictor Model (seller address).                     |
-| **`name`**        | `String` |                          | **Signal title/headline (Public).**                                |
+| **`title`**       | `String` |                          | **Signal title/headline (Public).**                                |
 | **`description`** | `String` |                          | **Short summary, visible before purchase (Public).**               |
 | `priceUSDT`       | `Number` | Indexed                  | Price set by the Predictor.                                        |
 | `category`        | `String` | Indexed                  | Platform-defined category (e.g., Crypto - DeFi, Forex - Majors).   |
-| `riskLevel`       | `String` | Indexed                  | Predictor-defined risk level (`Low`, `Medium`, `High`).            |
-| `potentialReward` | `String` | Indexed                  | Predictor-defined reward potential (`Normal`, `Medium`, `High`).   |
-| `expiryDate`      | `Date`   | **TTL Index**            | Signal expires and is removed from active listings.                |
+| `confidenceLevel` | `Number` | Indexed                  | Predictor's confidence in the prediction (1-100%).                 |
+| `eventUrl`        | `String` |                          | Optional link to prediction market event (Polymarket, etc.).       |
+| `expiresAt`       | `Date`   | **TTL Index**            | Signal expires and is removed from active listings.                |
 | `fullContent`     | `String` |                          | The core signal data (entry/exit points) - **Private (Unlocked)**. |
 | `reasoning`       | `String` |                          | The Predictor's detailed justification - **Private (Unlocked)**.   |
 | `totalBuyers`     | `Number` | Indexed                  | Count of unique buyers (useful for popularity metrics).            |

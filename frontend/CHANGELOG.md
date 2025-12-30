@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.32.0] - 2025-12-30 📝 DOCUMENTATION SYNC
+
+### Changed
+
+**Documentation Updates**
+- Synchronized all documentation with backend v0.35.0 changes
+- Updated PROJECT_CONTEXT.md with current version and status
+- Updated README.md with correct version number
+- Updated CHANGELOG with recent changes
+
+### Technical
+- No code changes, documentation only
+
+---
+
 ## [0.31.0] - 2025-12-30 📝 DOCUMENTATION & UI POLISH
 
 ### Changed

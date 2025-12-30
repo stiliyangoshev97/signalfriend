@@ -386,7 +386,7 @@ Trader purchases $10 signal:
 
 2. **Signal Model**
    - Primary Key: `contentId` (non-unique, reusable)
-   - Fields: `predictorWallet`, `name`, `description`, `priceUSDT`, `category`, `riskLevel`, `potentialReward`, `expiryDate`, `fullContent`, `reasoning`
+   - Fields: `predictorWallet`, `title`, `description`, `priceUSDT`, `category`, `confidenceLevel`, `eventUrl`, `expiresAt`, `content`
 
 3. **Receipt Model** (Critical mapping)
    - Primary Key: `tokenId` (unique NFT receipt)
