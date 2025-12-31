@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.37.1] - 2025-12-31 🧪 EARNINGS CALCULATION TESTS
+
+### Added
+
+**Test Coverage for Earnings**
+- New test file: `tests/unit/features/receipts/receipt.earnings.test.ts`
+- 13 tests covering earnings calculation logic:
+  - Predictor earnings (95% of sale price)
+  - Platform commission (5% of sale price)
+  - Rounding to 2 decimal places
+  - Edge cases: $0, $1, $1000 prices
+  - Cumulative earnings across multiple sales
+
+**Updated Schema Tests**
+- Added `totalEarnings` to valid sortBy options in predictor schema tests
+
+### Technical
+- Tests use pure functions matching receipt.service.ts calculation logic
+- Covers floating-point precision edge cases
+
+---
+
 ## [0.37.0] - 2025-12-31 💰 PUBLIC PREDICTOR EARNINGS
 
 ### Added
