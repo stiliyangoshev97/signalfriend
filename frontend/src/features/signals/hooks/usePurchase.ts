@@ -29,6 +29,7 @@ import { getContractAddresses, SIGNAL_FRIEND_MARKET_ABI, ERC20_ABI, env } from '
 import { checkPurchase, fetchContentIdentifier, fetchMyReceipts, fetchSignalContent } from '../api';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { signalKeys } from './useSignals';
+import { publicPredictorKeys } from '@/features/predictors/hooks/usePredictorProfilePage';
 import type { CheckPurchaseResponse, Receipt, SignalContentResponse } from '../api/purchase.api';
 
 /** USDT has 18 decimals on BNB Chain */
@@ -446,6 +447,10 @@ export function usePurchaseFlow(params: {
         queryClient.invalidateQueries({ 
           queryKey: signalKeys.lists() 
         });
+        // Invalidate predictor profile to update totalSales and totalEarnings
+        queryClient.invalidateQueries({ 
+          queryKey: publicPredictorKeys.profile(predictorAddress) 
+        });
       };
       
       // Immediate invalidation
@@ -460,7 +465,7 @@ export function usePurchaseFlow(params: {
         }, delay);
       });
     }
-  }, [isPurchaseConfirmed, contentId, address, queryClient]);
+  }, [isPurchaseConfirmed, contentId, address, queryClient, predictorAddress]);
 
   // Reset invalidation flag when contentId changes (new purchase flow)
   useEffect(() => {

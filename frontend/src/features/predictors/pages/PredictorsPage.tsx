@@ -26,7 +26,7 @@ function parseFiltersFromParams(params: URLSearchParams): PredictorFilters {
   const page = params.get('page');
 
   if (search) filters.search = search;
-  if (sortBy && ['totalSales', 'averageRating', 'joinedAt', 'totalSignals'].includes(sortBy)) {
+  if (sortBy && ['totalSales', 'averageRating', 'joinedAt', 'totalSignals', 'totalEarnings'].includes(sortBy)) {
     filters.sortBy = sortBy as PredictorFilters['sortBy'];
   }
   if (order && ['asc', 'desc'].includes(order)) {

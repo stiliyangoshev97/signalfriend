@@ -31,9 +31,9 @@ export const listPredictorsSchema = z.object({
     .string()
     .optional()
     .transform((val) => (val === undefined ? undefined : val === "true")),
-  /** Sort field (totalSales, averageRating, joinedAt) */
+  /** Sort field (totalSales, averageRating, joinedAt, totalSignals, totalEarnings) */
   sortBy: z
-    .enum(["totalSales", "averageRating", "joinedAt", "totalSignals"])
+    .enum(["totalSales", "averageRating", "joinedAt", "totalSignals", "totalEarnings"])
     .optional()
     .default("totalSales"),
   /** Sort direction */

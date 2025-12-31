@@ -1,7 +1,7 @@
 # SignalFriend Backend
 
 > Express + MongoDB + Viem backend API for the SignalFriend **Web3 Prediction Signals Marketplace**.  
-> **Version:** 0.35.0 | **Last Updated:** December 2025
+> **Version:** 0.37.0 | **Last Updated:** December 2025
 
 ## 🌐 Production
 
@@ -108,6 +108,10 @@ npx tsx src/scripts/seedTestSignals.ts --count=500 --dry-run
 
 # Clear test signals before seeding
 npx tsx src/scripts/seedTestSignals.ts --clear --count=500
+
+# Backfill predictor earnings (from historical receipts)
+npm run backfill:earnings:preview  # Preview changes
+npm run backfill:earnings:run      # Apply changes
 ```
 
 ## Project Structure
@@ -135,6 +139,7 @@ src/
 │   ├── seedCategories.ts        # Seed 33 prediction market categories
 │   ├── seedTestSignal.ts        # Create single test prediction signal
 │   ├── seedTestSignals.ts       # Bulk seed 100/500 prediction signals
+│   ├── backfillPredictorEarnings.ts # Backfill totalEarnings from receipts
 │   ├── migrateConfidenceLevel.ts # Add confidenceLevel to old signals
 │   ├── migrateSignalExpiry.ts   # Migrate expiryDays to expiresAt
 │   └── generateEventSignatures.ts # Generate event topic hashes

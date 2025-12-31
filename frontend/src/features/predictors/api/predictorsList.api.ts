@@ -25,7 +25,7 @@ export interface PredictorFilters {
   /** Filter by verified status (true = only verified, false = only unverified, undefined = all) */
   verified?: boolean;
   /** Sort field */
-  sortBy?: 'totalSales' | 'averageRating' | 'joinedAt' | 'totalSignals';
+  sortBy?: 'totalSales' | 'averageRating' | 'joinedAt' | 'totalSignals' | 'totalEarnings';
   /** Sort direction */
   sortOrder?: 'asc' | 'desc';
   /** Search by display name */

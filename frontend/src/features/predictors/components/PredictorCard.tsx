@@ -41,7 +41,7 @@ function getRankStyle(rank: number): string {
  * @param rating - Average rating (0-5)
  */
 function formatRating(rating: number | undefined): string {
-  if (!rating || rating === 0) return 'No ratings';
+  if (!rating || rating === 0) return 'N/A';
   return `⭐ ${rating.toFixed(1)}`;
 }
 
@@ -70,6 +70,7 @@ export function PredictorCard({ predictor, rank }: PredictorCardProps): React.Re
   const displayName = predictor.displayName || formatAddress(predictor.walletAddress);
   const totalSignals = predictor.totalSignals ?? 0;
   const totalSales = predictor.totalSales ?? predictor.totalSalesCount ?? 0;
+  const totalEarnings = predictor.totalEarnings ?? 0;
 
   return (
     <Link
@@ -124,7 +125,7 @@ export function PredictorCard({ predictor, rank }: PredictorCardProps): React.Re
       )}
 
       {/* Stats Grid */}
-      <div className="mt-auto grid grid-cols-3 gap-2 pt-4 border-t border-dark-600">
+      <div className="mt-auto grid grid-cols-4 gap-2 pt-4 border-t border-dark-600">
         {/* Signals */}
         <div className="text-center">
           <div className="text-lg font-semibold text-fur-light">
@@ -141,13 +142,21 @@ export function PredictorCard({ predictor, rank }: PredictorCardProps): React.Re
           <div className="text-xs text-gray-main">Sales</div>
         </div>
 
+        {/* Earnings */}
+        <div className="text-center">
+          <div className="text-lg font-semibold text-fur-light">
+            ${totalEarnings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+          </div>
+          <div className="text-xs text-gray-main">Earnings</div>
+        </div>
+
         {/* Rating */}
         <div className="text-center">
           <div className="text-lg font-semibold text-fur-light">
             {formatRating(predictor.averageRating)}
           </div>
           <div className="text-xs text-gray-main">
-            {predictor.totalReviews > 0 ? `${predictor.totalReviews} votes` : 'Avg Rating'}
+            {predictor.totalReviews > 0 ? `${predictor.totalReviews} votes` : 'Rating'}
           </div>
         </div>
       </div>

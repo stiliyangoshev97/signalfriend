@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.35.0] - 2025-12-31 💰 PUBLIC PREDICTOR EARNINGS
+
+### Added
+
+**Predictor Earnings Display**
+- Added `totalEarnings` field to Predictor schema
+- PredictorCard now shows earnings as 4th stat (Signals | Sales | Earnings | Rating)
+- PredictorProfilePage now shows 5th stat card for "Total Earnings" with dollar icon
+- Earnings displayed in gold/yellow color (`text-fur-light`)
+
+**Sort by Earnings**
+- Added "💰 Most Earnings" option in sort dropdown
+- Added "💰 Most Earnings" quick filter button
+- Quick filters now stack vertically for better mobile UX
+
+**Auto-Refresh After Purchase**
+- Purchase flow now invalidates predictor profile cache
+- Predictor's earnings update immediately after purchase without page refresh
+
+### Changed
+
+**PredictorCard Stats Grid**
+- Changed from 3 columns to 4 columns to accommodate earnings
+- Rating shows "N/A" instead of "No ratings" for compact display
+
+**PredictorProfilePage Stats Grid**
+- Changed from 4 columns to 5 columns for earnings card
+- Responsive: 2 cols on mobile, 3 on md, 5 on lg
+
+**PredictorFilterPanel**
+- Quick filters now use `flex-col` for vertical stacking
+- Fixed default filter to point to "New Predictors" (joinedAt desc)
+- Fixed `resetFilters()` to use correct default (was: totalSales, now: joinedAt)
+- Fixed `hasActiveFilters` check to use correct default
+
+**PredictorsPage**
+- Added `totalEarnings` to valid sortBy URL params
+
+### Technical
+- Updated `predictor.schemas.ts` (Zod): Added `totalEarnings` to Predictor schema
+- Updated `predictorsList.api.ts`: Added `totalEarnings` to PredictorFilters sortBy
+- Updated `admin.types.ts`: Added `totalEarnings` to AdminPredictorProfile
+- Updated `usePurchase.ts`: Added predictor profile invalidation after purchase
+
+---
+
 ## [0.34.0] - 2025-12-30 ✨ PREMIUM SIGNALS BRANDING
 
 ### Changed
@@ -1204,7 +1250,7 @@ src/features/
 **Required Profile Fields**
 - Red asterisks (*) on Display Name, Telegram, and Discord fields
 - Notice banner explaining required fields
-- Form validation prevents saving without required fields
+  - Form validation prevents saving without required fields
 
 **Report URL Validation**
 - Real-time URL detection in report descriptions
