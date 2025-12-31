@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.37.0] - 2025-12-31 💰 PUBLIC PREDICTOR EARNINGS
+
+### Added
+
+**Predictor Earnings Display**
+- Added `totalEarnings` field to Predictor model (stored field for public display)
+- Shows earnings from signal sales only (95% of revenue), NOT referral earnings
+- Added index on `totalEarnings` for efficient sorting
+
+**New Sort Option**
+- Added `totalEarnings` to sortBy options in `listPredictorsSchema`
+- Predictors can now be sorted by most/least earnings
+- Added tiebreaker logic: earnings sort uses joinedAt as secondary sort
+
+**Earnings Auto-Update**
+- `receipt.service.ts` now increments `totalEarnings` when a new sale occurs
+- Uses atomic `$inc` operation for consistency
+
+**Backfill Script**
+- New script: `src/scripts/backfillPredictorEarnings.ts`
+- Calculates historical earnings from all receipts
+- Two modes:
+  - `npm run backfill:earnings:preview` - Preview changes (dry run)
+  - `npm run backfill:earnings:run` - Apply changes to database
+
+### Changed
+
+**Predictor Schema**
+- Added `totalEarnings: number` with default 0 and index
+
+**Receipt Service**
+- Updated `createReceipt()` to increment predictor's `totalEarnings`
+
+### Technical
+- Earnings calculation: `priceUsdt * 0.95` (95% to predictor, 5% platform commission)
+- Uses aggregation pipeline to sum all historical sales per predictor
+- Backfill script has safety checks (requires explicit --preview or --run flag)
+
+---
+
 ## [0.36.0] - 2025-12-30 📊 ACCURATE PLATFORM EARNINGS CALCULATION
 
 ### Fixed
@@ -1011,7 +1051,7 @@ npx tsx src/scripts/migrateCategories.ts
   - Aggregates Receipt collection by contentId and predictorAddress
   - Updates Signal.totalSales and Predictor.totalSales based on actual receipt count
   - Also resets signals/predictors with no sales to 0
-  - Supports `--dry-run` flag to preview changes without applying them
+  - Supports `--dry-run` flag to preview changes without applying database
 
 ### Usage
 ```bash

@@ -30,6 +30,8 @@ export const predictorSchema = z.object({
   categoryIds: z.array(z.string()).optional(),
   totalSignals: z.number().optional(),
   totalSales: z.number().optional(),
+  /** Total earnings from signal sales (95% of revenue) - for public display */
+  totalEarnings: z.number().optional(),
   averageRating: z.number(),
   totalReviews: z.number(),
   isBlacklisted: z.boolean(),

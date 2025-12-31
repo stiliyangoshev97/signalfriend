@@ -99,7 +99,7 @@ export function PredictorFilterPanel({
   // Reset all filters
   const resetFilters = () => {
     const defaultFilters: PredictorFilters = {
-      sortBy: 'totalSales',
+      sortBy: 'joinedAt',
       sortOrder: 'desc',
     };
     isUserEditingRef.current = true;
@@ -117,7 +117,7 @@ export function PredictorFilterPanel({
   const hasActiveFilters =
     localFilters.search ||
     localFilters.verified !== undefined ||
-    (localFilters.sortBy !== 'totalSales' && localFilters.sortBy !== undefined) ||
+    (localFilters.sortBy !== 'joinedAt' && localFilters.sortBy !== undefined) ||
     (localFilters.sortOrder !== 'desc' && localFilters.sortOrder !== undefined);
 
   // Mobile: return null if not open
@@ -183,7 +183,7 @@ export function PredictorFilterPanel({
         <label className="block text-sm font-medium text-fur-cream/80 mb-2">
           Quick Filters
         </label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2">
           <button
             onClick={() => {
               isUserEditingRef.current = true;
@@ -198,7 +198,7 @@ export function PredictorFilterPanel({
               setTimeout(() => { isUserEditingRef.current = false; }, 300);
             }}
             className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
-              (localFilters.sortBy === 'totalSales' || !localFilters.sortBy) && localFilters.sortOrder === 'desc'
+              localFilters.sortBy === 'totalSales' && localFilters.sortOrder === 'desc'
                 ? 'bg-fur-light/20 border-fur-light text-fur-light'
                 : 'bg-dark-900 border-dark-600 text-fur-cream/70 hover:border-dark-500 hover:text-fur-cream'
             }`}
@@ -225,6 +225,27 @@ export function PredictorFilterPanel({
             }`}
           >
             ⭐ Best Rated
+          </button>
+          <button
+            onClick={() => {
+              isUserEditingRef.current = true;
+              const newFilters: PredictorFilters = {
+                ...localFilters,
+                sortBy: 'totalEarnings',
+                sortOrder: 'desc',
+                page: 1,
+              };
+              setLocalFilters(newFilters);
+              onFiltersChange(newFilters);
+              setTimeout(() => { isUserEditingRef.current = false; }, 300);
+            }}
+            className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
+              localFilters.sortBy === 'totalEarnings' && localFilters.sortOrder === 'desc'
+                ? 'bg-fur-light/20 border-fur-light text-fur-light'
+                : 'bg-dark-900 border-dark-600 text-fur-cream/70 hover:border-dark-500 hover:text-fur-cream'
+            }`}
+          >
+            💰 Most Earnings
           </button>
           <button
             onClick={() => {
@@ -276,7 +297,7 @@ export function PredictorFilterPanel({
           Sort By
         </label>
         <select
-          value={`${localFilters.sortBy || 'totalSales'}-${localFilters.sortOrder || 'desc'}`}
+          value={`${localFilters.sortBy || 'joinedAt'}-${localFilters.sortOrder || 'desc'}`}
           onChange={(e) => {
             const [sortBy, sortOrder] = e.target.value.split('-') as [
               PredictorFilters['sortBy'],
@@ -291,6 +312,8 @@ export function PredictorFilterPanel({
         >
           <option value="totalSales-desc">🏆 Most Sales</option>
           <option value="totalSales-asc">📉 Least Sales</option>
+          <option value="totalEarnings-desc">💰 Most Earnings</option>
+          <option value="totalEarnings-asc">💸 Least Earnings</option>
           <option value="averageRating-desc">⭐ Highest Rated</option>
           <option value="averageRating-asc">⭐ Lowest Rated</option>
           <option value="totalSignals-desc">📊 Most Signals</option>

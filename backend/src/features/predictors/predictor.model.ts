@@ -21,6 +21,8 @@ export interface IPredictor extends Document {
   categoryIds: mongoose.Types.ObjectId[];
   totalSignals: number;
   totalSales: number;
+  /** Total earnings from signal sales (95% of revenue, excluding referral earnings) */
+  totalEarnings: number;
   averageRating: number;
   totalReviews: number;
   isBlacklisted: boolean;
@@ -98,6 +100,11 @@ const predictorSchema = new Schema<IPredictor>(
     totalSales: {
       type: Number,
       default: 0,
+    },
+    totalEarnings: {
+      type: Number,
+      default: 0,
+      index: true, // Index for sorting by earnings
     },
     averageRating: {
       type: Number,

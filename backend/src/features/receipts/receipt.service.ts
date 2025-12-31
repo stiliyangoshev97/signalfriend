@@ -294,10 +294,18 @@ export class ReceiptService {
       { $inc: { totalSales: 1 } }
     );
 
-    // Update predictor sales count
+    // Calculate predictor earnings (95% of sale price, 5% platform commission)
+    const predictorEarningsFromSale = data.priceUsdt * 0.95;
+
+    // Update predictor sales count and earnings
     await Predictor.updateOne(
       { walletAddress: normalizedPredictor },
-      { $inc: { totalSales: 1 } }
+      { 
+        $inc: { 
+          totalSales: 1,
+          totalEarnings: Math.round(predictorEarningsFromSale * 100) / 100, // Round to 2 decimals
+        } 
+      }
     );
 
     return receipt;

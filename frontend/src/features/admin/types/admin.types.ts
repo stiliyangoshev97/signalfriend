@@ -207,6 +207,8 @@ export interface AdminPredictorProfile {
   categoryIds: Array<{ _id: string; name: string; slug: string; icon: string }>;
   totalSignals: number;
   totalSales: number;
+  /** Total earnings from signal sales (95% of revenue) - stored field for public display */
+  totalEarnings?: number;
   averageRating: number;
   totalReviews: number;
   isBlacklisted: boolean;
@@ -215,7 +217,7 @@ export interface AdminPredictorProfile {
   joinedAt: string;
   createdAt: string;
   updatedAt: string;
-  /** Earnings data (admin only) */
+  /** Earnings data (admin only - detailed breakdown) */
   earnings?: {
     totalSalesRevenue: number;
     predictorEarnings: number;

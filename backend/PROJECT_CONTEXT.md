@@ -1,8 +1,8 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** December 30, 2025  
+> **Last Updated:** December 31, 2025  
 > **Current Phase:** Production - BSC Mainnet Live  
-> **Project Status:** 🟢 **Backend v0.35.0** - Prediction Marketplace Complete  
+> **Project Status:** 🟢 **Backend v0.37.0** - Public Predictor Earnings  
 > **Branch:** `main`
 
 ---
@@ -62,6 +62,7 @@ backend/
 │   │   ├── seedCategories.ts        # Database category seeding
 │   │   ├── seedTestSignal.ts        # Single test prediction signal
 │   │   ├── seedTestSignals.ts       # Bulk test signals (100/500) - Prediction marketplace style
+│   │   ├── backfillPredictorEarnings.ts # Backfill totalEarnings from receipts
 │   │   ├── migrateConfidenceLevel.ts # Add confidenceLevel to old signals
 │   │   ├── migrateSignalExpiry.ts   # Migrate expiryDays to expiresAt
 │   │   ├── modifyPredictorStats.ts  # Test verification flow

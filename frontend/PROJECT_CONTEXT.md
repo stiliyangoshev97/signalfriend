@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 30 December 2025 (v0.32.0 - Prediction Marketplace Complete)
+> Last Updated: 31 December 2025 (v0.35.0 - Public Predictor Earnings)
 
 ---
 

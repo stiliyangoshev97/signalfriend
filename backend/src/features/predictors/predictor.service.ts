@@ -164,6 +164,12 @@ export class PredictorService {
         sort.averageRating = -1;
         sort.joinedAt = 1;
         break;
+      case "totalEarnings":
+        // Same earnings? More sales = more active
+        sort.totalSales = -1;
+        sort.averageRating = -1;
+        sort.joinedAt = 1;
+        break;
       case "joinedAt":
         // Same join date? More sales = more active
         sort.totalSales = -1;

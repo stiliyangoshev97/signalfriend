@@ -19,7 +19,9 @@
     "seed:signals:500": "tsx src/scripts/seedTestSignals.ts --count=500",
     "predictor:stats": "tsx src/scripts/modifyPredictorStats.ts",
     "predictor:stats:list": "tsx src/scripts/modifyPredictorStats.ts --list",
-    "predictor:verify-ready": "tsx src/scripts/modifyPredictorStats.ts --sales=100 --revenue=1000"
+    "predictor:verify-ready": "tsx src/scripts/modifyPredictorStats.ts --sales=100 --revenue=1000",
+    "backfill:earnings:preview": "tsx src/scripts/backfillPredictorEarnings.ts --preview",
+    "backfill:earnings:run": "tsx src/scripts/backfillPredictorEarnings.ts --run"
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.7",
