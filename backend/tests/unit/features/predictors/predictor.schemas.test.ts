@@ -121,10 +121,22 @@ describe("Predictor Schemas", () => {
     });
 
     it("should accept all valid sortBy options", () => {
-      const validSorts = ["totalSales", "averageRating", "joinedAt", "totalSignals"];
+      const validSorts = ["totalSales", "averageRating", "joinedAt", "totalSignals", "totalEarnings"];
       for (const sortBy of validSorts) {
         const result = listPredictorsSchema.safeParse({ sortBy });
         expect(result.success).toBe(true);
+      }
+    });
+
+    it("should accept totalEarnings as sortBy option", () => {
+      const result = listPredictorsSchema.safeParse({
+        sortBy: "totalEarnings",
+        sortOrder: "desc",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.sortBy).toBe("totalEarnings");
+        expect(result.data.sortOrder).toBe("desc");
       }
     });
 
