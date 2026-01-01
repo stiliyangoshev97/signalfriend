@@ -3,6 +3,7 @@
  *
  * Provides controllers for:
  * - GET /api/signals - List signals with filtering/pagination
+ * - GET /api/signals/my - Get authenticated predictor's signals (paginated)
  * - GET /api/signals/:contentId - Get signal public metadata
  * - GET /api/signals/:contentId/content - Get protected content (auth required)
  * - POST /api/signals - Create signal (predictor only)
@@ -122,6 +123,46 @@ export const getSignalContent = asyncHandler(
     res.json({
       success: true,
       data: result,
+    });
+  }
+);
+
+/**
+ * GET /api/signals/my
+ * Retrieves the authenticated predictor's signals with pagination.
+ * Used by predictor dashboard for efficient signal management.
+ * Requires authentication.
+ *
+ * @query {string} [status=all] - Filter by status (active, expired, deactivated, all)
+ * @query {string} [sortBy=createdAt] - Sort field
+ * @query {string} [sortOrder=desc] - Sort direction
+ * @query {number} [page=1] - Page number
+ * @query {number} [limit=12] - Items per page
+ * @returns {Object} JSON response with paginated signals
+ */
+export const getMySignals = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const predictorAddress = req.user!.address;
+    const { status, sortBy, sortOrder, page, limit } = req.query as {
+      status?: "active" | "expired" | "deactivated" | "all";
+      sortBy?: string;
+      sortOrder?: "asc" | "desc";
+      page?: number;
+      limit?: number;
+    };
+
+    const result = await SignalService.getByPredictorPaginated(predictorAddress, {
+      status,
+      sortBy,
+      sortOrder,
+      page,
+      limit,
+    });
+
+    res.json({
+      success: true,
+      data: result.signals,
+      pagination: result.pagination,
     });
   }
 );

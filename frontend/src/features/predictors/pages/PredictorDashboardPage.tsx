@@ -19,7 +19,7 @@ import { useAuthStore } from '@/features/auth/store';
 import { useIsVerifiedPredictor } from '@/shared/hooks';
 import { useSEO, getSEOUrl } from '@/shared/hooks';
 import { 
-  useMySignals, 
+  useMySignalsPaginated, 
   useMyEarnings,
   useDeactivateSignal,
   useReactivateSignal,
@@ -27,6 +27,7 @@ import {
 } from '../hooks';
 import { fetchPredictorByAddress } from '../api';
 import { DashboardStats, MySignalCard, CreateSignalModal, EditProfileModal, BlacklistBanner } from '../components';
+import { Pagination } from '@/features/signals/components/Pagination';
 
 /**
  * Empty state component for no signals
@@ -129,20 +130,30 @@ export function PredictorDashboardPage(): React.ReactElement {
   // State
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
-  const [signalFilter, setSignalFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [signalFilter, setSignalFilter] = useState<'active' | 'expired' | 'deactivated'>('active');
+  const [currentPage, setCurrentPage] = useState(1);
   const [deactivateModalOpen, setDeactivateModalOpen] = useState(false);
   const [signalToDeactivate, setSignalToDeactivate] = useState<{ contentId: string; title: string } | null>(null);
   
-  // Data fetching
+  const SIGNALS_PER_PAGE = 12;
+  
+  // Data fetching - use paginated API for current tab
   const { 
     data: signalsResponse, 
     isLoading: signalsLoading,
     refetch: refetchSignals,
-  } = useMySignals({ 
-    includeInactive: true,
+  } = useMySignalsPaginated({ 
+    status: signalFilter,
     sortBy: 'createdAt',
     sortOrder: 'desc',
+    page: currentPage,
+    limit: SIGNALS_PER_PAGE,
   });
+  
+  // Fetch counts for all tabs (lightweight queries just for counts)
+  const { data: activeCountData } = useMySignalsPaginated({ status: 'active', page: 1, limit: 1 });
+  const { data: expiredCountData } = useMySignalsPaginated({ status: 'expired', page: 1, limit: 1 });
+  const { data: deactivatedCountData } = useMySignalsPaginated({ status: 'deactivated', page: 1, limit: 1 });
   
   const { 
     data: earnings, 
@@ -156,37 +167,33 @@ export function PredictorDashboardPage(): React.ReactElement {
   
   const isActionPending = isDeactivating || isReactivating;
   
-  // Process signals data - signalsResponse is now directly an array
-  const signals = signalsResponse || [];
-  const activeSignals = signals.filter(s => s.isActive && new Date(s.expiresAt) > new Date());
-  const inactiveSignals = signals.filter(s => !s.isActive || new Date(s.expiresAt) <= new Date());
+  // Process signals data - signalsResponse is now paginated
+  const signals = signalsResponse?.data || [];
+  const pagination = signalsResponse?.pagination;
   
-  // Filter signals based on selection
-  const filteredSignals = signalFilter === 'all' 
-    ? signals 
-    : signalFilter === 'active' 
-      ? activeSignals 
-      : inactiveSignals;
+  // Get counts from tab queries
+  const activeCount = activeCountData?.pagination?.total ?? 0;
+  const expiredCount = expiredCountData?.pagination?.total ?? 0;
+  const deactivatedCount = deactivatedCountData?.pagination?.total ?? 0;
   
   // Calculate stats
-  const totalSignals = signals.length;
+  const totalSignals = activeCount + expiredCount + deactivatedCount;
   
   // Use earnings API as primary source (fetched fresh on this page)
   // Fall back to predictor.totalSales (from auth store, may be stale)
-  // Then calculate from signals as last resort
   const totalSales = earnings?.totalSalesCount 
     ?? predictor?.totalSales 
-    ?? signals.reduce((sum, s) => sum + s.totalSales, 0);
+    ?? 0;
   
   // Use earnings API for total earnings (most accurate, fetched fresh)
   // Only fall back to calculation if earnings hasn't loaded yet
   // Using explicit undefined check to allow 0 as a valid value
   const totalEarnings = earnings?.totalEarnings !== undefined 
     ? earnings.totalEarnings 
-    : signals.reduce((sum, s) => sum + (s.priceUsdt * 0.95 * s.totalSales), 0);
+    : 0;
   
   const averageRating = predictor?.averageRating || 0;
-  const totalReviews = predictor?.totalReviews || signals.reduce((sum, s) => sum + s.totalReviews, 0);
+  const totalReviews = predictor?.totalReviews || 0;
   
   // Referral earnings
   const referralEarnings = earnings?.referralEarnings || 0;
@@ -394,7 +401,7 @@ export function PredictorDashboardPage(): React.ReactElement {
       <div className="mb-8">
         <DashboardStats
           totalSignals={totalSignals}
-          activeSignals={activeSignals.length}
+          activeSignals={activeCount}
           totalSales={totalSales}
           totalEarnings={totalEarnings}
           averageRating={averageRating}
@@ -633,37 +640,37 @@ export function PredictorDashboardPage(): React.ReactElement {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-xl font-semibold text-fur-cream">Published Signals</h2>
           
-          {/* Filter Tabs */}
+          {/* Filter Tabs - Active/Expired/Deactivated */}
           <div className="flex gap-2">
             <button
-              onClick={() => setSignalFilter('all')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                signalFilter === 'all'
-                  ? 'bg-fur-light text-dark-900'
-                  : 'bg-dark-700 text-fur-cream/60 hover:text-fur-cream'
-              }`}
-            >
-              All ({signals.length})
-            </button>
-            <button
-              onClick={() => setSignalFilter('active')}
+              onClick={() => { setSignalFilter('active'); setCurrentPage(1); }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 signalFilter === 'active'
                   ? 'bg-success-500 text-white'
                   : 'bg-dark-700 text-fur-cream/60 hover:text-fur-cream'
               }`}
             >
-              Active ({activeSignals.length})
+              Active ({activeCount})
             </button>
             <button
-              onClick={() => setSignalFilter('inactive')}
+              onClick={() => { setSignalFilter('expired'); setCurrentPage(1); }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                signalFilter === 'inactive'
+                signalFilter === 'expired'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-dark-700 text-fur-cream/60 hover:text-fur-cream'
+              }`}
+            >
+              Expired ({expiredCount})
+            </button>
+            <button
+              onClick={() => { setSignalFilter('deactivated'); setCurrentPage(1); }}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                signalFilter === 'deactivated'
                   ? 'bg-gray-500 text-white'
                   : 'bg-dark-700 text-fur-cream/60 hover:text-fur-cream'
               }`}
             >
-              Inactive ({inactiveSignals.length})
+              Deactivated ({deactivatedCount})
             </button>
           </div>
         </div>
@@ -671,26 +678,39 @@ export function PredictorDashboardPage(): React.ReactElement {
         {/* Signals Content */}
         {signalsLoading ? (
           <SignalsLoadingSkeleton />
-        ) : signals.length === 0 ? (
+        ) : totalSignals === 0 ? (
           <EmptyState onCreateClick={() => setShowCreateModal(true)} />
-        ) : filteredSignals.length === 0 ? (
+        ) : signals.length === 0 ? (
           <Card padding="lg" className="text-center">
             <p className="text-fur-cream/60">
               No {signalFilter} signals found.
             </p>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredSignals.map((signal) => (
-              <MySignalCard
-                key={signal.contentId}
-                signal={signal}
-                onDeactivate={handleDeactivate}
-                onReactivate={handleReactivate}
-                isActionPending={isActionPending}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {signals.map((signal) => (
+                <MySignalCard
+                  key={signal.contentId}
+                  signal={signal}
+                  onDeactivate={handleDeactivate}
+                  onReactivate={handleReactivate}
+                  isActionPending={isActionPending}
+                />
+              ))}
+            </div>
+            
+            {/* Pagination */}
+            {pagination && pagination.totalPages > 1 && (
+              <div className="mt-8">
+                <Pagination
+                  pagination={pagination}
+                  onPageChange={setCurrentPage}
+                  itemLabel="signals"
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
 

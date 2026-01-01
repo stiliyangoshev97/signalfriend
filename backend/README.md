@@ -1,7 +1,7 @@
 # SignalFriend Backend
 
 > Express + MongoDB + Viem backend API for the SignalFriend **Web3 Prediction Signals Marketplace**.  
-> **Version:** 0.37.1 | **Last Updated:** December 2025
+> **Version:** 0.37.4 | **Last Updated:** January 2026
 
 ## 🌐 Production
 
@@ -189,13 +189,22 @@ src/
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/api/signals` | No | List signals (filter, paginate) |
+| GET | `/api/signals/my` | Yes | Get predictor's own signals (paginated, dashboard) |
 | GET | `/api/signals/predictor/:address` | No | Get predictor's signals |
 | GET | `/api/signals/:contentId` | No | Get signal metadata |
-| GET | `/api/signals/:contentId/content` | Yes | Get protected content (purchaser only) |
+| GET | `/api/signals/:contentId/content` | Optional | Get protected content (expired: public, active: auth) |
 | GET | `/api/signals/:contentId/content-identifier` | Yes | Get bytes32 for on-chain purchase |
 | POST | `/api/signals` | Yes | Create signal (predictor only) |
 | PUT | `/api/signals/:contentId` | Yes | Update own signal |
 | DELETE | `/api/signals/:contentId` | Yes | Deactivate own signal |
+| POST | `/api/signals/:contentId/reactivate` | Yes | Reactivate own signal |
+
+**Status Filter** (`status` query param):
+- `active` (default): purchasable signals
+- `expired`: naturally expired signals  
+- `deactivated`: manually deactivated
+- `inactive`: legacy (expired + deactivated)
+- `all`: all signals
 
 ### Receipts
 

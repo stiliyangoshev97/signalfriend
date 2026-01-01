@@ -67,6 +67,23 @@ export const listSignalsSchema = z.object({
 });
 
 /**
+ * Schema for GET /api/signals/my query parameters.
+ * Used by predictor dashboard for paginated signal management.
+ */
+export const mySignalsSchema = z.object({
+  /** Signal status filter: 'active', 'expired', 'deactivated', or 'all' (default) */
+  status: z.enum(["active", "expired", "deactivated", "all"]).optional().default("all"),
+  /** Sort field */
+  sortBy: z.enum(["createdAt", "priceUsdt", "totalSales", "averageRating"]).optional().default("createdAt"),
+  /** Sort direction */
+  sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
+  /** Page number (1-based) */
+  page: z.coerce.number().int().min(1).optional().default(1),
+  /** Items per page (max 50) */
+  limit: z.coerce.number().int().min(1).max(50).optional().default(12),
+});
+
+/**
  * Schema for signal contentId path parameter.
  * Validates UUID v4 format.
  */

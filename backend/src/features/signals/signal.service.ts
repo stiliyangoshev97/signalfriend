@@ -714,6 +714,91 @@ export class SignalService {
   }
 
   /**
+   * Gets signals created by a specific predictor with pagination.
+   * Used by predictor dashboard for efficient signal management.
+   *
+   * @param predictorAddress - The predictor's wallet address
+   * @param options - Query options for filtering, pagination, sorting
+   * @returns Promise resolving to paginated signals response
+   */
+  static async getByPredictorPaginated(
+    predictorAddress: string,
+    options: {
+      status?: "active" | "expired" | "deactivated" | "all";
+      sortBy?: string;
+      sortOrder?: "asc" | "desc";
+      page?: number;
+      limit?: number;
+    } = {}
+  ): Promise<SignalListResponse> {
+    const {
+      status = "all",
+      sortBy = "createdAt",
+      sortOrder = "desc",
+      page = 1,
+      limit = 12,
+    } = options;
+
+    const normalizedAddress = predictorAddress.toLowerCase();
+    const filter: Record<string, unknown> = {
+      predictorAddress: normalizedAddress,
+    };
+
+    // Apply status filter
+    const now = new Date();
+    if (status === "active") {
+      filter.isActive = true;
+      filter.expiresAt = { $gt: now };
+    } else if (status === "expired") {
+      filter.isActive = true;
+      filter.expiresAt = { $lte: now };
+    } else if (status === "deactivated") {
+      filter.isActive = false;
+    }
+    // status === "all" means no filter
+
+    // Build sort object
+    const allowedSortFields = ["createdAt", "priceUsdt", "totalSales", "averageRating"];
+    const sortField = allowedSortFields.includes(sortBy) ? sortBy : "createdAt";
+    const sortDirection = sortOrder === "asc" ? 1 : -1;
+
+    // Get total count
+    const total = await Signal.countDocuments(filter);
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
+    // Fetch paginated signals
+    const rawSignals = await Signal.find(filter)
+      .select(SignalService.PUBLIC_FIELDS)
+      .sort({ [sortField]: sortDirection })
+      .skip(skip)
+      .limit(limit)
+      .populate("categoryId", "name slug icon mainGroup")
+      .populate("predictorId", "displayName avatarUrl averageRating isVerified")
+      .lean();
+
+    // Transform field names for frontend compatibility
+    const signals = rawSignals.map((signal) => {
+      const { categoryId, predictorId, ...rest } = signal as Record<string, unknown>;
+      return {
+        ...rest,
+        category: categoryId || null,
+        predictor: predictorId || null,
+      } as TransformedSignal;
+    });
+
+    return {
+      signals,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
+  }
+
+  /**
    * Checks if a signal exists by contentId.
    *
    * @param contentId - The signal's unique content ID

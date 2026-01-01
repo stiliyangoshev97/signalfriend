@@ -3,6 +3,7 @@
  *
  * Route definitions:
  * - GET /api/signals - Public, list signals with filters
+ * - GET /api/signals/my - Auth required, predictor's own signals (paginated)
  * - GET /api/signals/predictor/:address - Public, get predictor's signals
  * - GET /api/signals/:contentId - Public, get signal metadata
  * - GET /api/signals/:contentId/content - Public for expired, Auth for active signals
@@ -22,6 +23,7 @@ import {
   updateSignal,
   deactivateSignal,
   getSignalsByPredictor,
+  getMySignals,
 } from "./signal.controller.js";
 import { validate } from "../../shared/middleware/validation.js";
 import { authenticate, optionalAuth } from "../../shared/middleware/auth.js";
@@ -31,6 +33,7 @@ import {
   getSignalByContentIdSchema,
   createSignalSchema,
   updateSignalSchema,
+  mySignalsSchema,
 } from "./signal.schemas.js";
 
 /** Express router instance for signal routes */
@@ -47,6 +50,14 @@ const router = Router();
  *               page, limit, search, minPrice, maxPrice
  */
 router.get("/", validate(listSignalsSchema, "query"), listSignals);
+
+/**
+ * GET /api/signals/my
+ * Get authenticated predictor's signals with pagination.
+ * Query params: status, sortBy, sortOrder, page, limit
+ * Auth required.
+ */
+router.get("/my", authenticate, validate(mySignalsSchema, "query"), getMySignals);
 
 /**
  * GET /api/signals/predictor/:address

@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.37.4] - 2026-01-02 📄 PREDICTOR DASHBOARD PAGINATION API
+
+### Added
+
+**New Paginated Endpoint for Predictor's Own Signals**
+- `GET /api/signals/my` - Fetch authenticated predictor's signals with pagination
+- Query params: `status`, `sortBy`, `sortOrder`, `page`, `limit`
+- Status filter supports: `active`, `expired`, `deactivated`, `all`
+- Requires authentication
+
+**Signal Service**
+- Added `getByPredictorPaginated()` method for efficient paginated queries
+- Returns signals with pagination metadata (total, page, limit, totalPages)
+- Supports status filtering: `active`, `expired`, `deactivated`, `all`
+
+**Schema Validation**
+- Added `mySignalsSchema` for `/api/signals/my` endpoint validation
+
+**Controller**
+- Added `getMySignals` controller function
+
+### Technical
+- All 338 tests passing
+- No breaking changes to existing endpoints
+
+---
+
 ## [0.37.3] - 2025-12-31 📋 SEPARATE EXPIRED & DEACTIVATED TABS
 
 ### Added
