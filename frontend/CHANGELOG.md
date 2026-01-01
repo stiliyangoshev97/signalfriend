@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.35.4] - 2026-01-02 📖 FAQ EXPIRED SIGNALS DOCUMENTATION
+
+### Changed
+
+**FAQ Page**
+- Updated "What happens when a signal expires?" FAQ entry
+- Added section explaining that expired signal content becomes public for trust/transparency
+- Corrected signal behavior: expired signals move to "Expired" tab (not hidden)
+- Added distinction between naturally expired vs manually deactivated signals
+- Explains benefits: track record verification, quality evaluation, informed decisions
+
+---
+
 ## [0.35.3] - 2026-01-02 📄 PREDICTOR DASHBOARD PAGINATION
 
 ### Added
