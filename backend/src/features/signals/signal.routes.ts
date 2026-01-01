@@ -5,7 +5,7 @@
  * - GET /api/signals - Public, list signals with filters
  * - GET /api/signals/predictor/:address - Public, get predictor's signals
  * - GET /api/signals/:contentId - Public, get signal metadata
- * - GET /api/signals/:contentId/content - Auth required, get protected content
+ * - GET /api/signals/:contentId/content - Public for expired, Auth for active signals
  * - POST /api/signals - Auth required, create signal (predictor only)
  * - PUT /api/signals/:contentId - Auth required, update own signal
  * - DELETE /api/signals/:contentId - Auth required, deactivate own signal
@@ -24,7 +24,7 @@ import {
   getSignalsByPredictor,
 } from "./signal.controller.js";
 import { validate } from "../../shared/middleware/validation.js";
-import { authenticate } from "../../shared/middleware/auth.js";
+import { authenticate, optionalAuth } from "../../shared/middleware/auth.js";
 import { writeRateLimiter } from "../../shared/middleware/rateLimiter.js";
 import {
   listSignalsSchema,
@@ -77,21 +77,22 @@ router.get(
   getContentIdentifier
 );
 
-// ============================================================================
-// Protected Routes (Authentication Required)
-// ============================================================================
-
 /**
  * GET /api/signals/:contentId/content
- * Get the protected content of a purchased signal.
- * Only accessible to users who own a receipt for this signal.
+ * Get the protected content of a signal.
+ * - Expired signals: Public access (content unlocks for transparency)
+ * - Active signals: Auth required (owner, predictor, or admin only)
  */
 router.get(
   "/:contentId/content",
-  authenticate,
+  optionalAuth,
   validate(getSignalByContentIdSchema, "params"),
   getSignalContent
 );
+
+// ============================================================================
+// Protected Routes (Authentication Required)
+// ============================================================================
 
 /**
  * POST /api/signals

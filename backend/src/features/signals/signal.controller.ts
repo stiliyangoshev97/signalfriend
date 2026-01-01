@@ -103,18 +103,19 @@ export const getSignalByContentId = asyncHandler(
 /**
  * GET /api/signals/:contentId/content
  * Retrieves the protected content of a signal.
- * Only accessible to users who have purchased the signal.
- * Requires authentication.
+ * - Expired signals: Public access (no auth required)
+ * - Active signals: Auth required (owner, predictor, or admin only)
  *
  * @param {string} contentId - Signal content ID (UUID v4)
  * @returns {Object} JSON response with protected content
  * @throws {404} If signal not found
- * @throws {403} If user has not purchased the signal
+ * @throws {403} If user has not purchased the signal (for non-expired signals)
  */
 export const getSignalContent = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const { contentId } = req.params as GetSignalByContentIdParams;
-    const buyerAddress = req.user!.address;
+    // buyerAddress may be undefined for unauthenticated users accessing expired signals
+    const buyerAddress = req.user?.address;
 
     const result = await SignalService.getProtectedContent(contentId, buyerAddress);
 

@@ -158,9 +158,13 @@ export function SignalDetailPage(): React.ReactElement {
     address.toLowerCase() === signal.predictorAddress.toLowerCase()
   );
   
-  // Fetch protected content if user owns the signal, is the predictor, OR is admin (multisig wallet)
-  const canAccessContent = isOwned || isOwnSignal || isAdmin;
-  const { data: contentData } = useSignalContent(contentId || '', canAccessContent);
+  // Check if signal has expired (content becomes public)
+  const expiresAtForAccess = signal?.expiresAt ? parseDate(signal.expiresAt) : null;
+  const isExpiredForAccess = expiresAtForAccess ? expiresAtForAccess < new Date() : false;
+  
+  // Fetch protected content if user owns the signal, is the predictor, is admin, OR signal has expired
+  const canAccessContent = isOwned || isOwnSignal || isAdmin || isExpiredForAccess;
+  const { data: contentData } = useSignalContent(contentId || '', canAccessContent, isExpiredForAccess);
   
   // Check if user has already reported this signal
   const tokenId = purchaseData?.receipt?.tokenId;

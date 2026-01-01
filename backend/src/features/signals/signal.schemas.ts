@@ -42,8 +42,8 @@ export const listSignalsSchema = z.object({
     .optional()
     .default("true")
     .transform((val) => val === "true"),
-  /** Signal status filter: 'active' (default), 'inactive', or 'all' */
-  status: z.enum(["active", "inactive", "all"]).optional().default("active"),
+  /** Signal status filter: 'active' (default), 'expired', 'deactivated', 'inactive' (legacy: expired+deactivated), or 'all' */
+  status: z.enum(["active", "expired", "deactivated", "inactive", "all"]).optional().default("active"),
   /** Sort field (undefined = quality-first default sort) */
   sortBy: z
     .enum(["createdAt", "totalSales", "averageRating", "priceUsdt"])

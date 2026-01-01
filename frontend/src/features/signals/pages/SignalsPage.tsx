@@ -15,7 +15,7 @@ import { useSEO, getSEOUrl } from '@/shared/hooks';
 import type { SignalFilters } from '@/shared/types';
 
 /** Status filter type for signal tabs */
-type StatusFilter = 'active' | 'inactive';
+type StatusFilter = 'active' | 'expired' | 'deactivated';
 
 /**
  * Parse URL search params into SignalFilters
@@ -44,7 +44,7 @@ function parseFiltersFromParams(params: URLSearchParams): SignalFilters {
     filters.sortBy = 'newest';
   }
   if (page) filters.page = parseInt(page, 10);
-  if (status && ['active', 'inactive'].includes(status)) {
+  if (status && ['active', 'expired', 'deactivated'].includes(status)) {
     filters.status = status as StatusFilter;
   }
 
@@ -100,7 +100,7 @@ export function SignalsPage(): React.ReactElement {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<StatusFilter>(() => {
     const status = searchParams.get('status');
-    if (status && ['active', 'inactive'].includes(status)) {
+    if (status && ['active', 'expired', 'deactivated'].includes(status)) {
       return status as StatusFilter;
     }
     return 'active';
@@ -120,12 +120,23 @@ export function SignalsPage(): React.ReactElement {
   // Fetch signals with current filters
   const { data, isLoading, error } = useSignals(queryFilters);
 
-  // Fetch count for the other tab to show in tab badge
-  const otherTabStatus = activeTab === 'active' ? 'inactive' : 'active';
-  const { data: otherTabData } = useSignals({
+  // Fetch counts for all tabs to show in tab badges
+  const { data: activeTabData } = useSignals({
     ...filters,
     limit: 1,
-    status: otherTabStatus,
+    status: 'active',
+    ...(address && { excludeBuyerAddress: address }),
+  });
+  const { data: expiredTabData } = useSignals({
+    ...filters,
+    limit: 1,
+    status: 'expired',
+    ...(address && { excludeBuyerAddress: address }),
+  });
+  const { data: deactivatedTabData } = useSignals({
+    ...filters,
+    limit: 1,
+    status: 'deactivated',
     ...(address && { excludeBuyerAddress: address }),
   });
 
@@ -173,7 +184,7 @@ export function SignalsPage(): React.ReactElement {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tabs for Active/Expired Signals */}
+        {/* Tabs for Active/Expired/Deactivated Signals */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-6">
           <button
             onClick={() => handleTabChange('active')}
@@ -184,36 +195,41 @@ export function SignalsPage(): React.ReactElement {
             }`}
           >
             <span className="whitespace-nowrap">Active</span>
-            {activeTab === 'active' && data?.pagination && (
-              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
-                {data.pagination.total}
-              </span>
-            )}
-            {activeTab === 'inactive' && otherTabData?.pagination && (
-              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-700 rounded-full text-xs">
-                {otherTabData.pagination.total}
-              </span>
-            )}
+            <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-xs ${
+              activeTab === 'active' ? 'bg-dark-950/30' : 'bg-dark-700'
+            }`}>
+              {activeTab === 'active' ? data?.pagination?.total ?? 0 : activeTabData?.pagination?.total ?? 0}
+            </span>
           </button>
           <button
-            onClick={() => handleTabChange('inactive')}
+            onClick={() => handleTabChange('expired')}
             className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
-              activeTab === 'inactive'
+              activeTab === 'expired'
                 ? 'bg-dark-600 text-fur-cream'
                 : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
             }`}
           >
             <span className="whitespace-nowrap">Expired</span>
-            {activeTab === 'inactive' && data?.pagination && (
-              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
-                {data.pagination.total}
-              </span>
-            )}
-            {activeTab === 'active' && otherTabData?.pagination && (
-              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-700 rounded-full text-xs">
-                {otherTabData.pagination.total}
-              </span>
-            )}
+            <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-xs ${
+              activeTab === 'expired' ? 'bg-dark-950/30' : 'bg-dark-700'
+            }`}>
+              {activeTab === 'expired' ? data?.pagination?.total ?? 0 : expiredTabData?.pagination?.total ?? 0}
+            </span>
+          </button>
+          <button
+            onClick={() => handleTabChange('deactivated')}
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
+              activeTab === 'deactivated'
+                ? 'bg-dark-600 text-fur-cream'
+                : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
+            }`}
+          >
+            <span className="whitespace-nowrap">Deactivated</span>
+            <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-xs ${
+              activeTab === 'deactivated' ? 'bg-dark-950/30' : 'bg-dark-700'
+            }`}>
+              {activeTab === 'deactivated' ? data?.pagination?.total ?? 0 : deactivatedTabData?.pagination?.total ?? 0}
+            </span>
           </button>
         </div>
 

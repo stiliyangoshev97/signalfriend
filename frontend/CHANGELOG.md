@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.35.2] - 2025-12-31 📋 SEPARATE EXPIRED & DEACTIVATED TABS
+
+### Added
+
+**Three-Tab Signal Filtering**
+- Signals Page: Now has 3 tabs - Active, Expired, Deactivated
+- Predictor Profile: Now has 3 tabs - Active, Expired, Deactivated
+- Each tab shows its own count badge
+
+### Changed
+
+**SignalsPage**
+- Updated `StatusFilter` type to include `expired` and `deactivated`
+- Fetches counts for all 3 tabs to display in badges
+- Tab buttons simplified with cleaner badge logic
+
+**PredictorProfilePage**
+- Updated tab state to support 3 values
+- Updated `handleTabChange` callback type
+- Signal count text now shows correct label for each tab
+- Fetches counts for all 3 tabs separately
+
+**Frontend Schemas**
+- Updated `signalFilterStatusSchema` to include `expired` and `deactivated`
+- Backwards compatible with existing `inactive` filter
+
+---
+
+## [0.35.1] - 2025-12-31 🔓 PUBLIC EXPIRED SIGNAL CONTENT
+
+### Added
+
+**Public Access for Expired Signals**
+- Unauthenticated users can now view expired signal content
+- Enables track record transparency and verification
+
+### Changed
+
+**useSignalContent Hook**
+- Added `isExpired` parameter to enable public access for expired signals
+- Expired signals bypass authentication requirements
+- Non-expired signals still require full authentication
+
+**SignalDetailPage**
+- Now passes `isExpiredForAccess` to `useSignalContent` hook
+- Content unlocks automatically when signal expires
+
+### Technical
+- Hook checks `isExpired` flag to determine if auth is required
+- Works in tandem with backend `optionalAuth` middleware change
+
+---
+
 ## [0.35.0] - 2025-12-31 💰 PUBLIC PREDICTOR EARNINGS
 
 ### Added

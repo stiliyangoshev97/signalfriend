@@ -117,13 +117,22 @@ export class SignalService {
 
     // Filter by signal status (new 'status' param takes precedence over deprecated 'active')
     // 'active' = isActive: true AND not expired
-    // 'inactive' = isActive: false OR expired
+    // 'expired' = isActive: true AND expired (naturally expired signals)
+    // 'deactivated' = isActive: false (manually deactivated by predictor)
+    // 'inactive' = isActive: false OR expired (legacy: combines expired + deactivated)
     // 'all' = no status filter
     if (status === "active" || (status === undefined && active)) {
       filter.isActive = true;
       filter.expiresAt = { $gt: new Date() }; // Only non-expired signals
+    } else if (status === "expired") {
+      // Expired means: isActive is true BUT expiresAt is in the past
+      filter.isActive = true;
+      filter.expiresAt = { $lte: new Date() };
+    } else if (status === "deactivated") {
+      // Deactivated means: predictor manually deactivated (isActive: false)
+      filter.isActive = false;
     } else if (status === "inactive") {
-      // Inactive means: deactivated OR expired
+      // Inactive (legacy) means: deactivated OR expired
       filter.$or = [
         { isActive: false },
         { expiresAt: { $lte: new Date() } },
@@ -322,27 +331,41 @@ export class SignalService {
   /**
    * Retrieves the protected content of a signal.
    * Accessible to:
+   * - Anyone if the signal has expired (content becomes public for track record)
    * - The predictor (creator) of the signal
    * - Users who have purchased the signal (own a receipt)
    * - Admin wallets (MultiSig signers)
    *
    * @param contentId - The signal's unique content ID
-   * @param buyerAddress - Address of the user requesting content
+   * @param buyerAddress - Address of the user requesting content (optional for expired signals)
    * @returns Promise resolving to the protected content
    * @throws {ApiError} 404 if signal not found
    * @throws {ApiError} 403 if user has not purchased the signal and is not admin
    */
   static async getProtectedContent(
     contentId: string,
-    buyerAddress: string
+    buyerAddress?: string
   ): Promise<{ content: string }> {
-    const normalizedBuyer = buyerAddress.toLowerCase();
-
     // Check if signal exists
     const signal = await Signal.findOne({ contentId });
     if (!signal) {
       throw ApiError.notFound(`Signal with contentId '${contentId}' not found`);
     }
+
+    // Check if signal has expired - content becomes public for track record/transparency
+    // Note: Deactivated signals (isActive=false) remain protected - predictor intentionally hid content
+    if (signal.expiresAt && new Date(signal.expiresAt) < new Date()) {
+      return { content: signal.content };
+    }
+
+    // For non-expired signals, authentication is required
+    if (!buyerAddress) {
+      throw ApiError.forbidden(
+        "You must purchase this signal to view its content"
+      );
+    }
+
+    const normalizedBuyer = buyerAddress.toLowerCase();
 
     // Check if the user is an admin (MultiSig signer)
     if (isAdmin(normalizedBuyer)) {

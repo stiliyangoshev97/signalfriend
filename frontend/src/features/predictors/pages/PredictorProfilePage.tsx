@@ -155,7 +155,7 @@ export function PredictorProfilePage(): React.ReactElement {
     parseFiltersFromParams(searchParams)
   );
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'active' | 'inactive'>('active');
+  const [activeTab, setActiveTab] = useState<'active' | 'expired' | 'deactivated'>('active');
   const [blacklistModalOpen, setBlacklistModalOpen] = useState(false);
   const [blacklistProposalSuccess, setBlacklistProposalSuccess] = useState<{
     actionId: string;
@@ -279,22 +279,29 @@ export function PredictorProfilePage(): React.ReactElement {
   const queryFilters = useMemo(() => ({
     ...filters,
     limit: 12,
-    status: activeTab, // 'active' or 'inactive' based on selected tab
+    status: activeTab, // 'active', 'expired', or 'deactivated' based on selected tab
     // Note: excludeBuyerAddress is intentionally NOT included here
     // On predictor profiles, we show ALL signals (purchased ones get a badge)
   }), [filters, activeTab]);
 
-  // Fetch predictor's signals (active or inactive based on tab)
+  // Fetch predictor's signals (based on selected tab)
   const { data: signalsData, isLoading: signalsLoading, error: signalsError } = usePublicPredictorSignals(
     address,
     queryFilters
   );
 
-  // Also fetch count for the other tab to show in tab badge
-  const otherTabStatus = activeTab === 'active' ? 'inactive' : 'active';
-  const { data: otherTabData } = usePublicPredictorSignals(
+  // Fetch counts for all tabs to show in tab badges
+  const { data: activeTabData } = usePublicPredictorSignals(
     address,
-    { limit: 1, status: otherTabStatus }
+    { limit: 1, status: 'active' }
+  );
+  const { data: expiredTabData } = usePublicPredictorSignals(
+    address,
+    { limit: 1, status: 'expired' }
+  );
+  const { data: deactivatedTabData } = usePublicPredictorSignals(
+    address,
+    { limit: 1, status: 'deactivated' }
   );
 
   // Fetch user's purchased content IDs (only when authenticated with SIWE)
@@ -316,7 +323,7 @@ export function PredictorProfilePage(): React.ReactElement {
   }, []);
 
   // Handle tab change (reset page when switching tabs)
-  const handleTabChange = useCallback((tab: 'active' | 'inactive') => {
+  const handleTabChange = useCallback((tab: 'active' | 'expired' | 'deactivated') => {
     setActiveTab(tab);
     setFilters((prev) => ({ ...prev, page: 1 }));
   }, []);
@@ -628,7 +635,7 @@ export function PredictorProfilePage(): React.ReactElement {
 
       {/* Signals Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Tabs for Active/Inactive Signals */}
+        {/* Tabs for Active/Expired/Deactivated Signals */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-6">
           <button
             onClick={() => handleTabChange('active')}
@@ -639,36 +646,41 @@ export function PredictorProfilePage(): React.ReactElement {
             }`}
           >
             <span className="whitespace-nowrap">Active</span>
-            {activeTab === 'active' && signalsData?.pagination && (
-              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
-                {signalsData.pagination.total}
-              </span>
-            )}
-            {activeTab === 'inactive' && otherTabData?.pagination && (
-              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-700 rounded-full text-xs">
-                {otherTabData.pagination.total}
-              </span>
-            )}
+            <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-xs ${
+              activeTab === 'active' ? 'bg-dark-950/30' : 'bg-dark-700'
+            }`}>
+              {activeTab === 'active' ? signalsData?.pagination?.total ?? 0 : activeTabData?.pagination?.total ?? 0}
+            </span>
           </button>
           <button
-            onClick={() => handleTabChange('inactive')}
+            onClick={() => handleTabChange('expired')}
             className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
-              activeTab === 'inactive'
+              activeTab === 'expired'
                 ? 'bg-dark-600 text-fur-cream'
                 : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
             }`}
           >
             <span className="whitespace-nowrap">Expired</span>
-            {activeTab === 'inactive' && signalsData?.pagination && (
-              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-950/30 rounded-full text-xs">
-                {signalsData.pagination.total}
-              </span>
-            )}
-            {activeTab === 'active' && otherTabData?.pagination && (
-              <span className="px-1.5 sm:px-2 py-0.5 bg-dark-700 rounded-full text-xs">
-                {otherTabData.pagination.total}
-              </span>
-            )}
+            <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-xs ${
+              activeTab === 'expired' ? 'bg-dark-950/30' : 'bg-dark-700'
+            }`}>
+              {activeTab === 'expired' ? signalsData?.pagination?.total ?? 0 : expiredTabData?.pagination?.total ?? 0}
+            </span>
+          </button>
+          <button
+            onClick={() => handleTabChange('deactivated')}
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
+              activeTab === 'deactivated'
+                ? 'bg-dark-600 text-fur-cream'
+                : 'bg-dark-800 text-fur-cream/70 hover:text-fur-cream hover:bg-dark-700'
+            }`}
+          >
+            <span className="whitespace-nowrap">Deactivated</span>
+            <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-xs ${
+              activeTab === 'deactivated' ? 'bg-dark-950/30' : 'bg-dark-700'
+            }`}>
+              {activeTab === 'deactivated' ? signalsData?.pagination?.total ?? 0 : deactivatedTabData?.pagination?.total ?? 0}
+            </span>
           </button>
         </div>
         
@@ -730,7 +742,7 @@ export function PredictorProfilePage(): React.ReactElement {
                       <span className="font-medium text-fur-cream">
                         {signalsData.pagination.total}
                       </span>{' '}
-                      {activeTab === 'active' ? 'active signals' : 'expired/deactivated signals'}
+                      {activeTab === 'active' ? 'active signals' : activeTab === 'expired' ? 'expired signals' : 'deactivated signals'}
                     </>
                   ) : (
                     '0 signals found'

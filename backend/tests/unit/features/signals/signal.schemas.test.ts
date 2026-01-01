@@ -68,6 +68,30 @@ describe("Signal Schemas", () => {
       }
     });
 
+    it("should accept all valid status filter values", () => {
+      const validStatuses = ["active", "expired", "deactivated", "inactive", "all"];
+      for (const status of validStatuses) {
+        const result = listSignalsSchema.safeParse({ status });
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.data.status).toBe(status);
+        }
+      }
+    });
+
+    it("should reject invalid status filter values", () => {
+      const result = listSignalsSchema.safeParse({ status: "invalid" });
+      expect(result.success).toBe(false);
+    });
+
+    it("should default status to active when not provided", () => {
+      const result = listSignalsSchema.safeParse({});
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.status).toBe("active");
+      }
+    });
+
     it("should coerce page and limit to numbers", () => {
       const result = listSignalsSchema.safeParse({
         page: "5",

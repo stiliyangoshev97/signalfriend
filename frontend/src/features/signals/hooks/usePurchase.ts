@@ -84,38 +84,40 @@ export function useCheckPurchase(contentId: string) {
 /**
  * Hook to fetch the protected content of a purchased signal.
  * Only fetches when user is authenticated and has purchased the signal (isOwned = true),
- * OR when the user is an admin (multisig wallet holder).
+ * OR when the user is an admin (multisig wallet holder),
+ * OR when the signal has expired (isExpired = true, public access).
  *
  * @param contentId - Signal's content ID
- * @param canAccess - Whether the user can access this content (owned, is creator, or is admin)
+ * @param canAccess - Whether the user can access this content (owned, is creator, is admin, or expired)
+ * @param isExpired - Whether the signal has expired (allows public access without auth)
  * @returns Query result with protected content
  *
  * @example
  * const { data: purchaseData } = useCheckPurchase(contentId);
- * const { data: contentData } = useSignalContent(contentId, purchaseData?.hasPurchased || isAdmin);
+ * const { data: contentData } = useSignalContent(contentId, purchaseData?.hasPurchased || isAdmin || isExpired, isExpired);
  * if (contentData) {
  *   console.log('Protected content:', contentData.content);
  * }
  */
-export function useSignalContent(contentId: string, canAccess: boolean = false) {
+export function useSignalContent(contentId: string, canAccess: boolean = false, isExpired: boolean = false) {
   const { address, isConnected } = useAccount();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
   // Double-check that authToken exists in localStorage (prevents stale state issues)
   const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
 
+  // For expired signals, allow public access without authentication
+  // For non-expired signals, require full authentication
+  const isAuthenticatedUser = isConnected && hasHydrated && isAuthenticated && hasToken;
+  const shouldFetch = isExpired 
+    ? (hasHydrated && !!contentId && canAccess)  // Expired: just need contentId and canAccess flag
+    : (isAuthenticatedUser && !!contentId && canAccess);  // Non-expired: need full auth
+
   return useQuery<SignalContentResponse>({
     // Include address in query key to ensure cache invalidation on wallet switch
     queryKey: purchaseKeys.content(contentId, address),
     queryFn: () => fetchSignalContent(contentId),
-    // Only fetch protected content when:
-    // 1. Wallet is connected
-    // 2. Auth store has hydrated
-    // 3. User is authenticated in store
-    // 4. authToken exists in localStorage
-    // 5. contentId is provided
-    // 6. User can access the content (owns signal, is creator, or is admin)
-    enabled: isConnected && hasHydrated && isAuthenticated && hasToken && !!contentId && canAccess,
+    enabled: shouldFetch,
     staleTime: 1000 * 60 * 30, // 30 minutes - content doesn't change
   });
 }
