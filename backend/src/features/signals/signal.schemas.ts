@@ -42,8 +42,8 @@ export const listSignalsSchema = z.object({
     .optional()
     .default("true")
     .transform((val) => val === "true"),
-  /** Signal status filter: 'active' (default), 'inactive', or 'all' */
-  status: z.enum(["active", "inactive", "all"]).optional().default("active"),
+  /** Signal status filter: 'active' (default), 'expired', 'deactivated', 'inactive' (legacy: expired+deactivated), or 'all' */
+  status: z.enum(["active", "expired", "deactivated", "inactive", "all"]).optional().default("active"),
   /** Sort field (undefined = quality-first default sort) */
   sortBy: z
     .enum(["createdAt", "totalSales", "averageRating", "priceUsdt"])
@@ -64,6 +64,23 @@ export const listSignalsSchema = z.object({
   minConfidence: z.coerce.number().min(1).max(100).optional(),
   /** Maximum confidence level filter */
   maxConfidence: z.coerce.number().min(1).max(100).optional(),
+});
+
+/**
+ * Schema for GET /api/signals/my query parameters.
+ * Used by predictor dashboard for paginated signal management.
+ */
+export const mySignalsSchema = z.object({
+  /** Signal status filter: 'active', 'expired', 'deactivated', or 'all' (default) */
+  status: z.enum(["active", "expired", "deactivated", "all"]).optional().default("all"),
+  /** Sort field */
+  sortBy: z.enum(["createdAt", "priceUsdt", "totalSales", "averageRating"]).optional().default("createdAt"),
+  /** Sort direction */
+  sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
+  /** Page number (1-based) */
+  page: z.coerce.number().int().min(1).optional().default(1),
+  /** Items per page (max 50) */
+  limit: z.coerce.number().int().min(1).max(50).optional().default(12),
 });
 
 /**

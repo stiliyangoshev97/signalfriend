@@ -11,6 +11,7 @@ export {
   fetchPredictorByAddress,
   fetchPredictorSignals,
   fetchMySignals,
+  fetchMySignalsPaginated,
   fetchPredictorEarnings,
   updatePredictorProfile,
   applyForVerification,
@@ -19,6 +20,8 @@ export {
   type PredictorEarnings,
   type UpdateProfileInput,
   type CheckFieldUniquenessResponse,
+  type MySignalsPaginatedResponse,
+  type MySignalsParams,
 } from './predictors.api';
 
 // Signal management

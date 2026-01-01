@@ -7,6 +7,85 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.37.4] - 2026-01-02 📄 PREDICTOR DASHBOARD PAGINATION API
+
+### Added
+
+**New Paginated Endpoint for Predictor's Own Signals**
+- `GET /api/signals/my` - Fetch authenticated predictor's signals with pagination
+- Query params: `status`, `sortBy`, `sortOrder`, `page`, `limit`
+- Status filter supports: `active`, `expired`, `deactivated`, `all`
+- Requires authentication
+
+**Signal Service**
+- Added `getByPredictorPaginated()` method for efficient paginated queries
+- Returns signals with pagination metadata (total, page, limit, totalPages)
+- Supports status filtering: `active`, `expired`, `deactivated`, `all`
+
+**Schema Validation**
+- Added `mySignalsSchema` for `/api/signals/my` endpoint validation
+
+**Controller**
+- Added `getMySignals` controller function
+
+### Technical
+- All 338 tests passing
+- No breaking changes to existing endpoints
+
+---
+
+## [0.37.3] - 2025-12-31 📋 SEPARATE EXPIRED & DEACTIVATED TABS
+
+### Added
+
+**New Signal Status Filters**
+- Added `expired` status: Signals that have naturally expired (isActive=true, expiresAt < now)
+- Added `deactivated` status: Signals manually deactivated by predictor (isActive=false)
+- Legacy `inactive` status still works (combines expired + deactivated)
+
+### Changed
+
+**Signal Schema**
+- `status` filter now accepts: `active`, `expired`, `deactivated`, `inactive` (legacy), `all`
+- Updated `listSignalsSchema` with new enum values
+
+**Signal Service**
+- Updated status filter logic to handle all four status types
+- `active`: isActive=true AND not expired
+- `expired`: isActive=true AND expiresAt <= now
+- `deactivated`: isActive=false
+- `inactive`: isActive=false OR expired (legacy, backwards compatible)
+
+---
+
+## [0.37.2] - 2025-12-31 🔓 PUBLIC EXPIRED SIGNAL CONTENT
+
+### Added
+
+**Public Access for Expired Signals**
+- Expired signal content is now publicly accessible without authentication
+- Changed `/api/signals/:contentId/content` to use `optionalAuth` middleware
+- Content unlocks for transparency and track record verification
+- Note: Deactivated signals (isActive=false) remain protected
+
+**Route Changes**
+- `GET /api/signals/:contentId/content`:
+  - Expired signals: Public access (no auth required)
+  - Active signals: Auth required (owner, predictor, or admin only)
+
+### Changed
+
+**Signal Service**
+- `getProtectedContent()` now accepts optional `buyerAddress` parameter
+- Expired signal check happens before authentication check
+- Non-expired signals still require authentication
+
+### Technical
+- Uses existing `optionalAuth` middleware for conditional authentication
+- All 313 existing tests still pass
+
+---
+
 ## [0.37.1] - 2025-12-31 🧪 EARNINGS CALCULATION TESTS
 
 ### Added

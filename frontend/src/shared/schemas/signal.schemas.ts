@@ -15,7 +15,7 @@ import { categorySchema } from './category.schemas';
 
 export const signalStatusSchema = z.enum(['active', 'expired', 'deactivated']);
 /** Filter status for API queries - different from display status */
-export const signalFilterStatusSchema = z.enum(['active', 'inactive', 'all']);
+export const signalFilterStatusSchema = z.enum(['active', 'expired', 'deactivated', 'inactive', 'all']);
 
 // ===========================================
 // Signal Schema
@@ -130,7 +130,7 @@ export const signalFiltersSchema = z.object({
   minPrice: z.number().optional(),
   maxPrice: z.number().optional(),
   predictor: z.string().optional(),
-  /** Filter status: 'active' (default), 'inactive' (expired/deactivated), or 'all' */
+  /** Filter status: 'active' (default), 'expired', 'deactivated', 'inactive' (legacy), or 'all' */
   status: signalFilterStatusSchema.optional(),
   sortBy: z.enum(['newest', 'price-low', 'price-high', 'popular', 'quality']).optional(),
   page: z.number().optional(),

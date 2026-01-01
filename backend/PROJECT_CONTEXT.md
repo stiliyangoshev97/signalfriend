@@ -1,8 +1,8 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** December 31, 2025  
+> **Last Updated:** January 2, 2026  
 > **Current Phase:** Production - BSC Mainnet Live  
-> **Project Status:** 🟢 **Backend v0.37.0** - Public Predictor Earnings  
+> **Project Status:** 🟢 **Backend v0.37.4** - Predictor Dashboard Pagination API  
 > **Branch:** `main`
 
 ---
@@ -333,21 +333,25 @@ MAIN_GROUPS = {
 | GET | `/api/predictors/:address/check` | No | Check if active predictor |
 | PUT | `/api/predictors/:address` | Yes | Update own profile |
 | GET | `/api/signals` | No | List signals (filter, paginate) |
+| GET | `/api/signals/my` | Yes | Get predictor's own signals (paginated, dashboard) |
 | GET | `/api/signals/predictor/:address` | No | Get predictor's signals |
 
 ### Signal Status Filter
-The `/api/signals` endpoint supports a `status` query parameter:
+The `/api/signals` and `/api/signals/my` endpoints support a `status` query parameter:
 | Value | Filter | Description |
 |-------|--------|-------------|
 | `active` (default) | `isActive: true` AND `expiresAt > now` | Only purchasable signals |
-| `inactive` | `isActive: false` OR `expiresAt <= now` | Deactivated or expired signals |
+| `expired` | `isActive: true` AND `expiresAt <= now` | Naturally expired signals |
+| `deactivated` | `isActive: false` | Manually deactivated signals |
+| `inactive` | `isActive: false` OR `expiresAt <= now` | Legacy: expired + deactivated |
 | `all` | No filter | All signals regardless of status |
 
 ```bash
 # Examples
 GET /api/signals?status=active          # Default behavior
-GET /api/signals?status=inactive        # Expired/deactivated only
-GET /api/signals?predictorAddress=0x...&status=inactive  # Predictor's inactive signals
+GET /api/signals?status=expired         # Expired signals only
+GET /api/signals?status=deactivated     # Deactivated signals only
+GET /api/signals/my?status=active&page=1&limit=12  # Predictor dashboard pagination
 ```
 
 ### Signal Endpoints (continued)

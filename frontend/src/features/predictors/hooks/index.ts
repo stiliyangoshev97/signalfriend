@@ -6,6 +6,7 @@
 export {
   predictorKeys,
   useMySignals,
+  useMySignalsPaginated,
   useMyEarnings,
   usePredictorProfile,
   useUpdateProfile,

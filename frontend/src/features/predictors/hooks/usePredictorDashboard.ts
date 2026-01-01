@@ -19,6 +19,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import {
   fetchMySignals,
+  fetchMySignalsPaginated,
   fetchPredictorEarnings,
   fetchPredictorByAddress,
   updatePredictorProfile,
@@ -28,6 +29,7 @@ import {
   deactivateSignal,
   reactivateSignal,
   checkFieldUniqueness,
+  type MySignalsParams,
 } from '../api';
 import { signalKeys } from '@/features/signals/hooks/useSignals';
 import type { CreateSignalData } from '@/shared/types';
@@ -66,6 +68,33 @@ export function useMySignals(params?: {
     queryKey: predictorKeys.signals(address ?? '', params),
     queryFn: () => fetchMySignals(address!, params),
     // Only fetch when authenticated to prevent 401 errors
+    enabled: isConnected && !!address && hasHydrated && isAuthenticated && hasToken,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+/**
+ * Hook to fetch predictor's own signals with pagination
+ * 
+ * @param params - Query parameters for filtering, sorting, pagination
+ * @returns Query result with paginated signals
+ * 
+ * @example
+ * const { data, isLoading } = useMySignalsPaginated({ 
+ *   status: 'active',
+ *   page: 1,
+ *   limit: 12
+ * });
+ */
+export function useMySignalsPaginated(params?: MySignalsParams) {
+  const { address, isConnected } = useAccount();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('authToken');
+
+  return useQuery({
+    queryKey: ['predictor', 'signals', 'paginated', address ?? '', params],
+    queryFn: () => fetchMySignalsPaginated(params),
     enabled: isConnected && !!address && hasHydrated && isAuthenticated && hasToken,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
@@ -268,9 +297,13 @@ export function useDeactivateSignal() {
   return useMutation({
     mutationFn: (contentId: string) => deactivateSignal(contentId),
     onSuccess: () => {
-      // Invalidate ALL predictor signals queries (any params)
+      // Invalidate ALL predictor signals queries (any params) - legacy
       queryClient.invalidateQueries({
         queryKey: [...predictorKeys.all, 'signals', address!],
+      });
+      // Invalidate paginated signals queries (dashboard)
+      queryClient.invalidateQueries({
+        queryKey: ['predictor', 'signals', 'paginated'],
       });
       // Also invalidate marketplace signals list so deactivated signal is removed
       queryClient.invalidateQueries({
@@ -300,13 +333,17 @@ export function useReactivateSignal() {
   return useMutation({
     mutationFn: (contentId: string) => reactivateSignal(contentId),
     onSuccess: () => {
-      // Invalidate ALL predictor signals queries (any params)
+      // Invalidate ALL predictor signals queries (any params) - legacy
       queryClient.invalidateQueries({
         queryKey: [...predictorKeys.all, 'signals', address!],
       });
+      // Invalidate paginated signals queries (dashboard)
+      queryClient.invalidateQueries({
+        queryKey: ['predictor', 'signals', 'paginated'],
+      });
       // Also invalidate marketplace signals list so reactivated signal appears
       queryClient.invalidateQueries({
-              queryKey: ['signals', 'list'],
+        queryKey: ['signals', 'list'],
       });
       // Invalidate signal detail page cache
       queryClient.invalidateQueries({

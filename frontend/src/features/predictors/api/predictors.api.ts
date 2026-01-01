@@ -147,6 +147,7 @@ export async function fetchPredictorSignals(
  * @param address - Current user's wallet address
  * @param params - Optional query parameters
  * @returns List of own signals
+ * @deprecated Use fetchMySignalsPaginated for better performance with pagination
  */
 export async function fetchMySignals(
   address: string,
@@ -157,6 +158,63 @@ export async function fetchMySignals(
   }
 ): Promise<Signal[]> {
   return fetchPredictorSignals(address, params);
+}
+
+/** Response type for paginated my signals API */
+export interface MySignalsPaginatedResponse {
+  data: Signal[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+/** Parameters for paginated my signals query */
+export interface MySignalsParams {
+  status?: 'active' | 'expired' | 'deactivated' | 'all';
+  sortBy?: 'createdAt' | 'priceUsdt' | 'totalSales' | 'averageRating';
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * Fetch current predictor's signals with pagination
+ * Used by predictor dashboard for efficient signal management.
+ * 
+ * @param params - Query parameters for filtering, sorting, pagination
+ * @returns Paginated signals response
+ * 
+ * @example
+ * const { data: signals, pagination } = await fetchMySignalsPaginated({ 
+ *   status: 'active', 
+ *   page: 1, 
+ *   limit: 12 
+ * });
+ */
+export async function fetchMySignalsPaginated(
+  params?: MySignalsParams
+): Promise<MySignalsPaginatedResponse> {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.status) queryParams.append('status', params.status);
+  if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+  if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+  if (params?.page) queryParams.append('page', params.page.toString());
+  if (params?.limit) queryParams.append('limit', params.limit.toString());
+  
+  const queryString = queryParams.toString();
+  const url = queryString 
+    ? `${API_CONFIG.ENDPOINTS.SIGNALS}/my?${queryString}`
+    : `${API_CONFIG.ENDPOINTS.SIGNALS}/my`;
+  
+  const response = await apiClient.get<ApiResponse<Signal[]> & { pagination: MySignalsPaginatedResponse['pagination'] }>(url);
+  return {
+    data: response.data.data,
+    pagination: response.data.pagination,
+  };
 }
 
 /**
