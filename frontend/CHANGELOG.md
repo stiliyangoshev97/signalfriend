@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.35.7] - 2026-01-03 🐛 PREDICTOR DASHBOARD AUTO-REFRESH
+
+### Fixed
+
+**Predictor Dashboard Sales/Earnings Refresh**
+- Fixed issue where predictors had to manually refresh the page to see updated sales/earnings after a buyer purchased their signal
+- Added `refetchOnWindowFocus: true` to `useMyEarnings()` hook - earnings now refresh when predictor returns to the dashboard tab
+- Added `refetchOnWindowFocus: true` to `useMySignalsPaginated()` hook - signal sales counts now refresh when predictor returns to the dashboard tab
+- No polling required - data refreshes only when user actively switches back to the tab
+
+### Technical Details
+- Root cause: Global React Query config had `refetchOnWindowFocus: false` and `staleTime: 5 minutes`
+- Predictor's session had no way to know about purchases made in buyer's session (cross-session)
+- Solution: Override `refetchOnWindowFocus` for specific dashboard queries to fetch fresh data from backend when tab becomes active
+
+---
+
 ## [0.35.6] - 2026-01-02 🐛 QUERY INVALIDATION FIX
 
 ### Fixed
