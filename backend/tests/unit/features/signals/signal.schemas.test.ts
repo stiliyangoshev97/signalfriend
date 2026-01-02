@@ -438,8 +438,12 @@ describe("Signal Schemas", () => {
       });
 
       it("should reject expiry less than 1 day from now", () => {
-        const date = new Date();
-        date.setHours(date.getHours() + 12); // Only 12 hours from now
+        // Use a time that's definitely before "start of tomorrow UTC"
+        // Set to 1 hour from now - always before tomorrow regardless of timezone
+        const now = new Date();
+        const startOfTodayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+        // Set expiry to middle of today UTC (always before tomorrow)
+        const date = new Date(startOfTodayUTC.getTime() + 12 * 60 * 60 * 1000);
         const result = createSignalSchema.safeParse({
           ...validSignal,
           expiresAt: date.toISOString(),
