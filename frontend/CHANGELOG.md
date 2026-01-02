@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.35.6] - 2026-01-02 🐛 QUERY INVALIDATION FIX
+
+### Fixed
+
+**Dashboard Signal List Refresh**
+- Fixed issue where newly created signals didn't appear in dashboard without page refresh
+- `useCreateSignal` now correctly invalidates paginated signals queries
+- `useUpdateSignal` now correctly invalidates paginated signals queries  
+- Root cause: Query keys didn't match - dashboard used `['predictor', 'signals', 'paginated', ...]` but mutations invalidated `['predictor', 'signals', ...]`
+
+---
+
 ## [0.35.5] - 2026-01-02 🐛 IMPROVED API ERROR DISPLAY
 
 ### Fixed
