@@ -433,7 +433,11 @@ export function CreateSignalModal({
         {/* Error Display */}
         {submitError && (
           <div className="bg-error-500/10 border border-error-500/30 rounded-lg p-3">
-            <p className="text-sm text-error-400">{submitError}</p>
+            {submitError.split('\n').map((line, idx) => (
+              <p key={idx} className="text-sm text-error-400">
+                {line}
+              </p>
+            ))}
           </div>
         )}
 

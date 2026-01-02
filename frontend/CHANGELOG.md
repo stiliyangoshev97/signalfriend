@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.35.5] - 2026-01-02 🐛 IMPROVED API ERROR DISPLAY
+
+### Fixed
+
+**API Error Handling**
+- Enhanced apiClient to extract field-specific validation errors from backend
+- Errors like "expiresAt: Expiration date must be at least tomorrow" now display clearly
+- Added `details` field to `ApiErrorResponse` schema for field-level errors
+- CreateSignalModal now renders multi-line errors properly (one per field)
+
+### Changed
+
+**CreateSignalModal Error Display**
+- Error box now shows each validation error on its own line
+- Format: `fieldName: error message` for better UX
+
+---
+
 ## [0.35.4] - 2026-01-02 📖 FAQ EXPIRED SIGNALS DOCUMENTATION
 
 ### Changed
