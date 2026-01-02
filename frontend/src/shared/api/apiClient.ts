@@ -109,17 +109,29 @@ apiClient.interceptors.request.use(
  * Handles global error responses:
  * - 401: Token expired/invalid → clear auth and redirect
  * - 503: Maintenance mode → show maintenance message
- * - Other errors: Extract user-friendly message
+ * - Other errors: Extract user-friendly message (including field-specific validation errors)
  */
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiErrorResponse>) => {
-    // Extract error message from backend response
-    const errorMessage = 
-      error.response?.data?.error ||
-      error.response?.data?.message ||
-      error.message ||
-      'An unexpected error occurred';
+    // Extract field-specific validation errors if present
+    const details = error.response?.data?.details;
+    let errorMessage: string;
+    
+    if (details && Array.isArray(details) && details.length > 0) {
+      // Format field-specific errors for better UX
+      // e.g., "expiresAt: Expiration date must be at least tomorrow"
+      errorMessage = details
+        .map((d: { field: string; message: string }) => `${d.field}: ${d.message}`)
+        .join('\n');
+    } else {
+      // Fall back to generic error message
+      errorMessage = 
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        'An unexpected error occurred';
+    }
 
     // Handle specific HTTP status codes
     const status = error.response?.status;
@@ -152,10 +164,11 @@ apiClient.interceptors.response.use(
       console.warn('Service is under maintenance', { maintenanceEnd });
     }
 
-    // Return a structured error object
+    // Return a structured error object with field-specific details
     return Promise.reject({
       message: errorMessage,
       status,
+      details, // Include field-specific errors for components that want them
       originalError: error,
     });
   }

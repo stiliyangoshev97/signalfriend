@@ -55,12 +55,22 @@ export const apiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
     data: dataSchema,
   });
 
+/** Schema for field-level validation errors from backend */
+export const apiFieldErrorSchema = z.object({
+  field: z.string(),
+  message: z.string(),
+});
+
 export const apiErrorResponseSchema = z.object({
   success: z.literal(false),
   error: z.string(),
   message: z.string().optional(),
   maintenanceEnd: z.string().optional(),
+  /** Field-level validation errors (e.g., from Zod validation) */
+  details: z.array(apiFieldErrorSchema).optional(),
 });
+
+export type ApiFieldError = z.infer<typeof apiFieldErrorSchema>;
 
 export const paginationSchema = z.object({
   page: z.number(),

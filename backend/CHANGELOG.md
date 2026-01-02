@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.37.5] - 2026-01-02 🐛 SIGNAL EXPIRY DATE VALIDATION FIX
+
+### Fixed
+
+**Signal Creation Expiry Date Validation**
+- Fixed timezone/time mismatch causing "Expiration must be between 1 and 90 days" errors
+- Implemented hybrid validation approach for cross-timezone compatibility:
+  - **Minimum**: Calendar day based (start of tomorrow UTC) - selecting "tomorrow" always works
+  - **Maximum**: Time-based (90 days from current time) - prevents edge case bypasses
+- Selecting "tomorrow" in date picker now works correctly regardless of time of day or timezone
+- Works correctly even when frontend (Vercel Germany) and backend (Render San Francisco) are in different timezones
+- Updated error message to be more user-friendly: "Expiration date must be at least tomorrow and within 90 days"
+
+### Technical Details
+- Previous logic: `now + 24 hours` could reject dates that appear valid in date picker
+- New hybrid logic:
+  - Min: `startOfTodayUTC + 24h` (calendar day approach)
+  - Max: `now + 90 days` (time-based approach)
+- This ensures "tomorrow" always works while 91+ days always fails
+
+---
+
 ## [0.37.4] - 2026-01-02 📄 PREDICTOR DASHBOARD PAGINATION API
 
 ### Added

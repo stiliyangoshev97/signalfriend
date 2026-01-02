@@ -416,14 +416,38 @@ const faqItems: FaqItem[] = [
     answer: (
       <div className="space-y-4">
         <p>
-          Predictors set an expiration date (1-2 days) when creating signals. When a signal expires:
+          Predictors set an expiration date when creating signals. Once that date passes, the signal expires:
         </p>
         <ul className="list-disc list-inside space-y-2 ml-2">
-          <li>It is automatically <strong>hidden from the marketplace</strong></li>
+          <li>It moves from the <strong>Active</strong> tab to the <strong>Expired</strong> tab</li>
           <li>It <strong>cannot be purchased</strong> by new buyers</li>
           <li>Existing buyers <strong>retain permanent access</strong> to the analysis</li>
           <li>The signal can still be viewed via direct URL (shows an "Expired" badge)</li>
         </ul>
+        
+        <div className="bg-dark-800/50 rounded-lg p-4 mt-4">
+          <h4 className="font-semibold text-fur-cream mb-2 flex items-center gap-2">
+            <span>🔓</span> Expired Signal Content Becomes Public
+          </h4>
+          <p className="text-gray-main">
+            For <strong className="text-fur-cream">transparency and trust</strong>, the full content of expired signals 
+            is automatically made public. This allows anyone to:
+          </p>
+          <ul className="list-disc list-inside space-y-1 mt-2 text-gray-main">
+            <li>Verify the predictor's track record and accuracy</li>
+            <li>Review historical predictions to evaluate quality</li>
+            <li>Make informed decisions about future purchases</li>
+          </ul>
+          <p className="text-sm text-gray-main mt-3">
+            This transparency feature ensures predictors are accountable for their signals and helps 
+            buyers identify consistently accurate analysts.
+          </p>
+        </div>
+        
+        <p className="text-sm text-gray-main">
+          <strong>Note:</strong> Only naturally expired signals become public. Manually deactivated 
+          signals (by the predictor) remain protected.
+        </p>
       </div>
     ),
   },

@@ -123,10 +123,18 @@ export const createSignalSchema = z.object({
     .refine((date) => {
       const expiry = new Date(date);
       const now = new Date();
-      const minDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 1 day from now
-      const maxDate = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000); // 90 days from now
-      return expiry >= minDate && expiry <= maxDate;
-    }, "Expiration must be between 1 and 90 days from now"),
+      
+      // MINIMUM: Use calendar day logic (start of tomorrow UTC)
+      // This ensures selecting "tomorrow" in any timezone always works
+      const startOfTodayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+      const startOfTomorrowUTC = new Date(startOfTodayUTC.getTime() + 24 * 60 * 60 * 1000);
+      
+      // MAXIMUM: Use time-based logic (90 days from now)
+      // This ensures 91+ days from now always fails regardless of timezone
+      const maxDate = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+      
+      return expiry >= startOfTomorrowUTC && expiry <= maxDate;
+    }, "Expiration date must be at least tomorrow and within 90 days"),
   /** Predictor's confidence level in this prediction (1-100%) */
   confidenceLevel: z.number().int().min(1).max(100),
   /** Optional URL to the prediction market event */
