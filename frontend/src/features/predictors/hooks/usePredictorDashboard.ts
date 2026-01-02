@@ -247,9 +247,14 @@ export function useCreateSignal() {
   return useMutation({
     mutationFn: (data: CreateSignalData) => createSignal(data),
     onSuccess: () => {
-      // Invalidate predictor's own signals list (dashboard)
+      // Invalidate predictor's own signals list (legacy non-paginated)
       queryClient.invalidateQueries({
         queryKey: predictorKeys.signals(address!, {}),
+      });
+      // Invalidate predictor's paginated signals list (dashboard uses this)
+      queryClient.invalidateQueries({
+        queryKey: ['predictor', 'signals', 'paginated', address!],
+        exact: false, // Match all filter/pagination variations
       });
       // Invalidate earnings (new signal may affect stats)
       queryClient.invalidateQueries({
@@ -278,8 +283,18 @@ export function useUpdateSignal() {
       data: Partial<Omit<CreateSignalData, 'expiryDays'>> 
     }) => updateSignal(contentId, data),
     onSuccess: () => {
+      // Invalidate predictor's own signals list (legacy non-paginated)
       queryClient.invalidateQueries({
         queryKey: predictorKeys.signals(address!, {}),
+      });
+      // Invalidate predictor's paginated signals list (dashboard uses this)
+      queryClient.invalidateQueries({
+        queryKey: ['predictor', 'signals', 'paginated', address!],
+        exact: false, // Match all filter/pagination variations
+      });
+      // Invalidate main signals list (Signals page) so updates appear
+      queryClient.invalidateQueries({
+        queryKey: signalKeys.lists(),
       });
     },
   });

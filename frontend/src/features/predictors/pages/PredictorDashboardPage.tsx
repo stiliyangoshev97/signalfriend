@@ -11,7 +11,7 @@
  * Protected by PredictorRoute guard.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { Card, Button, Badge, Modal } from '@/shared/components/ui';
@@ -135,6 +135,9 @@ export function PredictorDashboardPage(): React.ReactElement {
   const [deactivateModalOpen, setDeactivateModalOpen] = useState(false);
   const [signalToDeactivate, setSignalToDeactivate] = useState<{ contentId: string; title: string } | null>(null);
   
+  // Ref for scrolling to signals section after creation
+  const signalsSectionRef = useRef<HTMLDivElement>(null);
+  
   const SIGNALS_PER_PAGE = 12;
   
   // Data fetching - use paginated API for current tab
@@ -250,7 +253,19 @@ export function PredictorDashboardPage(): React.ReactElement {
   };
   
   const handleCreateSuccess = () => {
+    // Ensure we're on the Active tab to see the new signal
+    setSignalFilter('active');
+    setCurrentPage(1);
     refetchSignals();
+    
+    // Scroll to the signals section after a short delay
+    // to allow the modal to close and data to refetch
+    setTimeout(() => {
+      signalsSectionRef.current?.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 400);
   };
 
   useEffect(() => {
@@ -636,7 +651,7 @@ export function PredictorDashboardPage(): React.ReactElement {
       )}
 
       {/* Published Signals Section */}
-      <div>
+      <div ref={signalsSectionRef}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-xl font-semibold text-fur-cream">Published Signals</h2>
           
