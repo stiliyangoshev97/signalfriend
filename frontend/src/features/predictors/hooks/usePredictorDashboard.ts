@@ -97,6 +97,7 @@ export function useMySignalsPaginated(params?: MySignalsParams) {
     queryFn: () => fetchMySignalsPaginated(params),
     enabled: isConnected && !!address && hasHydrated && isAuthenticated && hasToken,
     staleTime: 1000 * 60 * 2, // 2 minutes
+    refetchOnWindowFocus: true, // Refetch when predictor returns to tab (for new sales)
   });
 }
 
@@ -121,6 +122,7 @@ export function useMyEarnings() {
     // Only fetch when authenticated to prevent 401 errors
     enabled: isConnected && !!address && hasHydrated && isAuthenticated && hasToken,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: true, // Refetch when predictor returns to tab (for new earnings)
   });
 }
 
