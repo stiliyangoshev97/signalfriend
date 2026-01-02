@@ -7,8 +7,8 @@
  * @module features/faq/pages/FaqPage
  */
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useSEO, getSEOUrl } from '@/shared/hooks';
 import { getExplorerAddressUrl } from '@/shared/utils/explorer';
 import { socialLinks } from '@/shared/config/social';
@@ -21,7 +21,7 @@ interface FaqItem {
   id: string;
   question: string;
   answer: React.ReactNode;
-  category: 'wallet' | 'predictor' | 'trading' | 'fees' | 'security' | 'general';
+  category: 'wallet' | 'predictor' | 'trading' | 'fees' | 'security' | 'templates' | 'general';
 }
 
 // =============================================================================
@@ -32,6 +32,210 @@ const CONTRACT_ADDRESSES = {
   predictorAccessPass: '0x198Cd0549A0Dba09Aa3aB88e0B51CEb8dd335d07',
   signalKeyNFT: '0x2A5F920133e584773Ef4Ac16260c2F954824491f',
 };
+
+// Signal content template for predictors
+export const SIGNAL_CONTENT_TEMPLATE = `📊 The Verdict: [BUY YES/NO] "[TARGET DATE]"
+
+📈 True Probability: [X]% (Market is [Y]%)
+
+🔍 The Analysis ([N] Alpha Triggers):
+
+🎯 [Trigger 1 Name] [Data Source]:
+[Explain the insight - what data did you find and why does it matter?]
+
+🎯 [Trigger 2 Name] [Data Source]:
+[Explain the insight - what pattern or information supports your thesis?]
+
+🎯 [Trigger 3 Name] [Data Source]:
+[Explain the insight - what's the catalyst or timing factor?]
+
+⚡ Execution:
+• Action: [Buy Yes/No] on [Date/Event]
+• Max Price: [Price limit] ([Reasoning for the price target])`;
+
+// Filled template example for predictors
+export const SIGNAL_TEMPLATE_EXAMPLE = `📊 The Verdict: BUY YES "March 15, 2026"
+
+📈 True Probability: 65% (Market is 38%)
+
+🔍 The Analysis (3 Alpha Triggers):
+
+🎯 Earnings Momentum [SEC Filings]:
+NVIDIA's Q4 data center revenue grew 42% QoQ per their 8-K filing. The market is pricing in a slowdown that isn't materializing. Their backlog visibility extends through Q2 2026, suggesting sustained demand that analysts are underweighting.
+
+🎯 Supply Chain Signal [Industry Sources]:
+TSMC's January capacity utilization report shows 98% allocation to AI accelerators. This contradicts the "demand cliff" narrative. When fab utilization stays above 95%, it historically precedes earnings beats by 15-20%.
+
+🎯 Options Flow Anomaly [Unusual Whales]:
+Institutional call buying at the $150 strike (March expiry) spiked 340% last week. Smart money is positioning for upside before the March 12 earnings call. The put/call ratio dropped to 0.4—lowest in 8 months.
+
+⚡ Execution:
+• Action: Buy Yes on March 15, 2026
+• Max Price: 45¢ (Targeting convergence with our 65% fair value. At 38¢, we have 70% upside to fair value)`;
+
+/**
+ * Signal Template Answer Component
+ * Contains the template display and copy functionality
+ */
+function SignalTemplateAnswer() {
+  const [copiedTemplate, setCopiedTemplate] = useState(false);
+  const [copiedExample, setCopiedExample] = useState(false);
+  const [showExample, setShowExample] = useState(false);
+
+  const handleCopyTemplate = async () => {
+    try {
+      await navigator.clipboard.writeText(SIGNAL_CONTENT_TEMPLATE);
+      setCopiedTemplate(true);
+      setTimeout(() => setCopiedTemplate(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy template:', err);
+    }
+  };
+
+  const handleCopyExample = async () => {
+    try {
+      await navigator.clipboard.writeText(SIGNAL_TEMPLATE_EXAMPLE);
+      setCopiedExample(true);
+      setTimeout(() => setCopiedExample(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy example:', err);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <p>
+        Yes! Use this <strong className="text-fur-cream">professional signal template</strong> to structure 
+        your hidden content. Well-structured signals build trust and sell better.
+      </p>
+      
+      {/* Template Preview */}
+      <div className="bg-dark-900 rounded-lg border border-dark-600 overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-2 bg-dark-800 border-b border-dark-600">
+          <span className="text-sm font-medium text-fur-cream flex items-center gap-2">
+            <span>📝</span> Signal Content Template
+          </span>
+          <button
+            onClick={handleCopyTemplate}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              copiedTemplate 
+                ? 'bg-success-500/20 text-success-400' 
+                : 'bg-dark-700 text-fur-cream hover:bg-dark-600'
+            }`}
+          >
+            {copiedTemplate ? (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Copied!
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Copy Template
+              </>
+            )}
+          </button>
+        </div>
+        <pre className="p-4 text-sm text-fur-cream/90 whitespace-pre-wrap font-mono overflow-x-auto">
+          {SIGNAL_CONTENT_TEMPLATE}
+        </pre>
+      </div>
+
+      {/* Toggle Example Button */}
+      <button
+        onClick={() => setShowExample(!showExample)}
+        className="flex items-center gap-2 text-accent-gold hover:text-accent-gold/80 transition-colors text-sm font-medium"
+      >
+        <svg 
+          className={`w-4 h-4 transition-transform ${showExample ? 'rotate-90' : ''}`} 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+        {showExample ? 'Hide' : 'Show'} Filled Example
+      </button>
+
+      {/* Filled Example */}
+      {showExample && (
+        <div className="bg-dark-900 rounded-lg border border-accent-gold/30 overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2 bg-accent-gold/10 border-b border-accent-gold/30">
+            <span className="text-sm font-medium text-accent-gold flex items-center gap-2">
+              <span>✨</span> Example: Filled Template
+            </span>
+            <button
+              onClick={handleCopyExample}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                copiedExample 
+                  ? 'bg-success-500/20 text-success-400' 
+                  : 'bg-dark-700 text-fur-cream hover:bg-dark-600'
+              }`}
+            >
+              {copiedExample ? (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copy Example
+                </>
+              )}
+            </button>
+          </div>
+          <pre className="p-4 text-sm text-fur-cream/90 whitespace-pre-wrap font-mono overflow-x-auto">
+            {SIGNAL_TEMPLATE_EXAMPLE}
+          </pre>
+          <div className="px-4 py-3 bg-dark-800/50 border-t border-dark-600">
+            <p className="text-xs text-gray-main">
+              <strong className="text-fur-cream">Note:</strong> This is a fictional example for demonstration purposes only. 
+              Always do your own research before making any investment decisions.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Section Explanations */}
+      <div className="space-y-3 mt-4">
+        <h4 className="font-semibold text-fur-cream">Template Sections Explained:</h4>
+        
+        <div className="bg-dark-800/50 rounded-lg p-4 space-y-3">
+          <div>
+            <p className="font-medium text-fur-cream">📊 The Verdict</p>
+            <p className="text-sm text-gray-main">Your clear recommendation (Buy Yes/No) and the target date for the prediction.</p>
+          </div>
+          <div>
+            <p className="font-medium text-fur-cream">📈 True Probability</p>
+            <p className="text-sm text-gray-main">Your calculated probability vs the market price. This shows your edge.</p>
+          </div>
+          <div>
+            <p className="font-medium text-fur-cream">🔍 Alpha Triggers</p>
+            <p className="text-sm text-gray-main">2-4 key insights with data sources. Each trigger should explain WHY you believe the market is mispriced.</p>
+          </div>
+          <div>
+            <p className="font-medium text-fur-cream">⚡ Execution</p>
+            <p className="text-sm text-gray-main">Clear action steps: what to buy, when, and at what price limit.</p>
+          </div>
+        </div>
+      </div>
+
+      <p className="text-sm text-gray-main">
+        <strong>Pro Tip:</strong> Replace all [bracketed placeholders] with your actual analysis. 
+        The more specific your data sources and reasoning, the more valuable your signal appears.
+      </p>
+    </div>
+  );
+}
 
 const faqItems: FaqItem[] = [
   // ===== WALLET & NFT QUESTIONS =====
@@ -372,6 +576,16 @@ const faqItems: FaqItem[] = [
     ),
   },
 
+  // ===== TEMPLATES =====
+  {
+    id: 'signal-template',
+    category: 'templates',
+    question: 'Is there a template for writing signal content?',
+    answer: (
+      <SignalTemplateAnswer />
+    ),
+  },
+
   // ===== SIGNAL QUESTIONS =====
   {
     id: 'purchase-signal',
@@ -656,6 +870,7 @@ const categoryLabels: Record<FaqItem['category'], { label: string; icon: string 
   trading: { label: 'Signals & Purchases', icon: '📈' },
   fees: { label: 'Fees & Payments', icon: '💰' },
   security: { label: 'Security', icon: '🔒' },
+  templates: { label: 'Templates', icon: '📝' },
   general: { label: 'General', icon: '❓' },
 };
 
@@ -665,7 +880,7 @@ const categoryLabels: Record<FaqItem['category'], { label: string; icon: string 
 
 function FaqAccordion({ item, isOpen, onToggle }: { item: FaqItem; isOpen: boolean; onToggle: () => void }) {
   return (
-    <div className="border border-dark-600 rounded-lg overflow-hidden">
+    <div id={`faq-${item.id}`} className="border border-dark-600 rounded-lg overflow-hidden">
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left bg-dark-800/50 hover:bg-dark-800/70 transition-colors"
@@ -698,6 +913,7 @@ function FaqAccordion({ item, isOpen, onToggle }: { item: FaqItem; isOpen: boole
 export function FaqPage() {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
   const [activeCategory, setActiveCategory] = useState<FaqItem['category'] | 'all'>('all');
+  const location = useLocation();
 
   // SEO for FAQ page
   useSEO({
@@ -705,6 +921,28 @@ export function FaqPage() {
     description: 'Find answers to common questions about SignalFriend - NFT visibility, becoming a predictor, fees, security, and more.',
     url: getSEOUrl('/faq'),
   });
+
+  // Handle hash navigation (e.g., /faq#signal-template)
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (hash) {
+      // Check if hash matches a FAQ item id
+      const faqItem = faqItems.find(item => item.id === hash);
+      if (faqItem) {
+        // Open the item
+        setOpenItems(new Set([hash]));
+        // Set category filter to show the item (or 'all')
+        setActiveCategory('all');
+        // Scroll to the item after a short delay
+        setTimeout(() => {
+          const element = document.getElementById(`faq-${hash}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      }
+    }
+  }, [location.hash]);
 
   const toggleItem = (id: string) => {
     setOpenItems((prev) => {
