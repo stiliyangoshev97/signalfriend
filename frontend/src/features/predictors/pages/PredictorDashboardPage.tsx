@@ -23,6 +23,7 @@ import {
   useMyEarnings,
   useDeactivateSignal,
   useReactivateSignal,
+  useExpireSignal,
   useApplyForVerification,
 } from '../hooks';
 import { fetchPredictorByAddress } from '../api';
@@ -134,6 +135,8 @@ export function PredictorDashboardPage(): React.ReactElement {
   const [currentPage, setCurrentPage] = useState(1);
   const [deactivateModalOpen, setDeactivateModalOpen] = useState(false);
   const [signalToDeactivate, setSignalToDeactivate] = useState<{ contentId: string; title: string } | null>(null);
+  const [expireModalOpen, setExpireModalOpen] = useState(false);
+  const [signalToExpire, setSignalToExpire] = useState<{ contentId: string; title: string } | null>(null);
   
   // Ref for scrolling to signals section after creation
   const signalsSectionRef = useRef<HTMLDivElement>(null);
@@ -166,9 +169,10 @@ export function PredictorDashboardPage(): React.ReactElement {
   // Mutations
   const { mutate: deactivateSignal, isPending: isDeactivating } = useDeactivateSignal();
   const { mutate: reactivateSignal, isPending: isReactivating } = useReactivateSignal();
+  const { mutate: expireSignal, isPending: isExpiring } = useExpireSignal();
   const { mutate: applyForVerification, isPending: isApplyingForVerification } = useApplyForVerification();
   
-  const isActionPending = isDeactivating || isReactivating;
+  const isActionPending = isDeactivating || isReactivating || isExpiring;
   
   // Process signals data - signalsResponse is now paginated
   const signals = signalsResponse?.data || [];
@@ -250,6 +254,19 @@ export function PredictorDashboardPage(): React.ReactElement {
   
   const handleReactivate = (contentId: string) => {
     reactivateSignal(contentId);
+  };
+  
+  const handleExpire = (contentId: string, title?: string) => {
+    setSignalToExpire({ contentId, title: title || 'this signal' });
+    setExpireModalOpen(true);
+  };
+  
+  const confirmExpire = () => {
+    if (signalToExpire) {
+      expireSignal(signalToExpire.contentId);
+      setExpireModalOpen(false);
+      setSignalToExpire(null);
+    }
   };
   
   const handleCreateSuccess = () => {
@@ -710,6 +727,7 @@ export function PredictorDashboardPage(): React.ReactElement {
                   signal={signal}
                   onDeactivate={handleDeactivate}
                   onReactivate={handleReactivate}
+                  onExpire={handleExpire}
                   isActionPending={isActionPending}
                 />
               ))}
@@ -781,6 +799,64 @@ export function PredictorDashboardPage(): React.ReactElement {
               disabled={isDeactivating}
             >
               {isDeactivating ? 'Deactivating...' : 'Deactivate'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Expire Confirmation Modal */}
+      <Modal
+        isOpen={expireModalOpen}
+        onClose={() => {
+          setExpireModalOpen(false);
+          setSignalToExpire(null);
+        }}
+        title="Make Signal Expired"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-center w-16 h-16 mx-auto bg-fur-light/10 rounded-full">
+            <svg className="w-8 h-8 text-fur-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div className="text-center">
+            <p className="text-fur-cream mb-2">
+              Are you sure you want to expire{' '}
+              <span className="font-semibold text-fur-light">
+                "{signalToExpire?.title}"
+              </span>
+              ?
+            </p>
+            <div className="bg-success-500/10 border border-success-500/30 rounded-lg p-3 mb-3">
+              <p className="text-sm text-success-400 font-medium mb-1">
+                ✓ Great for successful predictions!
+              </p>
+              <p className="text-sm text-fur-cream/60">
+                Your prediction content will become <span className="text-fur-light font-medium">public</span> for everyone to see, showcasing your track record.
+              </p>
+            </div>
+            <p className="text-sm text-fur-cream/60">
+              This action cannot be undone. Existing buyers will still have access.
+            </p>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <Button
+              variant="secondary"
+              className="flex-1"
+              onClick={() => {
+                setExpireModalOpen(false);
+                setSignalToExpire(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              className="flex-1"
+              onClick={confirmExpire}
+              disabled={isExpiring}
+            >
+              {isExpiring ? 'Expiring...' : 'Make Expired'}
             </Button>
           </div>
         </div>

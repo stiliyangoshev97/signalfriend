@@ -98,3 +98,23 @@ export async function reactivateSignal(contentId: string): Promise<Signal> {
   );
   return response.data.data;
 }
+
+/**
+ * Manually expire a signal (sets expiresAt to now)
+ * Unlike deactivation, expired signals have their content made PUBLIC
+ * for transparency and track record verification.
+ * 
+ * Use case: Prediction came true early, predictor wants to showcase it.
+ * 
+ * @param contentId - Signal's content ID
+ * @returns Success message
+ * 
+ * @example
+ * await expireSignal('abc123');
+ */
+export async function expireSignal(contentId: string): Promise<{ message: string }> {
+  const response = await apiClient.post<ApiResponse<{ message: string }>>(
+    `${API_CONFIG.ENDPOINTS.SIGNAL_BY_ID(contentId)}/expire`
+  );
+  return response.data.data;
+}

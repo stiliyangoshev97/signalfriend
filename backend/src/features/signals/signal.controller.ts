@@ -245,6 +245,36 @@ export const deactivateSignal = asyncHandler(
 );
 
 /**
+ * POST /api/signals/:contentId/expire
+ * Manually expires a signal (sets expiresAt to now).
+ * Unlike deactivation, expired signals have their content made PUBLIC
+ * for transparency and track record verification.
+ * 
+ * Use case: Predictor wants to showcase a prediction that came true early.
+ * Only the signal's creator can expire their own signal.
+ * Requires authentication.
+ *
+ * @param {string} contentId - Signal content ID (UUID v4)
+ * @returns {Object} JSON response confirming expiration
+ * @throws {404} If signal not found
+ * @throws {403} If caller is not the creator
+ * @throws {400} If signal is already expired
+ */
+export const expireSignal = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { contentId } = req.params as GetSignalByContentIdParams;
+    const callerAddress = req.user!.address;
+
+    await SignalService.expire(contentId, callerAddress);
+
+    res.json({
+      success: true,
+      message: "Signal expired successfully. Content is now public.",
+    });
+  }
+);
+
+/**
  * GET /api/signals/predictor/:address
  * Gets all signals created by a specific predictor.
  * Public endpoint - returns public signal data only.

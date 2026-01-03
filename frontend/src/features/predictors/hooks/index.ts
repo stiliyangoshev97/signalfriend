@@ -15,6 +15,7 @@ export {
   useUpdateSignal,
   useDeactivateSignal,
   useReactivateSignal,
+  useExpireSignal,
   useCheckFieldUniqueness,
 } from './usePredictorDashboard';
 

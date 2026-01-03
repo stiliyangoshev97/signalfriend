@@ -1,7 +1,7 @@
 # 📋 SignalFriend Frontend - Project Context
 
 > Quick reference for AI assistants and developers.  
-> Last Updated: 2 January 2026 (v0.35.3 - Predictor Dashboard Pagination)
+> Last Updated: 3 January 2026 (v0.35.8 - Manual Signal Expiration)
 
 ---
 

@@ -2,7 +2,26 @@
                     📝 GENERAL TO-DO
 ================================================================================
 
-Last Updated: December 30, 2025
+Last Updated: January 3, 2026
+
+================================================================================
+PHASE 18: MANUAL SIGNAL EXPIRATION ✅ COMPLETE (January 3, 2026)
+================================================================================
+
+[x] Manual Signal Expiration Feature
+    - Use case: Prediction came true early, predictor wants to showcase it
+    - Unlike deactivation (hides signal), expiration makes content PUBLIC
+    
+Backend:
+[x] New endpoint: POST /api/signals/:contentId/expire
+[x] New service method: SignalService.expire()
+[x] Validates: signal exists, caller is creator, not already expired
+
+Frontend:
+[x] New "Make Expired" button on active signal cards in Predictor Dashboard
+[x] Confirmation modal explaining content becomes public
+[x] New useExpireSignal() hook and expireSignal() API function
+[x] Proper cache invalidation on success
 
 ================================================================================
 PHASE 17: BUG FIXES & IMPROVEMENTS ✅ COMPLETE (December 30, 2025)

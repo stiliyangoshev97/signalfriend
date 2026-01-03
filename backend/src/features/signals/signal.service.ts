@@ -626,6 +626,46 @@ export class SignalService {
   }
 
   /**
+   * Manually expires a signal (sets expiresAt to now).
+   * Unlike deactivation, expired signals have their content made PUBLIC
+   * for transparency and track record verification.
+   * 
+   * Use case: Predictor wants to showcase a prediction that came true early.
+   * Only the signal's creator can expire their own signal.
+   *
+   * @param contentId - The signal's unique content ID
+   * @param callerAddress - Address of the caller (must be creator)
+   * @returns Promise resolving when signal is expired
+   * @throws {ApiError} 404 if signal not found
+   * @throws {ApiError} 403 if caller is not the creator
+   * @throws {ApiError} 400 if signal is already expired
+   */
+  static async expire(
+    contentId: string,
+    callerAddress: string
+  ): Promise<void> {
+    const normalizedCaller = callerAddress.toLowerCase();
+
+    const signal = await Signal.findOne({ contentId });
+    if (!signal) {
+      throw ApiError.notFound(`Signal with contentId '${contentId}' not found`);
+    }
+
+    if (signal.predictorAddress !== normalizedCaller) {
+      throw ApiError.forbidden("You can only expire your own signals");
+    }
+
+    // Check if already expired
+    if (signal.expiresAt && new Date(signal.expiresAt) < new Date()) {
+      throw ApiError.badRequest("This signal has already expired");
+    }
+
+    // Set expiresAt to now - this makes content public
+    signal.expiresAt = new Date();
+    await signal.save();
+  }
+
+  /**
    * Increments a signal's sales count.
    * Called by webhook service when SignalPurchased event is received.
    *

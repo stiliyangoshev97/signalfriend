@@ -28,6 +28,7 @@ import {
   updateSignal,
   deactivateSignal,
   reactivateSignal,
+  expireSignal,
   checkFieldUniqueness,
   type MySignalsParams,
 } from '../api';
@@ -359,6 +360,46 @@ export function useReactivateSignal() {
         queryKey: ['predictor', 'signals', 'paginated'],
       });
       // Also invalidate marketplace signals list so reactivated signal appears
+      queryClient.invalidateQueries({
+        queryKey: ['signals', 'list'],
+      });
+      // Invalidate signal detail page cache
+      queryClient.invalidateQueries({
+        queryKey: ['signals', 'detail'],
+      });
+      // Invalidate public predictor signals (profile page)
+      queryClient.invalidateQueries({
+        queryKey: [...predictorKeys.all, 'public-signals', address!.toLowerCase()],
+      });
+    },
+  });
+}
+
+/**
+ * Hook to manually expire a signal
+ * Unlike deactivation, expired signals have their content made PUBLIC
+ * for transparency and track record verification.
+ * 
+ * Use case: Prediction came true early, predictor wants to showcase it.
+ * 
+ * @returns Mutation for expiring signals
+ */
+export function useExpireSignal() {
+  const { address } = useAccount();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (contentId: string) => expireSignal(contentId),
+    onSuccess: () => {
+      // Invalidate ALL predictor signals queries (any params) - legacy
+      queryClient.invalidateQueries({
+        queryKey: [...predictorKeys.all, 'signals', address!],
+      });
+      // Invalidate paginated signals queries (dashboard)
+      queryClient.invalidateQueries({
+        queryKey: ['predictor', 'signals', 'paginated'],
+      });
+      // Also invalidate marketplace signals list
       queryClient.invalidateQueries({
         queryKey: ['signals', 'list'],
       });

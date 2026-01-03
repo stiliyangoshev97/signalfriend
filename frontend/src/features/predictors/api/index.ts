@@ -30,6 +30,7 @@ export {
   updateSignal,
   deactivateSignal,
   reactivateSignal,
+  expireSignal,
 } from './signals.api';
 
 // Dispute management (for blacklisted predictors)
