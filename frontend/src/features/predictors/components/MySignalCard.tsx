@@ -20,6 +20,8 @@ interface MySignalCardProps {
   onDeactivate?: (contentId: string, title?: string) => void;
   /** Callback when reactivate is clicked */
   onReactivate?: (contentId: string) => void;
+  /** Callback when expire is clicked (makes content public) */
+  onExpire?: (contentId: string, title?: string) => void;
   /** Whether an action is in progress */
   isActionPending?: boolean;
 }
@@ -113,6 +115,7 @@ export function MySignalCard({
   signal,
   onDeactivate,
   onReactivate,
+  onExpire,
   isActionPending,
 }: MySignalCardProps): React.ReactElement {
   const [showActions, setShowActions] = useState(false);
@@ -233,11 +236,9 @@ export function MySignalCard({
         )}
 
         {/* Actions */}
-        <div className={`flex gap-2 transition-opacity duration-200 ${showActions || window.innerWidth < 768 ? 'opacity-100' : 'opacity-0'}`}>
-          <Link
-            to={`/signals/${signal.contentId}`}
-            className="flex-1"
-          >
+        <div className={`flex flex-col gap-2 transition-opacity duration-200 ${showActions || window.innerWidth < 768 ? 'opacity-100' : 'opacity-0'}`}>
+          {/* Primary action - View */}
+          <Link to={`/signals/${signal.contentId}`} className="w-full">
             <Button variant="secondary" size="sm" className="w-full">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -247,19 +248,35 @@ export function MySignalCard({
             </Button>
           </Link>
           
+          {/* Secondary actions - status changes */}
           {isActive ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onDeactivate?.(signal.contentId, signal.title)}
-              disabled={isActionPending}
-              className="text-error-400 hover:text-error-300 hover:bg-error-500/10"
-            >
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-              </svg>
-              Deactivate
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onExpire?.(signal.contentId, signal.title)}
+                disabled={isActionPending}
+                className="flex-1 text-fur-light hover:text-fur-cream hover:bg-fur-light/10"
+                title="Mark as expired - content becomes public"
+              >
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Expire
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onDeactivate?.(signal.contentId, signal.title)}
+                disabled={isActionPending}
+                className="flex-1 text-error-400 hover:text-error-300 hover:bg-error-500/10"
+              >
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+                Deactivate
+              </Button>
+            </div>
           ) : !expiry.isExpired && (
             <Button
               variant="ghost"

@@ -1,8 +1,8 @@
 # SignalFriend Backend - Project Context
 
-> **Last Updated:** January 2, 2026  
+> **Last Updated:** January 3, 2026  
 > **Current Phase:** Production - BSC Mainnet Live  
-> **Project Status:** 🟢 **Backend v0.37.4** - Predictor Dashboard Pagination API  
+> **Project Status:** 🟢 **Backend v0.37.6** - Manual Signal Expiration  
 > **Branch:** `main`
 
 ---
@@ -363,6 +363,7 @@ GET /api/signals/my?status=active&page=1&limit=12  # Predictor dashboard paginat
 | POST | `/api/signals` | Yes | Create signal (predictor) |
 | PUT | `/api/signals/:contentId` | Yes | Update own signal |
 | DELETE | `/api/signals/:contentId` | Yes | Deactivate own signal |
+| POST | `/api/signals/:contentId/expire` | Yes | Manually expire signal (makes content public) |
 | GET | `/api/receipts/mine` | Yes | Get user's purchases |
 | GET | `/api/receipts/stats` | Yes | Get predictor stats |
 | GET | `/api/receipts/check/:contentId` | Yes | Check if purchased |

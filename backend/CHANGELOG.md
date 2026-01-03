@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.37.6] - 2026-01-03 ⏰ MANUAL SIGNAL EXPIRATION
+
+### Added
+
+**Manual Signal Expiration Endpoint**
+- New `POST /api/signals/:contentId/expire` endpoint
+- Allows predictors to manually expire their own signals
+- Sets `expiresAt` to current timestamp, making signal content PUBLIC
+- Use case: Prediction came true early, predictor wants to showcase it as a track record win
+
+**Service Method**
+- Added `SignalService.expire(contentId, callerAddress)` method
+- Validates: signal exists, caller is creator, not already expired
+- Returns error if signal is already expired
+
+**Controller**
+- Added `expireSignal` controller function
+- Returns success message: "Signal expired successfully. Content is now public."
+
+### Notes
+- Unlike deactivation (hides signal, content stays protected), expiration makes content PUBLIC
+- Great for showcasing successful predictions that resolved early
+- Buyers who purchased retain access regardless
+
+---
+
 ## [0.37.5] - 2026-01-02 🐛 SIGNAL EXPIRY DATE VALIDATION FIX
 
 ### Fixed

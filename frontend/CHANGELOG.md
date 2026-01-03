@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.35.8] - 2026-01-03 ⏰ MANUAL SIGNAL EXPIRATION
+
+### Added
+
+**"Expire" Button in Predictor Dashboard**
+- New "Expire" button on active signal cards
+- Allows predictors to manually expire signals when predictions come true early
+- Unlike deactivation, expiring a signal makes content PUBLIC for track record showcase
+
+**Confirmation Modal**
+- Styled modal explaining the action and its implications
+- Highlights that content becomes public (with success styling)
+- Clear warning that action cannot be undone
+
+**New Hook & API**
+- Added `useExpireSignal()` mutation hook
+- Added `expireSignal()` API function calling `POST /api/signals/:contentId/expire`
+- Proper cache invalidation on success
+
+### UI Design
+- Two-row button layout: View button on top, Expire/Deactivate side-by-side below
+- "Expire" button uses golden/cream styling (not red like Deactivate)
+- Clock icon to represent time/expiration
+- Confirmation modal has positive framing ("Great for successful predictions!")
+
+---
+
 ## [0.35.7] - 2026-01-03 🐛 PREDICTOR DASHBOARD AUTO-REFRESH
 
 ### Fixed

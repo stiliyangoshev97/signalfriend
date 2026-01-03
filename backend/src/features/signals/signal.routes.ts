@@ -22,6 +22,7 @@ import {
   createSignal,
   updateSignal,
   deactivateSignal,
+  expireSignal,
   getSignalsByPredictor,
   getMySignals,
 } from "./signal.controller.js";
@@ -140,6 +141,21 @@ router.delete(
   writeRateLimiter,
   validate(getSignalByContentIdSchema, "params"),
   deactivateSignal
+);
+
+/**
+ * POST /api/signals/:contentId/expire
+ * Manually expire a signal (sets expiresAt to now).
+ * Unlike deactivation, expired signals have their content made PUBLIC.
+ * Use case: Prediction came true early, predictor wants to showcase it.
+ * Rate limited: 60 req/15min (write operations)
+ */
+router.post(
+  "/:contentId/expire",
+  authenticate,
+  writeRateLimiter,
+  validate(getSignalByContentIdSchema, "params"),
+  expireSignal
 );
 
 export const signalRoutes = router;
