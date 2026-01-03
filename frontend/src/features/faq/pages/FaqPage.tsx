@@ -34,7 +34,7 @@ const CONTRACT_ADDRESSES = {
 };
 
 // Signal content template for predictors
-export const SIGNAL_CONTENT_TEMPLATE = `📊 The Verdict: [BUY YES/NO] "[TARGET DATE]"
+export const SIGNAL_CONTENT_TEMPLATE = `📊 The Verdict: [BUY YES/NO] "[TARGET/OUTCOME]"
 
 📈 True Probability: [X]% (Market is [Y]%)
 
@@ -50,8 +50,12 @@ export const SIGNAL_CONTENT_TEMPLATE = `📊 The Verdict: [BUY YES/NO] "[TARGET 
 [Explain the insight - what's the catalyst or timing factor?]
 
 ⚡ Execution:
-• Action: [Buy Yes/No] on [Date/Event]
-• Max Price: [Price limit] ([Reasoning for the price target])`;
+• Action: [Buy Yes/No] on [Outcome/Date]
+• Entry Zone: [Price range] ([Current price context and reasoning])
+
+📍 Exit Strategy:
+• Take Profit: [Target price] ([Catalyst that triggers exit])
+• Stop Loss: [Cut price] ([Scenario that invalidates thesis])`;
 
 // Filled template example for predictors
 export const SIGNAL_TEMPLATE_EXAMPLE = `📊 The Verdict: BUY YES "March 15, 2026"
@@ -71,7 +75,11 @@ Institutional call buying at the $150 strike (March expiry) spiked 340% last wee
 
 ⚡ Execution:
 • Action: Buy Yes on March 15, 2026
-• Max Price: 45¢ (Targeting convergence with our 65% fair value. At 38¢, we have 70% upside to fair value)`;
+• Entry Zone: Buy under 45¢ (Currently 38¢. We have 70% upside to our 65% fair value)
+
+📍 Exit Strategy:
+• Take Profit: Sell at 60¢ (When Q4 earnings beat confirms the thesis)
+• Stop Loss: Cut liability if odds drop below 25¢ (Implying unexpected demand weakness or major customer loss)`;
 
 /**
  * Signal Template Answer Component
@@ -212,7 +220,7 @@ function SignalTemplateAnswer() {
         <div className="bg-dark-800/50 rounded-lg p-4 space-y-3">
           <div>
             <p className="font-medium text-fur-cream">📊 The Verdict</p>
-            <p className="text-sm text-gray-main">Your clear recommendation (Buy Yes/No) and the target date for the prediction.</p>
+            <p className="text-sm text-gray-main">Your clear recommendation (Buy Yes/No) and the target outcome or date.</p>
           </div>
           <div>
             <p className="font-medium text-fur-cream">📈 True Probability</p>
@@ -224,7 +232,11 @@ function SignalTemplateAnswer() {
           </div>
           <div>
             <p className="font-medium text-fur-cream">⚡ Execution</p>
-            <p className="text-sm text-gray-main">Clear action steps: what to buy, when, and at what price limit.</p>
+            <p className="text-sm text-gray-main">Clear action and entry zone: what to buy, when, and at what price range.</p>
+          </div>
+          <div>
+            <p className="font-medium text-fur-cream">📍 Exit Strategy</p>
+            <p className="text-sm text-gray-main">Take profit target and stop loss levels with the catalysts that trigger each.</p>
           </div>
         </div>
       </div>
