@@ -163,7 +163,7 @@ SignalFriend/
 
 ---
 
-## 🎯 Technical Deep Dive (For Interviews)
+## 🎯 Technical Deep Dive 
 
 This section provides a comprehensive technical overview for Web3 engineering interviews.
 
