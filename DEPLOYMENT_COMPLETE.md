@@ -71,7 +71,7 @@
 
 **Connection String Format:**
 ```
-mongodb+srv://<username>:<password>@signalfriend-production.juw7mf9.mongodb.net/signalfriend?retryWrites=true&w=majority
+mongodb+srv://<username>:<password>@signalfriend-production.xxxxx.mongodb.net/signalfriend?retryWrites=true&w=majority
 ```
 
 ---

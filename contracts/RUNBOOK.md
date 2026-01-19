@@ -11,7 +11,7 @@
 
 ```bash
 # Navigate to contracts directory
-cd /Users/stiliyangoshev/Desktop/Coding/Full\ Projects/SignalFriend/contracts
+cd /path/to/SignalFriend/contracts
 
 # Deploy with contract verification
 source .env && forge script script/Deploy.s.sol:DeployScript \
