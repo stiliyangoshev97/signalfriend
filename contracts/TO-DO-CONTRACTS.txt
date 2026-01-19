@@ -1,33 +1,48 @@
-# SignalFriend - TO-DO List
-# Last Updated: November 29, 2024
+# SignalFriend Smart Contracts - Development Complete ✅
+# Last Updated: January 19, 2026
+# Status: DEPLOYED TO BSC MAINNET
 
 ================================================================================
-                        ✅ COMPLETED
+                    🎉 ALL DEVELOPMENT COMPLETE
 ================================================================================
 
-[✅] Smart Contracts Development
-    - SignalFriendMarket.sol (Logic/Controller)
-    - PredictorAccessPass.sol (Soulbound NFT)
-    - SignalKeyNFT.sol (Transferable Receipt NFT)
-    - MockUSDT.sol (Testnet only)
-
-[✅] Unit Tests (96 tests - ALL PASSING)
-    - SignalFriendMarket.t.sol (28 tests)
-    - PredictorAccessPass.t.sol (35 tests)
-    - SignalKeyNFT.t.sol (33 tests)
-
-[✅] Deployment to BNB Testnet
-    - Phase 1: Script deployment complete
-    - Phase 2: MultiSig setup complete
-    - isFullyInitialized() = true
-
-[✅] Documentation
-    - RUNBOOK.md (deployment & operations guide)
-    - PROJECT_CONTEXT.md
-    - CHANGELOG.md
+✅ Smart Contracts Development
+✅ Unit Tests (96 tests)
+✅ Integration Tests (11 tests)
+✅ Fuzz Tests (18 tests)
+✅ BNB Testnet Deployment & Testing
+✅ BSC Mainnet Deployment (December 15, 2025)
+✅ MultiSig Configuration
+✅ NFT Metadata Setup
+✅ Documentation
 
 ================================================================================
-                    📍 DEPLOYED CONTRACT ADDRESSES (BNB Testnet)
+                    📊 CONTRACT STATISTICS
+================================================================================
+
+Total Tests: 125 passing
+- Unit Tests: 96
+- Integration Tests: 11
+- Fuzz Tests: 18
+
+Contracts: 4
+- SignalFriendMarket.sol (Logic/Controller)
+- PredictorAccessPass.sol (Soulbound NFT)
+- SignalKeyNFT.sol (Transferable Receipt NFT)
+- MockUSDT.sol (Testnet only)
+
+================================================================================
+                    💰 DEPLOYED ADDRESSES (BSC Mainnet)
+================================================================================
+
+SignalFriendMarket:  0xaebec2cd5c2db4c0875de215515b3060a7a652fb
+PredictorAccessPass: 0x198cd0549a0dba09aa3ab88e0b51ceb8dd335d07
+SignalKeyNFT:        0x2a5f920133e584773ef4ac16260c2f954824491f
+Treasury:            0x76e3363f7aF2e46DFdb4824FA143264E58884e1b
+USDT (BSC):          0x55d398326f99059fF775485246999027B3197955
+
+================================================================================
+                    🧪 TESTNET ADDRESSES (BNB Testnet - Chain ID 97)
 ================================================================================
 
 MockUSDT:            0xF87d17a5ca95F3f992f82Baabf4eBC5301A178a5
@@ -36,273 +51,115 @@ PredictorAccessPass: 0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4
 SignalKeyNFT:        0xfb26Df6101e1a52f9477f52F54b91b99fb016aed
 
 ================================================================================
-                    🧪 MANUAL TESTING ON BSCSCAN (Testnet)
+                    ✅ COMPLETED FEATURES
 ================================================================================
 
-------------------------------------------------------------------------------
-MOCKUSDT TESTS
-------------------------------------------------------------------------------
-[✅] 1. Mint test USDT to wallet
-       - Function: mint(address to, uint256 amount)
-       - Amount: 1000000000000000000000 (1000 USDT)
-       - EXPECTED: ✅ SUCCESS - Balance increases by 1000 USDT
+SignalFriendMarket:
+[x] joinAsPredictor() - Register with $20 USDT
+[x] buySignalNFT() - Purchase signal access
+[x] Referral system ($5 payout)
+[x] Commission system (5%)
+[x] Buyer access fee ($0.50)
+[x] Pause/unpause (MultiSig)
 
-[✅] 2. Check balance
-       - Function: balanceOf(address)
-       - EXPECTED: ✅ SUCCESS - Returns correct balance
+PredictorAccessPass (ERC721):
+[x] Soulbound (non-transferable)
+[x] Blacklist system
+[x] Owner mint (MultiSig)
+[x] Metadata URI updates
 
-[✅] 3. Approve SignalFriendMarket to spend USDT
-       - Function: approve(spender, amount)
-       - Spender: 0x5133397a4B9463c5270beBa05b22301e6dD184ca
-       - EXPECTED: ✅ SUCCESS - Allowance set correctly
+SignalKeyNFT (ERC721):
+[x] Transferable receipts
+[x] Content identifier tracking
+[x] Batch queries (tokensOfOwner)
 
-------------------------------------------------------------------------------
-SIGNALFRIENDMARKET TESTS - JOIN AS PREDICTOR
-------------------------------------------------------------------------------
-[✅] 4. Join as Predictor (no referrer)
-       - Pre-req: Approve 20 USDT first
-       - Function: joinAsPredictor(address _referrer)
-       - _referrer: 0x0000000000000000000000000000000000000000
-       - Cost: 20 USDT
-       - EXPECTED: ✅ SUCCESS - Mints PredictorAccessPass NFT, Treasury receives 20 USDT
-
-[✅] 5. Join as Predictor WITH valid referrer
-       - Use a different wallet
-       - Pre-req: Wallet A is already a predictor
-       - Function: joinAsPredictor(walletA_address)
-       - EXPECTED: ✅ SUCCESS
-         - New predictor gets NFT
-         - Referrer (walletA) receives 5 USDT
-         - Treasury receives 15 USDT
-
-[✅] 6. Join as Predictor with INVALID referrer (non-predictor)
-       - Function: joinAsPredictor(random_address)
-       - EXPECTED: ✅ SUCCESS (no revert)
-         - Transaction succeeds, but NO referral payout
-         - Full 20 USDT goes to treasury
-
-[✅] 7. Join as Predictor with SELF as referrer
-       - Function: joinAsPredictor(your_own_address)
-       - EXPECTED: ✅ SUCCESS (no revert)
-         - Transaction succeeds, but NO referral payout
-         - Full 20 USDT goes to treasury
-
-[✅] 8. Try to join TWICE with same wallet
-       - EXPECTED: ❌ REVERT with "AlreadyHasPredictorNFT"
-
-------------------------------------------------------------------------------
-SIGNALFRIENDMARKET TESTS - BUY SIGNAL
-------------------------------------------------------------------------------
-[✅] 9. Buy Signal NFT (basic purchase)
-       - Pre-req: Approve 5.5 USDT (5 signal + 0.5 fee)
-       - Function: buySignalNFT(_predictor, _signalPrice, _maxCommissionRate, _contentIdentifier)
-       - _predictor: predictor wallet address
-       - _signalPrice: 5000000000000000000 (5 USDT)
-       - _maxCommissionRate: 500 (5%)
-       - _contentIdentifier: 0x0000000000000000000000000000000000000000000000000000000000000001
-       - EXPECTED: ✅ SUCCESS
-         - Mints SignalKeyNFT to buyer
-         - Predictor receives 4.75 USDT (95%)
-         - Treasury receives 0.75 USDT (5% + 0.5 fee)
-
-[✅] 10. Buy Signal with HIGHER price (e.g., 10 USDT)
-        - Pre-req: Approve 10.5 USDT
-        - _signalPrice: 10000000000000000000 (10 USDT)
-        - EXPECTED: ✅ SUCCESS
-          - Predictor receives 9.5 USDT
-          - Treasury receives 1.0 USDT (0.5 + 0.5 fee)
-
-[✅] 11. Buy Signal with price BELOW minimum (< 5 USDT)
-        - _signalPrice: 1000000000000000000 (1 USDT)
-        - EXPECTED: ❌ REVERT with "SignalPriceTooLow"
-
-[✅] 12. Buy Signal from INVALID predictor (non-predictor address)
-        - _predictor: random address with no NFT
-        - EXPECTED: ❌ REVERT with "InvalidPredictor"
-
-[✅] 13. Buy Signal from BLACKLISTED predictor
-        - Pre-req: Blacklist a predictor first (see test #18)
-        - EXPECTED: ❌ REVERT with "InvalidPredictor"
-
-[✅] 14. Buy MULTIPLE signals (same content, different buyers)
-        - Same contentIdentifier, different buyer wallets
-        - EXPECTED: ✅ SUCCESS - Each buyer gets unique tokenId, same contentIdentifier
-
-[✅] 15. Buy Signal with INSUFFICIENT allowance
-        - Approve only 4 USDT (less than 5.5 needed)
-        - EXPECTED: ❌ REVERT with "InsufficientAllowance"
-
-------------------------------------------------------------------------------
-PREDICTORACCESSPASS TESTS - SOULBOUND
-------------------------------------------------------------------------------
-[✅] 16. Try to TRANSFER PredictorAccessPass NFT
-        - Function: transferFrom(from, to, tokenId)
-        - EXPECTED: ❌ REVERT with "SoulboundTokenCannotBeTransferred"
-
-[✅] 17. Try to APPROVE PredictorAccessPass NFT
-        - Function: approve(to, tokenId)
-        - EXPECTED: ❌ REVERT with "SoulboundTokenCannotBeApproved"
-
-------------------------------------------------------------------------------
-PREDICTORACCESSPASS TESTS - BLACKLIST (MultiSig)
-------------------------------------------------------------------------------
-[✅] 18. Blacklist a predictor
-        - Signer 1: proposeSetBlacklist(predictorAddress, true)
-        - Get actionId from logs
-        - Signer 2: approveAction(actionId)
-        - Signer 3: approveAction(actionId) → auto-executes
-        - EXPECTED: ✅ SUCCESS
-          - isBlacklisted(predictorAddress) = true
-          - isPredictorActive(predictorAddress) = false
-
-[✅] 19. Unblacklist a predictor
-        - Signer 1: proposeSetBlacklist(predictorAddress, false)
-        - Signer 2 + 3: approveAction(actionId)
-        - EXPECTED: ✅ SUCCESS
-          - isBlacklisted(predictorAddress) = false
-          - isPredictorActive(predictorAddress) = true
-
-[✅] 20. Blacklisted predictor still OWNS their NFT
-        - Check: balanceOf(blacklistedAddress)
-        - EXPECTED: ✅ Returns 1 (they still own NFT, just can't sell)
-
-------------------------------------------------------------------------------
-PREDICTORACCESSPASS TESTS - OWNER MINT (MultiSig)
-------------------------------------------------------------------------------
-[✅] 21. Owner mint a free predictor pass
-        - Signer 1: proposeOwnerMint(newPredictorAddress)
-        - Signer 2 + 3: approveAction(actionId)
-        - EXPECTED: ✅ SUCCESS
-          - balanceOf(newPredictorAddress) = 1
-          - No USDT payment required
-
-------------------------------------------------------------------------------
-SIGNALKEYNFT TESTS - TRANSFERS
-------------------------------------------------------------------------------
-[✅] 22. Transfer SignalKeyNFT to another wallet
-        - Function: transferFrom(from, to, tokenId)
-        - EXPECTED: ✅ SUCCESS (SignalKeyNFT IS transferable)
-          - ownerOf(tokenId) = new owner
-
-[✅] 23. Check contentIdentifier preserved after transfer
-        - Function: getContentIdentifier(tokenId)
-        - EXPECTED: ✅ Returns same contentIdentifier as before transfer
-
-------------------------------------------------------------------------------
-METADATA URI TESTS (MultiSig)
-------------------------------------------------------------------------------
-[✅] 24. Update PredictorAccessPass metadata URI
-        - Signer 1: proposeUpdateMetadataURI("ipfs://new-uri/")
-        - Signer 2 + 3: approveAction(actionId)
-        - EXPECTED: ✅ SUCCESS - tokenURI(1) returns new URI
-
-[✅] 25. Update SignalKeyNFT metadata URI
-        - Same process on SignalKeyNFT contract
-        - EXPECTED: ✅ SUCCESS - tokenURI(1) returns new URI
-
-------------------------------------------------------------------------------
-PAUSE/UNPAUSE TESTS (MultiSig on SignalFriendMarket)
-------------------------------------------------------------------------------
-[✅] 26. Pause the contract
-        - Signer 1: proposePause()
-        - Signer 2 + 3: approveAction(actionId)
-        - EXPECTED: ✅ SUCCESS - paused() = true
-
-[✅] 27. Try operations while paused
-        - Try: joinAsPredictor()
-        - EXPECTED: ❌ REVERT with "ContractCurrentlyPaused"
-        - Try: buySignalNFT()
-        - EXPECTED: ❌ REVERT with "ContractCurrentlyPaused"
-
-[✅] 28. Unpause the contract
-        - Signer 1: proposeUnpause()
-        - Signer 2 + 3: approveAction(actionId)
-        - EXPECTED: ✅ SUCCESS
-          - paused() = false
-          - Operations work again
-
-------------------------------------------------------------------------------
-VIEW FUNCTIONS (Read Contract Tab)
-------------------------------------------------------------------------------
-[✅] 29. Check platform statistics
-        - totalPredictorsJoined()
-        - EXPECTED: ✅ Returns correct count
-        - totalSignalsPurchased()
-        - EXPECTED: ✅ Returns correct count
-        - totalReferralsPaid()
-        - EXPECTED: ✅ Returns correct count
-
-[✅] 30. Check fee parameters
-        - commissionRate()
-        - EXPECTED: ✅ Returns 500 (5%)
-        - minSignalPrice()
-        - EXPECTED: ✅ Returns 5000000000000000000 (5 USDT)
-        - predictorJoinFee()
-        - EXPECTED: ✅ Returns 20000000000000000000 (20 USDT)
-        - buyerAccessFee()
-        - EXPECTED: ✅ Returns 500000000000000000 (0.5 USDT)
-        - referralPayout()
-        - EXPECTED: ✅ Returns 5000000000000000000 (5 USDT)
-
-[✅] 31. Check predictor status
-        - PredictorAccessPass: balanceOf(address)
-        - EXPECTED: ✅ Returns 1 for predictors, 0 for non-predictors
-        - PredictorAccessPass: isPredictorActive(address)
-        - EXPECTED: ✅ Returns true for active, false for blacklisted/non-predictor
-        - PredictorAccessPass: getPredictorTokenId(address)
-        - EXPECTED: ✅ Returns tokenId for predictors, reverts for non-predictors
-        - PredictorAccessPass: isBlacklisted(address)
-        - EXPECTED: ✅ Returns true/false correctly
-
-[✅] 32. Check signal ownership
-        - SignalKeyNFT: balanceOf(address)
-        - EXPECTED: ✅ Returns number of signals owned
-        - SignalKeyNFT: tokensOfOwner(address)
-        - EXPECTED: ✅ Returns array of owned tokenIds
-        - SignalKeyNFT: getContentIdentifier(tokenId)
-        - EXPECTED: ✅ Returns bytes32 contentIdentifier
-        - SignalKeyNFT: totalMinted()
-        - EXPECTED: ✅ Returns total NFTs minted
+MultiSig Governance:
+[x] 3 signers, 2 required
+[x] 1-hour action expiry
+[x] Proposal → Approve → Execute flow
 
 ================================================================================
-                    ⏳ REMAINING TASKS
+                    ✅ MANUAL TESTS COMPLETED (32/32)
 ================================================================================
 
-[✅] 1. Complete all manual tests above (items 1-32)
-       - All 32 manual tests verified on BNB Testnet
+MockUSDT Tests:
+[x] Mint test USDT
+[x] Check balance
+[x] Approve spending
 
-[✅] 2. Fix NFT metadata/image display issue
-       - Updated URIs via MultiSig (proposeUpdateMetadataURI)
-       - NFT images now display correctly
+Join as Predictor Tests:
+[x] Join without referrer
+[x] Join with valid referrer
+[x] Join with invalid referrer
+[x] Join with self as referrer
+[x] Double join prevention
 
-[✅] 3. Integration Tests (Foundry)
-       - 11 integration tests added (Integration.t.sol)
-       - Cross-contract scenarios
-       - Full user journey tests
-       - Edge cases with multiple users
+Buy Signal Tests:
+[x] Basic purchase
+[x] Higher price purchase
+[x] Below minimum price (rejected)
+[x] Invalid predictor (rejected)
+[x] Blacklisted predictor (rejected)
+[x] Multiple buyers same signal
+[x] Insufficient allowance (rejected)
 
-[✅] 4. Security/Fuzz Tests (Foundry)
-       - 18 fuzz tests added (Fuzz.t.sol)
-       - Fuzz test payment calculations
-       - Commission/payout/fee conservation verified
-       - Multi-user stress tests
+Soulbound Tests:
+[x] Transfer blocked
+[x] Approval blocked
 
-[SKIP] 5. Gas Profiling
-       - Skipped (BNB is cheap, not needed)
+Blacklist Tests (MultiSig):
+[x] Blacklist predictor
+[x] Unblacklist predictor
+[x] Blacklisted still owns NFT
 
-[⏳] 6. Professional Audit (Optional)
-       - Consider for mainnet launch
+Owner Mint Test (MultiSig):
+[x] Free predictor pass
 
-[⏳] 7. Deploy to BNB Mainnet
-       - Set IS_TESTNET = false in Deploy.s.sol
-       - Use real USDT address
-       - Complete Phase 2 MultiSig setup
+Transfer Tests:
+[x] SignalKeyNFT transferable
+[x] Content identifier preserved
+
+Metadata Tests (MultiSig):
+[x] Update PredictorAccessPass URI
+[x] Update SignalKeyNFT URI
+
+Pause Tests (MultiSig):
+[x] Pause contract
+[x] Operations blocked while paused
+[x] Unpause contract
+
+View Function Tests:
+[x] Platform statistics
+[x] Fee parameters
+[x] Predictor status
+[x] Signal ownership
+
+================================================================================
+                    💻 TECH STACK
+================================================================================
+
+Language: Solidity 0.8.28
+Framework: Foundry (Forge, Cast, Anvil)
+Standards: ERC721, OpenZeppelin
+Testing: Foundry Test + Fuzz
+Chain: BNB Smart Chain (BSC)
+
+================================================================================
+                    🔮 FUTURE ENHANCEMENTS (Optional)
+================================================================================
+
+[ ] Professional security audit
+[ ] Gas optimization
+[ ] Upgradeable contracts (proxy pattern)
+[ ] Additional NFT features
 
 ================================================================================
                     📝 NOTES
 ================================================================================
 
-- Always run `source .env` before any commands
+- Always run `source .env` before forge commands
 - Each MultiSig action expires in 1 hour
-- Treasury wallet receiving fees: 0xc21Ca5BA47cF1C485DE33b26D9Da3d10ACcDa413
-- See RUNBOOK.md for detailed step-by-step instructions
+- USDT on BSC uses 18 decimals (not 6!)
+- See RUNBOOK.md for operational procedures
+
+================================================================================

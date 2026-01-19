@@ -3,6 +3,19 @@ examples/
 backend-examples/
 frontend-example/
 
+# AI Development Prompts (private)
+AI-PROMPTS.txt
+
+# Deployment & Infrastructure Documentation (contains URLs, endpoints, architecture details)
+DEPLOYMENT_RENDER.md
+DEPLOYMENT_VERCEL.md
+DEPLOYMENT_MONGODB_ATLAS.md
+DEPLOYMENT_COMPLETE.md
+DEPLOYMENT_CHECKLIST.md
+ALCHEMY_WEBHOOK_PRODUCTION.md
+AlchemyProtection.md
+ProductionFlow.md
+
 # Foundry - Contracts Build Artifacts & Dependencies
 contracts/cache/
 contracts/out/
