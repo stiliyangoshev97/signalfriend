@@ -1,938 +1,151 @@
 ================================================================================
-                        SIGNALFRIEND FRONTEND TO-DO LIST
+                SIGNALFRIEND FRONTEND - Development Complete ✅
 ================================================================================
 
-Last Updated: 2025-12-30
-Current Version: v0.32.0 (Prediction Marketplace Complete)
+Last Updated: January 19, 2026
+Status: PRODUCTION LIVE at https://signalfriend.com
+Current Version: v0.35.8
 
 ================================================================================
-PHASE 13: PREDICTION MARKETPLACE PIVOT ✅ COMPLETE (December 30, 2025)
+                    🎉 ALL PHASES COMPLETE
 ================================================================================
 
-[✅] Signal Schema Updates
-    - Removed riskLevel display (badge and filters)
-    - Removed potentialReward display (badge and filters)
-    - Added confidenceLevel badge (1-100%, color-coded)
-    - Added eventUrl display as "View Event" button
-
-[✅] CreateSignalModal Redesign
-    - Replaced 1-2 day slider with date picker (1-90 days expiration)
-    - Added confidence level slider (1-100%)
-    - Added optional Event URL input with domain preview
-
-[✅] FilterPanel Updates
-    - Removed Risk Level filter section
-    - Removed Potential Reward filter section
-    - Added confidence level filter support (API ready)
-
-[✅] Category Restructure (6 Main Groups)
-    - Crypto, Finance, Politics, Sports, World, Culture
-    - 33 subcategories total
-
-[✅] Documentation Updates
-    - Updated all README.md, PROJECT_CONTEXT.md, CHANGELOG.md files
-    - Clarified "Web3 Prediction Signals Marketplace" positioning
-
-[✅] Pagination Component
-    - Added itemLabel prop (defaults to "signals")
-    - PredictorsPage now shows "total predictors"
+✅ PHASE 13: Prediction Marketplace Pivot (December 30, 2025)
+✅ PHASE 12: MiCA Compliance & Legal Updates (December 21, 2025)
+✅ PHASE 11: Client Feedback Fixes (December 20, 2025)
+✅ PHASE 10: Bug Fixes & Improvements (December 20, 2025)
+✅ PHASE 9: About & FAQ Pages (December 19, 2025)
+✅ PHASE 8: Production Bug Fixes (December 18, 2025)
+✅ PHASE 7: Improvements & Audits (December 13, 2025)
+✅ PHASE 6: Frontend Validation & Polish (December 9, 2025)
+✅ PHASE 5: Admin Blacklist via Smart Contract (December 9, 2025)
+✅ PHASE 4: Predictor Features (December 2025)
+✅ PHASE 3: Signals Feature (December 2025)
+✅ PHASE 2: Authentication & Wallet (November 2025)
+✅ PHASE 1: Core Scaffold (November 2025)
 
 ================================================================================
-PHASE 12: MICA COMPLIANCE & LEGAL UPDATES ✅ COMPLETE (December 21, 2025)
+                    📊 FRONTEND STATISTICS
 ================================================================================
 
-[✅] EU/EEA Region Disclaimer Modal
-    - Created RegionDisclaimerModal component (Uniswap-style legal disclaimer)
-    - Shows on first visit, blocks all interaction until acknowledged
-    - Checkbox confirmation for EU/EEA exclusion
-    - Stores acknowledgment in localStorage
-    - Added to App.tsx as global component
-
-[✅] Terms & Conditions - MiCA Compliance
-    - Added Section 2: Jurisdictional Restrictions (EU/EEA Exclusion)
-    - Added MiCA Compliance Notice (not offering crypto-asset services)
-    - Strengthened NFT-based language throughout all sections
-    - Clarified platform sells NFTs (digital collectibles), not crypto services
-    - Added jurisdictional eligibility acknowledgments for users and predictors
-    - Added "Accessing from Restricted Jurisdiction" as prohibited activity
-    - Renumbered all sections (now 13 total)
-    - Updated date to December 21, 2025
-
-[✅] FAQ - Signal Categories Documentation
-    - Added "What categories can I post signals in?" FAQ entry
-    - Documented all signal categories with styled tags:
-      * Crypto: Bitcoin, Ethereum, Altcoins, DeFi, NFTs, Layer 1/2, Meme Coins, Futures/Perpetuals, Others
-      * Traditional Finance: US Stock - Tech, US Stock - General, Forex - Majors, Commodities - Metals, Commodities - Energy, Others
-      * Macro/Other: Economic Data, Geopolitical Events, Sports, Others
+Components: 80+ React components
+Pages: 15+ routes
+Hooks: 40+ custom hooks
+API Functions: 30+ endpoints
+Bundle: Optimized with code splitting
 
 ================================================================================
-PHASE 11: CLIENT FEEDBACK FIXES ✅ COMPLETE (December 20, 2025)
+                    ✅ COMPLETED FEATURES
 ================================================================================
 
-[✅] About Page - Mobile Contract Addresses Overflow
-    - Fixed: Contract addresses caused horizontal scroll on mobile devices
-    - Removed showFull prop from CopyableAddress (now shows truncated format)
-    - Changed layout to flex-col on mobile, flex-row on desktop
-    - Added overflow-hidden to container
-    - Users can still copy full address or click BscScan link
+Core UI:
+[x] Dark theme with logo-inspired colors
+[x] Responsive design (mobile hamburger menu)
+[x] Loading skeletons
+[x] Error boundaries
 
-[✅] Edit Profile Modal - Smart Optional Social Links
-    - Made Telegram and Discord fields optional instead of required
-    - Added helper text: "Optional — recommended for faster support & trust"
-    - Implemented smart preferred contact auto-selection:
-      * Only Telegram filled → Telegram auto-selected as preferred
-      * Only Discord filled → Discord auto-selected as preferred
-      * Both filled → User MUST choose preferred (radio buttons shown)
-      * Neither filled → No preferred contact (radio buttons hidden)
-    - Shows info message when only one social is filled
-    - Save button shows "Select Preferred Contact" when both filled but no choice
-    - Removed confusing "None" option from selector
+Authentication:
+[x] RainbowKit wallet connection
+[x] SIWE sign-in flow
+[x] Session persistence
+[x] Auto-reconnect
 
-================================================================================
-PHASE 10: BUG FIXES & IMPROVEMENTS ✅ COMPLETE (December 20, 2025)
-================================================================================
+Signals:
+[x] Signal listing with filters
+[x] Signal detail page
+[x] Purchase flow (approval + buy)
+[x] Protected content reveal
+[x] Rating system
 
-[✅] Homepage Stats Improvement
-    - Changed "Total Signals" → "Signals Purchased" on homepage CTA section
-    - Shows totalPurchases instead of totalSignals (already in API response)
-    - Better metric showing actual marketplace activity
+Predictors:
+[x] Predictor listing
+[x] Predictor profiles
+[x] Become a Predictor flow
+[x] Predictor dashboard
+[x] Signal creation/management
+[x] Earnings display
+[x] Verification progress
 
-[✅] Signals Cache Invalidation Fix
-    - Fixed: Purchased signals remained visible on Signals page for ~2 minutes after purchase
-    - Root cause: usePurchaseFlow only invalidated purchaseKeys and signalKeys.detail, not signalKeys.lists()
-    - Solution: Added signalKeys.lists() to cache invalidation in usePurchaseFlow
-    - Impact: Signals now disappear immediately from Signals page after purchase confirmation
+Admin:
+[x] Admin dashboard
+[x] Earnings overview
+[x] Verification management
+[x] Report management
+[x] Dispute management
+[x] Blacklist management
 
-[✅] Become Predictor Page - Help Link Fix
-    - Changed broken external docs link to internal /faq page
-    - Now uses React Router Link component
+Pages:
+[x] Home (landing page)
+[x] Signals marketplace
+[x] Signal detail
+[x] My purchased signals
+[x] Predictors list
+[x] Predictor profile
+[x] Become a Predictor
+[x] Dashboard (predictor)
+[x] Admin dashboard
+[x] FAQ
+[x] About
+[x] Terms
+[x] News
 
-[✅] Purchase Modal - Insufficient Balance After Success Fix
-    - Fixed: "Insufficient Balance" warning shown after successful purchase
-    - Root cause: Balance check ran before success state check
-    - Solution: Check isPurchaseConfirmed first in step determination
+SEO:
+[x] useSEO hook
+[x] Open Graph tags
+[x] Twitter cards
+[x] Sitemap
+[x] Robots.txt
 
-[✅] Purchase Modal - Layout Shift Fix
-    - Fixed: Modal "stretches then shrinks" after purchase
-    - Root cause: Progress steps disappeared when balance dropped
-    - Solution: Keep progress steps visible on success state
+Performance:
+[x] React.lazy code splitting
+[x] Debounced search
+[x] TanStack Query caching
+[x] URL-synced filters
 
-[✅] My Signals Page - Card Layout Consistency
-    - Fixed: Separator line at different positions based on title/description length
-    - Solution: flex-col + flex-grow for variable content, fixed content at bottom
-
-[✅] Predictor Dashboard - Signal Card Layout Consistency
-    - Same fix applied to MySignalCard component
-    - Price/Sales/Earnings boxes now aligned across all cards
-
-[✅] New Signal Cache Invalidation
-    - Fixed: New signals don't appear on Signals page without refresh
-    - Added signalKeys.lists() invalidation to useCreateSignal hook
-
-================================================================================
-PHASE 9: ABOUT & FAQ PAGES ✅ COMPLETE (December 19, 2025)
-================================================================================
-
-[✅] About Page (/about)
-    - Official contract addresses with BscScan links
-    - CopyableAddress component for each contract
-    - Blockaid security verification badge
-    - Platform overview section
-    - Key features grid
-    - Links to FAQ, Terms, News
-    - Added to footer navigation
-
-[✅] FAQ Page (/faq)
-    - Comprehensive FAQ with 15+ questions
-    - Expandable accordion UI
-    - Category filtering (Wallet, Predictor, Trading, Fees, Security, General)
-    - Questions cover:
-      - NFT mobile wallet import
-      - Blank NFT images
-      - NFT differences (Predictor Pass vs Signal Key)
-      - Becoming a predictor
-      - Verification requirements
-      - Blacklist/dispute process
-      - Signal purchase flow
-      - Rating system
-      - Signal expiration
-      - Fee structure
-      - Referral program
-      - Payment security
-      - Contract verification
-      - Supported wallets
-      - Getting USDT on BNB Chain
-    - Community links (Discord, X)
-    - Added to navbar navigation
-
-[✅] Blockaid Security Announcement
-    - Added news item for Blockaid verification
-    - All 3 contracts whitelisted
-    - Domain (signalfriend.com) approved
-
-[✅] Navigation Updates
-    - Added "FAQ" to navbar (desktop + mobile)
-    - Added "About" to footer
+Legal:
+[x] EU/EEA Region Disclaimer Modal
+[x] Terms and Conditions
+[x] MiCA compliance notice
 
 ================================================================================
-PHASE 8: PRODUCTION BUG FIXES ✅ COMPLETE (December 18, 2025)
+                    💻 TECH STACK
 ================================================================================
 
-[✅] Fix 404 Errors on Page Refresh/Direct Navigation
-    - Issue: Refreshing or directly accessing routes like /signals, /predictors returned 404
-    - Root cause: Vercel server didn't serve index.html for client-side routes
-    - Solution: Added rewrites configuration to vercel.json
-    - Configuration: { "source": "/(.*)", "destination": "/index.html" }
-    - Impact: All routes now work correctly on refresh and direct URL access
-    - Documentation: Added deployment section to README.md
-    - Updated CHANGELOG.md with v0.22.0 entry
-    - Updated PROJECT_CONTEXT.md header date
+Framework: React 19
+Build: Vite
+Language: TypeScript
+Styling: Tailwind CSS
+Routing: React Router v7
+State: Zustand + TanStack Query
+Forms: React Hook Form + Zod
+Web3: wagmi v2 + viem + RainbowKit
+Error Tracking: Sentry
+Hosting: Vercel ($20/month)
 
 ================================================================================
-PHASE 7: IMPROVEMENTS & AUDITS ✅ COMPLETE (December 13, 2025)
+                    🔮 FUTURE ENHANCEMENTS (Optional)
 ================================================================================
 
-[✅] Configurable Social Links
-    - Created src/shared/config/social.ts
-    - VITE_DISCORD_URL, VITE_TWITTER_URL, VITE_CONTACT_EMAIL env vars
-    - Updated RootLayout footer to use socialLinks config
-    - Updated MaintenancePage to use socialLinks config
-    - Updated TermsPage to use socialLinks config
-    - Discord fallback removed (requires explicit configuration)
-
-[✅] News Page Updates
-    - Changed all dates from 2024 to 2025
-    - Added referral program announcement at top
-    - Removed outdated maintenance notice
-
-[✅] How It Works Section
-    - Added Step 5: "Refer & Earn" (5 USDT per referred predictor)
-
-[✅] Vercel Preview Support
-    - Created Dummy.txt for preview deployment triggers
-
-[✅] Documentation
-    - Updated .env.example with social link variables
-    - Updated CHANGELOG.md
+[ ] Toast notification system
+[ ] Optimistic UI updates
+[ ] E2E tests with Playwright
+[ ] PWA support
+[ ] Multi-language (i18n)
+[ ] Advanced animations
 
 ================================================================================
-PHASE 6: FRONTEND VALIDATION & POLISH ✅ COMPLETE
+                    📝 DEPLOYMENT NOTES
 ================================================================================
 
-[✅] Reserved Names Validation
-    - RESERVED_DISPLAY_NAMES array with 30+ prohibited names
-    - isReservedDisplayName() function with case-insensitive + partial match
-    - RESERVED_SOCIAL_HANDLES array for Twitter/Telegram/Discord
-    - isReservedSocialHandle() function
-    - Zod .refine() validation on all relevant fields
-
-[✅] Avatar URL Length Limit
-    - .max(500) validation on avatarUrl field
-    - User-friendly error message
-
-[✅] Admin Badge Rename
-    - "Multisig" → "Admin" in AuthButton
-    - Updated tooltip text
-
-[✅] Bio Text Truncation
-    - Added break-all to PredictorCard and PredictorInfoCard
-    - Long unbroken strings now properly truncate with ellipsis
-
-[✅] Documentation
-    - Updated all changelogs
-    - Updated PROJECT_CONTEXT.md
-    - Updated RUNBOOK.md
-
-================================================================================
-PHASE 5: ADMIN BLACKLIST VIA SMART CONTRACT ✅ COMPLETE
-================================================================================
-
-[✅] Smart Contract Blacklist Integration
-    - useProposeBlacklist hook for calling proposeBlacklist on-chain
-    - Extended PREDICTOR_ACCESS_PASS_ABI with proposeBlacklist function
-    - Confirmation modal with MultiSig explanation
-    - Success state with actionId and transaction hash
-    - Error handling with parseWalletError utility
-
-[✅] Verification Progress Bar Fix
-    - Use predictor.totalSales as primary source
-    - Proper earnings calculation with undefined check
-    - Progress bar now increments correctly
-
-================================================================================
-PHASE 1: CORE SCAFFOLD ✅ COMPLETE
-================================================================================
-
-[✅] Project Setup
-    - Vite + React + TypeScript configuration
-    - Tailwind CSS with dark theme
-    - Path aliases (@/ for src/)
-
-[✅] Web3 Integration
-    - wagmi v2 configuration for BNB Chain
-    - RainbowKit wallet connection UI
-    - viem for blockchain interactions
-    - Contract addresses config
-
-[✅] Base UI Components
-    - Button (5 variants: primary, secondary, danger, ghost, outline)
-    - Input with label, error, helper text
-    - Textarea
-    - Select dropdown
-    - Card with sub-components
-    - Modal (accessible dialog)
-    - Badge (status indicators)
-    - Spinner / PageLoader
-    - Avatar with fallback
-    - CopyableAddress (copy-to-clipboard with visual feedback)
-
-[✅] Providers Setup
-    - Web3Provider (wagmi + RainbowKit)
-    - QueryProvider (TanStack Query)
-    - SentryProvider (error boundary placeholder)
-
-[✅] Router Setup
-    - React Router v7 with placeholder pages
-    - RootLayout with Header/Footer
-    - Header with logo + mobile hamburger menu
-    - Routes: /, /signals, /predictors, /dashboard, /profile
-
-[✅] API Layer
-    - Axios client with interceptors
-    - JWT token refresh logic
-    - API endpoints configuration
-
-[✅] State Management
-    - Zustand auth store with persistence
-
-[✅] Zod Schemas
-    - API response schemas
-    - Auth schemas
-    - Signal schemas
-    - Predictor schemas
-    - Review schemas
-    - Receipt schemas
-    - Category schemas
-
-[✅] Hooks
-    - useAuth hook with SIWE authentication flow
-
-[✅] Documentation
-    - README.md with detailed setup instructions
-    - PROJECT_CONTEXT.md
-    - CHANGELOG.md
-    - RUNBOOK.md
-    - TO-DO-FRONTEND.txt (this file)
-
-================================================================================
-PHASE 2: AUTHENTICATION & WALLET ✅ COMPLETE
-================================================================================
-
-[✅] useAuth Hook Implementation
-    - Login with wallet signature (SIWE)
-    - Logout and disconnect wallet
-    - Loading and error states
-    - React Query mutation for async handling
-
-[✅] Wallet Authentication Flow
-    - Connect wallet button in header (RainbowKit)
-    - AuthButton component (Connect → Sign In → Sign Out flow)
-    - Sign message for authentication (SIWE pattern)
-    - Auto-reconnect on page refresh (wagmi persistence)
-    - Session sync on refresh (useSessionSync hook) - Fixed in v0.9.0
-
-[✅] Auth API Integration
-    - GET /api/auth/nonce - get signing nonce
-    - POST /api/auth/verify - verify signature & get JWT
-    - GET /api/auth/me - validate session token - Added in v0.9.0
-    - Token storage in Zustand + localStorage
-    - Proper API response unwrapping
-
-[✅] Header Navigation
-    - Shows "My Signals" and "Dashboard" only when authenticated
-    - AuthButton shows correct state (Connect/Sign In/Sign Out)
-
-[✅] JSDoc Documentation (Added in v0.3.0)
-    - All UI components (Button, Input, Card, etc.)
-    - Auth feature files (hooks, API, components, store)
-    - Providers (Web3, Query, Sentry)
-    - Router files (Header, RootLayout, index)
-    - Config files (env, api.config, wagmi, contracts)
-    - Hooks (useAuth, useIsAdmin, useIsPredictor)
-    - Utils (cn, format)
-    - API client and types/schemas
-    - Each file includes examples, accessibility notes, flow diagrams
-
-[✅] Protected Routes (Added in v0.4.0)
-    - ProtectedRoute - requires wallet + SIWE auth
-    - PredictorRoute - requires predictor registration
-    - PredictorRoute (requireVerified) - requires verified status
-    - AdminRoute - requires admin wallet address
-    - All guards redirect with state (from path, message)
-    - Added /become-predictor route for predictor registration
-
-[✅] Landing Page (Added in v0.5.0)
-    - HeroSection with tagline, value prop, CTAs, trust indicators
-    - FeaturesSection with 6-card grid of key features
-    - HowItWorksSection with tab-based Buyer/Predictor guides
-    - CTASection with stats and final conversion CTA
-    - HomePage composing all sections
-    - Barrel exports for home feature
-    - Router updated to use HomePage at root path
-
-[ ] User Profile Page
-    - Display wallet address
-    - Show role/predictor status
-    - Edit profile form (for predictors)
-
-================================================================================
-PHASE 3: SIGNALS FEATURE (PRIORITY: HIGH)
-================================================================================
-
-[✅] Signals List Page (/signals) - Added in v0.6.0
-    - API functions (fetchSignals, fetchCategories, etc.)
-    - React Query hooks (useSignals, useCategories)
-    - SignalCard component with risk/reward badges
-    - FilterPanel with category, risk, reward, price filters
-    - SignalGrid with loading/empty/error states
-    - Pagination component
-    - SignalsPage combining all components
-    - URL-synced filters (shareable/bookmarkable)
-    - Mobile-responsive collapsible filters
-
-[✅] Signal Detail Page (/signals/:contentId) - Added in v0.7.0
-    - SignalDetailPage with full signal info
-    - SignalDetailSkeleton for loading state
-    - PredictorInfoCard with avatar, stats, bio
-    - PurchaseCard with dynamic button states
-    - SignalContent with locked/unlocked views
-    - Breadcrumb navigation
-    - Share buttons (copy link, Twitter)
-    - Error state for missing signals
-
-[✅] Purchase Flow - Added in v0.8.0
-    - Contract ABIs (SignalFriendMarket, ERC20) in shared/config/abis
-    - Purchase API functions (fetchContentIdentifier, checkPurchase, fetchMyReceipts)
-    - React Query hooks for purchase flow:
-      - useCheckPurchase - check if user owns signal
-      - useContentIdentifier - get bytes32 for on-chain call
-      - useUSDTBalance - check user's USDT balance
-      - useUSDTAllowance - check spending allowance
-      - useApproveUSDT - approve USDT spending
-      - useBuySignal - execute buySignalNFT contract call
-      - usePurchaseFlow - combined hook for entire flow
-    - PurchaseModal component with multi-step flow:
-      - Balance check step
-      - USDT approval step (if needed)
-      - Purchase execution step
-      - Success/error states
-    - SignalDetailPage integration:
-      - Real ownership check via useCheckPurchase
-      - Purchase modal trigger
-      - Auto-refresh on successful purchase
-    - Backend endpoint: GET /api/signals/:contentId/content-identifier
-
-[✅] My Purchased Signals - Added in v0.8.2
-    - useMyReceipts hook to fetch user's purchase receipts
-    - PurchasedSignalCard component with owned badge, purchase info, links
-    - MyPurchasedSignalsPage at /my-signals route:
-      - Grid of purchased signals
-      - Sort by date or price
-      - Empty state with marketplace CTA
-      - Loading skeleton
-      - Error handling
-    - Router updated with real page (replaces placeholder)
-    - "View Signal" links to unlocked content on detail page
-    - "View TX" links to BSCScan explorer
-
-[✅] User-Friendly Transaction Errors - Added in v0.10.4
-    - walletErrors.ts utility for parsing wallet errors
-    - Detects user rejection, insufficient funds, network errors
-    - PurchaseModal shows clean error messages instead of raw technical data
-    - User rejections shown as yellow "Transaction Cancelled" (not scary red)
-    - parseWalletError() and isUserRejectionError() exported for reuse
-
-[✅] Leave Rating Functionality - Added in v0.1.0 (feature/rating-system)
-    - StarRating component (shared/components/ui) with interactive + read-only modes
-    - Reviews API (reviews.api.ts) with checkReviewExists, getReviewByTokenId, createReview
-    - React Query hooks (useReviews.ts) with useCheckReview, useGetReview, useCreateReview
-    - RatingSection component with confirmation dialog (ratings are PERMANENT)
-    - Integrated into SignalDetailPage below SignalContent for purchased signals
-    - Ratings tied to SignalKeyNFT tokenId (one rating per purchase)
-    - Cannot update or delete ratings (prevents manipulation)
-    - Submit rating to backend API
-    - One rating per purchase (enforced by tokenId)
-
-[✅] Purchased Signals Display - Added in v0.1.1 (fix/predictor-signals-display)
-    - Receipts API (receipts.api.ts) with getMyReceipts, getMyPurchasedContentIds
-    - React Query hook (useReceipts.ts) with useMyPurchasedContentIds
-    - SignalCard updated with isPurchased prop and "Purchased" badge
-    - SignalGrid updated with purchasedContentIds prop for O(1) lookup
-    - PredictorProfilePage now shows ALL signals (removed excludeBuyerAddress filter)
-    - Purchased signals display "Purchased" badge instead of "Active"
-    - Fixed bug where predictor profile showed "No signals found" after purchasing all
-
-================================================================================
-PHASE 4: PREDICTOR FEATURES (PRIORITY: MEDIUM)
-================================================================================
-
-[✅] Predictor List Page (/predictors) - Added in v0.11.0
-    - Fetch predictors with stats via usePredictors hook
-    - Filter by search, quick filters (Top Sellers, Best Rated, New)
-    - Sort by sales, rating, signals, newest
-    - PredictorCard with avatar, stats, rank badges
-    - Pagination with URL-synced filters
-    - Mobile-responsive filter panel
-
-[✅] Predictor Profile Page (/predictors/:wallet) - Added in v0.12.0
-    - Full profile info (avatar, name, bio, verification badge)
-    - Statistics (Signals, Sales, Avg Rating, Votes)
-    - Active signals grid with full FilterPanel (same as marketplace)
-    - URL-synced filters, pagination, mobile-responsive
-    - Twitter social link display
-    - No text reviews (rating only to avoid moderation issues)
-
-[✅] Become a Predictor Flow - Added in v0.2.0
-    - BecomePredictorPage with complete registration flow
-    - Benefits overview (earn from signals, reputation, referrals, NFT pass)
-    - Check if user already owns PredictorAccessPass NFT
-    - USDT balance and allowance checking
-    - Optional referral address input with toggle (supports URL param ?ref=0x...)
-    - Multi-step flow: Review → Approve USDT → Register → Success
-    - Call joinAsPredictor on SignalFriendMarket contract
-    - Predictor record created via backend webhook on PredictorJoined event
-    - Redirect to dashboard after successful registration
-    - PUBLIC PAGE with internal auth handling:
-      - Not connected → Shows "Connect Wallet" button (RainbowKit)
-      - Connected but not signed in → Shows "Sign In" button
-      - Already predictor → Shows "Already a Predictor" message
-      - Authenticated, not predictor → Shows full registration flow
-    - Delayed cache invalidation for webhook processing:
-      - Uses useEffect with setTimeout at 2s, 5s, 10s intervals
-      - Same pattern as usePurchase.ts for rate limit handling
-      - ESLint disable comments needed for react-hooks/set-state-in-effect
-    - Contract ABIs added:
-      - PREDICTOR_ACCESS_PASS_ABI (balanceOf)
-      - joinAsPredictor, getPlatformParameters in SIGNAL_FRIEND_MARKET_ABI
-      - PredictorJoined event
-    - Hooks created in useBecomePredictor.ts:
-      - usePredictorNFTBalance
-      - usePlatformParameters
-      - useUSDTBalanceForPredictor
-      - useUSDTAllowanceForPredictor
-      - useApproveUSDTForPredictor
-      - useJoinAsPredictor
-      - useBecomePredictor (combined)
-
-[✅] Predictor Dashboard (/dashboard - predictor only) - Added in v0.9.0
-    - Dashboard stats overview (signals, sales, earnings, rating)
-    - My Signals grid with filter tabs (all/active/inactive)
-    - Signal management (view, deactivate, reactivate)
-    - Create Signal modal (available to all predictors)
-    - API functions for signal CRUD operations
-    - React Query hooks (useMySignals, useMyEarnings, useCreateSignal, etc.)
-    - DashboardStats component with animated stat cards
-    - MySignalCard component with expiry tracking
-    - CreateSignalModal with full form validation
-    - Verification badge display for verified predictors
-    - Empty state with CTA for first signal
-    - Router updated with real PredictorDashboardPage
-
-[✅] Auth Persistence Fix - Fixed in v0.9.0
-    - Backend now returns predictor data on /api/auth/verify
-    - Predictor data persisted to localStorage with JWT
-    - Route guards wait for Zustand hydration before redirect
-    - useSessionSync validates token on page refresh
-    - No more redirect flash or manual reconnect needed
-
-================================================================================
-PHASE 5: RATINGS (PRIORITY: MEDIUM)
-================================================================================
-
-NOTE: Rating system is STAR RATING ONLY (1-5 stars), no text reviews.
-This avoids moderation issues (spam links, inappropriate content).
-
-[ ] Rating System
-    - Star rating component (1-5 stars)
-    - Rating form after purchase (simple star selection)
-    - Submit rating to API
-    - Display average rating and vote count on predictor cards/profiles
-
-[ ] Rating Display
-    - Average rating badge (already shown)
-    - Total votes count (already shown)
-    - Rating breakdown chart (optional - shows distribution of 1-5 star votes)
-
-================================================================================
-PHASE 6: ADMIN FEATURES ✅ COMPLETE (v0.5.0)
-================================================================================
-
-[✅] Admin Dashboard (/admin - admin only) - Added in v0.5.0
-    - AdminDashboardPage with tabbed interface (Earnings, Verifications, Reports, Disputes)
-    - Platform earnings breakdown (from predictor joins, buyer fees, commissions)
-    - AdminStatsCard component with earnings visualization
-    - Quick Stats panel showing pending verifications and disputes
-    - Admin-only route protection via AdminRoute guard
-    - Admin link in Header (only visible to admin wallets)
-
-[✅] Verification Management - Added in v0.5.0
-    - Pending verifications list tab
-    - VerificationRequestCard with predictor details
-    - Approve/Reject verification actions
-    - Shows total sales, bio, social links, preferred contact
-
-[✅] Reports Management - Added in v0.5.0
-    - Reports tab with status filtering (pending/reviewed/resolved/dismissed)
-    - ReportCard with expandable details
-    - Update report status functionality
-    - Add admin notes capability
-    - Pagination for large report lists
-
-[✅] Disputes Management - Added in v0.5.0
-    - Disputes tab with status filtering (pending/contacted/resolved/rejected)
-    - DisputeCard with predictor contact info
-    - Status workflow: pending → contacted → resolved/rejected
-    - Resolve dispute auto-unblacklists predictor
-    - Dispute counts badge in tab header
-
-[✅] Predictor Dispute Flow - Added in v0.5.0
-    - BlacklistBanner component for blacklisted predictors
-    - File Dispute button triggers simple dispute creation
-    - No explanation needed - admin contacts via preferred method
-    - Disputes API + hooks for predictors (createDispute, getMyDispute)
-    - One dispute per predictor enforced
-
-[✅] Blacklist/Unblacklist from Admin Dashboard (Added in v0.6.0)
-    - Blacklisted Predictors tab in admin dashboard
-    - View all blacklisted predictors with stats
-    - Unblacklist button with confirmation
-    - Auto-refresh after actions
-    - Reminder about on-chain MultiSig action
-
-[✅] Admin Blacklist Button on Predictor Profiles (Added in v0.6.0)
-    - Blacklist/Unblacklist button visible only to admins
-    - Red danger button for blacklist action
-    - Secondary button for unblacklist action
-    - Warning indicator for blacklisted predictors
-
-[✅] Buyer Report Signal Feature (Added in v0.6.0)
-    - Report button on purchased signal detail page
-    - ReportSignalModal with reason selection and description
-    - Submit report to backend (one per purchase)
-    - "Already Reported" state shown after submission
-    - URL stripping on backend for security
-
-================================================================================
-PHASE 7: POLISH & FIXES ✅ PARTIAL (December 9, 2025)
-================================================================================
-
-[✅] Legal & Compliance
-    - Terms and Conditions page (/terms)
-    - Legal positioning as NFT marketplace (not financial advice, not gambling)
-    - Footer links: Terms | Contact | Discord | X
-
-[✅] Maintenance Mode
-    - MaintenancePage component
-    - Environment variable toggle (VITE_MAINTENANCE_MODE)
-    - Customizable message and end time
-    - RUNBOOK documentation
-
-[✅] UI/UX Fixes
-    - Signals page subtitle updated (removed refund claims)
-    - Footer social links updated (Discord, X)
-    - Contact email added to footer
-
-[✅] Performance (v0.17.0)
-    - React.lazy for route splitting (all pages except HomePage)
-    - Debounced search inputs (useDebounce hook, 300ms delay)
-    - Query caching strategies (TanStack Query built-in)
-    [ ] Image optimization (not needed yet)
-
-[ ] UX Improvements
-    - Toast notifications
-    - Loading skeletons
-    - Optimistic updates
-    - Error recovery
-
-[ ] Accessibility
-    - Keyboard navigation
-    - Screen reader support
-    - Focus management
-    - ARIA labels
-
-[ ] Mobile Responsiveness
-    - Mobile navigation menu
-    - Touch-friendly interactions
-    - Responsive layouts
-
-[✅] SEO & Meta (v0.16.0)
-    - useSEO hook for dynamic page titles
-    - Open Graph tags for social sharing
-    - Twitter cards
-    - Page-specific meta descriptions
-    - noIndex for private/admin pages
-
-================================================================================
-KNOWN ISSUES / BUGS
-================================================================================
-
-[✅] FIXED: SignalCard shows "Expired" for all signals (v0.8.1)
-    - Location: src/features/signals/components/SignalCard.tsx
-    - Problem: getExpiryInfo() was called with createdAt date (always in the past)
-    - Solution: Added expiresAt field to backend Signal model
-    - Predictors now set expiryDays (1-30) when creating signals
-    - SignalCard and SignalDetailPage now use real expiresAt
-    - Migration script added for existing signals
-
-[✅] FIXED: Unauthenticated users redirected from signal detail page (v0.9.6)
-    - Location: src/features/signals/hooks/usePurchase.ts, src/shared/api/apiClient.ts
-    - Problem: Protected API hooks fired before auth store hydrated, causing 401s
-    - Solution: Added hasHydrated + hasToken checks to all protected hooks
-    - Also updated apiClient to not redirect on 401 for public endpoints
-
-[✅] FIXED: Price input can't enter trailing decimals (v0.9.6)
-    - Location: src/features/predictors/components/CreateSignalModal.tsx
-    - Problem: type="number" with valueAsNumber strips trailing zeros on each keystroke
-    - Solution: Changed to type="text" with inputMode="decimal" + custom validation
-
-[✅] FIXED: SignalCard layout inconsistent (footer at different heights) (v0.9.6)
-    - Location: src/features/signals/components/SignalCard.tsx
-    - Problem: Variable title lengths and verbose expiry text caused cards to have different heights
-    - Solution: Added h-full + mt-auto, min-h on title, abbreviated expiry format (e.g., "Expires in 8h")
-
-[✅] FIXED: Predictor sales not showing on signal detail page (v0.12.1)
-    - Location: Backend signal.service.ts + frontend PredictorInfoCard.tsx
-    - Problem: Signal detail API only populated minimal predictor fields (missing totalSales, totalReviews, bio, isVerified)
-    - Solution: Backend now populates all PredictorInfoCard fields; frontend uses totalSales with fallback
-
-[✅] FIXED: Stale data shown after wallet switch (v0.1.2)
-    - Location: src/features/auth/api/authHooks.ts (useSessionSync)
-    - Problem: When user switched wallets, they were logged out but stayed on current page with stale data
-    - Example: Predictor profile showed "Purchased" badges for signals bought by OLD wallet
-    - Solution: useSessionSync now redirects to home page on wallet change via router.navigate('/')
-    - User must sign in again with new wallet to get fresh data
-
-[✅] FIXED: 401 error when visiting predictor profile with connected but unsigned wallet (v0.1.3)
-    - Location: src/features/predictors/pages/PredictorProfilePage.tsx
-    - Problem: useMyPurchasedContentIds hook was enabled when wallet was connected (not signed in)
-    - Root cause: Hook checked !!connectedWallet but API requires SIWE authentication
-    - Solution: Changed to check isAuthenticated from useAuthStore instead of wallet connection
-    - Also improved useSessionSync to only track addresses when authenticated
-
-[✅] FIXED: Rating submission doesn't update UI without page refresh (v0.1.4)
-    - Location: src/features/signals/hooks/useReviews.ts
-    - Problem: After rating a signal, predictor profile and signal detail didn't show updated rating
-    - Root cause: Only review-specific queries were invalidated, not signal/predictor queries
-    - Solution: useCreateReview now invalidates signal detail, predictor profile, and signal lists
-
-[✅] FIXED: Purchase not reflected in UI when API rate-limited (v0.1.4)
-    - Location: src/features/signals/hooks/usePurchase.ts
-    - Problem: Blockchain transaction succeeded but UI didn't update due to API rate limiting
-    - Root cause: Cache invalidation happened immediately, but webhook might not have processed yet
-    - Solution: Added multiple delayed cache invalidations (2s, 5s, 10s) after purchase confirmation
-    - Test: Use scripts/trigger-rate-limit.sh to simulate rate limiting during purchase
-
-================================================================================
-TECHNICAL DEBT
-================================================================================
-
-[ ] Add comprehensive error handling to all API calls
-[ ] Add unit tests for components
-[ ] Add integration tests for flows
-[ ] Add E2E tests with Playwright
-[ ] Set up Sentry error tracking (currently placeholder)
-[ ] Configure proper CSP headers
-[ ] Add rate limiting feedback to users
-
-================================================================================
-PHASE 7: ADMIN DASHBOARD & MODERATION ✅ COMPLETE
-================================================================================
-
-[✅] Admin Dashboard Page - Added in v0.5.0
-    - Only accessible by admin wallets (3 MultiSig signers)
-    - Tab-based navigation (Earnings, Verifications, Reports, Disputes)
-    - Real-time counts on tabs for pending items
-    - Dark theme consistent with app design
-
-[✅] Platform Earnings Tab - Added in v0.5.0
-    - AdminStatsCard component showing earnings breakdown
-    - Revenue from predictor joins ($15 per join after referral bonus)
-    - Revenue from buyer access fees ($0.50 per purchase)
-    - Revenue from commissions (5% of signal volume)
-    - Total earnings calculation
-    - Quick stats panel (pending verifications, disputes)
-
-[✅] Verification Management - Added in v0.5.0
-    - VerificationRequestCard component
-    - List of pending verification requests
-    - Predictor info (name, wallet, bio, contact, social links)
-    - Approve/Reject buttons with loading states
-    - Direct contact links (Telegram, Discord)
-
-[✅] Reports Management - Added in v0.5.0
-    - ReportCard component with expandable details
-    - Reports list with status filtering (pending, reviewed, resolved, dismissed)
-    - Signal and predictor info for context
-    - Admin notes (editable)
-    - Status update workflow (pending → reviewed → resolved/dismissed)
-    - Pagination support
-    - Links to signal detail and predictor profile
-
-[✅] Disputes Management - Added in v0.5.0
-    - DisputeCard component with expandable details
-    - Disputes list with status filtering (pending, contacted, resolved, rejected)
-    - Predictor info and contact details
-    - Admin notes for tracking communication
-    - Status workflow: pending → contacted → resolved/rejected
-    - "Resolve & Unblacklist" action (unblacklists predictor in DB)
-    - Pagination support
-    - Links to predictor profile
-
-[✅] Admin Feature Module Structure
-    - types/admin.types.ts - TypeScript types for admin data
-    - api/admin.api.ts - API functions for all admin endpoints
-    - hooks/useAdmin.ts - React Query hooks with caching
-    - components/ - AdminStatsCard, VerificationRequestCard, ReportCard, DisputeCard
-    - pages/AdminDashboardPage.tsx - Main dashboard with tabs
-    - Barrel exports (index.ts files at each level)
-
-[✅] API Endpoints Integrated
-    - GET /api/admin/stats - Platform earnings breakdown
-    - GET /api/admin/reports - List reports with pagination
-    - GET /api/admin/reports/:id - Get single report
-    - PUT /api/admin/reports/:id - Update report status
-    - GET /api/admin/disputes - List disputes with pagination
-    - GET /api/admin/disputes/counts - Dispute counts by status
-    - PUT /api/admin/disputes/:id - Update dispute status
-    - POST /api/admin/disputes/:id/resolve - Resolve and unblacklist
-
-[ ] Predictor Dispute Button
-    - "Dispute" button on blacklisted predictor's dashboard
-    - POST /api/disputes - Create dispute (authenticated blacklisted predictor)
-    - GET /api/disputes/me - Get own dispute status
-    - Simple one-click action (no explanation field needed)
-
-================================================================================
-PHASE 8: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)
-================================================================================
-
-[x] #1 Fix "You have already reported" → "You have reported" message
-[x] #2 Show "Login rejected" instead of verbose viem error on sign-in rejection
-    - Updated AuthButton to use parsedError.title instead of raw error message
-    - Updated walletErrors to show "Request Cancelled" for better UX
-[x] #3 Display updated verification requirements (100 sales + $1000 earnings)
-    - Added verification progress card to dashboard
-    - Shows progress bars for both sales (100) and earnings ($1000)
-[x] #4 Admin ability to manually verify any predictor regardless of sales
-    - Added useManualVerifyPredictor() and useUnverifyPredictor() hooks
-    - "Admin Actions" section on predictor profile pages
-    - Verify/Unverify button alongside Blacklist button
-[x] #5 Frontend validation for referral address (must be existing predictor)
-    - Added checkPredictorStatus API call
-    - Debounced validation on BecomePredictorPage
-    - Shows clear error if address is not a registered predictor
-    - Improved error message: "Invalid address format. Please enter a valid wallet address (0x...)"
-[x] #6 Fix purchase modal staying open after rate limit during purchase
-    - Added 'error' step type to usePurchase hook
-    - PurchaseModal shows API errors with Retry button
-[x] #7 Add referral earnings display to predictor dashboard
-    - New referral earnings card showing paid referrals and earnings
-    - Updated PredictorEarnings type to include referral data
-    - Card now always visible (with explanation if no referrals)
-    - Updated to green theme consistent with site design
-[x] #8 Admin can view predictor's total earnings on their profile
-    - "Admin Only - Earnings" card on predictor profiles
-    - Shows: Total Earnings, From Sales, From Referrals, Platform Fee
-    - Uses green theme consistent with site design
-[x] #9 Set up Sentry for error tracking (frontend)
-    - SentryProvider already implemented with @sentry/react
-    - Configured with error filtering and privacy settings
-[x] #10 UI/UX improvements (green theme consistency, verified badge on Predictors page)
-    - "Admin Only - Contact Info" and "Admin Only - Earnings" use green theme (was purple/pink)
-    - Referral Earnings card uses green theme (was purple/pink)
-    - Verified badge on Predictors page matches profile page style (Badge with checkmark icon)
-    - Admin action buttons properly spaced in flex container
-
-================================================================================
-BUGS FIXED (December 8, 2025) ✅
-================================================================================
-
-BLACKLIST SYSTEM - ALL FIXED:
-[x] Blacklisted predictor signals filtered from SignalsPage
-[x] SignalDetailPage blocks purchasing from blacklisted predictors
-[x] PurchaseCard shows "Predictor Blacklisted" and disables button
-[x] Blacklisted predictor profile shows warning banner
-[x] UI auto-refreshes after blacklist/unblacklist (query invalidation)
-[x] Blacklisted predictor's signals hidden on their profile page
-[x] Edit Profile button disabled when blacklisted
-[x] Create Signal button disabled when blacklisted
-
-ADMIN FEATURES - ALL FIXED:
-[x] Admin can see predictor's telegram/discord/preferred contact on profile
-[x] Admin notes in reports/disputes editable with "Save Notes" button
-[x] Reports auto-refresh when new report is created
-
-INPUT VALIDATION - ALL FIXED:
-[x] Signal creation blocks links in name/description/content (real-time)
-[x] Report description blocks links on input (real-time validation)
-[x] Profile required fields clearly marked with red asterisks
-[x] Preferred contact defaults to 'discord'
-[x] Bio text wraps properly on predictor profile page
-
-PREVIOUS BUGS (FIXED):
-[✅] Predictors page search filter cannot be reset
-[✅] Mobile responsive issues
-[✅] Wallet address copy with CopyableAddress component
-
-================================================================================
-DEPENDENCIES TO WATCH
-================================================================================
-
-- wagmi: Currently v2, watch for v3 updates
-- RainbowKit: Keep in sync with wagmi version
-- viem: Core blockchain library
-- TanStack Query: v5, stable
-- Zustand: v4, stable
-- React Router: v6, stable
-
-================================================================================
-NOTES
-================================================================================
-
-1. Always test wallet flows on BSC Testnet (chainId: 97) before mainnet
-2. Use the WalletConnect projectId from .env.local for wallet connections
-3. API URL defaults to http://localhost:3001 for local development
-4. Frontend runs on port 5173 (Vite default)
-
-================================================================================
-FRONTEND STATUS SUMMARY
-================================================================================
-
-✅ **PRODUCTION LIVE** - https://signalfriend.com
-
-**Deployment:**
-- Vercel (Pro Trial, then $20/month)
-- Auto-deploy from main branch
-- Custom domain with Cloudflare DNS
-- SSL certificates via Vercel
-
-**Completed:**
-- All 7 development phases complete
-- Logo-inspired theme with warm greens and golden tones
-- All marketplace features (signals, predictors, purchases)
-- Admin dashboard with full management capabilities
-- Verification system with reapplication tracking
-- Report and dispute systems
-- Mobile responsive design (hamburger menu, scaling)
-- SEO optimized (useSEO hook, meta tags, OG tags)
-- Performance optimized (React.lazy, debounced search)
-- Security headers configured (vercel.json)
-- CI/CD pipeline active
-- Documentation complete
-
-**Post-Deployment Tasks:**
-[ ] Real device testing (mobile) after deployment
-[ ] Monitor Sentry for errors
-[ ] Monitor for 48 hours
+Vercel Configuration:
+- Root Directory: frontend
+- Framework: Vite
+- Build Command: npm run build
+- Output Directory: dist
+- Node.js Version: 20.x
+
+Environment Variables: 14 total (see .env.example)
+
+SPA Routing: vercel.json rewrites all routes to index.html
 
 ================================================================================

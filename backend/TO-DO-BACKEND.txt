@@ -1,462 +1,117 @@
-# SignalFriend Backend Development Tracker
-# Created: 2024-11-30
-# Last Updated: 2025-12-30
+# SignalFriend Backend - Development Complete ✅
+# Last Updated: January 19, 2026
+# Status: PRODUCTION LIVE at https://api.signalfriend.com
 
 ================================================================================
-## PHASE 11: PREDICTION MARKETPLACE PIVOT ✅ COMPLETE (December 30, 2025)
-================================================================================
-[x] Signal schema updated for prediction marketplace
-    - Removed riskLevel and potentialReward fields
-    - Added confidenceLevel (1-100%)
-    - Added eventUrl (optional, for Polymarket/Predict.fun links)
-    - Changed expiry from expiryDays to expiresAt (1-90 days)
-[x] Categories restructured (6 main groups, 33 subcategories)
-    - Crypto, Finance, Politics, Sports, World, Culture
-[x] Seed scripts refactored for prediction marketplace
-    - seedTestSignals.ts: 60+ prediction-focused titles, confidence levels, event URLs
-    - seedTestSignal.ts: Single test prediction signal
-    - migrateConfidenceLevel.ts: Migration helper for old signals
-[x] 500 test prediction signals seeded for load testing
-[x] All unit tests passing (290 tests)
-[x] Documentation updated (CHANGELOG, README, PROJECT_CONTEXT)
-
-================================================================================
-## PHASE 10: SECURITY & CI/CD ✅ COMPLETE (December 13, 2025)
-================================================================================
-[x] Full security audit (documented in /AUDIT.md)
-[x] Rate limiting verified on all endpoints
-[x] Added writeRateLimiter to admin POST/PUT/DELETE routes
-[x] Added writeRateLimiter to dispute admin routes
-[x] CI/CD pipeline created (.github/workflows/ci.yml)
-    - TypeScript compilation check
-    - ESLint linting
-    - Vitest unit/integration tests (290 tests)
-[x] SetupWebhooks.md updated with exact working GraphQL query
-[x] Seeded 2500 signals for load testing (5x seed:signals:500)
-
-================================================================================
-## PHASE 1: Project Setup ✅
-================================================================================
-[x] Create feature branch (feature/backend-setup)
-[x] Initialize backend folder structure
-[x] Create package.json with dependencies
-[x] Create tsconfig.json
-[x] Create .env.example
-[x] Set up ESLint + Prettier configs
-
-================================================================================
-## PHASE 2: Shared Infrastructure ✅
-================================================================================
-[x] src/shared/config/env.ts - Environment variables with Zod validation
-[x] src/shared/config/database.ts - MongoDB connection with Mongoose
-[x] src/shared/config/logger.ts - Pino logger setup
-[x] src/shared/middleware/security.ts - Helmet, CORS config
-[x] src/shared/middleware/rateLimiter.ts - Express rate limiting
-[x] src/shared/middleware/errorHandler.ts - Global error handler
-[x] src/shared/middleware/validation.ts - Zod validation middleware
-[x] src/shared/middleware/auth.ts - JWT verification middleware
-[x] src/shared/utils/ApiError.ts - Custom error class
-[x] src/shared/utils/asyncHandler.ts - Async route wrapper
-[x] src/shared/types/api.types.ts - API response types
-[x] src/shared/types/common.types.ts - Shared types (Address, etc.)
-
-================================================================================
-## PHASE 3: Contract Integration ✅
-================================================================================
-[x] src/contracts/addresses.ts - Contract addresses by chainId
-[x] src/contracts/clients.ts - Viem public client setup
-[x] src/contracts/abis/ - Extracted ABIs from Foundry build output
-
-================================================================================
-## PHASE 4: MongoDB Models ✅
-================================================================================
-[x] src/features/predictors/predictor.model.ts
-[x] src/features/signals/signal.model.ts
-[x] src/features/receipts/receipt.model.ts
-[x] src/features/reviews/review.model.ts
-[x] src/features/categories/category.model.ts
-
-================================================================================
-## PHASE 5: Authentication Feature (SIWE + JWT) ✅
-================================================================================
-[x] src/features/auth/auth.schemas.ts - Zod schemas (nonce, verify)
-[x] src/features/auth/auth.service.ts - SIWE verify, JWT sign/verify
-[x] src/features/auth/auth.controller.ts - getNonce, verify, logout
-[x] src/features/auth/auth.routes.ts - POST /auth/nonce, /auth/verify
-[x] src/features/auth/auth.types.ts - Auth-specific types
-
-================================================================================
-## PHASE 6: Webhook Feature (Alchemy Event Indexing) ✅
-================================================================================
-[x] src/features/webhooks/webhook.schemas.ts - Alchemy webhook payload
-[x] src/features/webhooks/webhook.service.ts - Event handlers with viem decoding
-[x] src/features/webhooks/webhook.controller.ts - Process events
-[x] src/features/webhooks/webhook.routes.ts - POST /webhooks/alchemy
-[x] Event signature generation (PredictorJoined, SignalPurchased, PredictorBlacklisted)
-[x] viem decodeEventLog integration with contract ABIs
-[x] src/shared/services/blockchain.service.ts - On-chain verification utilities
-[x] Set up Alchemy Custom (GraphQL) Webhook in Dashboard
-[x] GraphQL webhook payload support (discriminated union schema)
-[x] ContentId format conversion (UUID ↔ bytes32)
-[x] src/shared/utils/contentId.ts - uuidToBytes32, bytes32ToUuid
-[x] SignalService.getContentIdentifier() - For frontend to get bytes32
-[x] Tested PredictorJoined event → Creates Predictor in MongoDB
-[x] Tested SignalPurchased event → Creates Receipt in MongoDB
-[x] Tested PredictorBlacklisted event → Updates Predictor.isBlacklisted
-
-================================================================================
-## PHASE 7: Core Features
+                    🎉 ALL PHASES COMPLETE
 ================================================================================
 
-### Predictors Feature ✅
-[x] src/features/predictors/predictor.schemas.ts
-[x] src/features/predictors/predictor.service.ts
-[x] src/features/predictors/predictor.controller.ts
-[x] src/features/predictors/predictor.routes.ts
-
-### Signals Feature ✅
-[x] src/features/signals/signal.schemas.ts
-[x] src/features/signals/signal.service.ts
-[x] src/features/signals/signal.controller.ts
-[x] src/features/signals/signal.routes.ts
-
-### Receipts Feature ✅
-[x] src/features/receipts/receipt.schemas.ts
-[x] src/features/receipts/receipt.service.ts
-[x] src/features/receipts/receipt.controller.ts
-[x] src/features/receipts/receipt.routes.ts
-
-### Reviews Feature ✅ (Simplified to Rating-Only, Permanent)
-[x] src/features/reviews/review.schemas.ts
-[x] src/features/reviews/review.service.ts
-[x] src/features/reviews/review.controller.ts
-[x] src/features/reviews/review.routes.ts
-[x] Simplified to rating-only (removed reviewText field)
-[x] Verified review validation (checks Receipt ownership via tokenId)
-[x] Clarified ratings are off-chain only (no markSignalRated on-chain)
-[x] Made ratings PERMANENT (removed update/delete routes and methods)
-    - Removed PUT /reviews/:tokenId route
-    - Removed DELETE /reviews/:tokenId route
-    - Removed update() and delete() service methods
-    - Prevents rating manipulation for integrity
-
-### Reports Feature ✅ (NEW - Scam/False Signal Reporting)
-[x] src/features/reports/report.model.ts - MongoDB model with status workflow
-[x] src/features/reports/report.schemas.ts - Zod validation schemas
-[x] src/features/reports/report.service.ts - Business logic (create, list, stats)
-[x] src/features/reports/report.controller.ts - Express request handlers
-[x] src/features/reports/report.routes.ts - API route definitions
-[x] Report reasons: false_signal, misleading_info, scam, duplicate_content, other
-[x] Status workflow: pending → reviewed → resolved/dismissed
-[x] One report per purchase (unique tokenId constraint)
-[x] Report validation (requires Receipt ownership)
-
-### Categories Feature ✅
-[x] src/features/categories/category.schemas.ts
-[x] src/features/categories/category.service.ts
-[x] src/features/categories/category.controller.ts
-[x] src/features/categories/category.routes.ts
-[x] Database seed script for initial categories
+✅ PHASE 11: Prediction Marketplace Pivot (December 30, 2025)
+✅ PHASE 10: Security & CI/CD (December 13, 2025)
+✅ PHASE 9: Testing (290 tests passing)
+✅ PHASE 8: Main App Entry
+✅ PHASE 7: Core Features
+✅ PHASE 6: Webhook Feature (Alchemy)
+✅ PHASE 5: Authentication (SIWE + JWT)
+✅ PHASE 4: MongoDB Models
+✅ PHASE 3: Contract Integration
+✅ PHASE 2: Shared Infrastructure
+✅ PHASE 1: Project Setup
 
 ================================================================================
-## PHASE 8: Main App Entry ✅
-================================================================================
-[x] src/index.ts - Express app setup, route mounting
-[x] Health check endpoint
-[x] Graceful shutdown handling
-
-================================================================================
-## PHASE 9: Testing ✅
-================================================================================
-[x] vitest.config.ts
-[x] tests/setup.ts - Test database setup
-[x] Unit tests for utilities (contentId, textValidation, ApiError)
-[x] Unit tests for schemas (predictor, signal, review)
-[x] Unit tests for services (auth.service)
-[x] Integration tests for routes (health, errorHandling)
-[x] Fixed global regex state bug in textValidation.ts
-[x] 290 tests passing (277 unit + 13 integration)
-
-================================================================================
-## PHASE 10: Network Configuration ✅
-================================================================================
-[x] CHAIN_ID env variable (97=testnet, 56=mainnet)
-[x] Network helper functions (isTestnet, isMainnet, getNetworkName)
-[x] Mainnet address validation (throws if zeros)
-[x] Simplified .env (removed contract addresses)
-[x] Contract addresses in addresses.ts (single source of truth)
-[x] Official BSC USDT address pre-configured for mainnet
-
-================================================================================
-## PHASE 10.5: Predictor Enhancements ✅
-================================================================================
-[x] Added preferredContact field to Predictor model (telegram | discord)
-[x] Updated predictor.schemas.ts to allow updating preferredContact
-[x] Added MIN_SIGNAL_PRICE_USDT env variable (default: 5)
-[x] Updated signal.schemas.ts to use env variable for validation
-[x] Added earnings endpoint GET /api/predictors/:address/earnings
-[x] Updated predictor.service.ts with getEarnings() method
-[x] Updated predictor.controller.ts with getPredictorEarnings handler
-[x] Updated predictor.routes.ts with earnings route
-
-================================================================================
-## PHASE 10.6: Admin Features ✅
-================================================================================
-[x] Added ADMIN_ADDRESSES env variable (comma-separated MultiSig wallets)
-[x] Created admin middleware (src/shared/middleware/admin.ts)
-    - isAdmin(address) helper function
-    - requireAdmin middleware for protected routes
-[x] Hidden sensitive contact info from public API responses
-    - telegram, discord, preferredContact hidden from regular users
-    - Only twitter visible to public
-[x] Admin can view any signal's protected content (bypass in getProtectedContent)
-[x] Created admin feature module (src/features/admin/)
-    - admin.controller.ts - Request handlers
-    - admin.routes.ts - Route definitions
-    - index.ts - Module exports
-[x] Admin endpoints:
-    - GET /api/admin/predictors/:address - Full predictor info with contacts
-    - POST /api/admin/predictors/:address/blacklist - Blacklist in DB
-    - POST /api/admin/predictors/:address/unblacklist - Remove blacklist in DB
-    - DELETE /api/admin/signals/:contentId - Deactivate signal (soft delete)
-[x] Added adminDeactivate() to signal.service.ts
-[x] Added getByAddressAdmin(), adminBlacklist(), adminUnblacklist() to predictor.service.ts
-[x] Updated .env.example with admin addresses documentation
-[x] Mounted admin routes at /api/admin in src/index.ts
-
-================================================================================
-## PHASE 10b: Predictor Verification System ✅
-================================================================================
-[x] Added verification fields to Predictor model:
-    - isVerified (boolean) - Has verified badge
-    - verificationStatus ('none' | 'pending' | 'rejected')
-    - salesAtLastApplication (number) - For re-apply logic
-    - verificationAppliedAt (Date) - When applied
-    - displayNameChanged (boolean) - Locked after first change
-[x] Display name restrictions:
-    - Can only be changed ONCE, then locked forever
-    - Must be unique (case-insensitive)
-    - Added unique index with collation
-[x] Avatar restrictions:
-    - Only verified predictors can set avatarUrl
-    - Unverifying removes avatar automatically
-[x] Verification endpoints:
-    - POST /api/predictors/:address/apply-verification (predictor, 100+ sales)
-    - GET /api/admin/verification-requests (admin, list pending)
-    - POST /api/admin/predictors/:address/verify (admin, approve)
-    - POST /api/admin/predictors/:address/reject (admin, reject)
-    - POST /api/admin/predictors/:address/unverify (admin, remove badge)
-[x] Re-apply logic:
-    - Need 100 more sales after rejection to re-apply
-
-================================================================================
-## PHASE 10c: Maintenance Mode ✅
-================================================================================
-[x] Added MAINTENANCE_MODE env variable (default: false)
-[x] Added MAINTENANCE_END env variable (optional ETA timestamp)
-[x] Created maintenance middleware (src/shared/middleware/maintenance.ts)
-[x] Middleware returns 503 during maintenance, allows /health endpoint
-[x] Updated .env.example with maintenance mode documentation
-
-================================================================================
-## PHASE 10d: Manual API Testing ✅ (December 2024)
-================================================================================
-[x] Health check endpoint - PASS
-[x] GET /api/categories - PASS (returns seeded categories)
-[x] GET /api/predictors - PASS (returns predictor with new verification fields)
-[x] GET /api/signals - PASS (returns test signal)
-[x] GET /api/auth/nonce - PASS (nonce generation working)
-
-================================================================================
-## PHASE 11: Deployment Prep ✅ COMPLETE (December 17, 2025)
-================================================================================
-[x] MongoDB Atlas setup (M0 free cluster in Frankfurt)
-[x] Render deployment (Starter $7/month)
-[x] Production environment variables configured
-[x] Custom domain (api.signalfriend.com)
-[x] SSL certificate via Render
-[x] Health check verified
-[x] Categories auto-seeded (19 categories)
-[N/A] Dockerfile - Not needed (Render native Node.js support)
-[N/A] docker-compose.yml - Not needed (using managed services)
-
-================================================================================
-## PHASE 12: Admin Dashboard & Moderation System ✅
+                    📊 BACKEND STATISTICS
 ================================================================================
 
-### Admin Dashboard API ✅
-[x] GET /api/admin/stats - Platform earnings breakdown
-    - fromPredictorJoins: $15 × predictors (assumes referrals)
-    - fromBuyerAccessFees: $0.50 × purchases
-    - fromCommissions: 5% × signal volume
-    - total: Sum of all above
-    - details: totalPredictors, totalPurchases, totalSignalVolume
-
-### Verification System (after 100 sales) ✅
-[x] POST /api/predictors/:address/apply-verification - Already implemented
-[x] GET /api/admin/verification-requests - Already implemented
-[x] POST /api/admin/predictors/:address/verify - Already implemented
-[x] POST /api/admin/predictors/:address/reject - Already implemented
-[x] POST /api/admin/predictors/:address/unverify - Already implemented
-
-### Report Management (Admin) ✅
-[x] GET /api/admin/reports - List all reports with full details
-    - Includes signal info (title, price)
-    - Includes predictor info (name, contacts)
-    - Pagination and status filter
-[x] GET /api/admin/reports/:id - Get single report by ID
-[x] PUT /api/admin/reports/:id - Update report status
-    - status: pending, reviewed, resolved, dismissed
-    - adminNotes: internal notes
-
-### Dispute System ✅
-[x] POST /api/disputes - Create dispute (blacklisted predictor only)
-    - No explanation needed (admin contacts via preferred method)
-    - One dispute per predictor (unique constraint)
-[x] GET /api/disputes/me - Get own dispute status (predictor)
-[x] GET /api/admin/disputes - List all disputes for admin
-    - Includes predictor contact info
-    - Pagination and status filter
-[x] GET /api/admin/disputes/counts - Get counts by status
-[x] PUT /api/admin/disputes/:id - Update dispute status
-    - status: pending, contacted, resolved, rejected
-    - adminNotes: internal tracking
-[x] POST /api/admin/disputes/:id/resolve - Resolve and unblacklist predictor
-
-### Blacklist/Unblacklist System ✅ (Already existed)
-[x] POST /api/admin/predictors/:address/blacklist - Blacklist in DB
-[x] POST /api/admin/predictors/:address/unblacklist - Unblacklist in DB
-    - Note: On-chain blacklist requires MultiSig on BscScan
+Tests: 290 passing (277 unit + 13 integration)
+Security Audit: 93/100 score
+API Endpoints: 50+ routes
+Features: 8 modules (auth, signals, predictors, receipts, reviews, reports, disputes, admin)
 
 ================================================================================
-## BUGS FIXED (December 8, 2025) ✅
+                    ✅ COMPLETED FEATURES
 ================================================================================
 
-BLACKLIST SYSTEM - ALL FIXED:
-[x] GET /api/signals filters out signals from blacklisted predictors
-[x] GET /api/signals with predictorAddress returns empty if predictor blacklisted
-[x] GET /api/signals/:contentId/content-identifier rejects blacklisted predictors
-[x] Prevent blacklisting admin wallet addresses
-[x] Reset dispute status when predictor is re-blacklisted after resolution
-[x] Auto-resolve disputes when predictor is unblacklisted
-[x] Correct error message for blacklisted predictor creating signal
-[x] Signal populate includes isBlacklisted in predictor data
+Authentication:
+[x] SIWE (Sign-In with Ethereum) flow
+[x] JWT token management (7-day expiry)
+[x] Nonce generation and verification
 
-ADMIN FEATURES - ALL FIXED:
-[x] Admin endpoint includes contact info (telegram/discord/preferred)
-[x] Admin notes editable via PATCH endpoints
+Signals:
+[x] CRUD operations
+[x] Filtering, pagination, sorting
+[x] Protected content access control
+[x] URL blocking in content
 
-INPUT VALIDATION - ALL FIXED:
-[x] Signal creation blocks URLs in title, description, content
-[x] Report description strips URLs on input
+Predictors:
+[x] Profile management
+[x] Earnings calculation
+[x] Verification system
+[x] Blacklist integration
 
-================================================================================
-## BUGS FIXED (December 12, 2025 - v0.27.0) ✅
-================================================================================
+Receipts:
+[x] Purchase tracking
+[x] On-chain verification
 
-VERIFICATION SYSTEM - ALL FIXED:
-[x] Bug #1: Verification sales count mismatch (100 shown but only 2 counted)
-    - Root cause: Backend checked predictor.totalSales (stale) vs frontend displayed receipt count
-    - Solution: Changed applyForVerification() to use earnings.totalSalesCount as source of truth
-    - Updated adminRejectVerification() to record receipt count in salesAtLastApplication
-    - Fixed modifyPredictorStats.ts to create receipts based on sales count, not revenue
-    - Files: predictor.service.ts, modifyPredictorStats.ts
+Reviews:
+[x] Rating system (1-5 stars)
+[x] Permanent ratings (no edit/delete)
 
-[x] Bug #2: Profile telegram/discord fields not saving after update
-    - Root cause: GET /api/predictors/:address uses HIDDEN_FIELDS, Dashboard refetch overwrites auth store
-    - Solution: Added optionalAuth middleware - authenticated users get full data when viewing own profile
-    - Modified getByAddress() to accept callerAddress parameter, returns private fields for own profile
-    - Files: predictor.service.ts, predictor.controller.ts, predictor.routes.ts
+Reports:
+[x] Signal reporting
+[x] Status workflow
 
-================================================================================
-## PHASE 13: MISC FIXES & IMPROVEMENTS ✅ COMPLETE (December 8, 2025)
-================================================================================
+Disputes:
+[x] Blacklist disputes
+[x] Resolution workflow
 
-[x] #2 Fix verbose viem error on sign-in rejection - return clean "Login rejected" message
-[x] #3 Verification: Require 100 sales AND $1000 USDT total earnings (not just sales count)
-    - Updated applyForVerification() to check both conditions
-    - Updated admin verification requests to show earnings alongside sales
-[x] #4 Admin ability to manually verify any predictor regardless of sales/earnings
-    - New endpoint: POST /api/admin/predictors/:address/manual-verify
-    - New endpoint: POST /api/admin/predictors/:address/unverify
-    - Added adminManualVerify() to PredictorService
-    - Sets isVerified=true, verificationStatus='none', manuallyVerified=true
-[x] #7 Track and expose referral earnings in predictor data
-    - Added referredBy and referralPaid fields to Predictor model
-    - Added getReferralEarnings() to PredictorService
-    - Updated getPredictorEarnings endpoint to include referral earnings
-[x] #8 Admin can view predictor's total earnings on their profile
-    - Updated /api/admin/predictors/:address to return earnings object
-    - Returns: totalSalesRevenue, predictorEarnings, platformCommission, 
-      totalSalesCount, totalReferrals, paidReferrals, referralEarnings, totalEarnings
-[N/A] #9 Sentry - Not needed for backend (using Pino logger instead)
+Admin:
+[x] Platform statistics
+[x] Verification management
+[x] Report/dispute management
+[x] Blacklist management
+
+Webhooks:
+[x] Alchemy GraphQL integration
+[x] Event decoding (viem)
+[x] Idempotency protection
+
+Security:
+[x] Rate limiting (tiered)
+[x] Input validation (Zod)
+[x] CORS configuration
+[x] Helmet security headers
 
 ================================================================================
-## PHASE 14: POLISH & SECURITY (December 9, 2025) ✅
+                    💻 TECH STACK
 ================================================================================
 
-[x] Reserved Display Name Validation
-    - RESERVED_DISPLAY_NAMES array with prohibited names
-    - Names blocked: admin, administrator, signalfriend, moderator, mod, 
-      support, help, official, team, staff, system, bot, root, owner, founder
-    - isReservedDisplayName() function with:
-      - Case-insensitive matching
-      - Partial match blocking (e.g., "admin123")
-      - Blocks any name containing "signalfriend"
-    - Zod schema validation in updatePredictorProfileSchema
-    - Defense-in-depth check in PredictorService.updateProfile()
-    - Both function and array exported for frontend use
+Runtime: Node.js 20
+Framework: Express.js
+Database: MongoDB + Mongoose
+Language: TypeScript
+Validation: Zod
+Blockchain: viem
+Auth: SIWE + JWT
+Testing: Vitest
+Logging: Pino
+Hosting: Render ($7/month)
 
 ================================================================================
-## NOTES
-================================================================================
-- Contract Addresses (BNB Testnet - Chain ID 97):
-  - MockUSDT: 0xF87d17a5ca95F3f992f82Baabf4eBC5301A178a5
-  - SignalFriendMarket: 0x5133397a4B9463c5270beBa05b22301e6dD184ca
-  - PredictorAccessPass: 0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4
-  - SignalKeyNFT: 0xfb26Df6101e1a52f9477f52F54b91b99fb016aed
-
-- Alchemy Webhook Setup (Completed with GraphQL):
-  1. Go to Alchemy Dashboard → Webhooks → Create Webhook
-  2. Select "Custom Webhook" (GraphQL) for richer data
-  3. Add SignalFriendMarket address: 0x5133397a4B9463c5270beBa05b22301e6dD184ca
-  4. Add PredictorAccessPass address: 0x10EB1A238Db78b763ec97e326b800D7A7AcA3fC4
-  5. Set webhook URL: https://your-ngrok-url.ngrok-free.dev/api/webhooks/alchemy
-  6. Copy signing key to ALCHEMY_SIGNING_KEY env var
-
-- ContentId Conversion (UUID ↔ bytes32):
-  - Backend uses UUID: 00000000-0000-0000-0000-000000000001
-  - Smart contract uses bytes32: 0x0000000000000000000000000000000100000000...
-  - Use SignalService.getContentIdentifier() for frontend
-
-- USDT on BNB Chain uses 18 decimals (not 6 like Ethereum!)
-
-================================================================================
-## BACKEND STATUS SUMMARY
+                    📍 CONTRACT ADDRESSES (BSC Mainnet)
 ================================================================================
 
-✅ **PRODUCTION LIVE** - https://api.signalfriend.com
+SignalFriendMarket:  0xaebec2cd5c2db4c0875de215515b3060a7a652fb
+PredictorAccessPass: 0x198cd0549a0dba09aa3ab88e0b51ceb8dd335d07
+SignalKeyNFT:        0x2a5f920133e584773ef4ac16260c2f954824491f
 
-**Deployment:**
-- MongoDB Atlas M0 (Frankfurt, AWS eu-central-1)
-- Render Starter ($7/month, Frankfurt)
-- Auto-deploy from main branch
-- 19 categories seeded
+================================================================================
+                    🔮 FUTURE ENHANCEMENTS (Optional)
+================================================================================
 
-**Completed:**
-- All 11 development phases complete
-- 290 tests passing (277 unit + 13 integration)
-- Security audit complete (93/100 score)
-- CI/CD pipeline active
-- Rate limiting implemented on all endpoints
-- Alchemy webhook integration tested
-- Performance testing done (2500+ signals)
-- Documentation complete
+[ ] Redis caching layer
+[ ] WebSocket real-time updates
+[ ] GraphQL API option
+[ ] Advanced analytics
+[ ] Automated backups
 
-**No Docker** - Using Render native Node.js support
-**No Redis** - Not needed for initial launch, can add later for scaling
-
-**Post-Deployment Tasks:**
-[ ] Update Alchemy webhook URL to production API
-[ ] Monitor for 48 hours
-[ ] Test real transactions on mainnet
+================================================================================
